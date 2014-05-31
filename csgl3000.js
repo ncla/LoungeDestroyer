@@ -28,7 +28,7 @@ var Bet3000 = function(matchID) {
                         self.attempts = self.attempts + 1;
                         console.log("Try Nr." + self.attempts + ", server denied our bet: " + data);
                         self.placeBet();
-                    } else {c
+                    } else {
                         alert("It seems we successfully placed a bet! It took" + self.attempts + " tries to place the bet.");
                         window.location.href = "mybets";
                     }
