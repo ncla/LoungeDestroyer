@@ -9,31 +9,31 @@
 var Bet3000 = function(matchID) {
     /* Construct */
     var self = this;
- 	
+    
     this.ID = matchID;
     this.attempts = 0;
     
-   	this.itemsInReturn = returns;
+    this.itemsInReturn = returns;
     
     this.placeBet = function() {
         if(!this.checkRequirements()) return false;
         // returns variable is created by CS:GL page, true if you are using return items.
         var url = (returns == true ? "ajax/postBet.php" : "ajax/postBetOffer.php");
         $.ajax({
-            type: "POST",
-            url: url,
-            data: $("#betpoll").serialize() + "&match=" + self.ID,
-            success: function(data) {
-                if (data) {
-                    self.attempts = self.attempts + 1;
-                    console.log("Try Nr." + self.attempts + ", server denied our bet: " + data);
-                    self.placeBet();
-                } else {
-                    alert("It seems we successfully placed a bet! It took" + self.attempts + " tries to place the bet.");
-                    window.location.href = "mybets";
+                type: "POST",
+                url: url,
+                data: $("#betpoll").serialize() + "&match=" + self.ID,
+                success: function(data) {
+                    if (data) {
+                        self.attempts = self.attempts + 1;
+                        console.log("Try Nr." + self.attempts + ", server denied our bet: " + data);
+                        self.placeBet();
+                    } else {c
+                        alert("It seems we successfully placed a bet! It took" + self.attempts + " tries to place the bet.");
+                        window.location.href = "mybets";
+                    }
                 }
-            }
-        });
+            });
     }
     this.checkRequirements = function() {
         if(!$(".betpoll .item").length > 0) { 
@@ -56,12 +56,12 @@ if($("#placebut").length) {
 }
 
 function gup(name) {
-  name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
-  var regexS = "[\\?&]"+name+"=([^&#]*)";
-  var regex = new RegExp( regexS );
-  var results = regex.exec( window.location.href );
-  if( results == null )
-    return null;
-  else
-    return results[1];
+    name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
+    var regexS = "[\\?&]"+name+"=([^&#]*)";
+    var regex = new RegExp( regexS );
+    var results = regex.exec( window.location.href );
+    if( results == null )
+        return null;
+    else
+        return results[1];
 }
