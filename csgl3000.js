@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name       CS:GO Lounge 3000 Destroyer
 // @namespace  http://csgolounge.com/
-// @version    0.1
+// @version    0.2
 // @description  Spam the fuck out of the CS:GL queue system, because it's absolute crap
 // @downloadURL https://raw.githubusercontent.com/iamncla/CSGOLounge3000/master/csgl3000.js
 // @match      http://csgolounge.com/*
@@ -64,7 +64,7 @@ var Bet3000 = function(matchID) {
     }
 }
 var Bet = new Bet3000();
-
+console.log("Auto-update?");
 if($("#placebut").length) {
     $("#placebut").before("<a class='buttonright' id='realbetbutton'>FUCKING PLACE A BET</a>");
     Bet.matchID = gup("m");
