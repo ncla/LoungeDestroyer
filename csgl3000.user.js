@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name       CS:GO Lounge 3000 Destroyer
 // @namespace  http://csgolounge.com/
-// @version    0.2
+// @version    0.3
 // @description  Spam the fuck out of the CS:GL queue system, because it's absolute crap
 // @match      http://csgolounge.com/*
 // @match      http://dota2lounge.com/*
@@ -16,6 +16,21 @@ var Bet3000 = function(matchID) {
     this.betAttempts = 0;
     this.inventoryAttempts = 0;
     this.returnAttempts = 0;
+
+    if(document.URL.indexOf("wait.html") != -1) {
+        window.location = GM_getValue("intendedVisitURL", location.host);
+    }
+
+    $("a").click(function(e) {
+        if (e.which === 1) {
+            e.preventDefault();
+            if($(this).attr("href").length > 0) {
+                var url = $(this).attr("href");
+                GM_setValue("intendedVisitURL", url);
+                window.location = url;
+            }
+        }
+    });
 
     this.placeBet = function() {
         if(!this.checkBetRequirements()) return false;
@@ -58,48 +73,45 @@ var Bet3000 = function(matchID) {
                 }
                 var steamAPI = ((Math.floor(Math.random() * (1 - 0 + 1)) + 0) == 0 ? "betBackpackApi" : "betBackpack");
                 ChoseInventoryReturns(steamAPI);
-                console.log("Attempting to get your Steam inventory!");
+                self.inventoryAttempts = self.inventoryAttempts + 1;
+                console.log("Attempting to get your Steam inventory, try Nr." + self.inventoryAttempts);
             }, 2000); // A little more gentle on bashing servers, because it's Volvo, not CS:GL
         }
     }
     this.requestReturns = function() {
-        /* Rewrite this and add requirement check */
-        if (toreturn) {
-            $.ajax({
-                url: 'ajax/postToReturn.php',
-                success: function(data) {
-                    if (data) {
-                        self.returnAttempts = self.returnAttempts + 1;
-                        console.log("Try Nr." + self.returnAttempts + ", server denied our return request: " + data);
-                        self.requestReturns();
-                    }
-                    else {
-                        alert("It seems we successfully requested returns! It took " + self.returnAttempts + " tries to request returns.");
-                        window.location.href = "mybets";
-                        localStorage.playedreturn = false;
-                    }
+        // Try Nr.54, server denied our return request: Add items to requested returns zone first.
+        // if FALSE, then the items need to be frozen
+        // if TRUE, then the items need to be requested for the actual trade
+        var ajaxProperties = { url: (toreturn ? "ajax/postToReturn.php" : "ajax/postToFreeze.php") };
+        if(toreturn) {
+            ajaxProperties.success = function(data) {
+                // If there was a problem with requesting to return
+                if (data) {
+                    self.returnAttempts = self.returnAttempts + 1;
+                    console.log("Try Nr." + self.returnAttempts + ", server denied our return request: " + data);
+                    self.requestReturns();
                 }
-            });
-        } else {
-            $.ajax({
-                url: 'ajax/postToFreeze.php',
-                data: $("#freeze").serialize(),
-                type: 'POST',
-                success: function(data) {
-                    if (data) {
-                        self.returnAttempts = self.returnAttempts + 1;
-                        console.log("Try Nr." + self.returnAttempts + ", server denied our return request: " + data);
-                        self.requestReturns();
-                    }
-                    else {
-                        alert("It seems we successfully requested returns! It took " + self.returnAttempts + " tries to request returns.");
-                        toreturn = true;
-                        postToFreezeReturn();
-                    }
+                else {
+                    alert("It seems we successfully requested returns! It took " + self.returnAttempts + " tries to request returns.");
+                    window.location.href = "mybets";
+                    localStorage.playedreturn = false;
                 }
-            });
+            }
         }
-
+        else {
+            ajaxProperties.type = "POST";
+            ajaxProperties.data = $("#freeze").serialize();
+            ajaxProperties.success = function(data) {
+                if (data) {
+                    window.alert(data);
+                }
+                else {
+                    toreturn = true;
+                    self.requestReturns();
+                }
+            }
+        }
+        $.ajax(ajaxProperties);
     }
 }
 var Bet = new Bet3000();
@@ -126,7 +138,7 @@ if($("#backpack").length) {
     }
 }
 if($("#freezebutton").length) {
-    $("#freezebutton").after("<a class='buttonright' id='returnitemspls'>FUCKING RETURN MY ITEMS</a>");
+    $("#freezebutton").after("<a class='buttonright' id='returnitemspls'>RETURN MY FUCKING ITEMS</a>");
     $("#returnitemspls").click(function() {
         Bet.requestReturns();
     })
