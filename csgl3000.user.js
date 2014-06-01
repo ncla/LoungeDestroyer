@@ -9,6 +9,9 @@
 // @downloadURL http://ncla.me/csgl3000/csgl3000.user.js
 // @copyright  iamncla @ GitHub.com
 // ==/UserScript==
+/*
+    Chaos is order yet undeciphered.
+ */
 var Bet3000 = function(matchID) {
     /* Construct */
     var self = this;
