@@ -3,6 +3,7 @@
 // @namespace  http://csgolounge.com/
 // @version    0.1
 // @description  Spam the fuck out of the CS:GL queue system, because it's absolute crap
+// @downloadURL https://raw.githubusercontent.com/iamncla/CSGOLounge3000/master/csgl3000.js
 // @match      http://csgolounge.com/*
 // @match      http://dota2lounge.com/*
 // @copyright  iamncla @ GitHub.com
@@ -12,9 +13,7 @@ var Bet3000 = function(matchID) {
     var self = this;
     
     this.attempts = 0;
-    
-    this.itemsInReturn = returns;
-    
+
     this.placeBet = function() {
         if(!this.checkBetRequirements()) return false;
         // returns variable is created by CS:GL page, true if you are using return items.
@@ -29,7 +28,7 @@ var Bet3000 = function(matchID) {
                         console.log("Try Nr." + self.attempts + ", server denied our bet: " + data);
                         self.placeBet();
                     } else {
-                        alert("It seems we successfully placed a bet! It took" + self.attempts + " tries to place the bet.");
+                        alert("It seems we successfully placed a bet! It took " + self.attempts + " tries to place the bet.");
                         window.location.href = "mybets";
                     }
                 }
@@ -59,6 +58,9 @@ var Bet3000 = function(matchID) {
                 console.log("Attempting to get your Steam inventory!");
             }, 2000); // A little more gentle on bashing servers, because it's Volvo, not CS:GL
         }
+    }
+    this.requestReturns = function() {
+
     }
 }
 var Bet = new Bet3000();
