@@ -13,10 +13,7 @@ Features:
 
 Instructions how to install this (for Chrome)
 
-1) Download Tampermoney extension
-
-2) Once installed, go to Tampermonkey settings, next to the tab "Installed userscripts" on the left, there is button for adding a new script.
-
-3) Copy this code and paste it in the huge text field, replacing the code that already was there.
-
-4) Save it (CTRL + S), goto CS:GO Lounge and on Match page there should be a new button.
+1. Download Tampermoney extension
+2. Once installed, go to Tampermonkey settings, next to the tab "Installed userscripts" on the left, there is button for adding a new script.
+3. Copy this code and paste it in the huge text field, replacing the code that already was there.
+4. Save it (CTRL + S), goto CS:GO Lounge and on Match page there should be a new button.
