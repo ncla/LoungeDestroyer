@@ -3,7 +3,6 @@
 // @namespace  http://csgolounge.com/
 // @version    0.2
 // @description  Spam the fuck out of the CS:GL queue system, because it's absolute crap
-// @downloadURL https://raw.githubusercontent.com/iamncla/CSGOLounge3000/master/csgl3000.js
 // @match      http://csgolounge.com/*
 // @match      http://dota2lounge.com/*
 // @copyright  iamncla @ GitHub.com
@@ -85,6 +84,9 @@ if($("#backpack").length) {
             }
         })
     }
+}
+if($("#freezebutton").length) {
+    $("#freezebutton").after("<a class='buttonright' id='returnitemspls'>FUCKING RETURN MY ITEMS</a>");
 }
 
 function gup(name) {
