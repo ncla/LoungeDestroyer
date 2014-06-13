@@ -12,6 +12,7 @@
 /*
     Chaos is order yet undeciphered.
  */
+
 var Bet3000 = function(matchID) {
     /* Construct */
     var self = this;
@@ -116,8 +117,102 @@ var Bet3000 = function(matchID) {
         }
         $.ajax(ajaxProperties);
     }
+    this.getMarketPrice = function(item) {
+        var name = $(".smallimg", item).attr("alt");
+        if(!$(item).hasClass("marketPriced") && nonMarketItems.indexOf(name) == -1 && nonMarketItems.indexOf($(".rarity", item).text()) == -1) {
+            GM_xmlhttpRequest({
+                method: "GET",
+                url: "http://steamcommunity.com/market/search?appid=730&q=" + encodeURI(name),
+                onload: function(response) {
+                    var listings = $(response.responseText).find(".market_listing_row.market_recent_listing_row.market_listing_searchresult");
+                    if ($(listings).length) {
+                        var lowestPrice;
+                        $(listings).each(function (index, value) {
+                            if($(value).find(".market_listing_item_name_block .market_listing_item_name").text() == name) {
+                                lowestPrice = $(value).find(".market_listing_their_price .market_table_value span").text().trim();
+                                return false;
+                            }
+                        });
+
+                        // check if the price has dashes
+                        if(lowestPrice.indexOf("--") != -1) {
+                            lowestPrice = lowestPrice.replace("--", "00");
+                        }
+                        for(x in currencyConvert) {
+                            if(lowestPrice.indexOf(x) != -1) {
+                                lowestPrice = "$ " + (lowestPrice.replace(x, "").replace(",", ".") * currencyConvert[x]).toFixed(2).replace(".", ",");
+                            }
+                        }
+                        $(item).find('.rarity').html(lowestPrice);
+                        $(item).addClass('marketPriced');
+
+                        // pricing simlar items
+                        $(".item").each(function() {
+                            if ($(this).find('img.smallimg').attr("alt") == name && !$(this).hasClass('marketPriced')) {
+                                $(this).find('.rarity').html(lowestPrice);
+                                $(this).addClass('marketPriced');
+                            }
+                        });
+
+                    } else {
+                        $(item).find('.rarity').html('Not Found');
+                    }
+                }
+            });
+        }
+    }
 }
+
+
+var currSigns = ["€", "£", "pуб", "R$", "$"];
+
+function updateCurrencies() {
+    var conversionRates = {};
+    GM_xmlhttpRequest({
+        method: "GET",
+        url: 'http://query.yahooapis.com/v1/public/yql?q=select * from yahoo.finance.xchange where pair in ("EURUSD", "GBPUSD", "RUBUSD", "BRLUSD", "USDUSD")&env=store://datatables.org/alltableswithkeys&format=json',
+        onload: function(response) {
+            var data = JSON.parse(response.responseText);
+            $(data.query.results.rate).each(function(index, value) {
+                conversionRates[currSigns[index]] = value.Rate;
+            })
+            storeCurrencies(JSON.stringify(conversionRates));
+        }
+    });
+}
+
+function storeCurrencies(currencies) {
+    GM_setValue("companionCurrencies", currencies);
+    GM_setValue("companionCurrenciesLastUpdated", Date.now());
+    currencyConvert = JSON.parse(currencies);
+}
+
+function getCurrencies() {
+    if((GM_getValue("companionCurrencies", false) == false) || (Math.abs(Date.now() - GM_getValue("companionCurrenciesLastUpdated")) > (1000 * 60 * 60 * 24 * 7))) {
+        updateCurrencies();
+    }
+    else {
+        currencyConvert = JSON.parse(GM_getValue("companionCurrencies"));
+    }
+}
+
+var currencyConvert = null; // used for storing currency rates
+getCurrencies();
+
+var nonMarketItems = ["Dota Items", "Any Offers", "Knife", "Gift"];
+
 var Bet = new Bet3000();
+
+
+if($(".item").length) {
+    var items = $(".item");
+    $(items).mouseenter(function() {
+        // only bother when currencies is retrieved and when LoungeCompanion is not installed
+        if(currencyConvert != null && $(".lc-big-preview").length == 0) {
+            Bet.getMarketPrice(this);
+        }
+    })
+}
 
 if($("#placebut").length) {
     $("#placebut").before("<a class='buttonright' id='realbetbutton'>FUCKING PLACE A BET</a>");
