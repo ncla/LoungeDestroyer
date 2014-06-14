@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name       CS:GO Lounge 3000 Destroyer
 // @namespace  http://csgolounge.com/
-// @version    0.3.1
+// @version    0.3.2
 // @description  Spam the fuck out of the CS:GL queue system, because it's absolute crap
 // @match      http://csgolounge.com/*
 // @match      http://dota2lounge.com/*
@@ -23,7 +23,7 @@ var Bet3000 = function(matchID) {
     this.returnAttempts = 0;
 
     // for handling maintainance errors http://csgolounge.com/break and wait.html page
-    if(document.URL.indexOf("/wait.html") != -1 || document.URL.indexOf("/break") != -1) {
+    if(document.URL.indexOf("/wait.html") != -1 || document.URL.indexOf("/break") != -1 || document.title == "The page is temporarily unavailable") {
         window.location = GM_getValue("intendedVisitURL", location.host);
     }
 
