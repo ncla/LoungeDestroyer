@@ -1,12 +1,13 @@
 // ==UserScript==
 // @name       CS:GO Lounge 3000 Destroyer
 // @namespace  http://csgolounge.com/
-// @version    0.3
+// @version    0.3.1
 // @description  Spam the fuck out of the CS:GL queue system, because it's absolute crap
 // @match      http://csgolounge.com/*
 // @match      http://dota2lounge.com/*
 // @updateURL   http://ncla.me/csgl3000/csgl3000.meta.js
 // @downloadURL http://ncla.me/csgl3000/csgl3000.user.js
+// @require http://code.jquery.com/jquery-2.1.1.js
 // @copyright  iamncla @ GitHub.com
 // ==/UserScript==
 /*
@@ -21,7 +22,8 @@ var Bet3000 = function(matchID) {
     this.inventoryAttempts = 0;
     this.returnAttempts = 0;
 
-    if(document.URL.indexOf("wait.html") != -1) {
+    // for handling maintainance errors http://csgolounge.com/break and wait.html page
+    if(document.URL.indexOf("/wait.html") != -1 || document.URL.indexOf("/break") != -1) {
         window.location = GM_getValue("intendedVisitURL", location.host);
     }
 
@@ -209,7 +211,7 @@ if($(".item").length) {
     $(items).mouseenter(function() {
         // only bother when currencies is retrieved and when LoungeCompanion is not installed
         if(currencyConvert != null && $(".lc-big-preview").length == 0) {
-            Bet.getMarketPrice(this);
+            //Bet.getMarketPrice(this);
         }
     })
 }
