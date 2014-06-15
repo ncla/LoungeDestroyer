@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name       CS:GO Lounge 3000 Destroyer
 // @namespace  http://csgolounge.com/
-// @version    0.3.2
+// @version    0.4.0
 // @description  Spam the fuck out of the CS:GL queue system, because it's absolute crap
 // @match      http://csgolounge.com/*
 // @match      http://dota2lounge.com/*
@@ -205,16 +205,11 @@ var nonMarketItems = ["Dota Items", "Any Offers", "Knife", "Gift"];
 
 var Bet = new Bet3000();
 
-
-if($(".item").length) {
-    var items = $(".item");
-    $(items).mouseenter(function() {
-        // only bother when currencies is retrieved and when LoungeCompanion is not installed
-        if(currencyConvert != null && $(".lc-big-preview").length == 0) {
-            //Bet.getMarketPrice(this);
-        }
-    })
-}
+$(document).on("mouseover", ".item", function() {
+    if(currencyConvert != null && $(".lc-big-preview").length == 0) {
+        Bet.getMarketPrice(this);
+    }
+})
 
 if($("#placebut").length) {
     $("#placebut").before("<a class='buttonright' id='realbetbutton'>FUCKING PLACE A BET</a>");

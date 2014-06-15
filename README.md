@@ -9,7 +9,8 @@ Features:
 * Place bet pwoperly
 * Load your inventory pwoperly on match page
 * Request your hard earned items to be returned, pwoperly ofcourse
-* Redirect from wait.html page to the page you intended to visit
+* Redirect from wait.html/maintainance/hatz to the page you intended to visit
+* Steam market prices for items
 
 ![Screenshot of button](http://i.imgur.com/IOxB3gZ.png)
 
