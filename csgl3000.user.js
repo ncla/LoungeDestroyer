@@ -39,6 +39,8 @@ var Bet3000 = function(matchID) {
     });
 
     this.placeBet = function() {
+        // to do: add exceptions for "you have too many items in your returns"
+
         if(!this.checkBetRequirements()) return false;
         // returns variable is created by CS:GL page, true if you are using return items.
         var url = (returns == true ? "ajax/postBet.php" : "ajax/postBetOffer.php");
@@ -210,13 +212,26 @@ $(document).on("mouseover", ".item", function() {
         Bet.getMarketPrice(this);
     }
 })
-
-if($("#placebut").length) {
+if(document.URL.indexOf("/match") != -1) {
     $("#placebut").before("<a class='buttonright' id='realbetbutton'>FUCKING PLACE A BET</a>");
     Bet.matchID = gup("m");
     $("#realbetbutton").click(function() {
         Bet.placeBet();
     });
+    // Okay, Bowerik or whoever designs and codes this shit.. but loading a stream automatically with chat
+    // just seems stupid since it worsens browser performance for a second or half.
+    // I DON'T WANT THE STREAM TO LOAD AUTOMATICALLY
+    // Also, someone needs to learn pwoper english. Method choseStream, srsly?
+    $("#stream object, #stream iframe").remove();
+    if($("#stream .tab").text().indexOf("English Stream") != -1) {
+        $("#stream .tab").contents().first().wrap("<span class='stream-placeholder'/>");
+        var streamLang = $(".stream-placeholder").text().trim().replace(" Stream", "");
+        var dup = $("#stream .subtabs .tab:first").clone();
+        dup.attr("onclick", "choseStream(" + Bet.matchID + ", '" + streamLang + "')");
+        dup.html(streamLang + " Stream");
+        $("#stream .subtabs").prepend(dup);
+        $("#stream .stream-placeholder").html("Select stream");
+    }
 }
 if($("#backpack").length) {
     if($("#backpack #loading").length) {
