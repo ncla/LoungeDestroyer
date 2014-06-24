@@ -12,7 +12,7 @@ Features:
 * Redirect from wait.html/maintainance/hatz to the page you intended to visit
 * Steam market prices for items
 
-![Screenshot of button](http://i.imgur.com/IOxB3gZ.png)
+![Screenshot of button](http://puu.sh/9IixA/79f4a95363.png)
 
 Instructions how to install this (for Chrome)
 
