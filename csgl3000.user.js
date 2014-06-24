@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name       CS:GO Lounge Destroyer
 // @namespace  http://csgolounge.com/
-// @version    0.5.1
+// @version    0.5.2
 // @description  Spam the fuck out of the CS:GL queue system, because it's absolute crap
 // @match      http://csgolounge.com/*
 // @match      http://dota2lounge.com/*
@@ -18,7 +18,7 @@ var Bet3000 = function(matchID) {
     /* Construct */
     var self = this;
 
-    var version = "0.5.1";
+    var version = "0.5.2";
     console.log("LoungeDestroyer " + version + " started");
     this.betAttempts = 0;
     this.inventoryAttempts = 0;
@@ -174,6 +174,9 @@ var Bet3000 = function(matchID) {
         if($(".tradeheader").text().indexOf("minute") != -1) {
             var numberino = $(".tradeheader").text().replace(" minutes ago", "").replace(" minute ago", "");
             var delayMinutes = (numberino >= 30) ? 0 : (30 - numberino);
+        }
+        if(delayMinutes == 0) {
+            delayMinutes = 0.5;
         }
         console.log(new Date() + " -- Auto-bumping in " + delayMinutes + " minutes");
         // start the vicious cycle
