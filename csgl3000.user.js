@@ -251,8 +251,8 @@ if(document.URL.indexOf("/trade?t=") != -1) {
     })
     $(".box-shiny-alt .half:eq(1)").append("<a class='buttonright justbump'>Bump</a>");
     $(".justbump").click(function() {
-        Bet.bumpTrade();
-
+        Bet.bumpTrade(Bet.tradeID);
+        Bet.updateLastBumped();
     })
 }
 
