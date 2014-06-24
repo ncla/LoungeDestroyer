@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name       CS:GO Lounge 3000 Destroyer
+// @name       CS:GO Lounge Destroyer
 // @namespace  http://csgolounge.com/
-// @version    0.4.1
+// @version    0.5.1
 // @description  Spam the fuck out of the CS:GL queue system, because it's absolute crap
 // @match      http://csgolounge.com/*
 // @match      http://dota2lounge.com/*
@@ -17,7 +17,9 @@
 var Bet3000 = function(matchID) {
     /* Construct */
     var self = this;
-    
+
+    var version = "0.5.1";
+    console.log("LoungeDestroyer " + version + " started");
     this.betAttempts = 0;
     this.inventoryAttempts = 0;
     this.returnAttempts = 0;
@@ -130,7 +132,7 @@ var Bet3000 = function(matchID) {
                 url: "http://steamcommunity.com/market/priceoverview/?country=US&currency=1&appid=730&market_hash_name=" + encodeURI(name),
                 onload: function(response) {
                     var responseParsed = JSON.parse(response.responseText);
-                    if(responseParsed["success"] == true) {
+                    if(responseParsed.success == true && responseParsed.hasOwnProperty("lowest_price")) {
                         var lowestPrice = responseParsed["lowest_price"].replace("&#36;", "&#36; ");
                         $(item).find('.rarity').html(lowestPrice);
                         $(item).addClass('marketPriced');
@@ -149,11 +151,61 @@ var Bet3000 = function(matchID) {
             });
         }
     }
+    this.bumpTrade = function(tradeID) {
+        $.ajax({
+            type: "POST",
+            url: "ajax/bumpTrade.php",
+            data: "trade=" + tradeID,
+            async: false,
+            success: function(data) {
+                console.log((new Date()) + " -- Bumped trade offer #" +tradeID);
+            }
+        });
+    }
+    this.startAutobump = function() {
+        if($(".tradeheader").text().indexOf("minute") == -1 && $(".tradeheader").text().indexOf("second") == -1) {
+            // force bump
+            var delayMinutes = 0;
+        }
+
+        if($(".tradeheader").text().indexOf("second") != -1 || $(".tradeheader").text().indexOf("just now") != -1) {
+            var delayMinutes = 30;
+        }
+        if($(".tradeheader").text().indexOf("minute") != -1) {
+            var numberino = $(".tradeheader").text().replace(" minutes ago", "").replace(" minute ago", "");
+            var delayMinutes = (numberino >= 30) ? 0 : (30 - numberino);
+        }
+        console.log(new Date() + " -- Auto-bumping in " + delayMinutes + " minutes");
+        // start the vicious cycle
+        var autoBump = setTimeout(function() {
+            console.log(new Date() + " -- Auto-bumping");
+            self.bumpTrade(Bet.tradeID);
+            self.updateLastBumped();
+            self.startAutobump();
+        }, (delayMinutes * 60 * 1000))
+    }
+    this.stopAutobump = function() {
+        console.log((new Date()) + " -- Stopping auto-bumping");
+        clearTimeout(autoBump);
+    }
+    this.updateLastBumped = function() {
+        $.ajax({
+            type: "GET",
+            url: window.location.href,
+            async: false
+        }).done(function(data) {
+            var lastUpdated = $(data).find(".tradeheader").text();
+            $(".tradeheader").html(lastUpdated);
+            console.log((new Date()) + " -- Updated last-updated element: " + lastUpdated);
+        })
+    }
 }
 
 var nonMarketItems = ["Dota Items", "Any Offers", "Knife", "Gift"];
 
 var Bet = new Bet3000();
+
+var autoBump; // global variable for autobump timeouts
 
 $(document).on("mouseover", ".item", function() {
     Bet.getMarketPrice(this);
@@ -177,6 +229,33 @@ if(document.URL.indexOf("/match") != -1) {
         $("#stream .stream-placeholder").html("Select stream");
     }
 }
+
+if(document.URL.indexOf("/trade?t=") != -1) {
+    Bet.tradeID = gup("t");
+
+    var autobumpBtn = $("<a class='buttonright autobump'>Auto-bump: <span class='status'>Off</span></a>");
+    $(".box-shiny-alt .half:eq(1)").append(autobumpBtn);
+
+    Bet.autobump = false;
+    $(".autobump").click(function() {
+        Bet.autobump = (Bet.autobump == false) ? true : false;
+        if(Bet.autobump) {
+            Bet.updateLastBumped();
+            Bet.startAutobump();
+        }
+        else {
+            Bet.stopAutobump();
+        }
+        var btnText = (Bet.autobump) ? "On" : "Off";
+        $(".autobump .status").html(btnText);
+    })
+    $(".box-shiny-alt .half:eq(1)").append("<a class='buttonright justbump'>Bump</a>");
+    $(".justbump").click(function() {
+        Bet.bumpTrade();
+
+    })
+}
+
 if($("#backpack").length) {
     if($("#backpack #loading").length) {
         // DOMSubtreeModified might have poor support
@@ -196,6 +275,10 @@ if($("#freezebutton").length) {
     $("#returnitemspls").click(function() {
         Bet.requestReturns();
     })
+}
+
+if($("#submenu").length) {
+    $("#submenu div:eq(0)").append('<a href="http://steamcommunity.com/tradeoffer/new/?partner=106750833&token=CXFPs7ON" title="Support LoungeDestroyer further development">LoungeDestroyer &#x2764;</a>')
 }
 
 function gup(name) {

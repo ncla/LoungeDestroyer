@@ -11,6 +11,7 @@ Features:
 * Request your hard earned items to be returned, pwoperly ofcourse
 * Redirect from wait.html/maintainance/hatz to the page you intended to visit
 * Steam market prices for items
+* Auto-bump your trade offers
 
 ![Screenshot of button](http://puu.sh/9IixA/79f4a95363.png)
 
