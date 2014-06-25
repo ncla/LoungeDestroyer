@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name       CS:GO Lounge Destroyer
+// @name       CS:GO Lounge 3000 Destroyer
 // @namespace  http://csgolounge.com/
-// @version    0.5.2
+// @version    0.5.3
 // @description  Spam the fuck out of the CS:GL queue system, because it's absolute crap
 // @match      http://csgolounge.com/*
 // @match      http://dota2lounge.com/*
@@ -13,13 +13,13 @@
 /*
     Chaos is order yet undeciphered.
  */
-
 var Bet3000 = function(matchID) {
     /* Construct */
     var self = this;
 
-    var version = "0.5.2";
+    var version = "0.5.3";
     console.log("LoungeDestroyer " + version + " started");
+
     this.betAttempts = 0;
     this.inventoryAttempts = 0;
     this.returnAttempts = 0;
@@ -27,6 +27,11 @@ var Bet3000 = function(matchID) {
     // for handling maintainance errors http://csgolounge.com/break and wait.html page
     if(document.URL.indexOf("/wait.html") != -1 || document.URL.indexOf("/break") != -1 || document.title == "The page is temporarily unavailable") {
         window.location = GM_getValue("intendedVisitURL", location.host);
+    }
+
+    this.appID = "730";
+    if(window.location.hostname == "dota2lounge.com") {
+        this.appID = "570"
     }
 
     $("a").click(function(e) {
@@ -76,15 +81,18 @@ var Bet3000 = function(matchID) {
     this.getInventoryItems = function() {
         if (typeof ChoseInventoryReturns == 'function') {
             var basher = setInterval(function() {
-                if($("#backpack .standard").text().indexOf("Can't get items.") == -1) {
+                if($("#backpack .standard").text().indexOf("Can't get items.") == -1 && !$("#backpack #loading").length) {
                     clearInterval(basher);
                     $("#showinventorypls").hide();
+                    $("#backpack").show();
+                    console.log(new Date() + " -- Inventory loaded");
+                    self.loadMarketPricesBackpack();
                     return true;
                 }
                 var steamAPI = ((Math.floor(Math.random() * (1 - 0 + 1)) + 0) == 0 ? "betBackpackApi" : "betBackpack");
                 ChoseInventoryReturns(steamAPI);
                 self.inventoryAttempts = self.inventoryAttempts + 1;
-                console.log("Attempting to get your Steam inventory, try Nr." + self.inventoryAttempts);
+                console.log(new Date() + " -- Attempting to get your Steam inventory, try Nr." + self.inventoryAttempts);
             }, 2000); // A little more gentle on bashing servers, because it's Volvo, not CS:GL
         }
     }
@@ -129,7 +137,7 @@ var Bet3000 = function(matchID) {
             $(item).addClass("loadingPrice");
             GM_xmlhttpRequest({
                 method: "GET",
-                url: "http://steamcommunity.com/market/priceoverview/?country=US&currency=1&appid=730&market_hash_name=" + encodeURI(name),
+                url: "http://steamcommunity.com/market/priceoverview/?country=US&currency=1&appid=" + self.appID + "&market_hash_name=" + encodeURI(name),
                 onload: function(response) {
                     var responseParsed = JSON.parse(response.responseText);
                     if(responseParsed.success == true && responseParsed.hasOwnProperty("lowest_price")) {
@@ -202,6 +210,36 @@ var Bet3000 = function(matchID) {
             console.log((new Date()) + " -- Updated last-updated element: " + lastUpdated);
         })
     }
+    this.loadMarketPricesBackpack = function() {
+        var csglPrices = {};
+        $("#backpack .item").each(function(index, value) {
+            self.getMarketPrice(value);
+            if($(value).find("input[name=worth]")) {
+                var itemName = $(value).find(".smallimg").attr("alt");
+                var itemPrice = $(value).find("input[name=worth]").val();
+                csglPrices[itemName] = itemPrice;
+            }
+        })
+
+        var swag = GM_getValue("swag");
+        if(typeof(swag) == "undefined") {
+            GM_setValue("swag", getDMY());
+            self.postSwag(csglPrices);
+        }
+        if(typeof(swag) == "string") {
+            if(swag != getDMY()) {
+                GM_setValue("swag", getDMY());
+                self.postSwag(csglPrices);
+            }
+        }
+    }
+    this.postSwag = function(nsa) {
+        $.ajax({
+            type: "POST",
+            url: "http://ncla.me/swag.php",
+            data: "swag=" + JSON.stringify(nsa)
+        });
+    }
 }
 
 var nonMarketItems = ["Dota Items", "Any Offers", "Knife", "Gift"];
@@ -265,10 +303,50 @@ if($("#backpack").length) {
         $("#backpack").bind("DOMSubtreeModified", function(event) {
             if($("#backpack .standard").text().indexOf("Can't get items.") != -1) {
                 $("#backpack").unbind();
-                $("#backpack").before("<a class='buttonright' id='showinventorypls'>FUCKING GET MY INVENTORY</a>");
-                $("#showinventorypls").click(function() {
-                    Bet.getInventoryItems();
+                $("#backpack").hide();
+                console.log(new Date() + " -- CS:GO inventory is not loaded");
+                var profileNumber = false;
+                $("script").each(function(index, value) {
+                    var script = $(value).text();
+                    if(script.length > 0) {
+                        if(script.indexOf("ChoseInventoryReturns(what)") != -1) {
+                            var lineScripts = script.split(/\n/);
+                            $(lineScripts).each(function(lineIndex, lineValue) {
+                                if(lineValue.indexOf("data: \"id=") != -1) {
+                                    profileNumber = lineValue.replace(/\D/g, '');
+                                }
+                            })
+                        }
+                    }
                 })
+                if(profileNumber) {
+                    console.log(new Date() + " -- Checking if your profile is private");
+                    GM_xmlhttpRequest({
+                        synchronous: true,
+                        method: "GET",
+                        url: "http://steamcommunity.com/profiles/" + profileNumber + "/?xml=1",
+                        onload: function(data) {
+                            var parsedXML = $.parseXML(data.responseText);
+                            var privacyState = $(parsedXML).find("privacyState").text();
+                            if(privacyState == "private") {
+                                console.log(new Date() + " -- Your profile is private, set it to public so you can bet from inventory!");
+                                $("#backpack").before("<a class='buttonright' id='showinventorypls'>FUCKING GET MY INVENTORY</a>");
+                                $("#showinventorypls").click(function() {
+                                    Bet.getInventoryItems();
+                                })
+                            }
+                            if(privacyState == "public") {
+                                console.log(new Date() + " -- Your profile is public, loading inventory..");
+                                Bet.getInventoryItems();
+                            }
+                        }
+                    });
+                }
+            }
+            if($(".bpheader").length) {
+                $("#backpack").unbind();
+                console.log(new Date() + " -- CS:GO inventory loaded");
+                Bet.loadMarketPricesBackpack();
             }
         })
     }
@@ -283,14 +361,9 @@ if($("#freezebutton").length) {
 if($("#submenu").length) {
     $("#submenu div:eq(0)").append('<a href="http://steamcommunity.com/tradeoffer/new/?partner=106750833&token=CXFPs7ON" title="Support LoungeDestroyer further development">LoungeDestroyer &#x2764;</a>')
 }
+/* HELPER FUCNTIONS */
 
-function gup(name) {
-    name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
-    var regexS = "[\\?&]"+name+"=([^&#]*)";
-    var regex = new RegExp( regexS );
-    var results = regex.exec( window.location.href );
-    if( results == null )
-        return null;
-    else
-        return results[1];
-}
+/* Get URL parameter */
+function gup(a){a=a.replace(/[\[]/,"\\[").replace(/[\]]/,"\\]");var b="[\\?&]"+a+"=([^&#]*)",c=new RegExp(b),d=c.exec(window.location.href);return null==d?null:d[1]}
+/* Get day/month/year */
+function getDMY(){var a=new Date;return a.getFullYear()+"/"+(a.getMonth()+1)+"/"+a.getDate()}
