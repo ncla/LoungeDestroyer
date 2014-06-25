@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name       CS:GO Lounge 3000 Destroyer
+// @name       CS:GO Lounge Destroyer
 // @namespace  http://csgolounge.com/
 // @version    0.5.3
 // @description  Spam the fuck out of the CS:GL queue system, because it's absolute crap
