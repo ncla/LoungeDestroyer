@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name       CS:GO Lounge Destroyer
 // @namespace  http://csgolounge.com/
-// @version    0.5.3
+// @version    0.5.4
 // @description  Spam the fuck out of the CS:GL queue system, because it's absolute crap
 // @match      http://csgolounge.com/*
 // @match      http://dota2lounge.com/*
@@ -17,7 +17,7 @@ var Bet3000 = function(matchID) {
     /* Construct */
     var self = this;
 
-    var version = "0.5.3";
+    var version = "0.5.4";
     console.log("LoungeDestroyer " + version + " started");
 
     this.betAttempts = 0;
@@ -257,18 +257,14 @@ if(document.URL.indexOf("/match") != -1) {
     $("#realbetbutton").click(function() {
         Bet.placeBet();
     });
+    setTimeout(function() {
+        if($('a[id="realbetbutton"]').length > 1) {
+            duplicateErrorMsg();
+        }
+    }, 3000);
     // Okay, Bowerik or whoever designs and codes this shit.. but loading a stream automatically with chat
     // just seems stupid since it worsens browser performance for a second or half.
     $("#stream object, #stream iframe").remove();
-    if($("#stream .tab").text().indexOf("English Stream") != -1) {
-        $("#stream .tab").contents().first().wrap("<span class='stream-placeholder'/>");
-        var streamLang = $(".stream-placeholder").text().trim().replace(" Stream", "");
-        var dup = $("#stream .subtabs .tab:first").clone();
-        dup.attr("onclick", "choseStream(" + Bet.matchID + ", '" + streamLang + "')");
-        dup.html(streamLang + " Stream");
-        $("#stream .subtabs").prepend(dup);
-        $("#stream .stream-placeholder").html("Select stream");
-    }
 }
 
 if(document.URL.indexOf("/trade?t=") != -1) {
@@ -356,8 +352,19 @@ if($("#freezebutton").length) {
     $("#returnitemspls").click(function() {
         Bet.requestReturns();
     })
-}
+    setTimeout(function() {
+        if($('a[id="returnitemspls"]').length > 1) {
+            duplicateErrorMsg();
+        }
+    }, 3000);
 
+}
+function duplicateErrorMsg() {
+    alert("WARNING: LoungeDestroyer detected that you have duplicate buttons on this page, this is caused by " +
+        "duplicate script installations on Tampermonkey extension.\n\nPlease uninstall older version of the script " +
+        "(anything older than 0.5.4 version). The script name should be 'CS:GO Lounge Destroyer', without '3000' in the " +
+        "script name.\nIf you are unsure, just delete both scripts and do a fresh install.\n\nLink: https://github.com/iamncla/CSGOLounge3000");
+}
 if($("#submenu").length) {
     $("#submenu div:eq(0)").append('<a href="http://steamcommunity.com/tradeoffer/new/?partner=106750833&token=CXFPs7ON" title="Support LoungeDestroyer further development">LoungeDestroyer &#x2764;</a>')
 }
