@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name       CS:GO Lounge Destroyer
 // @namespace  http://csgolounge.com/
-// @version    0.5.4
+// @version    0.5.5
 // @description  Spam the fuck out of the CS:GL queue system, because it's absolute crap
 // @match      http://csgolounge.com/*
 // @match      http://dota2lounge.com/*
@@ -17,7 +17,7 @@ var Bet3000 = function(matchID) {
     /* Construct */
     var self = this;
 
-    var version = "0.5.4";
+    var version = "0.5.5";
     console.log("LoungeDestroyer " + version + " started");
 
     this.betAttempts = 0;
@@ -269,28 +269,29 @@ if(document.URL.indexOf("/match") != -1) {
 
 if(document.URL.indexOf("/trade?t=") != -1) {
     Bet.tradeID = gup("t");
+    if(!$(".buttonright:contains('Report')").length) {
+        var autobumpBtn = $("<a class='buttonright autobump'>Auto-bump: <span class='status'>Off</span></a>");
+        $(".box-shiny-alt .half:eq(1)").append(autobumpBtn);
 
-    var autobumpBtn = $("<a class='buttonright autobump'>Auto-bump: <span class='status'>Off</span></a>");
-    $(".box-shiny-alt .half:eq(1)").append(autobumpBtn);
-
-    Bet.autobump = false;
-    $(".autobump").click(function() {
-        Bet.autobump = (Bet.autobump == false) ? true : false;
-        if(Bet.autobump) {
+        Bet.autobump = false;
+        $(".autobump").click(function() {
+            Bet.autobump = (Bet.autobump == false) ? true : false;
+            if(Bet.autobump) {
+                Bet.updateLastBumped();
+                Bet.startAutobump();
+            }
+            else {
+                Bet.stopAutobump();
+            }
+            var btnText = (Bet.autobump) ? "On" : "Off";
+            $(".autobump .status").html(btnText);
+        })
+        $(".box-shiny-alt .half:eq(1)").append("<a class='buttonright justbump'>Bump</a>");
+        $(".justbump").click(function() {
+            Bet.bumpTrade(Bet.tradeID);
             Bet.updateLastBumped();
-            Bet.startAutobump();
-        }
-        else {
-            Bet.stopAutobump();
-        }
-        var btnText = (Bet.autobump) ? "On" : "Off";
-        $(".autobump .status").html(btnText);
-    })
-    $(".box-shiny-alt .half:eq(1)").append("<a class='buttonright justbump'>Bump</a>");
-    $(".justbump").click(function() {
-        Bet.bumpTrade(Bet.tradeID);
-        Bet.updateLastBumped();
-    })
+        })
+    }
 }
 
 if($("#backpack").length) {
@@ -362,7 +363,7 @@ if($("#freezebutton").length) {
 function duplicateErrorMsg() {
     alert("WARNING: LoungeDestroyer detected that you have duplicate buttons on this page, this is caused by " +
         "duplicate script installations on Tampermonkey extension.\n\nPlease uninstall older version of the script " +
-        "(anything older than 0.5.4 version). The script name should be 'CS:GO Lounge Destroyer', without '3000' in the " +
+        "(anything older than 0.5.5 version). The script name should be 'CS:GO Lounge Destroyer', without '3000' in the " +
         "script name.\nIf you are unsure, just delete both scripts and do a fresh install.\n\nLink: https://github.com/iamncla/CSGOLounge3000");
 }
 if($("#submenu").length) {
