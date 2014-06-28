@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name       CS:GO Lounge Destroyer
 // @namespace  http://csgolounge.com/
-// @version    0.5.5
+// @version    0.5.6
 // @description  Spam the fuck out of the CS:GL queue system, because it's absolute crap
 // @match      http://csgolounge.com/*
 // @match      http://dota2lounge.com/*
