@@ -181,11 +181,9 @@ var Bet3000 = function(matchID) {
         }
         if($(".tradeheader").text().indexOf("minute") != -1) {
             var numberino = $(".tradeheader").text().replace(" minutes ago", "").replace(" minute ago", "");
-            var delayMinutes = (numberino >= 30) ? 0 : (30 - numberino);
+            var delayMinutes = (numberino >= 30) ? 0.5 : (30 - numberino);
         }
-        if(delayMinutes == 0) {
-            delayMinutes = 0.5;
-        }
+
         console.log(new Date() + " -- Auto-bumping in " + delayMinutes + " minutes");
         // start the vicious cycle
         var autoBump = setTimeout(function() {
@@ -242,7 +240,7 @@ var Bet3000 = function(matchID) {
     }
 }
 
-var nonMarketItems = ["Dota Items", "Any Offers", "Knife", "Gift"];
+var nonMarketItems = ["Dota Items", "Any Offers", "Knife", "Gift", "TF2 Items", "Real Money"];
 
 var Bet = new Bet3000();
 
