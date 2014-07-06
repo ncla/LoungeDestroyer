@@ -1,4 +1,4 @@
-CSGOLounge3000
+LoungeDestroyer
 ==============
 
 An enhancer for CS:GL site, here is a [video demonstration](http://youtu.be/JT2a4h35o90) of script placing a bet.
