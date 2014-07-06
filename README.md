@@ -3,7 +3,7 @@ LoungeDestroyer
 
 An enhancer for CS:GL site, here is a [video demonstration](http://youtu.be/JT2a4h35o90) of script placing a bet.
 
-Don't want to keep spamming the "Place bet" button? Now you don't have to! Now with CSGOLounge3000, the script does it for you!
+Don't want to keep spamming the "Place bet" button? Now you don't have to! Now with LoungeDestroyer, the script does it for you!
 
 Features:
 * Place bet pwoperly
