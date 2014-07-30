@@ -18,7 +18,7 @@ Features:
 * Button for re-fetching your inventory on match page (experimental)
 
 ![Screenshot of match page added buttons](http://puu.sh/ax7Wr/512a8e7c7a.png)
-![Market prices for items, market listing links and market search added in popup](http://puu.sh/ax7TU/12d8c2a2bb.png)
+![Market prices for items, market listing links and market search added in popup](http://puu.sh/ax80W/4aa5cf71e2.png)
 
 Instructions how to install on Chrome
 
