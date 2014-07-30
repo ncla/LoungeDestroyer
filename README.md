@@ -12,12 +12,26 @@ Features:
 * Redirect from wait.html/maintainance/hatz to the page you intended to visit
 * Steam market prices for items
 * Auto-bump your trade offers
+* Market listing and market search links added to item pop-up
+* Checks if your profile and inventory is public when loading your backpack
+* Automatically loads market prices for all the items in your backpack
+* Button for re-fetching your inventory on match page (experimental)
 
 ![Screenshot of button](http://puu.sh/9IixA/79f4a95363.png)
+![Market prices for items](http://puu.sh/ax7jd/ad8f7940a3.png)
+![Market listing links and market search added in popup](http://puu.sh/ax7nj/28b84aec7d.png)
 
-Instructions how to install this (for Chrome)
+Instructions how to install on Chrome
 
 1. Download Tampermoney extension
 2. [Install script from here](http://ncla.me/csgl3000/csgl3000.user.js)
 
-To open console, hit F12 (developers mode) and select Console tab.
+Instructions how to install on Firefox
+1. Download Greasemonkey add-on and install it
+2. [Install script from here](http://ncla.me/csgl3000/csgl3000.user.js)
+
+The script is not the most user friendliest at the moment, so to get some feedback from the script you need to have your browser console opened.
+
+To open console for Chrome, hit F12 (developers mode) and select Console tab.
+To open console for Firefox, hit F12 (developers mode) and select Console tab, to filter log messages only, toggle on "JS" and "Logging" buttons shown in image below:
+![Toggle JS and Logging](http://puu.sh/ax7MR/e8641ac1ac.png)
