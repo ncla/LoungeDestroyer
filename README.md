@@ -22,12 +22,12 @@ Features:
 
 Instructions how to install on Chrome
 
-1. Download Tampermoney extension
+1. Download [Tampermonkey extension](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo)
 2. [Install script from here](http://ncla.me/csgl3000/csgl3000.user.js)
 
 Instructions how to install on Firefox
 
-1. Download Greasemonkey add-on and install it
+1. Download [Greasemonkey add-on](https://addons.mozilla.org/en-US/firefox/addon/greasemonkey/) and install it
 2. [Install script from here](http://ncla.me/csgl3000/csgl3000.user.js)
 
 The script is not the most user friendliest at the moment, so to get some feedback from the script you need to have your browser console opened.
