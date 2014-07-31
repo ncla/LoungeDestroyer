@@ -16,9 +16,11 @@ Features:
 * Market listing and market search links added to item pop-up
 * Checks if your profile and inventory is public when loading your backpack
 * Button for re-fetching your inventory on match page (experimental)
+* Removes stream and stream chat on match pages
 
 ![Screenshot of match page added buttons](http://puu.sh/ax7Wr/512a8e7c7a.png)
 ![Market prices for items, market listing links and market search added in popup](http://puu.sh/ax80W/4aa5cf71e2.png)
+![LoungeDestroyer settings window](http://puu.sh/az3tA/beb6194190.png)
 
 Instructions how to install on Chrome
 
