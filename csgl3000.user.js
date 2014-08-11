@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name       CS:GO Lounge Destroyer
 // @namespace  http://csgolounge.com/
-// @version    0.6.2
+// @version    0.6.3
 // @description  Spam the fuck out of the CS:GL queue system, because it's absolute crap
 // @match      http://csgolounge.com/*
 // @match      http://dota2lounge.com/*
@@ -31,18 +31,24 @@ var Loge = function(message) {
 /* LoungeDestroyer class */
 /* Chaos is order yet undeciphered. */
 
+if (window.top != window.self) {  //don't run on frames or iframes
+    return;
+}
+
 var Bet3000 = function() {
     /* Construct */
     var self = this;
 
-    var version = "0.6.2";
-    var versionReleaseDate = "2014.08.01";
+    var version = "0.6.3";
+    var versionReleaseDate = "2014.08.11";
 
     Loge("LoungeDestroyer v" + version + " (released on " + versionReleaseDate + ")");
 
     this.betAttempts = 0;
     this.inventoryAttempts = 0;
     this.returnAttempts = 0;
+
+    this.TLS = false;
 
     /* User settings */
     this.defaultSettings =
@@ -109,7 +115,8 @@ var Bet3000 = function() {
         "#overlay-dummy { display: none; background-color: rgba(0, 0, 0, 0.3); position: fixed; width: 100%; height: 100%; z-index: 9000; }" +
         "#ld_popup .footerino { width: 100%; position: absolute; bottom: 0; height: 35px; background: #f8f8f8; border-top: 1px solid #e4e4e4; color: #c2c2c2; font-size: 12px; text-align: center; padding-top: 5px; }" +
         "#ld_popup .footerino a { color: #a0a0a0; }" +
-        "#ld_popup .footerino a:hover { text-decoration: underline; }");
+        "#ld_popup .footerino a:hover { text-decoration: underline; }" +
+        ".lastbumped { float: left; font-size: 13px; margin-top: 10px; font-weight: bold; }");
 
     this.placeBet = function() {
         // to do: add exceptions for "you have too many items in your returns"
@@ -124,7 +131,7 @@ var Bet3000 = function() {
         $.ajax({
             type: "POST",
             url: url,
-            data: $("#betpoll").serialize() + "&match=" + self.matchID,
+            data: $("#betpoll").serialize() + "&match=" + self.matchID + "&tlss=" + self.TLS,
             success: function(data) {
                 if (data) {
                     self.betAttempts = self.betAttempts + 1;
@@ -174,10 +181,24 @@ var Bet3000 = function() {
             var steamAPI = ((Math.floor(Math.random() * (1 - 0 + 1)) + 0) == 0 ? "betBackpackApi" : "betBackpack");
             self.inventoryAttempts = self.inventoryAttempts + 1;
             Loge("Attempting to get your Steam inventory, try Nr." + self.inventoryAttempts);
+            var profileNumber = false;
+            $("script").each(function(index, value) {
+                var script = $(value).text();
+                if(script.length > 0) {
+                    if(script.indexOf("ChoseInventoryReturns(what)") != -1) {
+                        var lineScripts = script.split(/\n/);
+                        $(lineScripts).each(function(lineIndex, lineValue) {
+                            if(lineValue.indexOf("data: \"id=") != -1) {
+                                profileNumber = lineValue.replace(/\D/g, '');
+                            }
+                        })
+                    }
+                }
+            })
             $.ajax({
                 url: 'ajax/'+steamAPI+'.php',
                 type: 'POST',
-                data: "id=76561198043770492",
+                data: "id=" + profileNumber,
                 success: function(data) {
                     if($(data).text().indexOf("Can't get items.") == -1) {
                         $("#showinventorypls").hide();
@@ -451,6 +472,7 @@ $(document).on("mouseover", ".item", function() {
 if(document.URL.indexOf("/match?m=") != -1) {
     $("#placebut").before("<a class='buttonright' id='realbetbutton'>FUCKING PLACE A BET</a>");
     Bet.matchID = gup("m");
+    Bet.TLS = $("#placebut").attr("onclick").split("'")[3];
     $("#realbetbutton").click(function() {
         Bet.placeBet();
     });
@@ -498,6 +520,22 @@ if(document.URL.indexOf("/trade?t=") != -1) {
     $("a:contains('Add items to offer')").click(function() {
         Bet.getBackpack("offer");
     })
+}
+
+if(document.URL.indexOf("/mytrades") != -1) {
+//    $(".tradepoll").each(function(index, value) {
+//        var tradeURL = $(value).find(".tradeheader a:eq(0)").attr("href");
+//        $(value).find(".tradecnt").after('<div class="lastbumped">Last bumped: <span>unknown</span></div>');
+//        var autobumpBtn = $("<a class='button autobump'>Auto-bump: <span class='status'>Off</span></a>");
+//        $(value).find(".tradeheader a:eq(2)").after(autobumpBtn);
+//        $.ajax({
+//            type: "GET",
+//            url: tradeURL,
+//            success: function(data) {
+//                $(value).find(".lastbumped span").html($(data).find(".tradeheader").text());
+//            }
+//        })
+//    })
 }
 
 if($("#backpack").length) {
