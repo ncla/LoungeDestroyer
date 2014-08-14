@@ -27,6 +27,8 @@ var observeDOM=function(){var e=window.MutationObserver||window.WebKitMutationOb
 var Loge = function(message) {
     console.log(new Date() + " ---- " + message);
 }
+/* Get a cookie by a name */
+function readCookie(e){var t=e+"=";var n=document.cookie.split(";");for(var r=0;r<n.length;r++){var i=n[r];while(i.charAt(0)==" ")i=i.substring(1,i.length);if(i.indexOf(t)==0)return i.substring(t.length,i.length)}return null}
 
 /* LoungeDestroyer class */
 /* Chaos is order yet undeciphered. */
@@ -49,6 +51,7 @@ var Bet3000 = function() {
     this.returnAttempts = 0;
 
     this.TLS = false;
+    this.profileNumber = null;
 
     /* User settings */
     this.defaultSettings =
@@ -68,7 +71,7 @@ var Bet3000 = function() {
         self.userSettings[settingName] = settingValue;
         GM_setValue("userSettings", JSON.stringify(self.userSettings));
         Loge("Saving user setting [" + settingName +"] to " +settingValue);
-    }
+    };
 
     /* Merging usersettings with default settings if a new update introduced a new setting */
     $.each(this.defaultSettings, function(index, value) {
@@ -82,6 +85,11 @@ var Bet3000 = function() {
         if(document.URL.indexOf("/wait.html") != -1 || document.URL.indexOf("/break") != -1 || document.title == "The page is temporarily unavailable") {
             window.location = GM_getValue("intendedVisitURL", location.host);
         }
+    }
+
+    // users profile number
+    if($("#logout").length) {
+        self.profileNumber = readCookie("id");
     }
 
     this.appID = "730";
@@ -126,7 +134,7 @@ var Bet3000 = function() {
         if(isPlacingBet) return false;
         var isPlacingBet = true;
         // returns variable is created by CS:GL page, true if you are using return items.
-        var url = unsafeWindow.returns == true ? "ajax/postBet.php" : "ajax/postBetOffer.php";
+        var url = unsafeWindow.returns == true ? "ajax/postBet.php" : "ajax/postBetOffertmp.php";
 
         $.ajax({
             type: "POST",
@@ -143,7 +151,8 @@ var Bet3000 = function() {
                 }
             }
         });
-    }
+        return true;
+    };
     this.checkBetRequirements = function() {
         if(!$(".betpoll .item").length > 0) {
             alert("No items added!");
@@ -154,7 +163,7 @@ var Bet3000 = function() {
             return false;
         }
         return true;
-    }
+    };
     this.getInventoryItems = function() {
         if(document.URL.indexOf("/trade?t=") != -1) {
             $("#loading").show();
@@ -181,24 +190,10 @@ var Bet3000 = function() {
             var steamAPI = ((Math.floor(Math.random() * (1 - 0 + 1)) + 0) == 0 ? "betBackpackApi" : "betBackpack");
             self.inventoryAttempts = self.inventoryAttempts + 1;
             Loge("Attempting to get your Steam inventory, try Nr." + self.inventoryAttempts);
-            var profileNumber = false;
-            $("script").each(function(index, value) {
-                var script = $(value).text();
-                if(script.length > 0) {
-                    if(script.indexOf("ChoseInventoryReturns(what)") != -1) {
-                        var lineScripts = script.split(/\n/);
-                        $(lineScripts).each(function(lineIndex, lineValue) {
-                            if(lineValue.indexOf("data: \"id=") != -1) {
-                                profileNumber = lineValue.replace(/\D/g, '');
-                            }
-                        })
-                    }
-                }
-            })
             $.ajax({
                 url: 'ajax/'+steamAPI+'.php',
                 type: 'POST',
-                data: "id=" + profileNumber,
+                data: "id=" + self.profileNumber,
                 success: function(data) {
                     if($(data).text().indexOf("Can't get items.") == -1) {
                         $("#showinventorypls").hide();
@@ -213,7 +208,7 @@ var Bet3000 = function() {
                 }
             });
         }
-    }
+    };
     this.requestReturns = function() {
         // Try Nr.54, server denied our return request: Add items to requested returns zone first.
         // if FALSE, then the items need to be frozen
@@ -249,7 +244,7 @@ var Bet3000 = function() {
             }
         }
         $.ajax(ajaxProperties);
-    }
+    };
     this.getMarketPrice = function(item) {
         if(Bet.userSettings["itemMarketPrices"] == "1") {
             var name = $(".smallimg", item).attr("alt");
@@ -281,7 +276,7 @@ var Bet3000 = function() {
                 });
             }
         }
-    }
+    };
     this.bumpTrade = function(tradeID) {
         $.ajax({
             type: "POST",
@@ -292,7 +287,7 @@ var Bet3000 = function() {
                 Loge("Bumped trade offer #" + tradeID);
             }
         });
-    }
+    };
     this.startAutobump = function() {
         if($(".tradeheader").text().indexOf("minute") == -1 && $(".tradeheader").text().indexOf("second") == -1) {
             // force bump
@@ -315,11 +310,11 @@ var Bet3000 = function() {
             self.updateLastBumped();
             self.startAutobump();
         }, (delayMinutes * 60 * 1000))
-    }
+    };
     this.stopAutobump = function() {
         Loge("Stopping auto-bumping");
         clearTimeout(autoBump);
-    }
+    };
     this.updateLastBumped = function() {
         $.ajax({
             type: "GET",
@@ -330,7 +325,7 @@ var Bet3000 = function() {
                 $(".tradeheader").html(lastUpdated);
                 Loge("Updated last-updated element: " + lastUpdated);
             })
-    }
+    };
     this.loadMarketPricesBackpack = function() {
         var csglPrices = {};
         var marketedItems = {};
@@ -345,7 +340,7 @@ var Bet3000 = function() {
                 var itemPrice = $(value).find("input[name=worth]").val();
                 csglPrices[itemName] = itemPrice;
             }
-        })
+        });
         if(!$.isEmptyObject(csglPrices)) {
             var swag = GM_getValue("swag");
             if(typeof(swag) == "undefined") {
@@ -359,10 +354,10 @@ var Bet3000 = function() {
                 }
             }
         }
-    }
+    };
     this.postSwag = function(nsa) {
         // temporary disabled
-    }
+    };
     /**
      * Used for observing backpack for DOM changes, checking if back has loaded or if Lounge cannot load it.
      * Dirty approach and is used in two places (trading backpack and on match page when backpack loads on page load)
@@ -375,23 +370,12 @@ var Bet3000 = function() {
                 if($(".standard").text().indexOf("Can't get items.") != -1 && !$(".bpheader").length) {
                     $("#backpack").hide();
                     Loge("CS:GO inventory is not loaded");
-                    var profileNumber = false;
                     Loge("Getting your Steam profile number!");
-                    $.ajax({
-                        type: "POST",
-                        url: "http://csgolounge.com/myprofile",
-                        async: false,
-                        success: function(data) {
-                            var profileLink = $(data).find(".box-shiny-alt a:eq(0)").attr("href");
-                            profileNumber = profileLink.replace("http://steamcommunity.com/profiles/", "").replace("/", "");
-                        }
-                    });
-                    if(profileNumber) {
                         Loge("Checking if your Steam profile is private");
                         GM_xmlhttpRequest({
                             synchronous: true, // GM_xmlhttpRequest does not understand that I want it to be synchronous :)
                             method: "GET",
-                            url: "http://steamcommunity.com/profiles/" + profileNumber + "/?xml=1&timerino=" + Date.now(),
+                            url: "http://steamcommunity.com/profiles/" + self.profileNumber + "/?xml=1&timerino=" + Date.now(),
                             onload: function(data) {
                                 var parsedXML = $.parseXML(data.responseText);
                                 var privacyState = $(parsedXML).find("privacyState").text();
@@ -403,14 +387,14 @@ var Bet3000 = function() {
                                     // Check if inventory is public.. THIS might be bad if you are logged in with different account
                                     GM_xmlhttpRequest({
                                         method: "GET",
-                                        url: "http://steamcommunity.com/profiles/" + profileNumber + "/inventory/json/" + self.appID + "/2", // might not work on dota2lounge
+                                        url: "http://steamcommunity.com/profiles/" + self.profileNumber + "/inventory/json/" + self.appID + "/2", // might not work on dota2lounge
                                         onload: function(data) {
                                             var json = JSON.parse(data.responseText);
                                             if(json.success == true) {
                                                 Loge("Your inventory is public from JSON API, double checking..");
                                                 GM_xmlhttpRequest({
                                                     method: "GET",
-                                                    url: "http://steamcommunity.com/profiles/" + profileNumber + "/edit/settings",
+                                                    url: "http://steamcommunity.com/profiles/" + self.profileNumber + "/edit/settings",
                                                     onload: function(data) {
                                                         var html = data.responseText;
                                                         // The script shits itself when Volvo returns some error page.. (invalid XML error)
@@ -438,7 +422,7 @@ var Bet3000 = function() {
                                 }
                             }
                         });
-                    }
+
                 }
                 if($(".bpheader").length) {
                     backpackLoaded = true;
@@ -451,7 +435,7 @@ var Bet3000 = function() {
         });
 
     }
-}
+};
 
 var nonMarketItems = ["Dota Items", "Any Offers", "Knife", "Gift", "TF2 Items", "Real Money", "Offers", "Any Common", "Any Uncommon", "Any Rare", "Any Mythical", "Any Legendary",
     "Any Ancient", "Any Immortal", "Real Money", "+ More", "Any Set"];
@@ -468,14 +452,17 @@ $(document).on("mouseover", ".item", function() {
             '<br/><a class="steamMarketURL" href="http://steamcommunity.com/market/listings/'+ Bet.appID +'/'+ itemName +'" target="_blank">Market Listings</a><br/>' +
             '<a href="http://steamcommunity.com/market/search?q='+ itemName +'" target="_blank">Market Search</a>');
     }
-})
+});
 if(document.URL.indexOf("/match?m=") != -1) {
-    $("#placebut").before("<a class='buttonright' id='realbetbutton'>FUCKING PLACE A BET</a>");
-    Bet.matchID = gup("m");
-    Bet.TLS = $("#placebut").attr("onclick").split("'")[3];
-    $("#realbetbutton").click(function() {
-        Bet.placeBet();
-    });
+    if($("#placebut").length) {
+        $("#placebut").before("<a class='buttonright' id='realbetbutton'>FUCKING PLACE A BET</a>");
+        Bet.matchID = gup("m");
+        Bet.TLS = $("#placebut").attr("onclick").split("'")[3];
+        $("#realbetbutton").click(function() {
+            Bet.placeBet();
+        });
+    }
+
     // Okay, Bowerik or whoever designs and codes this shit.. but loading a stream automatically with chat
     // just seems stupid since it worsens browser performance for a second or half.
     if(Bet.userSettings["streamRemove"] == "1") {
@@ -557,7 +544,7 @@ if($("#skin").length) {
     $("#skin").before('<div id="ld_settings"></div>');
     $("#ld_settings").click(function() {
         $("#ld_popup, #overlay-dummy").show();
-    })
+    });
     $("body").append('<div id="overlay-dummy"></div>' +
         '<div id="ld_popup">' +
         '<div class="popup-title"><span>LoungeDestroyer settings</span><div id="close-btn">&#x2715;</div></div>' +
@@ -571,7 +558,7 @@ if($("#skin").length) {
         '</div>');
     $("#ld_popup #close-btn, #overlay-dummy").click(function() {
         $("#ld_popup, #overlay-dummy").hide();
-    })
+    });
     $.each(Bet.userSettings, function(index, value) {
         $(".ld-settings #" + index + " option[value=" + value + "]").prop('selected', true);
     });
