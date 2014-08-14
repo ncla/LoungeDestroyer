@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name       CS:GO Lounge Destroyer
 // @namespace  http://csgolounge.com/
-// @version    0.6.3
+// @version    0.6.4
 // @description  Spam the fuck out of the CS:GL queue system, because it's absolute crap
 // @match      http://csgolounge.com/*
 // @match      http://dota2lounge.com/*
@@ -41,8 +41,8 @@ var Bet3000 = function() {
     /* Construct */
     var self = this;
 
-    var version = "0.6.3";
-    var versionReleaseDate = "2014.08.11";
+    var version = "0.6.4";
+    var versionReleaseDate = "2014.08.14";
 
     Loge("LoungeDestroyer v" + version + " (released on " + versionReleaseDate + ")");
 
