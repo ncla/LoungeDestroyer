@@ -42,7 +42,7 @@ To open console for Firefox, hit F12 (developers mode) and select Console tab. T
 ## Updates
 It is possible that CSGOLounge.com might update their site which breaks LoungeDestroyer's functionality. GreaseMonkey and Tampermonkey provides auto-updating functionality.
 
-**On TamperMonkey (Chrome):** go to your TamperMonkey dashboard, manage to Settings, locate "Script update" section and there should be "Check interval" select menu. You can change it to "Every hour" if you so desire.
+**On TamperMonkey (Chrome):** go to your TamperMonkey dashboard, manage to Settings, locate "Script update" section and there should be "Check interval" select menu. You can change it to "Every hour" if you so desire. To force update, go to Dashboard => Installed userscripts, select/tick "CS:GO Lounge Destroyer", and select "Trigger an update" from the menu and press "Start".
 
 **On GreaseMonkey (Firefox):** GreaseMonkey doesn't have an option for update intervals in their options. You can force a manual update however. Go to your Add-ons => User Scripts, right click on "CS:GO Lounge Destroyer" and click "Find updates" or "Forced Find updates". If both options are disabled, you need to disable "Require secure updates" in GreaseMonkey options and try again.
 
