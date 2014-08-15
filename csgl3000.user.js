@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name       CS:GO Lounge Destroyer
 // @namespace  http://csgolounge.com/
-// @version    0.6.4
+// @version    0.6.5
 // @description  Spam the fuck out of the CS:GL queue system, because it's absolute crap
 // @match      http://csgolounge.com/*
 // @match      http://dota2lounge.com/*
@@ -41,8 +41,8 @@ var Bet3000 = function() {
     /* Construct */
     var self = this;
 
-    var version = "0.6.4";
-    var versionReleaseDate = "2014.08.14";
+    var version = "0.6.5";
+    var versionReleaseDate = "2014.08.15";
 
     Loge("LoungeDestroyer v" + version + " (released on " + versionReleaseDate + ")");
 
@@ -52,6 +52,10 @@ var Bet3000 = function() {
 
     this.TLS = false;
     this.profileNumber = null;
+
+    this.isPlacingBet = false;
+
+    this.placeBetRetry = false;
 
     /* User settings */
     this.defaultSettings =
@@ -100,6 +104,9 @@ var Bet3000 = function() {
     $("a").click(function(e) {
         if (e.which === 1) {
             e.preventDefault();
+            if(self.isPlacingBet) {
+                $(window).unbind('beforeunload');
+            }
             // http://stackoverflow.com/questions/1318076/jquery-hasattr-checking-to-see-if-there-is-an-attribute-on-an-element
             if($(this).is("[href]")) {
                 var url = $(this).attr("href");
@@ -126,33 +133,39 @@ var Bet3000 = function() {
         "#ld_popup .footerino a:hover { text-decoration: underline; }" +
         ".lastbumped { float: left; font-size: 13px; margin-top: 10px; font-weight: bold; }");
 
-    this.placeBet = function() {
+    this.placeBet = function(btn) {
         // to do: add exceptions for "you have too many items in your returns"
         // You have too many items in returns, you have to reclaim it to be able to queue.
         // Due to extensive load, queue is disabled for about 5 minutes.
         if(!this.checkBetRequirements()) return false;
-        if(isPlacingBet) return false;
-        var isPlacingBet = true;
-        // returns variable is created by CS:GL page, true if you are using return items.
-        var url = unsafeWindow.returns == true ? "ajax/postBet.php" : "ajax/postBetOffertmp.php";
+        if(self.isPlacingBet) return false;
+        self.isPlacingBet = true;
 
-        $.ajax({
-            type: "POST",
-            url: url,
-            data: $("#betpoll").serialize() + "&match=" + self.matchID + "&tlss=" + self.TLS,
-            success: function(data) {
-                if (data) {
-                    self.betAttempts = self.betAttempts + 1;
-                    Loge("Try Nr." + self.betAttempts + ", server denied our bet: " + data);
-                    self.placeBet();
-                } else {
-                    alert("It seems we successfully placed a bet! It took " + self.betAttempts + " tries to place the bet.");
-                    window.location.href = "mybets";
-                }
+        unsafeWindow.$('body').ajaxSuccess(function(event, requestData) {
+            if(requestData.responseText.length > 0) {
+                self.betAttempts = self.betAttempts + 1;
+                Loge("Try Nr." + self.betAttempts + ", server denied our bet: " + requestData.responseText);
+                clearTimeout(self.placeBetRetry);
+                $(btn).click();
+                self.placeBetRetry = setTimeout(function() {
+                    $(btn).click();
+                    Loge("Forcing a retry...");
+                }, 5000);
             }
         });
+
+        unsafeWindow.alert = function() {};
+
+        $(window).bind('beforeunload', function(){
+            return "It seems we successfully placed a bet! It took " + self.betAttempts + " tries to place the bet.\n\n" +
+                "This site seems to be redirecting to My Bets page, just confirm redirection to proceed. \n\nIf you are just refreshing/leaving this page, ignore this pop-up.";
+        });
+
+        $("a:contains('Place Bet')").click();
+
         return true;
     };
+
     this.checkBetRequirements = function() {
         if(!$(".betpoll .item").length > 0) {
             alert("No items added!");
@@ -457,9 +470,8 @@ if(document.URL.indexOf("/match?m=") != -1) {
     if($("#placebut").length) {
         $("#placebut").before("<a class='buttonright' id='realbetbutton'>FUCKING PLACE A BET</a>");
         Bet.matchID = gup("m");
-        Bet.TLS = $("#placebut").attr("onclick").split("'")[3];
         $("#realbetbutton").click(function() {
-            Bet.placeBet();
+            Bet.placeBet($("#placebut"));
         });
     }
 
