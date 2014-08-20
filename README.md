@@ -27,7 +27,7 @@ Instructions how to install on Chrome
 1. Download [Tampermonkey extension](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo)
 2. [Install script from here](http://ncla.me/csgl3000/csgl3000.user.js)
 
-Instructions how to install on Firefox
+Instructions how to install on Firefox **(0.6.5 version does not support Firefox)**
 
 1. Download [Greasemonkey add-on](https://addons.mozilla.org/en-US/firefox/addon/greasemonkey/) and install it
 2. [Install script from here](http://ncla.me/csgl3000/csgl3000.user.js)
