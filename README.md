@@ -3,13 +3,13 @@ LoungeDestroyer
 
 An enhancer for CS:GL site, here is a [video demonstration](http://youtu.be/JT2a4h35o90) of script placing a bet.
 
-Don't want to keep spamming the "Place bet" button? Now you don't have to! Now with LoungeDestroyer, the script does it for you!
+Don't want to keep spamming the "Place bet" button? Now you don't have to! With LoungeDestroyer, the script does it for you!
 
 ## Features
-* Place bet pwoperly
+* Place bet properly
 * Automatically loads inventory on match page / trading pages
 * Automatically loads market prices for all the items in your backpack
-* Request your hard earned items to be returned, pwoperly ofcourse
+* Request your hard earned items to be returned, properly of course
 * Redirect from wait.html/maintainance/hatz to the page you intended to visit
 * Steam market prices for items when you hover on an item
 * Auto-bump your trade offers
