@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name       CS:GO Lounge Destroyer
 // @namespace  http://csgolounge.com/
-// @version    0.6.5
+// @version    0.6.6
 // @description  Spam the fuck out of the CS:GL queue system, because it's absolute crap
 // @match      http://csgolounge.com/*
 // @match      http://dota2lounge.com/*
@@ -29,9 +29,33 @@ var Loge = function(message) {
 }
 /* Get a cookie by a name */
 function readCookie(e){var t=e+"=";var n=document.cookie.split(";");for(var r=0;r<n.length;r++){var i=n[r];while(i.charAt(0)==" ")i=i.substring(1,i.length);if(i.indexOf(t)==0)return i.substring(t.length,i.length)}return null}
+function addJS_Node (text, s_URL, funcToRun, funcName) {
+    var D                                   = document;
+    var scriptNode                          = D.createElement ('script');
+    scriptNode.type                         = "text/javascript";
+    if (text)       scriptNode.textContent  = text;
+    if (s_URL)      scriptNode.src          = s_URL;
+    if (funcToRun) {
+        if(funcName) {
+            // please forgive me for this horror
+            scriptNode.textContent  = funcToRun.toString().replace("function () {", "function " + funcName + "() {");
+        }
+        else {
+            scriptNode.textContent  = '(' + funcToRun.toString() + ')()';
+        }
+    }
+
+    var targ    = D.getElementsByTagName('head')[0] || D.body || D.documentElement;
+    targ.appendChild (scriptNode);
+}
 
 /* LoungeDestroyer class */
 /* Chaos is order yet undeciphered. */
+
+/*
+ yaroberto  -2 points 5 hours ago
+ dont use shity scripts :)
+ */
 
 if (window.top != window.self) {  //don't run on frames or iframes
     return;
@@ -41,8 +65,8 @@ var Bet3000 = function() {
     /* Construct */
     var self = this;
 
-    var version = "0.6.5";
-    var versionReleaseDate = "2014.08.15";
+    var version = "0.6.6";
+    var versionReleaseDate = "2014.08.22";
 
     Loge("LoungeDestroyer v" + version + " (released on " + versionReleaseDate + ")");
 
@@ -63,7 +87,10 @@ var Bet3000 = function() {
         marketCurrency: "1",
         itemMarketPrices: "1",
         redirect: "1",
-        streamRemove: "1"
+        streamRemove: "1",
+        delayBotsOff: "30000",
+        delayBotsOn: "5000",
+        delayRelogError: "15000"
     };
     var userSettings = GM_getValue("userSettings");
     if(typeof(userSettings) == "undefined") {
@@ -91,11 +118,12 @@ var Bet3000 = function() {
         }
     }
 
-    // users profile number
+    // users profile number, also shorten dis pls oneline, dont b scrub
     if($("#logout").length) {
         self.profileNumber = readCookie("id");
     }
 
+    // ncla pls shorten dis
     this.appID = "730";
     if(window.location.hostname == "dota2lounge.com") {
         this.appID = "570"
@@ -131,39 +159,135 @@ var Bet3000 = function() {
         "#ld_popup .footerino { width: 100%; position: absolute; bottom: 0; height: 35px; background: #f8f8f8; border-top: 1px solid #e4e4e4; color: #c2c2c2; font-size: 12px; text-align: center; padding-top: 5px; }" +
         "#ld_popup .footerino a { color: #a0a0a0; }" +
         "#ld_popup .footerino a:hover { text-decoration: underline; }" +
-        ".lastbumped { float: left; font-size: 13px; margin-top: 10px; font-weight: bold; }");
+        ".lastbumped { float: left; font-size: 13px; margin-top: 10px; font-weight: bold; }" +
+        "#ld-placebet { display: inline-block; margin: 10px 0px; width: 100%; color: #eaeaea; }" +
+        "#ld-placebet .wrapperino { margin: 13px; }" +
+        "#ld-placebet .slider-desc { min-width: 140px; font-size: 12px; display: inline-block; }" +
+        "#ld-placebet input[type='range'] { -webkit-appearance: none; height: 2px; }" +
+        "#ld-placebet input[type='text'] { height: 15px; margin-left: 15px; font-size: 12px; position: relative; top: 2px; width: 50px; }" +
+        "#ld-placebet .setting-block { height: 25px; }");
 
     this.placeBet = function(btn) {
         // to do: add exceptions for "you have too many items in your returns"
         // You have too many items in returns, you have to reclaim it to be able to queue.
         // Due to extensive load, queue is disabled for about 5 minutes.
+        // You have to relog in order to place a bet.
         if(!this.checkBetRequirements()) return false;
         if(self.isPlacingBet) return false;
         self.isPlacingBet = true;
 
-        unsafeWindow.$('body').ajaxSuccess(function(event, requestData) {
-            if(requestData.responseText.length > 0) {
-                self.betAttempts = self.betAttempts + 1;
-                Loge("Try Nr." + self.betAttempts + ", server denied our bet: " + requestData.responseText);
-                clearTimeout(self.placeBetRetry);
-                $(btn).click();
-                self.placeBetRetry = setTimeout(function() {
-                    $(btn).click();
-                    Loge("Forcing a retry...");
+        unsafeWindow.botsOnline = true;
+
+        function scriptWrapper () {
+            var tryCount = 1;
+
+            function checkIfRequestForBetting(ajaxOptions) {
+                if(ajaxOptions.hasOwnProperty("data")) {
+                    return (ajaxOptions.data.indexOf("&on=") != -1);
+                }
+                else {
+                    return false;
+                }
+            }
+
+            $.ajaxPrefilter(function(options, originalOptions, jqXHR) {
+                var originalSuccess = options.success;
+                options.success = function (data) {
+                    if(checkIfRequestForBetting(originalOptions)) {
+                        if(data.length > 0) {
+                            console.log("Try Nr." + tryCount + ", server denied our bet: " + data);
+                            if(data.indexOf("You have to relog in order to place a bet.") != -1) {
+                                renewHash(); // aaand delay after renewing hash
+                            }
+                            else {
+                                var delayerino = (!botsOnline ? delays.delayBotsOff : delays.delayBotsOn);
+                                setTimeout(function() {
+                                    $.ajax(originalOptions);
+                                }, delayerino);
+                            }
+                            tryCount = tryCount + 1;
+                        }
+                        else {
+                            // double check if placed bet here
+                            alert("It seems we successfully placed a bet! It took " + tryCount + " " + (tryCount == 1 ? 'try' : 'tries') + " to place the bet.");
+                            // possibly automatically accept trade offers (?)
+                            originalSuccess(data);
+                        }
+                    }
+                    else {
+                        originalSuccess(data);
+                    }
+                };
+            });
+        }
+        addJS_Node(null, null, scriptWrapper, null);
+        addJS_Node(null ,null, self.renewHash, "renewHash");
+
+        $(btn).click();
+
+        return true;
+    };
+    /*
+        @param callback - What do on success?
+     */
+    this.checkBotsOnline = function(onlineCallback, offlineCallback) {
+        $.ajax({
+            url: "http://csgolounge.com/status",
+            type: "GET",
+            success: function(data) {
+                if($(data).find("h2:eq(0)").length) {
+                    var botStatusText = $(data).find("h2:eq(0)").text();
+                    if(botStatusText.indexOf("ONLINE") != -1) {
+                        onlineCallback();
+                    } else if(botStatusText.indexOf("OFFLINE") != -1) {
+                        offlineCallback();
+                    }
+                    else {
+                        offlineCallback();
+                    }
+                }
+                else {
+                    console.log("Error getting bots status from page, retrying in 5 seconds...");
+                    setTimeout(function() {
+                        self.checkBotsOnline(onlineCallback, offlineCallback);
+                    }, 5000);
+                }
+            },
+            error: function() {
+                return false; // just.. meh..
+            }
+        });
+    };
+
+    this.renewHash = function() {
+        console.log("TLS has has expired (re-log error got returned), renewing hash..");
+        $.ajax({
+            url: document.URL,
+            type: "GET",
+            async: false,
+            success: function(data) {
+                if($(data).find("#placebut").length) {
+                    var newOnclick = $(data).find("#placebut").attr("onclick");
+                    $("#placebut").attr("onclick", newOnclick);
+                    console.log("Hash renewed for place bet button, continuing..");
+                    setTimeout(function() {
+                        $("#placebut").click();
+                    }, delays.delayRelogError);
+                }
+                else {
+                    console.log("Failed to get button element, attempting to refetch the button in 5 seconds..");
+                    setTimeout(function() {
+                        renewHash();
+                    }, 5000);
+                }
+            },
+            error: function() {
+                console.log("Error getting response, retrying in 5 seconds...");
+                setTimeout(function() {
+                    renewHash();
                 }, 5000);
             }
         });
-
-        unsafeWindow.alert = function() {};
-
-        $(window).bind('beforeunload', function(){
-            return "It seems we successfully placed a bet! It took " + self.betAttempts + " tries to place the bet.\n\n" +
-                "This site seems to be redirecting to My Bets page, just confirm redirection to proceed. \n\nIf you are just refreshing/leaving this page, ignore this pop-up.";
-        });
-
-        $("a:contains('Place Bet')").click();
-
-        return true;
     };
 
     this.checkBetRequirements = function() {
@@ -247,6 +371,7 @@ var Bet3000 = function() {
             ajaxProperties.data = $("#freeze").serialize();
             ajaxProperties.success = function(data) {
                 if (data) {
+                    self.returnAttempts = self.returnAttempts + 1;
                     Loge("Try Nr." + self.returnAttempts + ", items need to be frozen, attempting to freeze them!");
                     self.requestReturns();
                 }
@@ -473,10 +598,44 @@ if(document.URL.indexOf("/match?m=") != -1) {
         $("#realbetbutton").click(function() {
             Bet.placeBet($("#placebut"));
         });
+
+        $(".gradient:eq(0)").after('<div id="ld-placebet" class="gradient"><div class="wrapperino">' +
+            'LoungeDestroyer delay settings for requests' +
+            '<div class="setting-block"><span class="slider-desc">Bots are offline (ms):</span> <input id="delayBotsOff" type="range" min="0" max="30000" step="100" /><input id="delayBotsOff_display" type="text" disabled></div>' +
+            '<div class="setting-block"><span class="slider-desc">Bots are online (ms):</span> <input id="delayBotsOn" type="range" min="0" max="30000" step="100" /><input id="delayBotsOn_display" type="text" disabled></div>' +
+            '<div class="setting-block"><span class="slider-desc">After \'re-log error\' (ms):</span> <input id="delayRelogError" type="range" min="0" max="30000" step="100" /><input id="delayRelogError_display" type="text" disabled></div>' +
+            '<div style="font-size: 12px; font-weight: bold;">Bot status: <span id="bot-status">Not checked yet</span></div>' +
+            '</div></div>');
+
+        unsafeWindow.delays = {};
+        function updatePlaceBetSetting(name, value) {
+            $("#" + name + "_display").val(value);
+            unsafeWindow.delays[name] = parseInt(value);
+        }
+        $("#ld-placebet .setting-block input[type=range]").change(function() {
+            Bet.saveSetting(this.id, this.value);
+            updatePlaceBetSetting(this.id, this.value);
+        });
+        $("#ld-placebet .setting-block input[type=range]").each(function(index, value) {
+            var settingVal = Bet.userSettings[value.id];
+            $(value).val(settingVal);
+            updatePlaceBetSetting(value.id, settingVal);
+        });
+        function checkBotsPlaceBet() {
+            Bet.checkBotsOnline(function() {
+                unsafeWindow.botsOnline = true;
+                $("#bot-status").html("ONLINE");
+            }, function () {
+                $("#bot-status").html("OFFLINE");
+                unsafeWindow.botsOnline = false;
+            })
+        }
+        checkBotsPlaceBet();
+        setInterval(function() {
+            checkBotsPlaceBet();
+        }, 15000);
     }
 
-    // Okay, Bowerik or whoever designs and codes this shit.. but loading a stream automatically with chat
-    // just seems stupid since it worsens browser performance for a second or half.
     if(Bet.userSettings["streamRemove"] == "1") {
         $("#stream object, #stream iframe").remove();
     }
@@ -519,22 +678,6 @@ if(document.URL.indexOf("/trade?t=") != -1) {
     $("a:contains('Add items to offer')").click(function() {
         Bet.getBackpack("offer");
     })
-}
-
-if(document.URL.indexOf("/mytrades") != -1) {
-//    $(".tradepoll").each(function(index, value) {
-//        var tradeURL = $(value).find(".tradeheader a:eq(0)").attr("href");
-//        $(value).find(".tradecnt").after('<div class="lastbumped">Last bumped: <span>unknown</span></div>');
-//        var autobumpBtn = $("<a class='button autobump'>Auto-bump: <span class='status'>Off</span></a>");
-//        $(value).find(".tradeheader a:eq(2)").after(autobumpBtn);
-//        $.ajax({
-//            type: "GET",
-//            url: tradeURL,
-//            success: function(data) {
-//                $(value).find(".lastbumped span").html($(data).find(".tradeheader").text());
-//            }
-//        })
-//    })
 }
 
 if($("#backpack").length) {
