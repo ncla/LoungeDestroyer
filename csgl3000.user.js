@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name       CS:GO Lounge Destroyer
 // @namespace  http://csgolounge.com/
-// @version    0.6.6
+// @version    0.6.7
 // @description  Spam the fuck out of the CS:GL queue system, because it's absolute crap
 // @match      http://csgolounge.com/*
 // @match      http://dota2lounge.com/*
@@ -65,8 +65,8 @@ var Bet3000 = function() {
     /* Construct */
     var self = this;
 
-    var version = "0.6.6";
-    var versionReleaseDate = "2014.08.22";
+    var version = "0.6.7";
+    var versionReleaseDate = "2014.08.26";
 
     Loge("LoungeDestroyer v" + version + " (released on " + versionReleaseDate + ")");
 
@@ -248,9 +248,6 @@ var Bet3000 = function() {
                 }
                 else {
                     console.log("Error getting bots status from page, retrying in 5 seconds...");
-                    setTimeout(function() {
-                        self.checkBotsOnline(onlineCallback, offlineCallback);
-                    }, 5000);
                 }
             },
             error: function() {
@@ -308,7 +305,7 @@ var Bet3000 = function() {
             $.ajax({
                 url: "ajax/backpack.php",
                 success: function(data) {
-                    if($(data).text().indexOf("Can't get items.") == -1) {
+                    if($(data).text().indexOf("Can't get items.") == -1 && data.length != 0) {
                         document.getElementById("offer").innerHTML += data; // .append() no like ;(
                         $("#backpack").hide().slideDown();
                         $("#loading").hide();
@@ -332,9 +329,10 @@ var Bet3000 = function() {
                 type: 'POST',
                 data: "id=" + self.profileNumber,
                 success: function(data) {
-                    if($(data).text().indexOf("Can't get items.") == -1) {
+                    if($(data).text().indexOf("Can't get items.") == -1 && data.length != 0) {
                         $("#showinventorypls").hide();
                         $(".left").html("");
+                        $("#loading").hide();
                         $("#backpack").html(data).show();
                         Loge("Inventory loaded");
                         self.loadMarketPricesBackpack();
@@ -505,8 +503,10 @@ var Bet3000 = function() {
         observeDOM(document.getElementById(observeElement), function() {
             if(!backpackLoaded) {
                 // !$(".bpheader").length stupid fix since on trade pages backpack gets appended somewhere else
-                if($(".standard").text().indexOf("Can't get items.") != -1 && !$(".bpheader").length) {
+                if(($(".standard").text().indexOf("Can't get items.") != -1 && !$(".bpheader").length) || $("#backpack").html().length == 0) {
+                    // Uncaught Error: Syntax error, unrecognized expression: Temp disabled.
                     $("#backpack").hide();
+                    $("#backpack").after('<img src="http://cdn.dota2lounge.com/img/load.gif" id="loading" style="margin: 0.75em 2%"/>');
                     Loge("CS:GO inventory is not loaded");
                     Loge("Getting your Steam profile number!");
                         Loge("Checking if your Steam profile is private");
@@ -586,9 +586,18 @@ $(document).on("mouseover", ".item", function() {
     Bet.getMarketPrice(this);
     if($(this).find(".steamMarketURL").length == 0) {
         var itemName = encodeURI($(this).find(".smallimg").attr("alt"));
-        $(this).find('.name a[onclick="previewItem($(this))"]').after('<br/>' +
+        if($(this).find("a.button").length) {
+            var elementToAppendAfter = $(this).find("b:eq(0)");
+        }
+        else {
+            var elementToAppendAfter = $(this).find('.name a[onclick="previewItem($(this))"]');
+        }
+        $(this).find(elementToAppendAfter).after('<br/>' +
             '<br/><a class="steamMarketURL" href="http://steamcommunity.com/market/listings/'+ Bet.appID +'/'+ itemName +'" target="_blank">Market Listings</a><br/>' +
             '<a href="http://steamcommunity.com/market/search?q='+ itemName +'" target="_blank">Market Search</a>');
+        $(this).find("a[href]").click(function(e) {
+            e.stopPropagation();
+        });
     }
 });
 if(document.URL.indexOf("/match?m=") != -1) {
