@@ -1,0 +1,132 @@
+<!doctype html>
+<style type="text/css">
+    body {
+        padding: 0;
+        margin: 0;
+        font-family: Arial, sans-serif;
+    }
+    #ld_popup {
+        display: block;
+        width: 280px;
+        height: 380px;
+        background: white;
+    }
+
+    #ld_popup .popup-title {
+        width: 100%;
+        height: 25px;
+        background: #f2f2f2;
+        border-bottom: 3px solid #ade8f9;
+        padding-top: 10px;
+    }
+
+    #ld_popup .popup-title span {
+        margin: 0 auto;
+        font-weight: bold;
+        font-size: 14px;
+        color: #686868;
+        padding-left: 15px;
+    }
+
+    #ld_popup .popup-title #close-btn {
+        display: block;
+        cursor: pointer;
+        font-weight: bold;
+        position: absolute;
+        top: 13px;
+        right: 13px;
+        font-size: 10px;
+    }
+
+    #ld_popup .ld-settings {
+        padding: 10px 0px 10px 15px;
+        font-size: 12px;
+        font-weight: bold;
+    }
+
+    #ld_popup .ld-settings select {
+        width: 205px;
+        height: 21px;
+        margin-bottom: 5px;
+    }
+    #ld_popup .footerino {
+        width: 100%;
+        position: absolute;
+        bottom: 0;
+        height: 65px;
+        background: #f8f8f8;
+        border-top: 1px solid #e4e4e4;
+        color: #c2c2c2;
+        font-size: 12px;
+        text-align: center;
+        padding-top: 5px;
+    }
+
+    #ld_popup .footerino a {
+        color: #a0a0a0;
+    }
+
+    #ld_popup .footerino a:hover {
+        text-decoration: underline;
+    }
+</style>
+
+<div id="ld_popup">
+    <div class="popup-title">
+        <span>LoungeDestroyer settings</span>
+        <div id="close-btn">&#x2715;</div>
+    </div>
+    <div class="ld-settings">
+        <div>Market prices on items:</div>
+        <select id="itemMarketPrices">
+            <option value="1">Enabled</option>
+            <option value="0">Disabled</option>
+        </select>
+
+        <div>Steam market currency:</div>
+        <select id="marketCurrency">
+            <option value="1">USD</option>
+            <option value="2">GBP</option>
+            <option value="3">EUR</option>
+            <option value="5">RUB</option>
+        </select>
+
+        <!--<div>Redirect from item draft page:</div>-->
+        <!--<select id="redirect">-->
+            <!--<option value="1">Enabled</option>-->
+            <!--<option value="0">Disabled</option>-->
+        <!--</select>-->
+
+        <div>Remove stream from match page:</div>
+        <select id="streamRemove">
+            <option value="1">Enabled</option>
+            <option value="0">Disabled</option>
+        </select>
+
+        <div>Notify when bots go online:</div>
+        <select id="notifyBots">
+            <option value="1">Enabled</option>
+            <option value="0">Disabled</option>
+        </select>
+
+        <div>Notify about new matches:</div>
+        <select id="notifyMatches">
+            <option value="1">Both</option>
+            <option value="2">Dota2 Lounge matches only</option>
+            <option value="3">CS:GO Lounge matches only</option>
+            <option value="4">Disabled</option>
+        </select>
+    </div>
+    <div class="footerino">
+        <div>created by <a href="http://ncla.me" target="_blank">NCLA</a></div>
+        <div style="font-weight: bold;font-size:11px;">
+            <a href="http://github.com/iamncla/LoungeDestroyer" target="_blank">Contribute</a>
+        </div>
+        <div>
+            <span>BTC: 1JPiadmQsRPKxR7ADzYNpdP7LL7xV1vVaq</span>
+        </div>
+    </div>
+</div>
+<script src="../inject/jquery-2.1.1.min.js"></script>
+<script src="../inject/user.js"></script>
+<script src="popup.js"></script>

@@ -6,7 +6,7 @@
 // @match      http://csgolounge.com/*
 // @match      http://dota2lounge.com/*
 // @updateURL   http://ncla.me/csgl3000/csgl3000.meta.js
-// @downloadURL http://ncla.me/csgl3000/csgl3000.user.js
+// @downloadURL http://ncla.me/csgl3000/oldshit.js
 // @require http://code.jquery.com/jquery-2.1.1.js
 // @grant       GM_getValue
 // @grant       GM_setValue

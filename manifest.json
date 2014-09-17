@@ -1,0 +1,58 @@
+{
+    "name": "LoungeDestroyer",
+    "version": "0.7",
+    "manifest_version": 2,
+    "description": "Improves the experience of CSGOLounge.com/Dota2Lounge.com",
+    "homepage_url": "http://github.com/iamncla/LoungeDestroyer",
+    "icons": {
+        "16": "icons/loungedestroyer_icon2.png",
+        "48": "icons/loungedestroyer_icon2.png",
+        "128": "icons/loungedestroyer_icon2.png"
+    },
+    "default_locale": "en",
+    "background": {
+        "scripts": [
+            "src/inject/jquery-2.1.1.min.js",
+            "src/bg/background.js"
+        ],
+        "persistent": true
+    },
+    "browser_action": {
+        "default_icon": "icons/loungedestroyer_icon2.png",
+        "default_title": "LoungeDestroyer settings",
+        "default_popup": "src/browser_action/browser_action.html"
+    },
+    "permissions": [
+        "notifications",
+        "http://csgolounge.com/*",
+        "http://steamcommunity.com/*",
+        "http://dota2lounge.com/*",
+        "storage",
+        "webRequest",
+        "webRequestBlocking",
+        "tabs"
+    ],
+    "content_scripts": [
+        {
+            "matches": [
+                "http://csgolounge.com/*",
+                "http://dota2lounge.com/*"
+            ],
+            "css": [
+                "src/inject/inject.css"
+            ]
+        },
+        {
+            "matches": [
+                "http://csgolounge.com/*",
+                "http://dota2lounge.com/*"
+            ],
+            "js": [
+                "src/inject/jquery-2.1.1.min.js",
+                "src/inject/user.js",
+                "src/inject/inject.js"
+            ],
+            "run-at": "document_start"
+        }
+    ]
+}
