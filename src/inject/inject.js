@@ -31,7 +31,6 @@ chrome.storage.local.get('botsOnline', function(result) {
     When bot status changes (detected by background.js), a message gets send from background script to content script (here).
     TO-DO: Pass bot status through listener.
  */
-console.log("content script " + Date.now());
 chrome.extension.onMessage.addListener(function(msg, sender, sendResponse) {
     if(msg.action == "updateBotStatus") {
         chrome.storage.local.get('botsOnline', function(result) {
@@ -46,7 +45,9 @@ chrome.extension.onMessage.addListener(function(msg, sender, sendResponse) {
             var bpItem = new Item(v);
             bpItem.getMarketPrice();
         });
-        epicStuff();
+        if(document.URL.indexOf("/match?m=") != -1) {
+            epicStuff();
+        }
     }
 });
 
@@ -208,7 +209,7 @@ $(document).on("mouseover", ".item", function() {
         $(this).find(elementToAppendAfter).after('<br/>' +
             '<br/><a class="steamMarketURL" href="' + LoungeItem.generateMarketURL() + '" target="_blank">Market Listings</a><br/>' +
             '<a href="' + LoungeItem.generateMarketSearchURL() + '" target="_blank">Market Search</a>');
-        $(this).find("a[href]").click(function(e) {
+        $("a", this).click(function(e) {
             e.stopPropagation();
         });
     }

@@ -126,7 +126,7 @@ setInterval(function() {
             oReq.send();
         }
     });
-}, 2500);
+}, 5000);
 function checkNewMatches(ajaxResponse, appID) {
     var activeMatches = {};
 
@@ -216,4 +216,4 @@ setInterval(function() {
             }
         }
     });
-}, 10000);
+}, 20000);

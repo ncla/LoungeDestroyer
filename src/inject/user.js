@@ -22,6 +22,9 @@ var User = function() {
     this.saveSetting = function(settingName, settingValue) {
         self.userSettings[settingName] = settingValue;
         chrome.storage.local.set({"userSettings": JSON.stringify(self.userSettings)});
+        /*
+            Inform background page and content script about setting changes here
+        */
         console.log("Saving user setting [" + settingName +"] to " +settingValue);
     };
 }
