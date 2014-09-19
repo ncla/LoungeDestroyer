@@ -6,6 +6,8 @@ var defaultUser = new User();
 var Settings = defaultUser.defaultSettings;
 
 function restore_options() {
+    var manifesto = chrome.runtime.getManifest();
+    document.getElementById("version").innerHTML = manifesto.version;
     chrome.storage.local.get("userSettings", function(result) {
         var storageSettings = JSON.parse(result.userSettings);
         $.each(storageSettings, function(index, value) {

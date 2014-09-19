@@ -13,7 +13,7 @@ function setBotstatus(value) {
                 /* Might not want to notify when installed for first time */
                 var notify = new Notification("CS:GO Lounge Bot status",
                     {body: "Bots appear to be online since " + new Date().toLocaleString(),
-                        icon: "../../icons/icon128.png"});
+                        icon: "../../icons/icon.png"});
                 setTimeout(function() {
                     notify.close();
                 }, 10000);
@@ -178,7 +178,7 @@ function checkNewMatches(ajaxResponse, appID) {
             $.each(matchesToNotificate, function(index, value) {
                 var notify = new Notification("A new " + (appID == 730 ? "CS:GO" : "DOTA2") + " match has been added!",
                     {body: value.teamA + " vs. " + value.teamB + " @ " + value.tournament + "\nMatch begins " + value.when,
-                        icon: "../../icons/icon128.png"});
+                        icon: "../../icons/icon.png"});
                 setTimeout(function() {
                     notify.close();
                 }, 10000);

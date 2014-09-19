@@ -5,9 +5,9 @@
     "description": "Improves the experience of CSGOLounge.com/Dota2Lounge.com",
     "homepage_url": "http://github.com/iamncla/LoungeDestroyer",
     "icons": {
-        "16": "icons/loungedestroyer_icon2.png",
-        "48": "icons/loungedestroyer_icon2.png",
-        "128": "icons/loungedestroyer_icon2.png"
+        "16": "icons/icon.png",
+        "48": "icons/icon.png",
+        "128": "icons/icon.png"
     },
     "background": {
         "scripts": [
@@ -17,7 +17,7 @@
         "persistent": true
     },
     "browser_action": {
-        "default_icon": "icons/loungedestroyer_icon2.png",
+        "default_icon": "icons/icon.png",
         "default_title": "LoungeDestroyer settings",
         "default_popup": "src/browser_action/browser_action.html"
     },
