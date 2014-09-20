@@ -1,3 +1,18 @@
+var LoungeUser = new User();
+LoungeUser.loadUserSettings(function() {
+    console.log("Settings for background.js have loaded!");
+});
+/*
+    Make changes to LoungeUser user settings once the settings are changed from extension pop-up
+ */
+chrome.extension.onMessage.addListener(function (request, sender, sendResponse) {
+    if(request.hasOwnProperty("changeSetting")) {
+        for(var name in request.changeSetting) {
+            LoungeUser.userSettings[name] = request.changeSetting[name];
+        }
+    }
+});
+
 function setBotstatus(value) {
     chrome.storage.local.get('botsOnline', function(result) {
         if(result.botsOnline != value) {
@@ -45,20 +60,13 @@ chrome.webRequest.onHeadersReceived.addListener(
         var originalURL = details.url;
         for(var i = 0, l = headers.length; i < l; ++i) {
             /*
-                That's right.
-                I did it this way.
-                What you gonna do now?
+             That's right.
+             I did it this way.
+             What you gonna do now?
              */
-            if(headers[i].name == 'Location' && headers[i].value.indexOf("/wait.html") != -1) {
-//                chrome.storage.local.get("userSettings", function(result) {
-//                    var storageUserSettings = JSON.parse(result.userSettings);
-//                    var redirect = storageUserSettings.redirect;
-//                    if(redirect == "1") {
-                        details.responseHeaders.splice(i, 1); // Removes it
-                        chrome.tabs.update(details.tabId, {url: originalURL});
-//                    }
-//                });
-
+            if(headers[i].name == 'Location' && headers[i].value.indexOf("/wait.html") != -1 && LoungeUser.userSettings.redirect == "1") {
+                details.responseHeaders.splice(i, 1); // Removes it
+                chrome.tabs.update(details.tabId, {url: originalURL});
             }
         }
         blockingResponse.responseHeaders = headers;
@@ -67,20 +75,6 @@ chrome.webRequest.onHeadersReceived.addListener(
     {urls: ["*://csgolounge.com/*", "*://dota2lounge.com/*"]},
     ["responseHeaders", "blocking"]
 );
-
-function onCompletedObserve(details) {
-    chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
-        if (changeInfo.status == 'complete' && tabId == details.tabId) {
-            chrome.extension.onRequest.removeListener(onCompletedObserve);
-            console.log(tabId);
-            console.log(changeInfo);
-            console.log(tab);
-            console.log("onUpdated " + Date.now());
-            var message = {action: "onInventoryLoaded"};
-            sendMessageToContentScript(message, details.tabId);
-        }
-    });
-}
 
 chrome.webRequest.onCompleted.addListener(
     function(details) {
@@ -96,36 +90,34 @@ chrome.webRequest.onCompleted.addListener(
 );
 
 /*
- http://jsperf.com/xmlhttprequest-vs-jquery-ajax/3
+    Performance is the key for background tasks. Using jQuery selectors is fine, createHTMLDocument() doesn't parse
+    HTML string in such a way that it loads external resources.
+    http://jsperf.com/xmlhttprequest-vs-jquery-ajax/3
  */
 
 setInterval(function() {
-    chrome.storage.local.get("userSettings", function(result) {
-        var storageUserSettings = JSON.parse(result.userSettings);
-        var notifyWhat = storageUserSettings.notifyBots;
-        if(notifyWhat == "1") {
-            var oReq = new XMLHttpRequest();
-            oReq.onload = function() {
-                var doc = document.implementation.createHTMLDocument("");
-                doc.body.innerHTML = this.responseText;
+    if(LoungeUser.userSettings.notifyBots == "1") {
+        var oReq = new XMLHttpRequest();
+        oReq.onload = function() {
+            var doc = document.implementation.createHTMLDocument("");
+            doc.body.innerHTML = this.responseText;
 
-                var botStatus = doc.getElementsByTagName("center")[0].innerText.replace("BOTS ARE ", "");
-                if(botStatus == "ONLINE") {
-                    setBotstatus(1);
-                } else if(botStatus == "OFFLINE") {
-                    setBotstatus(0);
-                }
-                else {
-                    setBotstatus(-1);
-                }
-            };
-            oReq.onerror = function() {
+            var botStatus = doc.getElementsByTagName("center")[0].innerText.replace("BOTS ARE ", "");
+            if(botStatus == "ONLINE") {
+                setBotstatus(1);
+            } else if(botStatus == "OFFLINE") {
+                setBotstatus(0);
+            }
+            else {
                 setBotstatus(-1);
             }
-            oReq.open("get", "http://csgolounge.com/status", true);
-            oReq.send();
-        }
-    });
+        };
+        oReq.onerror = function() {
+            setBotstatus(-1);
+        };
+        oReq.open("get", "http://csgolounge.com/status", true);
+        oReq.send();
+    }
 }, 5000);
 function checkNewMatches(ajaxResponse, appID) {
     var activeMatches = {};
@@ -188,32 +180,29 @@ function checkNewMatches(ajaxResponse, appID) {
 }
 
 setInterval(function() {
-    chrome.storage.local.get("userSettings", function(result) {
-        var storageUserSettings = JSON.parse(result.userSettings);
-        var notifyWhat = storageUserSettings.notifyMatches;
-        if(notifyWhat != "4") {
-            if(notifyWhat == "2" || notifyWhat == "1") {
-                console.log("Checking DOTA2 matches");
-                var oReq = new XMLHttpRequest();
-                oReq.onload = function() {
-                    var doc = document.implementation.createHTMLDocument("");
-                    doc.body.innerHTML = this.responseText;
-                    checkNewMatches(doc, 570);
-                };
-                oReq.open("get", "http://dota2lounge.com/", true);
-                oReq.send();
-            }
-            if(notifyWhat == "3" || notifyWhat == "1") {
-                console.log("Checking CS:GO matches");
-                var oReq = new XMLHttpRequest();
-                oReq.onload = function() {
-                    var doc = document.implementation.createHTMLDocument("");
-                    doc.body.innerHTML = this.responseText;
-                    checkNewMatches(doc, 730);
-                };
-                oReq.open("get", "http://csgolounge.com/", true);
-                oReq.send();
-            }
+    var notifyWhat = LoungeUser.userSettings.notifyMatches;
+    if(notifyWhat != "4") {
+        if(notifyWhat == "2" || notifyWhat == "1") {
+            console.log("Checking DOTA2 matches");
+            var oReq = new XMLHttpRequest();
+            oReq.onload = function() {
+                var doc = document.implementation.createHTMLDocument("");
+                doc.body.innerHTML = this.responseText;
+                checkNewMatches(doc, 570);
+            };
+            oReq.open("get", "http://dota2lounge.com/", true);
+            oReq.send();
         }
-    });
+        if(notifyWhat == "3" || notifyWhat == "1") {
+            console.log("Checking CS:GO matches");
+            var oReq = new XMLHttpRequest();
+            oReq.onload = function() {
+                var doc = document.implementation.createHTMLDocument("");
+                doc.body.innerHTML = this.responseText;
+                checkNewMatches(doc, 730);
+            };
+            oReq.open("get", "http://csgolounge.com/", true);
+            oReq.send();
+        }
+    }
 }, 20000);

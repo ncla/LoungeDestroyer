@@ -1,6 +1,6 @@
 {
     "name": "LoungeDestroyer",
-    "version": "0.7.0.1",
+    "version": "0.7.0.4",
     "manifest_version": 2,
     "description": "Improves the experience of CSGOLounge.com/Dota2Lounge.com",
     "homepage_url": "http://github.com/iamncla/LoungeDestroyer",
@@ -12,12 +12,13 @@
     "background": {
         "scripts": [
             "src/inject/jquery-2.1.1.min.js",
+            "src/inject/user.js",
             "src/bg/background.js"
         ],
         "persistent": true
     },
     "browser_action": {
-        "default_icon": "icons/icon.png",
+        "default_icon": "icons/icon_cropped.png",
         "default_title": "LoungeDestroyer settings",
         "default_popup": "src/browser_action/browser_action.html"
     },
