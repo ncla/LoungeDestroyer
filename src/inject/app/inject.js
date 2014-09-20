@@ -1,25 +1,6 @@
-/* HELPER FUCNTIONS */
-/* Get URL parameter */
-function gup(a){a=a.replace(/[\[]/,"\\[").replace(/[\]]/,"\\]");var b="[\\?&]"+a+"=([^&#]*)",c=new RegExp(b),d=c.exec(window.location.href);return null==d?null:d[1]}
-/* Custom logging function */
-var Loge = function(message) {
-    console.log(new Date() + " ---- " + message);
-}
 /*
     Bot status initiated
  */
-var LoungeBots = function() {
-    this.status = null;
-    this.updateStatus = function(status) {
-        this.status = status;
-        if(status == 1) {
-            $("#bot-status").addClass("online");
-        }
-        else {
-            $("#bot-status").removeClass("online");
-        }
-    }
-}
 
 var BotStatus = new LoungeBots();
 
@@ -38,14 +19,12 @@ chrome.extension.onMessage.addListener(function(msg, sender, sendResponse) {
         });
     }
     if(msg.action == "onInventoryLoaded") {
-        console.log("onInventoryLoaded " + Date.now());
-
         console.log("Message received for inventory");
         $("#backpack .item").each(function(i, v) {
             var bpItem = new Item(v);
             bpItem.getMarketPrice();
         });
-        if(document.URL.indexOf("/match?m=") != -1) {
+        if(document.URL.indexOf("/match?m=") != -1 && appID == "730") {
             epicStuff();
         }
     }
@@ -56,28 +35,6 @@ chrome.extension.onMessage.addListener(function(msg, sender, sendResponse) {
     }
 });
 
-/* Get a cookie by a name */
-function readCookie(e){var t=e+"=";var n=document.cookie.split(";");for(var r=0;r<n.length;r++){var i=n[r];while(i.charAt(0)==" ")i=i.substring(1,i.length);if(i.indexOf(t)==0)return i.substring(t.length,i.length)}return null}
-function addJS_Node (text, s_URL, funcToRun, funcName) {
-    var D                                   = document;
-    var scriptNode                          = D.createElement ('script');
-    scriptNode.type                         = "text/javascript";
-    if (text)       scriptNode.textContent  = text;
-    if (s_URL)      scriptNode.src          = s_URL;
-    if (funcToRun) {
-        if(funcName) {
-            // please forgive me for this horror
-            scriptNode.textContent  = funcToRun.toString().replace("function () {", "function " + funcName + "() {");
-        }
-        else {
-            scriptNode.textContent  = '(' + funcToRun.toString() + ')()';
-        }
-    }
-
-    var targ    = D.getElementsByTagName('head')[0] || D.body || D.documentElement;
-    targ.appendChild (scriptNode);
-}
-
 var nonMarketItems = ["Dota Items", "Any Offers", "Knife", "Gift", "TF2 Items", "Real Money", "Offers", "Any Common", "Any Uncommon", "Any Rare", "Any Mythical", "Any Legendary",
     "Any Ancient", "Any Immortal", "Real Money", "+ More", "Any Set", "Any Key", "Undefined / Not Tradeable"];
 
@@ -86,85 +43,10 @@ var appID = (window.location.hostname == "dota2lounge.com" ? "570" : "730");
 var marketedItems = {}; /* Global variable for marketed items so we dont overwhelm Volvo */
 
 $("body").addClass("appID" + appID);
+
 if(document.URL.indexOf("/mytrades") != -1 || $("a:contains('Clean messages')").length) {
     $("body").addClass("mytrades");
 }
-
-var Item = function(item) {
-    var self = this;
-    this.itemName = $(".smallimg", item).attr("alt");
-    this.condition = $(".rarity", item).text().trim();
-
-    this.getMarketPrice = function() {
-        if(marketedItems.hasOwnProperty(self.itemName)) {
-            // Not sure if I am genius for returning something and calling a function at the same time
-            return self.insertMarketValue(marketedItems[self.itemName]);
-        }
-        if(!$(item).hasClass("marketPriced") && nonMarketItems.indexOf(this.itemName) == -1 && nonMarketItems.indexOf($(".rarity", item).text()) == -1 && !$(item).hasClass("loadingPrice")) {
-            $(item).addClass("loadingPrice");
-            $.ajax({
-                url: this.generateMarketApiURL(),
-                type: "GET",
-                success: function(data) {
-                    if(data.success == true && data.hasOwnProperty("lowest_price")) {
-                        var lowestPrice = data["lowest_price"].replace("&#36;", "&#36; ");
-                        marketedItems[self.itemName] = lowestPrice;
-                        self.insertMarketValue(lowestPrice);
-                    }
-                    else {
-                        $(item).find('.rarity').html('Not Found');
-                    }
-                },
-                error: function() {
-                    console.log("Error getting response for item " + this.itemName);
-                }
-            }).done(function() {
-                    $(item).removeClass("loadingPrice");
-                });
-        }
-    };
-    this.insertMarketValue = function(lowestPrice) {
-        $(".item").each(function() {
-            if ($(this).find('img.smallimg').attr("alt") == self.itemName && !$(this).hasClass('marketPriced')) {
-                $(this).find('.rarity').html(lowestPrice);
-                $(this).addClass('marketPriced');
-            }
-        });
-    };
-    this.generateMarketURL = function() {
-        return 'http://steamcommunity.com/market/listings/' + appID + '/' + this.itemName;
-    };
-    this.generateMarketSearchURL = function() {
-        return 'http://steamcommunity.com/market/search?q=' + this.itemName;
-    };
-    this.generateMarketApiURL = function() {
-        return "http://steamcommunity.com/market/priceoverview/?country=US&currency=" + LoungeUser.userSettings["marketCurrency"] + "&appid=" + appID + "&market_hash_name=" + encodeURI(this.itemName);
-    };
-    this.generateSteamStoreURL = function() {
-        return "http://store.steampowered.com/search/?term=" + encodeURI(this.itemName);
-    }
-};
-
-var Inventory = function() {
-    this.loadInventory = function() {
-
-    };
-    this.getMarketPrices = function() {
-        $(".item").each(function(index, value) {
-            var item = new Item(value);
-            item.getMarketPrice();
-        });
-    };
-    /*
-        Caching betting/trading inventories incase API is broken
-     */
-    this.cacheInventory = function(type) {
-
-    };
-    this.getCachedInventory = function(type) {
-
-    };
-};
 
 /*
  Wrap the init code here, because for this to function properly, we need user settings to be loaded first
