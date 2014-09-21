@@ -136,3 +136,54 @@ div.trade-description {
 .name {
     min-width: 180px;
 }
+
+/*
+http://codepen.io/larrygeams/pen/nhgze
+*/
+#LDloading {
+    background-color: rgba(0,0,0,0);
+    opacity: .8;
+    border-radius: 50px;
+    margin: 5% auto;
+    animation: loading .7s infinite linear;
+    -moz-animation: loading .7s infinite linear;
+    -webkit-animation: loading .7s infinite linear;
+}
+
+.spin-1{
+    border: 5px solid #fff;
+    border-top: 5px solid rgba(0,0,0,0);
+    border-left: 5px solid rgba(0,0,0,0);
+    width: 24px;
+    height: 24px;
+}
+
+@keyframes loading {
+    0% {
+        -moz-transform: rotate(0deg);
+    }
+
+    100% {
+        -moz-transform: rotate(360deg);
+    };
+}
+
+@-moz-keyframes loading {
+    0% {
+        -moz-transform: rotate(0deg);
+    }
+
+    100% {
+        -moz-transform: rotate(360deg);
+    };
+}
+
+@-webkit-keyframes loading {
+    0% {
+        -webkit-transform: rotate(0deg);
+    }
+
+    100% {
+        -webkit-transform: rotate(360deg);
+    };
+}

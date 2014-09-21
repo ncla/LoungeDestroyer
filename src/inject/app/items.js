@@ -1,7 +1,6 @@
 var Item = function(item) {
     var self = this;
     this.itemName = $(".smallimg", item).attr("alt");
-    this.condition = $(".rarity", item).text().trim();
 
     this.getMarketPrice = function() {
         if(marketedItems.hasOwnProperty(self.itemName)) {
@@ -32,12 +31,15 @@ var Item = function(item) {
         }
     };
     this.insertMarketValue = function(lowestPrice) {
-        $(".item").each(function() {
-            if ($(this).find('img.smallimg').attr("alt") == self.itemName && !$(this).hasClass('marketPriced')) {
-                $(this).find('.rarity').html(lowestPrice);
-                $(this).addClass('marketPriced');
-            }
-        });
+        $(".rarity", item).html(lowestPrice);
+        $(item).addClass("marketPriced");
+        // Need to rethink/rewrite this so it doesnt cause performance issues. Necessary for same items to have market value
+//        $(".item").each(function() {
+//            if ($(this).find('img.smallimg').attr("alt") == self.itemName && !$(this).hasClass('marketPriced')) {
+//                $(this).find('.rarity').html(lowestPrice);
+//                $(this).addClass('marketPriced');
+//            }
+//        });
     };
     this.generateMarketURL = function() {
         return 'http://steamcommunity.com/market/listings/' + appID + '/' + this.itemName;

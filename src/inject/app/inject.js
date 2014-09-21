@@ -20,13 +20,19 @@ chrome.extension.onMessage.addListener(function(msg, sender, sendResponse) {
     }
     if(msg.action == "onInventoryLoaded") {
         console.log("Message received for inventory");
-        $("#backpack .item").each(function(i, v) {
-            var bpItem = new Item(v);
-            bpItem.getMarketPrice();
-        });
-        if(document.URL.indexOf("/match?m=") != -1 && appID == "730") {
-            epicStuff();
+        var inv = new Inventory();
+        if(document.URL.indexOf("/match?m=") != -1) {
+            if($(".bpheader").text().indexOf("CS:GO Inventory") != -1) {
+                inv.cacheInventory("bettingInventory" + appID + "_" + readCookie("id"), $("#backpack").html());
+            }
+            if($(".bpheader .title").text().indexOf("Armory") != -1) {
+                inv.cacheInventory("bettingInventory" + appID + "_" + readCookie("id"), $("#backpack").html());
+            }
+            if(appID == "730") {
+                epicStuff();
+            }
         }
+        inv.getMarketPrices(true);
     }
     if(msg.hasOwnProperty("changeSetting")) {
         for(var name in msg.changeSetting) {
@@ -54,7 +60,7 @@ if(document.URL.indexOf("/mytrades") != -1 || $("a:contains('Clean messages')").
 function init() {
     if((document.URL.indexOf("/mytrades") != -1 || document.URL.indexOf("/trade?t=") != -1 || document.URL.indexOf("/mybets") != -1) && (LoungeUser.userSettings["itemMarketPrices"] == "1")) {
         var inv = new Inventory();
-        inv.getMarketPrices();
+        inv.getMarketPrices(false);
     }
     if(document.URL.indexOf("/mybets") != -1) {
         $(".matchmain").each(function(index, value) {
@@ -66,11 +72,9 @@ function init() {
             $(value).addClass("custom-my-bets-margin");
             $(".match .full:eq(0)", value).after('<div class="full total-bet"><span style="float: left; margin-right: 0.5em">Total value bet:</span><div class="potwin Value"><b>'+total.toFixed(2)+'</b> Value</div></div>');
         });
-        $(".standard:eq(1) .item").each(function(i, v) {
-
-        });
     }
-    if($('a[href="/trades"]').length || document.URL.indexOf("/result?") != -1) {
+    if($('a[href="/trades"]').length || document.URL.indexOf("/result?") != -1 || document.URL.indexOf("/trades") != -1) {
+        // On infinite scrolling trade page, new trades wont have expanded description
         $(".tradepoll").each(function(index, value) {
             var description = $(value).find(".tradeheader").attr("title");
             var descriptionTextLength = description.length;
@@ -94,6 +98,21 @@ function init() {
         if(LoungeUser.userSettings["streamRemove"] == "1") {
             $("#stream object, #stream iframe").remove();
         }
+        var tabWrapper = $("div[style='float: left; width: 96%;margin: 0 2%;height: 26px;border-radius: 5px;position: relative;overflow: hidden;']");
+        $(tabWrapper).append('<a class="tab" id="ld_cache" onclick="returns = false;">Cached inventory</div>');
+        $(tabWrapper).find(".tab").width("33%");
+        $("#ld_cache", tabWrapper).click(function() {
+            document.getElementById("backpack").innerHTML = '<div id="LDloading" class="spin-1"></div>';
+            var BettingInventory = new Inventory();
+            BettingInventory.getCachedInventory("bettingInventory" + appID + "_" + readCookie("id"), function(bpHTML) {
+                document.getElementById("backpack").innerHTML = bpHTML;
+                // Move appID check to epicStuff method instead
+                if(appID == "730") {
+                    epicStuff();
+                }
+                BettingInventory.getMarketPrices(true);
+            });
+        });
     }
 }
 

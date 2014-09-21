@@ -28,7 +28,7 @@ function setBotstatus(value) {
                 /* Might not want to notify when installed for first time */
                 var notify = new Notification("CS:GO Lounge Bot status",
                     {body: "Bots appear to be online since " + new Date().toLocaleString(),
-                        icon: "../../icons/icon.png"});
+                        icon: "../../icons/icon_normal_notification.png"});
                 setTimeout(function() {
                     notify.close();
                 }, 10000);
@@ -79,7 +79,7 @@ chrome.webRequest.onHeadersReceived.addListener(
 chrome.webRequest.onCompleted.addListener(
     function(details) {
         if(details.type == "xmlhttprequest" &&
-         (details.url.indexOf("/ajax/betReturns.php") != -1 || details.url.indexOf("/ajax/betBackpackApi.php") != -1 || details.url.indexOf("/ajax/betBackpack.php") != -1 ||
+         (details.url.indexOf("/ajax/betReturns") != -1 || details.url.indexOf("/ajax/betBackpackApi") != -1 || details.url.indexOf("/ajax/betBackpack") != -1 ||
           details.url.indexOf("/ajax/tradeBackpackApi.php") != -1 || details.url.indexOf("/ajax/tradeBackpack.php") != -1)) {
                 console.log("requesterino " + Date.now());
                 var message = {action: "onInventoryLoaded"};
@@ -161,7 +161,8 @@ function checkNewMatches(ajaxResponse, appID) {
 
         var countNotify = Object.keys(matchesToNotificate).length;
         if(countNotify >= 3) {
-            var notify = new Notification("New matches have been added for betting on " + appID);
+            var notify = new Notification("New matches have been added for betting on " + appID,
+                {icon: "../../icons/icon_normal_notification.png"});
             setTimeout(function() {
                 notify.close();
             }, 10000);
@@ -170,7 +171,7 @@ function checkNewMatches(ajaxResponse, appID) {
             $.each(matchesToNotificate, function(index, value) {
                 var notify = new Notification("A new " + (appID == 730 ? "CS:GO" : "DOTA2") + " match has been added!",
                     {body: value.teamA + " vs. " + value.teamB + " @ " + value.tournament + "\nMatch begins " + value.when,
-                        icon: "../../icons/icon.png"});
+                        icon: "../../icons/icon_normal_notification.png"});
                 setTimeout(function() {
                     notify.close();
                 }, 10000);
