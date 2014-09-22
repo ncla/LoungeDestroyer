@@ -23,7 +23,6 @@ chrome.extension.onMessage.addListener(function(msg, sender, sendResponse) {
     if(msg.inventory) {
         console.log(msg.inventory);
         inv.onInventoryLoaded(msg.inventory);
-        inv.getMarketPrices(true);
     }
     if(msg.hasOwnProperty("changeSetting")) {
         for(var name in msg.changeSetting) {

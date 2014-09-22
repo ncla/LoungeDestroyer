@@ -9,10 +9,21 @@ Inventory.prototype.loadInventory = function() {
 
 Inventory.prototype.getMarketPrices = function(onlyForBackpack) {
     var selector = (onlyForBackpack ? $("#backpack .item") : $(".item"));
+    var cachedItemList = [];
     $(selector).each(function(index, value) {
         var item = new Item(value);
-        item.getMarketPrice();
+        if(!cachedItemList.hasOwnProperty(item.itemName)) {
+            cachedItemList[item.itemName] = [];
+        }
+        cachedItemList[item.itemName].push(item);
     });
+
+    for (var index in cachedItemList) {
+        var itemForScience = cachedItemList[index][0];
+        //console.log(itemForScience);
+        itemForScience.myFriends = cachedItemList[index];
+        itemForScience.getMarketPrice();
+    }
 };
 
 /*
@@ -56,7 +67,7 @@ Inventory.prototype.onInventoryLoaded = function(url) {
 //        }
     backpackAjaxURL = url;
     var whereToLookAt = (document.URL.indexOf("/trade?t=") != -1 ? $("#offer") : $("#backpack"));
-    console.log(whereToLookAt);
+    //console.log(whereToLookAt);
     if($(whereToLookAt).text().indexOf("Can't get items.") != -1) {
         console.log("Failure to get items!");
         this.addInventoryLoadButton(whereToLookAt);

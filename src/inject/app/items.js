@@ -12,15 +12,24 @@ var Item = function(item) {
 
 Item.prototype.insertMarketValue = function(lowestPrice) {
     var self = this;
-    // TODO: Need to rethink/rewrite this
-    $(".item").each(function() {
-        if(!$(this).hasClass('marketPriced')) {
-            if ($("img.smallimg", this).attr("alt") == self.itemName) {
-                $(".rarity", this).html(lowestPrice);
-                $(this).addClass('marketPriced');
-            }
+    if(this.myFriends) {
+        for (var index in self.myFriends) {
+            var $myLittleItem = $(self.myFriends[index]["item"]);
+            $myLittleItem.addClass('marketPriced');
+            $myLittleItem.find(".rarity").html(lowestPrice);
         }
-    });
+    }
+    else {
+        $(".item").each(function() {
+            var $theItem = $(this);
+            if(!$theItem.hasClass('marketPriced')) {
+                if ($theItem.find("img.smallimg").attr("alt") == self.itemName) {
+                    $theItem.find(".rarity").html(lowestPrice);
+                    $theItem.addClass('marketPriced');
+                }
+            }
+        });
+    }
 };
 
 Item.prototype.getMarketPrice = function() {
@@ -35,8 +44,6 @@ Item.prototype.getMarketPrice = function() {
         return this.insertMarketValue(marketedItems[this.itemName]);
     }
     if(nonMarketItems.indexOf(self.itemName) == -1 && !nonMarketItems.hasOwnProperty($(".rarity", this.item).text()) && !loadingItems.hasOwnProperty(this.itemName)) {
-        uniqueItemsFetched++;
-        console.log("Fetching.. #" + uniqueItemsFetched + " -- " + self.itemName);
         loadingItems[this.itemName] = true;
         $.ajax({
             url: this.generateMarketApiURL(),
@@ -87,4 +94,4 @@ Item.prototype.generateSteamStoreURL = function() {
     }
 
     return "http://store.steampowered.com/search/?term=" + encodeURI(this.itemName);
-}
+};
