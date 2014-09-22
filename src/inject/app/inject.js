@@ -8,6 +8,8 @@ chrome.storage.local.get('botsOnline', function(result) {
     $('a[href="/status"]').html('Bots status <div id="bot-status"></div>');
     BotStatus.updateStatus(result.botsOnline);
 });
+
+var inv = new Inventory();
 /*
     When bot status changes (detected by background.js), a message gets send from background script to content script (here).
     TO-DO: Pass bot status through listener.
@@ -18,20 +20,9 @@ chrome.extension.onMessage.addListener(function(msg, sender, sendResponse) {
             BotStatus.updateStatus(result.botsOnline);
         });
     }
-    if(msg.action == "onInventoryLoaded") {
-        console.log("Message received for inventory");
-        var inv = new Inventory();
-        if(document.URL.indexOf("/match?m=") != -1) {
-            if($(".bpheader").text().indexOf("CS:GO Inventory") != -1) {
-                inv.cacheInventory("bettingInventory" + appID + "_" + readCookie("id"), $("#backpack").html());
-            }
-            if($(".bpheader .title").text().indexOf("Armory") != -1) {
-                inv.cacheInventory("bettingInventory" + appID + "_" + readCookie("id"), $("#backpack").html());
-            }
-            if(appID == "730") {
-                epicStuff();
-            }
-        }
+    if(msg.inventory) {
+        console.log(msg.inventory);
+        inv.onInventoryLoaded(msg.inventory);
         inv.getMarketPrices(true);
     }
     if(msg.hasOwnProperty("changeSetting")) {
@@ -41,12 +32,7 @@ chrome.extension.onMessage.addListener(function(msg, sender, sendResponse) {
     }
 });
 
-var nonMarketItems = ["Dota Items", "Any Offers", "Knife", "Gift", "TF2 Items", "Real Money", "Offers", "Any Common", "Any Uncommon", "Any Rare", "Any Mythical", "Any Legendary",
-    "Any Ancient", "Any Immortal", "Real Money", "+ More", "Any Set", "Any Key", "Undefined / Not Tradeable"];
-
 var appID = (window.location.hostname == "dota2lounge.com" ? "570" : "730");
-
-var marketedItems = {}; /* Global variable for marketed items so we dont overwhelm Volvo */
 
 $("body").addClass("appID" + appID);
 
@@ -59,7 +45,6 @@ if(document.URL.indexOf("/mytrades") != -1 || $("a:contains('Clean messages')").
  */
 function init() {
     if((document.URL.indexOf("/mytrades") != -1 || document.URL.indexOf("/trade?t=") != -1 || document.URL.indexOf("/mybets") != -1) && (LoungeUser.userSettings["itemMarketPrices"] == "1")) {
-        var inv = new Inventory();
         inv.getMarketPrices(false);
     }
     if(document.URL.indexOf("/mybets") != -1) {
@@ -102,6 +87,7 @@ function init() {
         $(tabWrapper).append('<a class="tab" id="ld_cache" onclick="returns = false;">Cached inventory</div>');
         $(tabWrapper).find(".tab").width("33%");
         $("#ld_cache", tabWrapper).click(function() {
+            $(".left").html("");
             document.getElementById("backpack").innerHTML = '<div id="LDloading" class="spin-1"></div>';
             var BettingInventory = new Inventory();
             BettingInventory.getCachedInventory("bettingInventory" + appID + "_" + readCookie("id"), function(bpHTML) {

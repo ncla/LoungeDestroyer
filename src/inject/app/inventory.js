@@ -1,5 +1,6 @@
 var Inventory = function() {
-    // TODO: should this be a class?
+    var inventoryIsLoading = false;
+    var backpackAjaxURL = null;
 };
 
 Inventory.prototype.loadInventory = function() {
@@ -40,4 +41,50 @@ Inventory.prototype.getCachedInventory = function(type, callback) {
             callback(result[type]["html"]);
         }
     });
+};
+Inventory.prototype.stopLoadingInventory = function() {
+
+};
+Inventory.prototype.onInventoryLoaded = function(url) {
+//        if(document.URL.indexOf("/match?m=") != -1) {
+//            if($(".bpheader").text().indexOf("CS:GO Inventory") != -1) {
+//                inv.cacheInventory("bettingInventory" + appID + "_" + readCookie("id"), $("#backpack").html());
+//            }
+//            if($(".bpheader .title").text().indexOf("Armory") != -1) {
+//                inv.cacheInventory("bettingInventory" + appID + "_" + readCookie("id"), $("#backpack").html());
+//            }
+//        }
+    backpackAjaxURL = url;
+    var whereToLookAt = (document.URL.indexOf("/trade?t=") != -1 ? $("#offer") : $("#backpack"));
+    console.log(whereToLookAt);
+    if($(whereToLookAt).text().indexOf("Can't get items.") != -1) {
+        console.log("Failure to get items!");
+        this.addInventoryLoadButton(whereToLookAt);
+    } else if($(whereToLookAt).text().trim().length == 0) {
+        console.log("Empty response!");
+    } else {
+        console.log("Assuming the backpack has loaded!");
+        $("#loading", whereToLookAt).hide();
+        this.getMarketPrices(true);
+        if(appID == "730" && document.URL.indexOf("/match?m=") != -1) {
+            epicStuff();
+        }
+    }
+};
+Inventory.prototype.addInventoryLoadButton = function(element) {
+    var self = this;
+        var btn = $('<a class="button">Initiate backpack loading</a>');
+        $(btn).click(function() {
+            if(inventoryIsLoading) {
+                self.stopLoadingInventory();
+                $(btn).html("Initiate backpack loading");
+                inventoryIsLoading = false;
+            }
+            else {
+                self.loadInventory();
+                $(btn).html("Stop backpack loading");
+                inventoryIsLoading = true;
+            }
+        });
+        $(element).append(btn);
 };

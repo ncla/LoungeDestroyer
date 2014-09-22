@@ -78,15 +78,13 @@ chrome.webRequest.onHeadersReceived.addListener(
 
 chrome.webRequest.onCompleted.addListener(
     function(details) {
-        if(details.type == "xmlhttprequest" &&
-         (details.url.indexOf("/ajax/betReturns") != -1 || details.url.indexOf("/ajax/betBackpackApi") != -1 || details.url.indexOf("/ajax/betBackpack") != -1 ||
-          details.url.indexOf("/ajax/tradeBackpackApi.php") != -1 || details.url.indexOf("/ajax/tradeBackpack.php") != -1)) {
-                console.log("requesterino " + Date.now());
-                var message = {action: "onInventoryLoaded"};
-                sendMessageToContentScript(message, details.tabId);
-        }
+        var message = {inventory: details.url};
+        sendMessageToContentScript(message, details.tabId);
     },
-    {urls: ["*://csgolounge.com/*", "*://dota2lounge.com/*"]}
+    {
+        urls: ["http://*/ajax/betReturns*", "http://*/ajax/betBackpack*", "http://*/ajax/tradeBackpack*", "http://*/ajax/tradeGifts*", "http://*/ajax/backpack*"],
+        types: ["xmlhttprequest"]
+    }
 );
 
 /*

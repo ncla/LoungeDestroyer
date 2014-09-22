@@ -1,19 +1,26 @@
+var marketedItems = [];
+var loadingItems = [];
+var nonMarketItems = ["Dota Items", "Any Offers", "Knife", "Gift", "TF2 Items", "Real Money", "Offers", "Any Common", "Any Uncommon", "Any Rare", "Any Mythical", "Any Legendary",
+    "Any Ancient", "Any Immortal", "Real Money", "+ More", "Any Set", "Any Key", "Undefined / Not Tradeable"];
+var uniqueItemsFetched = 0;
+
 var Item = function(item) {
     var self = this;
-    this.itemName = $(".smallimg", item).attr("alt");
     this.item = item;
+    this.itemName = $(".smallimg", this.item).attr("alt");
 };
 
 Item.prototype.insertMarketValue = function(lowestPrice) {
-    $(".rarity", this.item).html(lowestPrice);
-    $(this.item).addClass("marketPriced");
-    // TODO: Need to rethink/rewrite this so it doesnt cause performance issues. Necessary for same items to have market value
-//        $(".item").each(function() {
-//            if ($(this).find('img.smallimg').attr("alt") == self.itemName && !$(this).hasClass('marketPriced')) {
-//                $(this).find('.rarity').html(lowestPrice);
-//                $(this).addClass('marketPriced');
-//            }
-//        });
+    var self = this;
+    // TODO: Need to rethink/rewrite this
+    $(".item").each(function() {
+        if(!$(this).hasClass('marketPriced')) {
+            if ($("img.smallimg", this).attr("alt") == self.itemName) {
+                $(".rarity", this).html(lowestPrice);
+                $(this).addClass('marketPriced');
+            }
+        }
+    });
 };
 
 Item.prototype.getMarketPrice = function() {
@@ -27,8 +34,10 @@ Item.prototype.getMarketPrice = function() {
         // Not sure if I am genius for returning something and calling a function at the same time
         return this.insertMarketValue(marketedItems[this.itemName]);
     }
-    if(!$(this.item).hasClass("marketPriced") && nonMarketItems.indexOf(this.itemName) == -1 && nonMarketItems.indexOf($(".rarity", this.item).text()) == -1 && !$(this.item).hasClass("loadingPrice")) {
-        $(this.item).addClass("loadingPrice");
+    if(nonMarketItems.indexOf(self.itemName) == -1 && !nonMarketItems.hasOwnProperty($(".rarity", this.item).text()) && !loadingItems.hasOwnProperty(this.itemName)) {
+        uniqueItemsFetched++;
+        console.log("Fetching.. #" + uniqueItemsFetched + " -- " + self.itemName);
+        loadingItems[this.itemName] = true;
         $.ajax({
             url: this.generateMarketApiURL(),
             type: "GET",
@@ -46,7 +55,7 @@ Item.prototype.getMarketPrice = function() {
                 console.log("Error getting response for item " + self.itemName);
             }
         }).done(function() {
-                $(self.item).removeClass("loadingPrice");
+                delete loadingItems[self.itemName];
             });
     }
 };
