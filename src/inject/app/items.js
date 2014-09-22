@@ -1,11 +1,12 @@
 var Item = function(item) {
     var self = this;
     this.itemName = $(".smallimg", item).attr("alt");
+    this.item = item;
 };
 
-this.insertMarketValue = function(lowestPrice) {
-    $(".rarity", item).html(lowestPrice);
-    $(item).addClass("marketPriced");
+Item.prototype.insertMarketValue = function(lowestPrice) {
+    $(".rarity", this.item).html(lowestPrice);
+    $(this.item).addClass("marketPriced");
     // TODO: Need to rethink/rewrite this so it doesnt cause performance issues. Necessary for same items to have market value
 //        $(".item").each(function() {
 //            if ($(this).find('img.smallimg').attr("alt") == self.itemName && !$(this).hasClass('marketPriced')) {
@@ -20,30 +21,32 @@ Item.prototype.getMarketPrice = function() {
         throw new TypeError("'this' must be instance of Item");
     }
 
+    var self = this;
+
     if(marketedItems.hasOwnProperty(this.itemName)) {
         // Not sure if I am genius for returning something and calling a function at the same time
         return this.insertMarketValue(marketedItems[this.itemName]);
     }
-    if(!$(item).hasClass("marketPriced") && nonMarketItems.indexOf(this.itemName) == -1 && nonMarketItems.indexOf($(".rarity", item).text()) == -1 && !$(item).hasClass("loadingPrice")) {
-        $(item).addClass("loadingPrice");
+    if(!$(this.item).hasClass("marketPriced") && nonMarketItems.indexOf(this.itemName) == -1 && nonMarketItems.indexOf($(".rarity", this.item).text()) == -1 && !$(this.item).hasClass("loadingPrice")) {
+        $(this.item).addClass("loadingPrice");
         $.ajax({
             url: this.generateMarketApiURL(),
             type: "GET",
             success: function(data) {
                 if(data.success == true && data.hasOwnProperty("lowest_price")) {
                     var lowestPrice = data["lowest_price"].replace("&#36;", "&#36; ");
-                    marketedItems[this.itemName] = lowestPrice;
-                    this.insertMarketValue(lowestPrice);
+                    marketedItems[self.itemName] = lowestPrice;
+                    self.insertMarketValue(lowestPrice);
                 }
                 else {
-                    $(item).find('.rarity').html('Not Found');
+                    $(self.item).find('.rarity').html('Not Found');
                 }
             },
             error: function() {
-                console.log("Error getting response for item " + this.itemName);
+                console.log("Error getting response for item " + self.itemName);
             }
         }).done(function() {
-                $(item).removeClass("loadingPrice");
+                $(self.item).removeClass("loadingPrice");
             });
     }
 };
