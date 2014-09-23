@@ -9,30 +9,7 @@ chrome.storage.local.get('botsOnline', function(result) {
     BotStatus.updateStatus(result.botsOnline);
 });
 
-var inv = new Inventory();
-/*
-    When bot status changes (detected by background.js), a message gets send from background script to content script (here).
-    TO-DO: Pass bot status through listener.
- */
-chrome.extension.onMessage.addListener(function(msg, sender, sendResponse) {
-    if(msg.action == "updateBotStatus") {
-        chrome.storage.local.get('botsOnline', function(result) {
-            BotStatus.updateStatus(result.botsOnline);
-        });
-    }
-    if(msg.inventory) {
-        console.log(msg.inventory);
-        inv.onInventoryLoaded(msg.inventory);
-    }
-    if(msg.hasOwnProperty("changeSetting")) {
-        for(var name in msg.changeSetting) {
-            LoungeUser.userSettings[name] = msg.changeSetting[name];
-        }
-    }
-});
-
 var appID = (window.location.hostname == "dota2lounge.com" ? "570" : "730");
-
 $("body").addClass("appID" + appID);
 
 if(document.URL.indexOf("/mytrades") != -1 || $("a:contains('Clean messages')").length) {
@@ -43,6 +20,26 @@ if(document.URL.indexOf("/mytrades") != -1 || $("a:contains('Clean messages')").
  Wrap the init code here, because for this to function properly, we need user settings to be loaded first
  */
 function init() {
+    /*
+     When bot status changes (detected by background.js), a message gets send from background script to content script (here).
+     TODO: Pass bot status through listener.
+     */
+    var inv = new Inventory();
+    chrome.extension.onMessage.addListener(function(msg, sender, sendResponse) {
+        if(msg.action == "updateBotStatus") {
+            chrome.storage.local.get('botsOnline', function(result) {
+                BotStatus.updateStatus(result.botsOnline);
+            });
+        }
+        if(msg.inventory) {
+            inv.onInventoryLoaded(msg.inventory);
+        }
+        if(msg.hasOwnProperty("changeSetting")) {
+            for(var name in msg.changeSetting) {
+                LoungeUser.userSettings[name] = msg.changeSetting[name];
+            }
+        }
+    });
     if((document.URL.indexOf("/mytrades") != -1 || document.URL.indexOf("/trade?t=") != -1 || document.URL.indexOf("/mybets") != -1) && (LoungeUser.userSettings["itemMarketPrices"] == "1")) {
         inv.getMarketPrices(false);
     }
@@ -88,14 +85,13 @@ function init() {
         $("#ld_cache", tabWrapper).click(function() {
             $(".left").html("");
             document.getElementById("backpack").innerHTML = '<div id="LDloading" class="spin-1"></div>';
-            var BettingInventory = new Inventory();
-            BettingInventory.getCachedInventory("bettingInventory" + appID + "_" + readCookie("id"), function(bpHTML) {
+            inv.getCachedInventory("bettingInventory" + appID + "_" + readCookie("id"), function(bpHTML) {
                 document.getElementById("backpack").innerHTML = bpHTML;
                 // Move appID check to epicStuff method instead
                 if(appID == "730") {
                     epicStuff();
                 }
-                BettingInventory.getMarketPrices(true);
+                inv.getMarketPrices(true);
             });
         });
     }

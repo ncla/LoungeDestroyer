@@ -1,10 +1,50 @@
 var Inventory = function() {
-    var inventoryIsLoading = false;
-    var backpackAjaxURL = null;
+    this.inventoryIsLoading = false; // LD loading it, not site loading it
+    this.backpackAjaxURL = null;
+    this.isRetryLinkAvailable = null;
+    var self = this;
+    /*
+        Construct for backpack
+     */
+    if(document.URL.indexOf("/match?m=") != -1 || document.URL.indexOf("/search") != -1 || document.URL.indexOf("/addtrade") != -1) {
+        this.backpackElement = $("#backpack");
+        if($("#backpack #loading").length == 0) {
+            chrome.runtime.sendMessage({giveMeBackpackURL: "pls"}, function(response) {
+                self.onInventoryLoaded(response);
+            });
+        }
+    } else if(document.URL.indexOf("/trade?t=") != -1) {
+        /*
+            This backpack is like one of the twins, except this one is the retarded one.
+            This backpack appends itself to #offer instead of replacing contents of #backpack
+         */
+        $unwantedChild = $("#offer");
+        $unwantedChild.attr("id", "fakeBackpack"); // ehehheheh
+        $unwantedChild.append('<div id="offer"></div>');
+        this.backpackElement = $("#offer");
+    } else {
+        this.backpackElement = false;
+    }
 };
 
 Inventory.prototype.loadInventory = function() {
-    // TODO: create logic
+    var self = this;
+    $.ajax({
+        url: this.backpackAjaxURL,
+        success: function(data) {
+            if($(data).text().indexOf("Can't get items.") == -1 && data.length != 0) {
+                console.log("yay");
+                console.log(data);
+                $(self.backpackElement).html(data);
+                self.inventoryIsLoading = false;
+                self.onInventoryLoaded(self.backpackAjaxURL);
+            }
+            else {
+                console.log("sad");
+                self.loadInventory();
+            }
+        }
+    });
 };
 
 Inventory.prototype.getMarketPrices = function(onlyForBackpack) {
@@ -65,13 +105,18 @@ Inventory.prototype.onInventoryLoaded = function(url) {
 //                inv.cacheInventory("bettingInventory" + appID + "_" + readCookie("id"), $("#backpack").html());
 //            }
 //        }
-    backpackAjaxURL = url;
+    if(!this.backpackElement || this.inventoryIsLoading) {
+        return false;
+    }
+    this.backpackAjaxURL = url;
     var whereToLookAt = (document.URL.indexOf("/trade?t=") != -1 ? $("#offer") : $("#backpack"));
     //console.log(whereToLookAt);
     if($(whereToLookAt).text().indexOf("Can't get items.") != -1) {
         console.log("Failure to get items!");
+        this.isRetryLinkAvailable = ($("a[onclick]", whereToLookAt).length ? true : false);
         this.addInventoryLoadButton(whereToLookAt);
     } else if($(whereToLookAt).text().trim().length == 0) {
+        this.isRetryLinkAvailable = false;
         console.log("Empty response!");
     } else {
         console.log("Assuming the backpack has loaded!");
@@ -86,16 +131,10 @@ Inventory.prototype.addInventoryLoadButton = function(element) {
     var self = this;
         var btn = $('<a class="button">Initiate backpack loading</a>');
         $(btn).click(function() {
-            if(inventoryIsLoading) {
-                self.stopLoadingInventory();
-                $(btn).html("Initiate backpack loading");
-                inventoryIsLoading = false;
-            }
-            else {
-                self.loadInventory();
-                $(btn).html("Stop backpack loading");
-                inventoryIsLoading = true;
-            }
+            self.loadInventory();
+            $(btn).hide();
+            //$(btn).html("Stop backpack loading");
+            self.inventoryIsLoading = true;
         });
         $(element).append(btn);
 };

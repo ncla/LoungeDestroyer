@@ -11,6 +11,9 @@ chrome.extension.onMessage.addListener(function (request, sender, sendResponse) 
             LoungeUser.userSettings[name] = request.changeSetting[name];
         }
     }
+    if(request.hasOwnProperty("giveMeBackpackURL")) {
+        sendResponse(lastBackpackAjaxURL);
+    }
 });
 
 function setBotstatus(value) {
@@ -75,9 +78,10 @@ chrome.webRequest.onHeadersReceived.addListener(
     {urls: ["*://csgolounge.com/*", "*://dota2lounge.com/*"]},
     ["responseHeaders", "blocking"]
 );
-
+var lastBackpackAjaxURL = null;
 chrome.webRequest.onCompleted.addListener(
     function(details) {
+        lastBackpackAjaxURL = details.url;
         var message = {inventory: details.url};
         sendMessageToContentScript(message, details.tabId);
     },
@@ -86,7 +90,6 @@ chrome.webRequest.onCompleted.addListener(
         types: ["xmlhttprequest"]
     }
 );
-
 /*
     Performance is the key for background tasks. Using jQuery selectors is fine, createHTMLDocument() doesn't parse
     HTML string in such a way that it loads external resources.
