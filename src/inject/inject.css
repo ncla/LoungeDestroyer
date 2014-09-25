@@ -119,9 +119,8 @@ div.trade-description {
     opacity: 0.5;
     -webkit-transition: opacity 0.5s ease-in-out;
     transition: opacity 0.5s ease-in-out;
-
 }
-.trade-description:hover p {
+.tradepoll:hover .trade-description p {
     padding: 12px 5px;
     color: black;
     opacity: 1;
