@@ -109,9 +109,13 @@ div.trade-description {
     font-size: 12px;
     margin-top: 10px;
     white-space: pre-wrap;
+    border-radius: 3px;
+    opacity: 0.5;
 }
 .trade-description p {
     padding: 12px 5px;
+    border-left: solid 1px black;
+    color: black;
 }
 .trade-description .more-text, .trade-description .open-trade {
     position: absolute;
@@ -171,7 +175,7 @@ http://codepen.io/larrygeams/pen/nhgze
 
     100% {
         -moz-transform: rotate(360deg);
-    };
+    }
 }
 
 @-moz-keyframes loading {
@@ -181,7 +185,7 @@ http://codepen.io/larrygeams/pen/nhgze
 
     100% {
         -moz-transform: rotate(360deg);
-    };
+    }
 }
 
 @-webkit-keyframes loading {
@@ -191,5 +195,5 @@ http://codepen.io/larrygeams/pen/nhgze
 
     100% {
         -webkit-transform: rotate(360deg);
-    };
+    }
 }
