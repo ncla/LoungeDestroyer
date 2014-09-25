@@ -110,6 +110,7 @@ div.trade-description {
     margin-top: 10px;
     white-space: pre-wrap;
     border-radius: 3px;
+    overflow: hidden;
 }
 .trade-description p {
     padding: 12px 5px;
@@ -117,8 +118,8 @@ div.trade-description {
     border-radius: 3px;
     color: black;
     opacity: 0.5;
-    -webkit-transition: opacity 0.5s ease-in-out;
-    transition: opacity 0.5s ease-in-out;
+    -webkit-transition: opacity 0.3s ease-in-out;
+    transition: opacity 0.3s ease-in-out;
 }
 .tradepoll:hover .trade-description p {
     padding: 12px 5px;

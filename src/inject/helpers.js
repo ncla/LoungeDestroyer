@@ -35,3 +35,9 @@ function addJS_Node(text, s_URL, funcToRun, funcName) {
     var targ = D.getElementsByTagName('head')[0] || D.body || D.documentElement;
     targ.appendChild(scriptNode);
 }
+/*
+    CSGL horribleness, not mine
+ */
+function textToUrl(text) {
+    return text.replace(/(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig,"<a href='http://csgolounge.com/goto?url=$1'>$1</a>");
+}

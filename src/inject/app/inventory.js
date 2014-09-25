@@ -30,17 +30,22 @@ var Inventory = function() {
 Inventory.prototype.loadInventory = function() {
     var self = this;
     var theURL = self.backpackAjaxURL;
-    if(this.backpackAjaxURL.indexOf("tradeBackpack") != -1) {
-        var theURL = (Math.random() < 0.5 ? "ajax/tradeBackpack.php": "ajax/tradeBackpackApi.php");
+    if(this.backpackAjaxURL.indexOf("Backpack") != -1) {
+        theURL = (Math.random() < 0.5 ? theURL.replace("BackpackApi", "Backpack"): theURL);
     }
-    $.ajax({
+
+    this.ajaxRequest = $.ajax({
         url: theURL,
         success: function(data) {
             if($(data).text().indexOf("Can't get items.") == -1 && data.length != 0) {
-                console.log("yay");
-                console.log(data);
-                $(self.backpackElement).html(data);
-                self.onInventoryLoaded(self.backpackAjaxURL);
+                /*
+                    Ok, before you ask questions, jQuery's html() method doesn't execute scripts inside script tags
+                    from HTML string, but this dirty workaround works. If you know less dirtier solution, go ahead and fix it.
+                 */
+                var hax = document.getElementById($(self.backpackElement).attr("id"));
+                hax.innerHTML = null;
+                hax.innerHTML = data;
+
                 self.inventoryIsLoading = false;
             }
             else {
@@ -64,7 +69,6 @@ Inventory.prototype.getMarketPrices = function(onlyForBackpack) {
 
     for (var index in cachedItemList) {
         var itemForScience = cachedItemList[index][0];
-        //console.log(itemForScience);
         itemForScience.myFriends = cachedItemList[index];
         itemForScience.getMarketPrice();
     }
@@ -98,17 +102,11 @@ Inventory.prototype.getCachedInventory = function(type, callback) {
     });
 };
 Inventory.prototype.stopLoadingInventory = function() {
-
+    if(this.inventoryIsLoading) {
+        this.ajaxRequest.abort();
+    }
 };
 Inventory.prototype.onInventoryLoaded = function(url) {
-//        if(document.URL.indexOf("/match?m=") != -1) {
-//            if($(".bpheader").text().indexOf("CS:GO Inventory") != -1) {
-//                inv.cacheInventory("bettingInventory" + appID + "_" + readCookie("id"), $("#backpack").html());
-//            }
-//            if($(".bpheader .title").text().indexOf("Armory") != -1) {
-//                inv.cacheInventory("bettingInventory" + appID + "_" + readCookie("id"), $("#backpack").html());
-//            }
-//        }
     if(!this.backpackElement || this.inventoryIsLoading) {
         return false;
     }
@@ -129,6 +127,12 @@ Inventory.prototype.onInventoryLoaded = function(url) {
         if(appID == "730" && document.URL.indexOf("/match?m=") != -1) {
             epicStuff();
         }
+        // At the moment caching only betting inventories
+        if(document.URL.indexOf("/match?m=") != -1) {
+            if($(".bpheader", self.backpackElement).text().indexOf("CS:GO Inventory") != -1 || $(".bpheader .title", self.backpackElement).text().indexOf("Armory") != -1) {
+                this.cacheInventory("bettingInventory" + appID + "_" + readCookie("id"), $("#backpack").html());
+            }
+        }
     }
 };
 Inventory.prototype.addInventoryLoadButton = function(element) {
@@ -137,7 +141,11 @@ Inventory.prototype.addInventoryLoadButton = function(element) {
         $(btn).click(function() {
             self.loadInventory();
             $(btn).hide();
-            $(self.backpackElement).html('<div id="LDloading" class="spin-1"></div><div id="LDerr"></div>');
+            $(self.backpackElement).html('<div id="LDloading" class="spin-1"></div><div id="LDerr"></div><div><a class="button" id="stopLD">Stop loading inventory</a></div>');
+            $("#stopLD").click(function() {
+                self.stopLoadingInventory();
+                $(self.backpackElement).html('<div id="LDerr">Backpack loading was stopped by user</div>');
+            });
             //$(btn).html("Stop backpack loading");
             self.inventoryIsLoading = true;
         });

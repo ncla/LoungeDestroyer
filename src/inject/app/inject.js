@@ -67,10 +67,13 @@ function init() {
                         url: $(value).find("a:eq(1)").attr("href"),
                         type: "GET",
                         success: function(data) {
-                            $(".trade-description p", value).text($.trim($(data).find(".standard.msgtxt").text()));
-                            $(".more-text", value).hide();
+                            $(".trade-description p", value).html(textToUrl($.trim($(data).find(".standard.msgtxt").text())));
                         }
                     });
+                } else {
+                    $(".trade-description p", value).html(
+                        textToUrl($(".trade-description p", value).text())
+                    );
                 }
             }
         });
@@ -81,7 +84,9 @@ function init() {
         }
         var tabWrapper = $("div[style='float: left; width: 96%;margin: 0 2%;height: 26px;border-radius: 5px;position: relative;overflow: hidden;']");
         $(tabWrapper).append('<a class="tab" id="ld_cache" onclick="returns = false;">Cached inventory</div>');
-        $(tabWrapper).find(".tab").width("33%");
+        $(tabWrapper).find(".tab").width("33%").click(function() {
+            inv.stopLoadingInventory();
+        });
         $("#ld_cache", tabWrapper).click(function() {
             $(".left").html("");
             document.getElementById("backpack").innerHTML = '<div id="LDloading" class="spin-1"></div>';
@@ -93,6 +98,11 @@ function init() {
                 }
                 inv.getMarketPrices(true);
             });
+        });
+    }
+    if(document.URL.indexOf("/addtrade") != -1) {
+        $(".tabholder .tab").click(function() {
+            inv.stopLoadingInventory();
         });
     }
 }
