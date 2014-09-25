@@ -117,20 +117,14 @@ div.trade-description {
     border-radius: 3px;
     color: black;
     opacity: 0.5;
-    -webkit-animation: description-init 1s forwards;
-}
-@-webkit-keyframes description-apparition {
-    0%   { opacity: 0.5; }
-    100% { opacity: 1; }
-}
-@-webkit-keyframes description-init {
-    from { opacity: 1; }
-    to { opacity: 0.5; }
+    -webkit-transition: opacity 0.5s ease-in-out;
+    transition: opacity 0.5s ease-in-out;
+
 }
 .trade-description:hover p {
     padding: 12px 5px;
     color: black;
-    -webkit-animation: description-apparition 0.5s forwards;
+    opacity: 1;
 }
 .trade-description .more-text, .trade-description .open-trade {
     position: absolute;
