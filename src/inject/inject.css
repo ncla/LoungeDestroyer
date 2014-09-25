@@ -110,12 +110,27 @@ div.trade-description {
     margin-top: 10px;
     white-space: pre-wrap;
     border-radius: 3px;
-    opacity: 0.5;
 }
 .trade-description p {
     padding: 12px 5px;
-    border-left: solid 1px black;
+    border-left: solid 3px black;
+    border-radius: 3px;
     color: black;
+    opacity: 0.5;
+    -webkit-animation: description-init 1s forwards;
+}
+@-webkit-keyframes description-apparition {
+    0%   { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+@-webkit-keyframes description-init {
+    from { opacity: 1; }
+    to { opacity: 0.5; }
+}
+.trade-description:hover p {
+    padding: 12px 5px;
+    color: black;
+    -webkit-animation: description-apparition 0.5s forwards;
 }
 .trade-description .more-text, .trade-description .open-trade {
     position: absolute;
