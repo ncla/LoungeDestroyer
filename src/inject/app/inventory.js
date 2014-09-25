@@ -29,18 +29,22 @@ var Inventory = function() {
 
 Inventory.prototype.loadInventory = function() {
     var self = this;
+    var theURL = self.backpackAjaxURL;
+    if(this.backpackAjaxURL.indexOf("tradeBackpack") != -1) {
+        var theURL = (Math.random() < 0.5 ? "ajax/tradeBackpack.php": "ajax/tradeBackpackApi.php");
+    }
     $.ajax({
-        url: this.backpackAjaxURL,
+        url: theURL,
         success: function(data) {
             if($(data).text().indexOf("Can't get items.") == -1 && data.length != 0) {
                 console.log("yay");
                 console.log(data);
                 $(self.backpackElement).html(data);
-                self.inventoryIsLoading = false;
                 self.onInventoryLoaded(self.backpackAjaxURL);
+                self.inventoryIsLoading = false;
             }
             else {
-                console.log("sad");
+                document.getElementById("LDerr").innerHTML = $(data).text();
                 self.loadInventory();
             }
         }
@@ -133,6 +137,7 @@ Inventory.prototype.addInventoryLoadButton = function(element) {
         $(btn).click(function() {
             self.loadInventory();
             $(btn).hide();
+            $(self.backpackElement).html('<div id="LDloading" class="spin-1"></div><div id="LDerr"></div>');
             //$(btn).html("Stop backpack loading");
             self.inventoryIsLoading = true;
         });

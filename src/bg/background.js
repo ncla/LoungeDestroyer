@@ -180,31 +180,83 @@ function checkNewMatches(ajaxResponse, appID) {
         }
     });
 }
+/*
+    Credit to Bakkes (fork of LoungeCompanion on GitHub)
+ */
+function checkForNewTradeOffers(data, appID) {
+    console.log("Checking for new trade offers on " + appID);
+    var data = $(data); // dirty fixerino
+    var trades = data.find('a[href$="mytrades"]:first');
+    var offers = data.find('a[href$="myoffers"]:first');
+
+    var urlStart = (appID == 730 ? "http://csgolounge.com/" : "http://dota2lounge.com/");
+
+    if(trades.find(".notification").length > 0) {
+        $.get(urlStart + "mytrades"); /* Yeah so someone please slap me for doing this */
+        var notification = trades.find(".notification");
+        var newCount = notification.text();
+
+        var notify = new Notification("Trade update on " + (appID == 730 ? "CS:GO Lounge" : "DOTA2 Lounge"),
+            {body: newCount == 1 ? "You have 1 new comment on your trades" : "You have " + newCount + " new comments on your trades",
+                icon: "../../icons/icon_normal_notification.png"});
+        setTimeout(function() {
+            notify.close();
+        }, 10000);
+    }
+    if(offers.find(".notification").length > 0) {
+        $.get(urlStart + "myoffers");
+        var notification = offers.find(".notification");
+        var newCount = notification.text();
+
+        var notify = new Notification("Offer update on " + (appID == 730 ? "CS:GO Lounge" : "DOTA2 Lounge"),
+            {body: newCount == 1 ? "You have 1 new comment on your offers" : "You have " + newCount + " new comments on your offers",
+                icon: "../../icons/icon_normal_notification.png"});
+        setTimeout(function() {
+            notify.close();
+        }, 10000);
+    }
+}
 
 setInterval(function() {
-    var notifyWhat = LoungeUser.userSettings.notifyMatches;
-    if(notifyWhat != "4") {
-        if(notifyWhat == "2" || notifyWhat == "1") {
-            console.log("Checking DOTA2 matches");
-            var oReq = new XMLHttpRequest();
-            oReq.onload = function() {
-                var doc = document.implementation.createHTMLDocument("");
-                doc.body.innerHTML = this.responseText;
+    /*
+        Somebody please slap me for this DRY'ness
+     */
+    var checkDotoPage = (LoungeUser.userSettings.notifyMatches == "1" || LoungeUser.userSettings.notifyMatches == "2"
+        || LoungeUser.userSettings.notifyTrades == "1" || LoungeUser.userSettings.notifyTrades == "2");
+    var checkCSGOPage = (LoungeUser.userSettings.notifyMatches == "1" || LoungeUser.userSettings.notifyMatches == "3"
+        || LoungeUser.userSettings.notifyTrades == "1" || LoungeUser.userSettings.notifyTrades == "3");
+
+    if(checkDotoPage) {
+        console.log("Checking DOTA2 matches");
+        var oReq = new XMLHttpRequest();
+        oReq.onload = function() {
+            var doc = document.implementation.createHTMLDocument("");
+            doc.body.innerHTML = this.responseText;
+            if((LoungeUser.userSettings.notifyMatches == "1" || LoungeUser.userSettings.notifyMatches == "2")) {
                 checkNewMatches(doc, 570);
-            };
-            oReq.open("get", "http://dota2lounge.com/", true);
-            oReq.send();
-        }
-        if(notifyWhat == "3" || notifyWhat == "1") {
-            console.log("Checking CS:GO matches");
-            var oReq = new XMLHttpRequest();
-            oReq.onload = function() {
-                var doc = document.implementation.createHTMLDocument("");
-                doc.body.innerHTML = this.responseText;
+            }
+            if(LoungeUser.userSettings.notifyTrades == "1" || LoungeUser.userSettings.notifyTrades == "2") {
+                checkForNewTradeOffers(doc, 570);
+            }
+        };
+        oReq.open("get", "http://dota2lounge.com/", true);
+        oReq.send();
+    }
+    if(checkCSGOPage) {
+        console.log("Checking CS:GO matches");
+
+        var oReq = new XMLHttpRequest();
+        oReq.onload = function() {
+            var doc = document.implementation.createHTMLDocument("");
+            doc.body.innerHTML = this.responseText;
+            if((LoungeUser.userSettings.notifyMatches == "1" || LoungeUser.userSettings.notifyMatches == "3")) {
                 checkNewMatches(doc, 730);
-            };
-            oReq.open("get", "http://csgolounge.com/", true);
-            oReq.send();
-        }
+            }
+            if(LoungeUser.userSettings.notifyTrades == "1" || LoungeUser.userSettings.notifyTrades == "3") {
+                checkForNewTradeOffers(doc, 730);
+            }
+        };
+        oReq.open("get", "http://csgolounge.com/", true);
+        oReq.send();
     }
 }, 20000);

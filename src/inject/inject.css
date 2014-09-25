@@ -136,6 +136,12 @@ div.trade-description {
 .name {
     min-width: 180px;
 }
+#LDerr {
+    text-align: center;
+    font-size: 11px;
+    padding: 0 10px;
+}
+
 
 /*
 http://codepen.io/larrygeams/pen/nhgze
