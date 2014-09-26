@@ -104,6 +104,7 @@ Inventory.prototype.getCachedInventory = function(type, callback) {
 Inventory.prototype.stopLoadingInventory = function() {
     if(this.inventoryIsLoading) {
         this.ajaxRequest.abort();
+        this.inventoryIsLoading = false;
     }
 };
 Inventory.prototype.onInventoryLoaded = function(url) {
@@ -133,6 +134,10 @@ Inventory.prototype.onInventoryLoaded = function(url) {
                 this.cacheInventory("bettingInventory" + appID + "_" + readCookie("id"), $("#backpack").html());
             }
         }
+        if(document.URL.indexOf("/trade?t=") != -1) {
+            $("#fakeBackpack .left").show();
+            $("#loading").hide();
+        }
     }
 };
 Inventory.prototype.addInventoryLoadButton = function(element) {
@@ -141,12 +146,11 @@ Inventory.prototype.addInventoryLoadButton = function(element) {
         $(btn).click(function() {
             self.loadInventory();
             $(btn).hide();
-            $(self.backpackElement).html('<div id="LDloading" class="spin-1"></div><div id="LDerr"></div><div><a class="button" id="stopLD">Stop loading inventory</a></div>');
+            $(self.backpackElement).html('<div class="inventory-loading-wrapper"><div id="LDloading" class="spin-1"></div><div id="LDerr"></div><div><a class="button" id="stopLD">Stop loading inventory</a></div></div>');
             $("#stopLD").click(function() {
                 self.stopLoadingInventory();
-                $(self.backpackElement).html('<div id="LDerr">Backpack loading was stopped by user</div>');
+                $(self.backpackElement).html('');
             });
-            //$(btn).html("Stop backpack loading");
             self.inventoryIsLoading = true;
         });
         $(element).append(btn);

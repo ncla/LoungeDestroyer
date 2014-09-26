@@ -149,12 +149,23 @@ div.trade-description {
 .name {
     min-width: 180px;
 }
-#LDerr {
+.inventory-loading-wrapper {
+    float: left;
+    display: block;
+    width: 100%;
+}
+.inventory-loading-wrapper div {
+    text-align: center;
+}
+.inventory-loading-wrapper #LDerr {
     text-align: center;
     font-size: 11px;
-    padding: 0 10px;
+    padding: 10px 10px 0;
 }
-
+.inventory-loading-wrapper #stopLD {
+    display: inline-block;
+    float: none !important;
+}
 
 /*
 http://codepen.io/larrygeams/pen/nhgze
