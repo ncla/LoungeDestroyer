@@ -56,9 +56,13 @@
                 "src/inject/app/loungebots.js",
                 "src/inject/app/items.js",
                 "src/inject/app/inventory.js",
-                "src/inject/app/inject.js"
+                "src/inject/app/inject.js",
+                "src/inject/app/bet.js"
             ],
             "run-at": "document_start"
         }
+    ],
+    "web_accessible_resources": [
+        "src/inject/app/prefilter.js"
     ]
 }

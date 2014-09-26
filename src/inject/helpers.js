@@ -16,12 +16,12 @@ function readCookie(e) {
     }
     return null
 }
-function addJS_Node(text, s_URL, funcToRun, funcName) {
+function addJS_Node(text, s_URL, funcToRun, funcName, local) {
     var D = document;
     var scriptNode = D.createElement('script');
     scriptNode.type = "text/javascript";
     if (text)       scriptNode.textContent = text;
-    if (s_URL)      scriptNode.src = s_URL;
+    if (s_URL)      scriptNode.src = local ? chrome.extension.getURL(s_URL) : s_URL;
     if (funcToRun) {
         if (funcName) {
             // please forgive me for this horror

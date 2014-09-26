@@ -6,10 +6,17 @@ LoungeUser.loadUserSettings(function() {
     Make changes to LoungeUser user settings once the settings are changed from extension pop-up
  */
 chrome.extension.onMessage.addListener(function (request, sender, sendResponse) {
+    // Make changes to LoungeUser user settings once the settings are changed from extension pop-up
     if(request.hasOwnProperty("changeSetting")) {
         for(var name in request.changeSetting) {
             LoungeUser.userSettings[name] = request.changeSetting[name];
         }
+    }
+
+    // Inject AJAX prefilter to specific tab
+    if(request.hasOwnProperty("injectScript")) {
+        console.log("Injecting script ("+request.injectScript+") into tab "+sender.tab.id);
+        chrome.tabs.executeScript(sender.tab.id, {file: "src/inject/app/"+request.injectScript}); // TODO: support relative path
     }
 });
 
