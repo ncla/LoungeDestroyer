@@ -15,8 +15,9 @@ chrome.extension.onMessage.addListener(function (request, sender, sendResponse) 
         sendResponse(lastBackpackAjaxURL);
     }
 });
-
+var icons = {"-1": "icons/icon_unknown.png", "0": "icons/icon_offline.png", "1": "icons/icon_online.png"};
 function setBotstatus(value) {
+    chrome.browserAction.setIcon({path: icons[value.toString()]});
     chrome.storage.local.get('botsOnline', function(result) {
         if(result.botsOnline != value) {
             console.log("Bot status changed!!!!111");
@@ -38,6 +39,7 @@ function setBotstatus(value) {
             }
         }
     });
+
 }
 function sendMessageToContentScript(message, tabId) {
     if(tabId) {

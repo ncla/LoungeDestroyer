@@ -4,11 +4,6 @@
 
 var BotStatus = new LoungeBots();
 
-chrome.storage.local.get('botsOnline', function(result) {
-    $('a[href="/status"]').html('Bots status <div id="bot-status"></div>');
-    BotStatus.updateStatus(result.botsOnline);
-});
-
 var appID = (window.location.hostname == "dota2lounge.com" ? "570" : "730");
 $("body").addClass("appID" + appID);
 

@@ -19,7 +19,7 @@
         "persistent": true
     },
     "browser_action": {
-        "default_icon": "icons/icon_normal.png",
+        "default_icon": "icons/icon_unknown.png",
         "default_title": "LoungeDestroyer settings",
         "default_popup": "src/browser_action/browser_action.html"
     },
