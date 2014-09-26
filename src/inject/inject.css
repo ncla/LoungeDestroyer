@@ -158,6 +158,48 @@ http://codepen.io/larrygeams/pen/nhgze
     height: 24px;
 }
 
+.destroyer { box-sizing: border-box; } /* TO-DO: add class to all extension-specific elements
+/* Error messages */
+.destroyer.error-container {
+    position: fixed;
+    top: 5px;
+    left: 50%;
+    -webkit-transform: translate(-50%, 0); /* center */
+
+    max-width: 500px;
+    padding: 20px;
+
+    background: #eee;
+    border: 1px solid #aaa;
+    border-radius: 3px;
+    box-shadow: 0 5px 20px rgba(0,0,0,.1);
+}
+.destroyer.error-container:empty { display: none; }
+.destroyer.error-container .button-container { float: right; }
+.destroyer.error-container p { margin: 10px 0; }
+.destroyer.error-container button:first-of-type { margin-left: 0; }
+.destroyer.error-container button {
+    -webkit-appearance: none;
+    outline: 0;
+
+    background: #eee;
+    border: 1px solid #aaa;
+    border-radius: 3px;
+    box-shadow: 0 0 20px -8px rgba(0,0,0,0.3);
+
+    padding: 5px 10px;
+}
+.destroyer.error-container button:active {
+    background: #dfdfdf;
+    box-shadow: inset 0 0 15px -8px rgba(0,0,0,.3);
+}
+.destroyer.error-container button.green {
+    background: #2ecc71;
+    border-color: #27ae60;
+    color: #eee;
+}
+/* TO-DO: add color styling for errors */
+
 @keyframes loading {
     0% {
         -moz-transform: rotate(0deg);
