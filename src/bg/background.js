@@ -22,7 +22,8 @@ function setBotstatus(value) {
                 Notifications
                 https://developer.mozilla.org/en/docs/Web/API/notification
             */
-            var message = {action: "updateBotStatus"};
+            var message = {action: "updateBotStatus",
+                           status: value};
             sendMessageToContentScript(message, null);
             if(value == 1 && result.botsOnline != -1) {
                 /* Might not want to notify when installed for first time */

@@ -14,9 +14,7 @@ chrome.storage.local.get('botsOnline', function(result) {
  */
 chrome.extension.onMessage.addListener(function(msg, sender, sendResponse) {
     if(msg.action == "updateBotStatus") {
-        chrome.storage.local.get('botsOnline', function(result) {
-            BotStatus.updateStatus(result.botsOnline);
-        });
+        BotStatus.updateStatus(msg.status);
     }
     if(msg.action == "onInventoryLoaded") {
         console.log("Message received for inventory");
