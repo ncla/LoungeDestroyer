@@ -124,20 +124,20 @@ Inventory.prototype.onInventoryLoaded = function(url) {
     } else {
         console.log("Assuming the backpack has loaded!");
         $("#loading", whereToLookAt).hide();
-        this.getMarketPrices(true);
-        if(appID == "730" && document.URL.indexOf("/match?m=") != -1) {
-            epicStuff();
-        }
-        // At the moment caching only betting inventories
         if(document.URL.indexOf("/match?m=") != -1) {
+            // At the moment caching only betting inventories
             if($(".bpheader", self.backpackElement).text().indexOf("CS:GO Inventory") != -1 || $(".bpheader .title", self.backpackElement).text().indexOf("Armory") != -1) {
                 this.cacheInventory("bettingInventory" + appID + "_" + readCookie("id"), $("#backpack").html());
+            }
+            if(appID == 730) {
+                epicStuff();
             }
         }
         if(document.URL.indexOf("/trade?t=") != -1) {
             $("#fakeBackpack .left").show();
             $("#loading").hide();
         }
+        this.getMarketPrices(true);
     }
 };
 Inventory.prototype.addInventoryLoadButton = function(element) {
