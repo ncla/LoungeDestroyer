@@ -1,9 +1,3 @@
-/*
-    Bot status initiated
- */
-
-var BotStatus = new LoungeBots();
-
 var appID = (window.location.hostname == "dota2lounge.com" ? "570" : "730");
 $("body").addClass("appID" + appID);
 
