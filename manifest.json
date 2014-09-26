@@ -52,7 +52,6 @@
                 "src/inject/jquery-2.1.1.min.js",
                 "src/inject/helpers.js",
                 "src/inject/app/user.js",
-                "src/inject/app/loungebots.js",
                 "src/inject/app/items.js",
                 "src/inject/app/inventory.js",
                 "src/inject/app/inject.js"
