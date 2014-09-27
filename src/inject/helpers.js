@@ -41,7 +41,7 @@ function addJS_Node(text, s_URL, funcToRun, funcName, local) {
  * Display error message
  * @param string title - title of error
  * @param string text - description of error
- * @param array/Element btns - array of elements, or single element, to be added as button
+ * @param array/Element btns - optional array of elements, or single element, to be added as button
  */
 function displayError(title, text, btns) {
     if (title) {

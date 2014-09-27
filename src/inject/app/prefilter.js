@@ -3,14 +3,11 @@ console.log("Injected prefilter script");
 var HOOK_URLS = {
 	"ajax/postBetOffer.php": handleBetReturn, 
 	"ajax/betReturns.php": handleBetReturn,
+	"ajax/betHistory.php": handleBetReturn
 };
 
 /**
- * Save all AJAX requests to window.localStorage.requestCache, in format:
- * {
- *     <url>: [<type>, <data>],
- *     ...
- * }
+ * Hook AJAX requests if needed
  */
 $.ajaxPrefilter(function(options, original, jqXHR) {
 	console.log("AJAX request:");
@@ -23,37 +20,41 @@ $.ajaxPrefilter(function(options, original, jqXHR) {
 		return;
 
 	// update item in localstorage
+	// for debugging purposes
+	// TO-DO: remove before release
 	var obj;
 	try {
 		obj = JSON.parse(window.localStorage.requestCache);
 	} catch(e) {
 		obj = {};
 	}
-	obj[original.url] = [original.type || null, original.data || null];
+	obj[original.url] = {type: original.type || null, 
+		                 data: original.data || null,
+		                 time: Date.now()};
 	window.localStorage.requestCache = JSON.stringify(obj);
 
 	// if in HOOK_URLS, create error from response
 	if (HOOK_URLS[original.url] instanceof Function) {
 		var origCallback = original.success;
-		options.success = function(data){HOOK_URLS[original.url](data,original.url,origCallback)};
+		options.success = function(data){HOOK_URLS[original.url](data,original.url,original,origCallback)};
 	}
 });
 
 // called instead of original callback on a hooked request
-function handleBetReturn(data, url, origCallback) {
-	var title,
+function handleBetReturn(data, url, origOptions, origCallback) {
+	var title = "Betting error",
 	    button;
-	/*switch(url) {
-		case "ajax/postBetOffer.php":
-		case "ajax/betReturns.php":*/
-			title = "Betting error";
-			// generate auto-bet button
-			button = document.createElement("button");
-			button.className = "destroyer green";
-			button.textContent = "Enable auto-bet";
-			// event listener is added in bet.js
-			/*break;
-	}*/
+
+	// generate auto-bet button
+	button = document.createElement("button");
+	button.className = "destroyer green auto-bet";
+	button.textContent = "Enable auto-bet";
+	// save request data to DOM
+	origOptions.url && button.setAttribute("data-url", origOptions.url);
+	origOptions.type && button.setAttribute("data-type", origOptions.type);
+	origOptions.data && button.setAttribute("data-data", origOptions.data);
+	// click listener is added in bet.js
+
 	displayError(title, data.length > 250 ? data.substr(0,247)+"..." : data, button);
 }
 
