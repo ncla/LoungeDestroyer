@@ -1,6 +1,6 @@
 {
     "name": "LoungeDestroyer",
-    "version": "0.7.0.6",
+    "version": "0.7.1.0",
     "manifest_version": 2,
     "description": "Improves the experience of CSGOLounge.com/Dota2Lounge.com",
     "homepage_url": "http://github.com/iamncla/LoungeDestroyer",
@@ -23,6 +23,7 @@
         "default_title": "LoungeDestroyer settings",
         "default_popup": "src/browser_action/browser_action.html"
     },
+    "options_page": "settings/options.html",
     "permissions": [
         "notifications",
         "http://csgolounge.com/*",

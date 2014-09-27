@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>LoungeDestroyer dashboard</title>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/ld.css" rel="stylesheet">
+</head>
+
+<body>
+
+<!-- Fixed navbar -->
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">LoungeDestroyer</a>
+        </div>
+        <div class="collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+                <li class="active"><a href="#">Settings</a></li>
+            </ul>
+        </div><!--/.nav-collapse -->
+    </div>
+</div>
+
+<!-- Begin page content -->
+<div class="container">
+    <div class="togglerino">
+        <div class="page-header">
+            <h1>LoungeDestroyer settings <small>version <span id="version"></span></small></h1>
+        </div>
+        <p>Settings are automatically saved once you have selected an option.</p>
+        <div class="ld-settings">
+            <div class="row">
+                <div class="col-md-6 ld-setting">
+                    <label class="control-label">Market prices on items:</label>
+                    <select id="itemMarketPrices" class="form-control">
+                        <option value="1">Enabled</option>
+                        <option value="0">Disabled</option>
+                    </select>
+                </div>
+                <div class="col-md-6 ld-setting">
+                    <label class="control-label">Steam market currency:</label>
+                    <select id="marketCurrency" class="form-control">
+                        <option value="1">USD</option>
+                        <option value="2">GBP</option>
+                        <option value="3">EUR</option>
+                        <option value="5">RUB</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 ld-setting">
+                    <label class="control-label">Redirect from item draft page <a href="#" data-toggle="tooltip" data-original-title="CS:GO Lounge does an annoying redirect to item drafting page, which can be stopped by extension. This may cause some lag issues as this will keep redirecting to intended page instead of item drafting page.">(?)</a>:</label>
+                    <select id="redirect" class="form-control">
+                        <option value="1">Enabled</option>
+                        <option value="0">Disabled</option>
+                    </select>
+                </div>
+                <div class="col-md-6 ld-setting">
+                    <label class="control-label">Remove stream from match page:</label>
+                    <select id="streamRemove" class="form-control">
+                        <option value="1">Enabled</option>
+                        <option value="0">Disabled</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 ld-setting">
+                    <label class="control-label">Notify when bots go online:</label>
+                    <select id="notifyBots" class="form-control">
+                        <option value="1">Enabled</option>
+                        <option value="0">Disabled</option>
+                    </select>
+                </div>
+                <div class="col-md-6 ld-setting">
+                    <label class="control-label">Notify about new matches:</label>
+                    <select id="notifyMatches" class="form-control">
+                        <option value="1">Both</option>
+                        <option value="2">Dota2 Lounge matches only</option>
+                        <option value="3">CS:GO Lounge matches only</option>
+                        <option value="4">Disabled</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 ld-setting">
+                    <label class="control-label">Notify about new trade offers:</label>
+                    <select id="notifyTrades" class="form-control">
+                        <option value="1">Both</option>
+                        <option value="2">Dota2 Lounge trades only</option>
+                        <option value="3">CS:GO Lounge trades only</option>
+                        <option value="4">Disabled</option>
+                    </select>
+                </div>
+                <div class="col-md-6 ld-setting"></div>
+            </div>
+        </div>
+    </div>
+    <div class="togglerino">
+        <div class="page-header">
+            <h1>About</h1>
+        </div>
+        <p>LoungeDestroyer makes a shitty website more bearable, enough said.</p>
+        <a href="https://www.youtube.com/watch?v=fJrGo92Qwk0" target="_blank">Here is theme song for LoungeDestroyer</a>
+        <div style="margin: 10px 0;">
+            <a class="btn btn-primary" role="button" href="http://reddit.com/r/loungedestroyer" target="_blank">Subreddit</a>
+            <a class="btn btn-primary" role="button" href="http://github.com/ncla/LoungeDestroyer" target="_blank">GitHub</a>
+            <a class="btn btn-primary" role="button" href="https://github.com/ncla/LoungeDestroyer/issues" target="_blank">Report a bug</a>
+        </div>
+    </div>
+</div>
+
+<div class="footer">
+    <div class="container">
+        <p class="text-muted">Developed with hate by NCLA and <a href="https://github.com/ncla/LoungeDestroyer/graphs/contributors">contributors on GitHub</a></p>
+    </div>
+</div>
+
+<script src="../src/inject/jquery-2.1.1.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="../src/inject/app/user.js"></script>
+<script src="js/options.js"></script>
+</body>
+</html>
