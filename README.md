@@ -13,8 +13,15 @@ LoungeDestroyer is currently being converted/developed into a Chrome extension s
 * Steam market prices for items when you hover on an item
 * ~~Auto-bump your trade offers~~
 * Market listing and market search links added to item pop-up
-* ~~Button for re-fetching your inventory on match page (experimental)~~
 * Remove stream and stream chat on match pages
+* Automatic inventory loading
+* Cached inventories for times when API is down
+* Extension icon indicator displaying bot status
+* Notifications for new comments on trades and offers
+* Notifications for new matches
+* Notifications for when the bots go online
+* Trade descriptions
+* Statistics about your betting inventory (credit to ekim43)
 
 ## Discussion
 You can discuss about LoungeDestroyer on our [subreddit](http://www.reddit.com/r/loungedestroyer/).
