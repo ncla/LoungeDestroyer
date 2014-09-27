@@ -55,10 +55,12 @@ function handleBetReturn(data, url, origOptions, origCallback) {
 	origOptions.data && button.setAttribute("data-data", origOptions.data);
 	// click listener is added in bet.js
 
-	if (data)
+	if (data) {
+		$("#placebut").show(); // lonely jQuery because fuck it
 		displayError(title, data.length > 250 ? data.substr(0,247)+"..." : data, button);
-	else
+	} else {
 		origCallback(data);
+	}
 }
 
 /**

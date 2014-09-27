@@ -13,17 +13,22 @@
 var bet = { // not a class - don't instantiate
 	autoDelay: 15000,
 	autoBetting: false,
-	betData: {}
+	betData: {},
+	lastError: ""
 };
 
 // example data:
 // ldef_index%5B%5D=2682&lquality%5B%5D=0&id%5B%5D=711923886&worth=0.11&on=a&match=1522&tlss=2e7877e8d42fb969c5f6f517243c2d19
 bet.enableAuto = function(url, data) {
 	console.log("Auto-betting");
-	if (this.autoBetting)
+	if (this.autoBetting) {
+		console.log("Already auto-betting");
 		return false;
-	if (!url || !data)
+	}
+	if (!url || !data) {
+		console.log("Can't autobet without URL and data");
 		return false;
+	}
 
 	this.autoBetting = true;
 
@@ -47,21 +52,35 @@ bet.enableAuto = function(url, data) {
 	};
 
 	// start looping
-	return bet.autoLoop();
+	this.autoBetting = bet.autoLoop();
+	if (this.autoBetting) {
+		// update info-box in top-right
+		document.querySelector(".destroyer.auto-info").className = "destroyer auto-info";
+		document.querySelector(".destroyer.auto-info .worth").textContent = "$"+worth;
+		document.getElementById("bet-time").valueAsNumber = bet.autoDelay / 1000;
+		chrome.storage.local.set({"betData": {delay: bet.autoDelay, data: bet.betData}});
+	}
+	return this.autoBetting;
 };
 bet.disableAuto = function() {
 	console.log("Disabling auto-bet");
 	this.autoBetting = false;
+	document.querySelector(".destroyer.auto-info").className = "destroyer auto-info hidden";
+	chrome.storage.local.set({"betData": null});
 };
 bet.autoLoop = function() {
-	if (bet.betData.data.indexOf("&on=") === -1) // if not a betting request
+	if (bet.betData.data.indexOf("&on=") === -1) { // if not a betting request
+		console.log("Not a betting request");
 		return false;
-	if (!bet.autoBetting) // if no longer auto-betting, for some reason
+	}
+	if (!bet.autoBetting) { // if no longer auto-betting, for some reason
+		console.log("No longer auto-betting");
 		return false;
+	}
 
 	// repeat request
 	console.log("Performing request:");
-	console.log({url: url, data: bet.betData.data + "tlss="+bet.betData.hash});
+	console.log({url: bet.betData.url, data: bet.betData.data + "tlss="+bet.betData.hash});
 	$.ajax({
 		url: bet.betData.url,
 		type: "POST",
@@ -71,6 +90,8 @@ bet.autoLoop = function() {
 			if (data) {
 				console.log("Received error from auto:");
 				console.log(data.substr(0,500));
+				bet.lastError = data;
+				document.querySelector(".destroyer.auto-info .error-text").textContent = data;
 				if (data.indexOf("You have to relog in order to place a bet.") !== -1) {
 					bet.renewHash();
 				}
@@ -163,6 +184,7 @@ addJS_Node(null, "src/inject/app/prefilter.js", null, null, true);
 				var btn = container.children[k];
 				// if auto-bet button
 				if (btn.localName === "button" && btn.className.indexOf("auto-bet") !== -1) {
+					console.log("Found the auto-bet button");
 					// set to appropriate color
 					if (bet.autoBetting) {
 						btn.className = btn.className.replace("green", "red");
@@ -192,4 +214,49 @@ addJS_Node(null, "src/inject/app/prefilter.js", null, null, true);
 		}
 	});
 	obs.observe(errorElm, {childList: true, subtree: true});
+})();
+
+// load data if auto-betting
+chrome.storage.local.get("betData", function(d) {
+	var data = d.betData;
+	bet.autoDelay = data.delay;
+	bet.enableAuto(data.betData.url, data.betData.data + "tlss="+data.betData.hash);
+});
+
+// create info box in top-right
+(function(){
+	var container = document.createElement("div"),
+	    paragraphs = [document.createElement("p"),document.createElement("p"),document.createElement("p")],
+	    worthSpan = document.createElement("span"),
+	    btn = document.createElement("button"),
+	    label = document.createElement("label"),
+	    betTime = document.createElement("input");
+
+	container.className = "destroyer auto-info hidden";
+	paragraphs[0].textContent = "Auto-betting items worth ";
+	paragraphs[1].textContent = "Last error:";
+	paragraphs[1].className = "destroyer error-title";
+	paragraphs[2].className = "destroyer error-text";
+	worthSpan.className = "worth";
+	btn.className = "red";
+	btn.textContent = "Disable auto-bet";
+	label.textContent = "Seconds between retries:";
+	betTime.id = "bet-time";
+	betTime.type = "number";
+	betTime.min = "5";
+	betTime.max = "60";
+	betTime.step = "1";
+
+	btn.addEventListener("click", function(){bet.disableAuto()});
+
+	paragraphs[0].appendChild(worthSpan);
+
+	container.appendChild(paragraphs[0]);
+	container.appendChild(btn);
+	container.appendChild(paragraphs[1]);
+	container.appendChild(paragraphs[2]);
+	container.appendChild(label);
+	container.appendChild(betTime);
+
+	document.body.appendChild(container);
 })();
