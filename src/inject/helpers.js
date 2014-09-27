@@ -70,14 +70,15 @@ function displayError(title, text, btns) {
     // make error delete itself after 7.5 seconds
     errorElm.removeAble = true;
     setTimeout(function(){
-            if (errorElm && errorElm.firstChild)
-                if (errorElm.removeAble) {
-                    while (errorElm.firstChild) {
-                        errorElm.removeChild(errorElm.firstChild);
-                    }
-                } else
-                    errorElm.removeQueued = true;
-        }, 7500);
+        console.log("Removing self: "+errorElm.removeAble);
+        if (errorElm && errorElm.firstChild)
+            if (errorElm.removeAble) {
+                while (errorElm.firstChild) {
+                    errorElm.removeChild(errorElm.firstChild);
+                }
+            } else
+                errorElm.removeQueued = true;
+    }, 7500);
 }
 
 // add error element, so we don't have to recreate it every time we display a new error

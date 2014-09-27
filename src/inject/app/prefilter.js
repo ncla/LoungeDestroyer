@@ -55,7 +55,10 @@ function handleBetReturn(data, url, origOptions, origCallback) {
 	origOptions.data && button.setAttribute("data-data", origOptions.data);
 	// click listener is added in bet.js
 
-	displayError(title, data.length > 250 ? data.substr(0,247)+"..." : data, button);
+	if (data)
+		displayError(title, data.length > 250 ? data.substr(0,247)+"..." : data, button);
+	else
+		origCallback(data);
 }
 
 /**
@@ -91,6 +94,7 @@ function displayError(title, text, btns) {
     // make error delete itself after 7.5 seconds
     errorElm.removeAble = true;
     setTimeout(function(){
+    		console.log("Removing self: "+errorElm.removeAble);
             if (errorElm && errorElm.firstChild)
                 if (errorElm.removeAble) {
                     while (errorElm.firstChild) {
@@ -101,3 +105,24 @@ function displayError(title, text, btns) {
         }, 7500);
 }
 var errorElm = document.querySelector(".destroyer.error-container");
+// hook up logic for removing error after N seconds
+errorElm.addEventListener("mouseenter", function(e){
+    console.log("Mouse entered - delaying remove");
+    e.target.removeAble = false;
+});
+errorElm.addEventListener("mouseleave", function leaveHandler(e){
+    console.log("Mouse left - enabling remove");
+    e.target.removeAble = true;
+    if (e.target.removeQueued)
+        console.log("Queued for remove.");
+        setTimeout((function(e){return function removeElm(){
+                console.log("Checking if we should remove");
+                if (e.target.removeAble && e.target.firstChild) {
+                    while (e.target.firstChild) {
+                        e.target.removeChild(e.target.firstChild);
+                    }
+                } else if (e.target.firstChild) {
+                    setTimeout(removeElm, 1500);
+                }
+            }})(e), 1500);
+});
