@@ -60,7 +60,7 @@ bet.enableAuto = function(url, data) {
 		document.querySelector(".destroyer.auto-info").className = "destroyer auto-info";
 		document.querySelector(".destroyer.auto-info .worth").textContent = "$"+worth;
 		document.getElementById("bet-time").valueAsNumber = bet.autoDelay / 1000;
-		chrome.storage.local.set({"betData": {delay: bet.autoDelay, data: bet.betData}});
+		chrome.storage.local.set({"betData": bet.betData});
 
 		// update timer
 		(function timerLoop(){
@@ -231,13 +231,13 @@ addJS_Node(null, "src/inject/app/prefilter.js", null, null, true);
 })();
 
 // load data if auto-betting
-chrome.storage.local.get("betData", function(d) {
+chrome.storage.local.get(["betData","betDelay"], function(d) {
 	var data = d.betData;
 	if (!data)
 		return;
 
-	bet.autoDelay = data.delay;
-	bet.enableAuto(data.data.url, data.data.data + "tlss="+data.data.hash);
+	bet.autoDelay = d.betDelay || bet.autoDelay;
+	bet.enableAuto(data.url, data.data + "tlss="+data.hash);
 });
 
 // create info box in top-right
@@ -270,7 +270,10 @@ chrome.storage.local.get("betData", function(d) {
 	betTime.step = "1";
 
 	btn.addEventListener("click", function(){bet.disableAuto()});
-	betTime.addEventListener("change", function(){bet.autoDelay = this.valueAsNumber * 1000}); // TO-DO: save setting
+	betTime.addEventListener("change", function(){
+		bet.autoDelay = this.valueAsNumber * 1000
+		chrome.storage.local.set({"betDelay": bet.autoDelay});
+	}); // TO-DO: save setting
 
 	paragraphs[0].appendChild(worthSpan);
 
