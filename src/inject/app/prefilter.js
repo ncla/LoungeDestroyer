@@ -1,9 +1,7 @@
 console.log("Injected prefilter script");
 // urls to hook - displays response as error
 var HOOK_URLS = {
-	"ajax/postBetOffer.php": handleBetReturn, 
-	"ajax/betReturns.php": handleBetReturn,
-	"ajax/betHistory.php": handleBetReturn
+	"ajax/postBetOffer.php": handleBetReturn
 };
 
 /**
