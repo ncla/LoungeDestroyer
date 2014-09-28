@@ -14,14 +14,15 @@ var bet = { // not a class - don't instantiate
 	autoDelay: 15000,
 	autoBetting: false,
 	betData: {},
-	lastError: ""
+	lastError: "",
+	lastBetTime: 0
 };
 
 // example data:
 // ldef_index%5B%5D=2682&lquality%5B%5D=0&id%5B%5D=711923886&worth=0.11&on=a&match=1522&tlss=2e7877e8d42fb969c5f6f517243c2d19
 bet.enableAuto = function(url, data) {
 	console.log("Auto-betting");
-	if (this.autoBetting) {
+	if (bet.autoBetting) {
 		console.log("Already auto-betting");
 		return false;
 	}
@@ -30,7 +31,8 @@ bet.enableAuto = function(url, data) {
 		return false;
 	}
 
-	this.autoBetting = true;
+	bet.autoBetting = true;
+	bet.lastBetTime = Date.now();
 
 	// extract data
 	var hash = /tlss=([0-9a-z]*)/.exec(data)[1],
@@ -52,15 +54,26 @@ bet.enableAuto = function(url, data) {
 	};
 
 	// start looping
-	this.autoBetting = bet.autoLoop();
-	if (this.autoBetting) {
+	bet.autoBetting = bet.autoLoop();
+	if (bet.autoBetting) {
 		// update info-box in top-right
 		document.querySelector(".destroyer.auto-info").className = "destroyer auto-info";
 		document.querySelector(".destroyer.auto-info .worth").textContent = "$"+worth;
 		document.getElementById("bet-time").valueAsNumber = bet.autoDelay / 1000;
 		chrome.storage.local.set({"betData": {delay: bet.autoDelay, data: bet.betData}});
+
+		// update timer
+		(function timerLoop(){
+			if (!bet.autoBetting)
+				return;
+
+			var span = document.querySelector(".destroyer.auto-info .time-since");
+			span.textContent = ((Date.now() - bet.lastBetTime) / 1000).toFixed(2) + "s";
+
+			requestAnimationFrame(timerLoop);
+		})();
 	}
-	return this.autoBetting;
+	return bet.autoBetting;
 };
 bet.disableAuto = function() {
 	console.log("Disabling auto-bet");
@@ -91,6 +104,7 @@ bet.autoLoop = function() {
 				console.log("Received error from auto:");
 				console.log(data.substr(0,500));
 				bet.lastError = data;
+				bet.lastBetTime = Date.now();
 				document.querySelector(".destroyer.auto-info .error-text").textContent = data;
 				if (data.indexOf("You have to relog in order to place a bet.") !== -1) {
 					bet.renewHash();
@@ -99,7 +113,7 @@ bet.autoLoop = function() {
 			} else {
 				// happy times
 				console.log("Bet was succesfully placed");
-				bet.autoBetting = false;
+				bet.disableAuto();
 				localStorage.playedbet = "false";
 				window.location.href = "mybets";
 			}
@@ -219,8 +233,11 @@ addJS_Node(null, "src/inject/app/prefilter.js", null, null, true);
 // load data if auto-betting
 chrome.storage.local.get("betData", function(d) {
 	var data = d.betData;
+	if (!data)
+		return;
+
 	bet.autoDelay = data.delay;
-	bet.enableAuto(data.betData.url, data.betData.data + "tlss="+data.betData.hash);
+	bet.enableAuto(data.data.url, data.data.data + "tlss="+data.data.hash);
 });
 
 // create info box in top-right
@@ -229,12 +246,17 @@ chrome.storage.local.get("betData", function(d) {
 	    paragraphs = [document.createElement("p"),document.createElement("p"),document.createElement("p")],
 	    worthSpan = document.createElement("span"),
 	    btn = document.createElement("button"),
+	    timeSpan = document.createElement("span"),
 	    label = document.createElement("label"),
 	    betTime = document.createElement("input");
 
 	container.className = "destroyer auto-info hidden";
 	paragraphs[0].textContent = "Auto-betting items worth ";
-	paragraphs[1].textContent = "Last error:";
+	paragraphs[1].textContent = "Last error (";
+	timeSpan.className = "destroyer time-since";
+	timeSpan.textContent = "0s";
+	paragraphs[1].appendChild(timeSpan);
+	paragraphs[1].appendChild(document.createTextNode("):"));
 	paragraphs[1].className = "destroyer error-title";
 	paragraphs[2].className = "destroyer error-text";
 	worthSpan.className = "worth";
@@ -248,6 +270,7 @@ chrome.storage.local.get("betData", function(d) {
 	betTime.step = "1";
 
 	btn.addEventListener("click", function(){bet.disableAuto()});
+	betTime.addEventListener("change", function(){bet.autoDelay = this.valueAsNumber * 1000}); // TO-DO: save setting
 
 	paragraphs[0].appendChild(worthSpan);
 
