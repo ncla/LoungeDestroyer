@@ -6,6 +6,7 @@ LoungeUser.loadUserSettings(function() {
     Make changes to LoungeUser user settings once the settings are changed from extension pop-up
  */
 chrome.extension.onMessage.addListener(function (request, sender, sendResponse) {
+    // Make changes to LoungeUser user settings once the settings are changed from extension pop-up
     if(request.hasOwnProperty("changeSetting")) {
         for(var name in request.changeSetting) {
             LoungeUser.userSettings[name] = request.changeSetting[name];
@@ -13,6 +14,11 @@ chrome.extension.onMessage.addListener(function (request, sender, sendResponse) 
     }
     if(request.hasOwnProperty("giveMeBackpackURL")) {
         sendResponse(lastBackpackAjaxURL);
+    }
+    // Inject AJAX prefilter to specific tab
+    if(request.hasOwnProperty("injectScript")) {
+        console.log("Injecting script ("+request.injectScript+") into tab "+sender.tab.id);
+        chrome.tabs.executeScript(sender.tab.id, {file: "src/inject/app/"+request.injectScript}); // TODO: support relative path
     }
 });
 var icons = {"-1": "icons/icon_unknown.png", "0": "icons/icon_offline.png", "1": "icons/icon_online.png"};
@@ -26,7 +32,8 @@ function setBotstatus(value) {
                 Notifications
                 https://developer.mozilla.org/en/docs/Web/API/notification
             */
-            var message = {action: "updateBotStatus"};
+            var message = {action: "updateBotStatus",
+                           status: value};
             sendMessageToContentScript(message, null);
             if(value == 1 && result.botsOnline != -1) {
                 /* Might not want to notify when installed for first time */
