@@ -79,6 +79,7 @@ function init() {
             document.getElementById("backpack").innerHTML = '<div id="LDloading" class="spin-1"></div>';
             inv.getCachedInventory("bettingInventory" + appID + "_" + readCookie("id"), function(bpHTML) {
                 document.getElementById("backpack").innerHTML = bpHTML;
+                this.bettingInventoryType = "inventory";
                 // Move appID check to epicStuff method instead
                 if(appID == "730") {
                     epicStuff();

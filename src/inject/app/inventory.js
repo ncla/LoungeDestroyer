@@ -53,6 +53,11 @@ Inventory.prototype.loadInventory = function() {
                 document.getElementById("LDerr").innerHTML = $(data).text();
                 self.loadInventory();
             }
+        },
+        error: function() {
+            setTimeout(function() {
+                self.loadInventory();
+            }, 5000);
         }
     });
 };
@@ -152,6 +157,18 @@ Inventory.prototype.onInventoryLoaded = function(url) {
             $("#loading").hide();
         }
         this.getMarketPrices(true);
+        this.determineBackpackType();
+    }
+};
+Inventory.prototype.determineBackpackType = function() {
+    var isInventory = ($(".bpheader", self.backpackElement).text().indexOf("CS:GO Inventory") != -1 || $(".bpheader .title", self.backpackElement).text().indexOf("Armory") != -1);
+    var isReturns = ($(".bpheader", self.backpackElement).text().indexOf("Returns") != -1);
+    if(isReturns) {
+        this.bettingInventoryType = "returns";
+    } else if(isInventory) {
+        this.bettingInventoryType = "inventory";
+    } else {
+        this.bettingInventoryType = -1;
     }
 };
 /*

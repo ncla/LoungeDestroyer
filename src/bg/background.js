@@ -171,7 +171,7 @@ function checkNewMatches(ajaxResponse, appID) {
 
         var countNotify = Object.keys(matchesToNotificate).length;
         if(countNotify >= 3) {
-            var notify = new Notification("New matches have been added for betting on " + appID,
+            var notify = new Notification("New matches have been added for betting on " + (appID == 730 ? "CS:GO" : "DOTA2") + " Lounge",
                 {icon: "../../icons/icon_normal_notification.png"});
             setTimeout(function() {
                 notify.close();
