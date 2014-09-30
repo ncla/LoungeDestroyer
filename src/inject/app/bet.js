@@ -122,6 +122,7 @@ function onAutobetClicked() {
 		} else if (inventory.determineBackpackType() === "inventory") {
 			url = "http://csgolounge.com/ajax/postBetOffer.php"
 		} else {
+			console.log("Couldn't determine backpack type");
 			return;
 		}
 
