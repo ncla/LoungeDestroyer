@@ -170,6 +170,7 @@ Inventory.prototype.determineBackpackType = function() {
     } else {
         this.bettingInventoryType = -1;
     }
+    return this.bettingInventoryType;
 };
 /*
     Adds LD `load inventory` button
