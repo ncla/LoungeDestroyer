@@ -38,7 +38,7 @@ function enableAuto(worth, match, tries, error) {
     document.querySelector(".destroyer.auto-info .worth").textContent = "$"+(worth || 0).toFixed(2);
     document.querySelector(".destroyer.auto-info .match-link").textContent = match;
     document.querySelector(".destroyer.auto-info .match-link").href = "http://csgolounge.com/match?m="+match;
-    document.querySelector(".destroyer.auto-info .num-tries").textContent = tries + ordinalEnding;
+    document.querySelector(".destroyer.auto-info .num-tries").textContent = (tries||0) + ordinalEnding;
     document.querySelector(".destroyer.auto-info .error-text").textContent = error;
     document.getElementById("bet-time").valueAsNumber = betStatus.rebetDelay / 1000;
 
@@ -109,6 +109,14 @@ chrome.runtime.onMessage.addListener(function(request,sender,sendResponse){
 		// autobetting has received an error from Lounge
 		if (request.autoBet.time && request.autoBet.error) {
 			document.querySelector(".destroyer.auto-info .error-text").textContent = request.autoBet.error;
+			
+			var ordinalEnding = ((request.autoBet.numTries||0)+"").slice(-1);
+			ordinalEnding = (ordinalEnding === "1" ? "st":
+				             ordinalEnding === "2" ? "nd":
+				             ordinalEnding === "3" ? "rd":
+				             "th");
+			document.querySelector(".destroyer.auto-info .num-tries").textContent = (tries||0) + ordinalEnding;
+
 			betStatus.betTime = request.autoBet.time;
 			return;
 		}
