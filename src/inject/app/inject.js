@@ -1,51 +1,4 @@
-/*
-    Bot status initiated
- */
-
-var BotStatus = new LoungeBots();
-
-chrome.storage.local.get('botsOnline', function(result) {
-    $('a[href="/status"]').html('Bots status <div id="bot-status"></div>');
-    BotStatus.updateStatus(result.botsOnline);
-});
-/*
-    When bot status changes (detected by background.js), a message gets send from background script to content script (here).
-    TO-DO: Pass bot status through listener.
- */
-chrome.extension.onMessage.addListener(function(msg, sender, sendResponse) {
-    if(msg.action == "updateBotStatus") {
-        BotStatus.updateStatus(msg.status);
-    }
-    if(msg.action == "onInventoryLoaded") {
-        console.log("Message received for inventory");
-        var inv = new Inventory();
-        if(document.URL.indexOf("/match?m=") != -1) {
-            if($(".bpheader").text().indexOf("CS:GO Inventory") != -1) {
-                inv.cacheInventory("bettingInventory" + appID + "_" + readCookie("id"), $("#backpack").html());
-            }
-            if($(".bpheader .title").text().indexOf("Armory") != -1) {
-                inv.cacheInventory("bettingInventory" + appID + "_" + readCookie("id"), $("#backpack").html());
-            }
-            if(appID == "730") {
-                epicStuff();
-            }
-        }
-        inv.getMarketPrices(true);
-    }
-    if(msg.hasOwnProperty("changeSetting")) {
-        for(var name in msg.changeSetting) {
-            LoungeUser.userSettings[name] = msg.changeSetting[name];
-        }
-    }
-});
-
-var nonMarketItems = ["Dota Items", "Any Offers", "Knife", "Gift", "TF2 Items", "Real Money", "Offers", "Any Common", "Any Uncommon", "Any Rare", "Any Mythical", "Any Legendary",
-    "Any Ancient", "Any Immortal", "Real Money", "+ More", "Any Set", "Any Key", "Undefined / Not Tradeable"];
-
 var appID = (window.location.hostname == "dota2lounge.com" ? "570" : "730");
-
-var marketedItems = {}; /* Global variable for marketed items so we dont overwhelm Volvo */
-
 $("body").addClass("appID" + appID);
 
 if(document.URL.indexOf("/mytrades") != -1 || $("a:contains('Clean messages')").length) {
@@ -56,8 +9,25 @@ if(document.URL.indexOf("/mytrades") != -1 || $("a:contains('Clean messages')").
  Wrap the init code here, because for this to function properly, we need user settings to be loaded first
  */
 function init() {
+    /*
+     When bot status changes (detected by background.js), a message gets send from background script to content script (here).
+     TODO: Pass bot status through listener.
+     */
+    var inv = new Inventory();
+    chrome.extension.onMessage.addListener(function(msg, sender, sendResponse) {
+        if(msg.action == "updateBotStatus") {
+            BotStatus.updateStatus(msg.status);
+        }
+        if(msg.inventory) {
+            inv.onInventoryLoaded(msg.inventory);
+        }
+        if(msg.hasOwnProperty("changeSetting")) {
+            for(var name in msg.changeSetting) {
+                LoungeUser.userSettings[name] = msg.changeSetting[name];
+            }
+        }
+    });
     if((document.URL.indexOf("/mytrades") != -1 || document.URL.indexOf("/trade?t=") != -1 || document.URL.indexOf("/mybets") != -1) && (LoungeUser.userSettings["itemMarketPrices"] == "1")) {
-        var inv = new Inventory();
         inv.getMarketPrices(false);
     }
     if(document.URL.indexOf("/mybets") != -1) {
@@ -84,10 +54,13 @@ function init() {
                         url: $(value).find("a:eq(1)").attr("href"),
                         type: "GET",
                         success: function(data) {
-                            $(".trade-description p", value).text($.trim($(data).find(".standard.msgtxt").text()));
-                            $(".more-text", value).hide();
+                            $(".trade-description p", value).html(textToUrl($.trim($(data).find(".standard.msgtxt").text())));
                         }
                     });
+                } else {
+                    $(".trade-description p", value).html(
+                        textToUrl($(".trade-description p", value).text())
+                    );
                 }
             }
         });
@@ -98,18 +71,26 @@ function init() {
         }
         var tabWrapper = $("div[style='float: left; width: 96%;margin: 0 2%;height: 26px;border-radius: 5px;position: relative;overflow: hidden;']");
         $(tabWrapper).append('<a class="tab" id="ld_cache" onclick="returns = false;">Cached inventory</div>');
-        $(tabWrapper).find(".tab").width("33%");
+        $(tabWrapper).find(".tab").width("33%").click(function() {
+            inv.stopLoadingInventory();
+        });
         $("#ld_cache", tabWrapper).click(function() {
+            $(".left").html("");
             document.getElementById("backpack").innerHTML = '<div id="LDloading" class="spin-1"></div>';
-            var BettingInventory = new Inventory();
-            BettingInventory.getCachedInventory("bettingInventory" + appID + "_" + readCookie("id"), function(bpHTML) {
+            inv.getCachedInventory("bettingInventory" + appID + "_" + readCookie("id"), function(bpHTML) {
                 document.getElementById("backpack").innerHTML = bpHTML;
+                this.bettingInventoryType = "inventory";
                 // Move appID check to epicStuff method instead
                 if(appID == "730") {
                     epicStuff();
                 }
-                BettingInventory.getMarketPrices(true);
+                inv.getMarketPrices(true);
             });
+        });
+    }
+    if(document.URL.indexOf("/addtrade") != -1) {
+        $(".tabholder .tab").click(function() {
+            inv.stopLoadingInventory();
         });
     }
 }

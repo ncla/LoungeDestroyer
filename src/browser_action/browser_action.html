@@ -8,7 +8,7 @@
     #ld_popup {
         display: block;
         width: 280px;
-        height: 380px;
+        height: 160px;
         background: white;
     }
 
@@ -72,6 +72,24 @@
     #ld_popup .footerino a:hover {
         text-decoration: underline;
     }
+    #open-options {
+        cursor: pointer;
+    }
+    .big-ol-btn {
+        width: 100%;
+        height: 33px;
+        background: #FFFFFF;
+        text-align: center;
+        padding-top: 17px;
+        font-size: 12px;
+    }
+    .big-ol-btn a {
+        text-decoration: none;
+        color: #000000;
+    }
+    .big-ol-btn:hover a {
+        text-decoration: underline;
+    }
 </style>
 
 <div id="ld_popup">
@@ -79,46 +97,8 @@
         <span>LoungeDestroyer <span id="version"></span></span>
         <div id="close-btn">&#x2715;</div>
     </div>
-    <div class="ld-settings">
-        <div>Market prices on items:</div>
-        <select id="itemMarketPrices">
-            <option value="1">Enabled</option>
-            <option value="0">Disabled</option>
-        </select>
-
-        <div>Steam market currency:</div>
-        <select id="marketCurrency">
-            <option value="1">USD</option>
-            <option value="2">GBP</option>
-            <option value="3">EUR</option>
-            <option value="5">RUB</option>
-        </select>
-
-        <div>Redirect from item draft page:</div>
-        <select id="redirect">
-            <option value="1">Enabled</option>
-            <option value="0">Disabled</option>
-        </select>
-
-        <div>Remove stream from match page:</div>
-        <select id="streamRemove">
-            <option value="1">Enabled</option>
-            <option value="0">Disabled</option>
-        </select>
-
-        <div>Notify when bots go online:</div>
-        <select id="notifyBots">
-            <option value="1">Enabled</option>
-            <option value="0">Disabled</option>
-        </select>
-
-        <div>Notify about new matches:</div>
-        <select id="notifyMatches">
-            <option value="1">Both</option>
-            <option value="2">Dota2 Lounge matches only</option>
-            <option value="3">CS:GO Lounge matches only</option>
-            <option value="4">Disabled</option>
-        </select>
+    <div class="big-ol-btn" id="open-options">
+        <a href="#">Open settings page</a>
     </div>
     <div class="footerino">
         <div>created by <a href="http://ncla.me" target="_blank">NCLA</a></div>

@@ -111,9 +111,22 @@ div.trade-description {
     font-size: 12px;
     margin-top: 10px;
     white-space: pre-wrap;
+    border-radius: 3px;
+    overflow: hidden;
 }
 .trade-description p {
     padding: 12px 5px;
+    border-left: solid 3px black;
+    border-radius: 3px;
+    color: black;
+    opacity: 0.5;
+    -webkit-transition: opacity 0.3s ease-in-out;
+    transition: opacity 0.3s ease-in-out;
+}
+.tradepoll:hover .trade-description p {
+    padding: 12px 5px;
+    color: black;
+    opacity: 1;
 }
 .trade-description .more-text, .trade-description .open-trade {
     position: absolute;
@@ -137,6 +150,23 @@ div.trade-description {
 }
 .name {
     min-width: 180px;
+}
+.inventory-loading-wrapper {
+    float: left;
+    display: block;
+    width: 100%;
+}
+.inventory-loading-wrapper div {
+    text-align: center;
+}
+.inventory-loading-wrapper #LDerr {
+    text-align: center;
+    font-size: 11px;
+    padding: 10px 10px 0;
+}
+.inventory-loading-wrapper #stopLD {
+    display: inline-block;
+    float: none !important;
 }
 
 /*
@@ -235,7 +265,7 @@ http://codepen.io/larrygeams/pen/nhgze
 
     100% {
         -moz-transform: rotate(360deg);
-    };
+    }
 }
 
 @-moz-keyframes loading {
@@ -245,7 +275,7 @@ http://codepen.io/larrygeams/pen/nhgze
 
     100% {
         -moz-transform: rotate(360deg);
-    };
+    }
 }
 
 @-webkit-keyframes loading {
@@ -255,5 +285,5 @@ http://codepen.io/larrygeams/pen/nhgze
 
     100% {
         -webkit-transform: rotate(360deg);
-    };
+    }
 }

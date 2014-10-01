@@ -16,7 +16,8 @@ User.prototype.defaultSettings =
     delayBotsOn: "5000",
     delayRelogError: "15000",
     notifyBots: "1",
-    notifyMatches: "3"
+    notifyMatches: "3",
+    notifyTrades: "1"
 };
 
 User.prototype.loadUserSettings = function(callback) {
