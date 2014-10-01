@@ -47,11 +47,14 @@ chrome.extension.onMessage.addListener(function (request, sender, sendResponse) 
             sendResponse({enabled: bet.autoBetting,
                           time: bet.lastBetTime,
                           worth: bet.betData.worth,
-                          rebetDelay: bet.autoDelay});
+                          rebetDelay: bet.autoDelay,
+                          error: bet.lastError,
+                          matchId: bet.matchNum,
+                          numTries: bet.numTries});
         }
     }
 
-    // Save info in format {set: {variable: {key: newValue}}}
+    // Overwrite variable in format {set: {variable: {key: newValue}}}
     if(request.hasOwnProperty("set")) {
         for (var v in request.set) {
             var oldVar = window[v],
@@ -353,7 +356,8 @@ var bet = { // not a class - don't instantiate
     matchNum: 0, // for hash purposes
     betData: {},
     lastError: "",
-    lastBetTime: 0
+    lastBetTime: 0,
+    numTries: 0
 };
 
 // example data:
@@ -371,6 +375,7 @@ bet.enableAuto = function(url, data) {
 
     bet.autoBetting = true;
     bet.lastBetTime = Date.now();
+    bet.numTries = 0;
 
     // extract data
     var hash = /tlss=([0-9a-z]*)/.exec(data)[1],
@@ -394,7 +399,14 @@ bet.enableAuto = function(url, data) {
     bet.autoBetting = bet.autoLoop();
     if (bet.autoBetting) {
         // send event to all lounge tabs
-        sendMessageToContentScript({autoBet: {worth: worth, time: bet.lastBetTime, rebetDelay: bet.autoDelay}}, -1);
+        sendMessageToContentScript({autoBet: 
+            {
+                worth: worth, 
+                time: bet.lastBetTime, 
+                rebetDelay: bet.autoDelay,
+                error: bet.lastError,
+                matchId: bet.matchNum
+            }}, -3);
     }
     return bet.autoBetting;
 };
@@ -428,10 +440,12 @@ bet.autoLoop = function() {
                 console.log(data.substr(0,500));
                 bet.lastError = data;
                 bet.lastBetTime = Date.now();
+                bet.numTries++;
                 sendMessageToContentScript({
                     autoBet: {
                         time: bet.lastBetTime,
-                        error: data
+                        error: data,
+                        numTries: bet.numTries
                     }},-3);
                 //document.querySelector(".destroyer.auto-info .error-text").textContent = data;
                 if (data.indexOf("You have to relog in order to place a bet.") !== -1) {
