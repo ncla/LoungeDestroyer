@@ -115,7 +115,7 @@ chrome.runtime.onMessage.addListener(function(request,sender,sendResponse){
 				             ordinalEnding === "2" ? "nd":
 				             ordinalEnding === "3" ? "rd":
 				             "th");
-			document.querySelector(".destroyer.auto-info .num-tries").textContent = (tries||0) + ordinalEnding;
+			document.querySelector(".destroyer.auto-info .num-tries").textContent = (request.autoBet.numTries||0) + ordinalEnding;
 
 			betStatus.betTime = request.autoBet.time;
 			return;
