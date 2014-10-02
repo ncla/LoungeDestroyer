@@ -9,7 +9,7 @@ var inventory = new Inventory();
 			var newBtn = document.createElement("a");
 			newBtn.id = "realbetbutton";
 			newBtn.className = "buttonright";
-			newBtn.textContent = "For real";
+			newBtn.textContent = "FUCKING PLACE A BET";
 			newBtn.setAttribute("data-tlss", placebut.getAttribute("onclick").match(/\('[0-9]+', '([0-9A-Za-z]+)/)[1]);
 			newBtn.addEventListener("click", onAutobetClicked);
 			placebut.parentNode.insertBefore(newBtn, placebut);
@@ -24,7 +24,6 @@ var betStatus = {
 };
 
 function enableAuto(worth, match, tries, error) {
-	console.log("Enabling auto");
 	betStatus.enabled = true;
 
 	var ordinalEnding = ((tries||0)+"").slice(-1);
@@ -60,8 +59,6 @@ function enableAuto(worth, match, tries, error) {
 
 // load data if auto-betting
 chrome.runtime.sendMessage({get: "autoBet"}, function(data){
-	console.log("Auto bet is currently:");
-	console.log(data);
 	if (!data.enabled)
 		return;
 
@@ -73,10 +70,6 @@ chrome.runtime.sendMessage({get: "autoBet"}, function(data){
 
 // listen for auto-betting updates
 chrome.runtime.onMessage.addListener(function(request,sender,sendResponse){
-	console.log("Received message");
-	console.log("Received autobet update:");
-	console.log(request);
-
 	if (request.autoBet === false) { // autobetting has stopped
 		betStatus.enabled = false;
 		document.querySelector(".destroyer.auto-info").className = "destroyer auto-info hidden";
@@ -97,7 +90,6 @@ chrome.runtime.onMessage.addListener(function(request,sender,sendResponse){
 	if (request.autoBet) {
 		// autobetting has started
 		if (request.autoBet.worth && request.autoBet.time && request.autoBet.rebetDelay) {
-			console.log(request.autoBet);
 			betStatus.enabled = true;
 			betStatus.betTime = request.autoBet.time;
 			betStatus.rebetDelay = request.autoBet.rebetDelay;
@@ -125,8 +117,6 @@ chrome.runtime.onMessage.addListener(function(request,sender,sendResponse){
 
 // when the auto-bet button is clicked
 function onAutobetClicked() {
-	console.log("Autobet clicked");
-
 	// if no team was selected, error out
 	if (!document.getElementById("on").value) {
 		alert("You didn't select a team.");
@@ -144,12 +134,8 @@ function onAutobetClicked() {
 		} else if (inventory.determineBackpackType() === "inventory") {
 			url = "http://csgolounge.com/ajax/postBetOffer.php"
 		} else {
-			console.log("Couldn't determine backpack type");
 			return;
 		}
-
-		console.log("Data: " + data);
-		console.log("URL: " + url);
 
 		// enable auto-betting
 		chrome.runtime.sendMessage({
