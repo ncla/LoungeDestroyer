@@ -110,7 +110,7 @@ function sendMessageToContentScript(message, tabId) {
     } else {
         // Although they claim to, Chrome do not support arrays as url parameter for query
         // Therefore, -3 is currently the same as -1
-        var url = ["*://*/*", "*://csgolounge.com/*", "*://dota2lounge.com/*", "*://csgolounge.com/*"][tabId*-1] || "*://*/*";
+        var url = ["*://*/*", "*://csgolounge.com/*", "*://dota2lounge.com/*", "*://csgolounge.com/*"][tabId*-1 || 0] || "*://*/*";
         chrome.tabs.query({url: url}, function(tabs) {
             for (var i=0; i<tabs.length; ++i) {
                 chrome.tabs.sendMessage(tabs[i].id, message);
@@ -414,7 +414,6 @@ bet.disableAuto = function(success) {
     console.log("Disabling auto-bet");
     this.autoBetting = false;
     sendMessageToContentScript({autoBet: (success || false)}, -3);
-    //document.querySelector(".destroyer.auto-info").className = "destroyer auto-info hidden";
 };
 bet.autoLoop = function() {
     if (bet.betData.data.indexOf("&on=") === -1) { // if not a betting request
@@ -447,7 +446,6 @@ bet.autoLoop = function() {
                         error: data,
                         numTries: bet.numTries
                     }},-3);
-                //document.querySelector(".destroyer.auto-info .error-text").textContent = data;
                 if (data.indexOf("You have to relog in order to place a bet.") !== -1) {
                     bet.renewHash();
                 }
@@ -456,12 +454,8 @@ bet.autoLoop = function() {
                 // happy times
                 console.log("Bet was succesfully placed");
                 bet.disableAuto(true);
+                // tell tabs of our great success
                 sendMessageToContentScript({autoBet: true});
-                // only make one tab go to mybets page
-                chrome.tabs.query({url: "*://csgolounge.com/*"}, function(tabs){
-                    var id = tabs[0].id;
-                    sendMessageToContentScript({autoBet: true, navigate: "mybets"}, id);
-                });
             }
         },
         error: function(xhr) {
@@ -472,17 +466,6 @@ bet.autoLoop = function() {
             setTimeout(bet.autoLoop, bet.autoDelay);
         }
     });
-    return true;
-};
-bet.checkRequirements = function() { // not used
-    if (!document.querySelectorAll(".betpoll .item").length > 0) {
-        displayError("User error", "No items added!");
-        return false;
-    }
-    if (!document.getElementById("on").value.length > 0) {
-        displayError("User error", "No team selected");
-        return false;
-    }
     return true;
 };
 bet.renewHash = function(numTries) {

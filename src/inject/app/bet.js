@@ -73,7 +73,6 @@ chrome.runtime.onMessage.addListener(function(request,sender,sendResponse){
 	if (request.autoBet === false) { // autobetting has stopped
 		betStatus.enabled = false;
 		document.querySelector(".destroyer.auto-info").className = "destroyer auto-info hidden";
-		document.location.reload();
 		return;
 	}
 
@@ -83,6 +82,8 @@ chrome.runtime.onMessage.addListener(function(request,sender,sendResponse){
 		if (request.navigate) { // and we're the chosen tab
 			localStorage.playedbet = false;
 			window.location.href = request.navigate;
+		} else {
+			document.location.reload();
 		}
 		return;
 	}
@@ -103,10 +104,12 @@ chrome.runtime.onMessage.addListener(function(request,sender,sendResponse){
 			document.querySelector(".destroyer.auto-info .error-text").textContent = request.autoBet.error;
 			
 			var ordinalEnding = ((request.autoBet.numTries||0)+"").slice(-1);
-			ordinalEnding = (ordinalEnding === "1" ? "st":
-				             ordinalEnding === "2" ? "nd":
-				             ordinalEnding === "3" ? "rd":
-				             "th");
+			ordinalEnding = (request.autoBet.numTries < 20 &&
+							request.autoBet.numTries > 10) ? "th" : // if a "teen" number, end in th
+							1ordinalEnding === "1" ? "st":
+				            ordinalEnding === "2" ? "nd":
+				            ordinalEnding === "3" ? "rd":
+				            "th");
 			document.querySelector(".destroyer.auto-info .num-tries").textContent = (request.autoBet.numTries||0) + ordinalEnding;
 
 			betStatus.betTime = request.autoBet.time;
