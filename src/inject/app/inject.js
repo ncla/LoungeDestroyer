@@ -5,6 +5,18 @@ if(document.URL.indexOf("/mytrades") != -1 || $("a:contains('Clean messages')").
     $("body").addClass("mytrades");
 }
 
+// cannot check if actually playing, unfortunately
+// only if it's been clicked while on the page
+var streamPlaying = false;
+
+// onclick/onmousedown doesn't fire on flash objects
+document.getElementById("mainstream").addEventListener("mousedown", function(){
+    streamPlaying = true;
+});
+// onmousedown won't fire unless wmode=transparent, don't ask me why
+document.getElementById("live_embed_player_flash").setAttribute("wmode", "transparent");
+
+
 /*
  Wrap the init code here, because for this to function properly, we need user settings to be loaded first
  */
@@ -42,28 +54,30 @@ function init() {
         });
     }
     if($('a[href="/trades"]').length || document.URL.indexOf("/result?") != -1 || document.URL.indexOf("/trades") != -1) {
-        // On infinite scrolling trade page, new trades wont have expanded description
-        $(".tradepoll").each(function(index, value) {
-            var description = $(value).find(".tradeheader").attr("title");
-            var descriptionTextLength = description.length;
-            if(descriptionTextLength > 0) {
-                $(value).find(".tradecnt").after('<div class="trade-description"><p>' + $.trim(description) + (descriptionTextLength > 240 ? "..." : "") + '</p></div>');
-                var tradeDescription = $(".trade-description", value);
-                if(descriptionTextLength > 240) {
-                    $.ajax({
-                        url: $(value).find("a:eq(1)").attr("href"),
-                        type: "GET",
-                        success: function(data) {
-                            $(".trade-description p", value).html(textToUrl($.trim($(data).find(".standard.msgtxt").text())));
-                        }
-                    });
-                } else {
-                    $(".trade-description p", value).html(
-                        textToUrl($(".trade-description p", value).text())
-                    );
+        if (LoungeUser.userSettings.showDescriptions !== "0") {
+            // On infinite scrolling trade page, new trades wont have expanded description
+            $(".tradepoll").each(function(index, value) {
+                var description = $(value).find(".tradeheader").attr("title");
+                var descriptionTextLength = description.length;
+                if(descriptionTextLength > 0) {
+                    $(value).find(".tradecnt").after('<div class="trade-description"><p>' + $.trim(description) + (descriptionTextLength > 240 ? "..." : "") + '</p></div>');
+                    var tradeDescription = $(".trade-description", value);
+                    if(descriptionTextLength > 240) {
+                        $.ajax({
+                            url: $(value).find("a:eq(1)").attr("href"),
+                            type: "GET",
+                            success: function(data) {
+                                $(".trade-description p", value).html(textToUrl($.trim($(data).find(".standard.msgtxt").text())));
+                            }
+                        });
+                    } else {
+                        $(".trade-description p", value).html(
+                            textToUrl($(".trade-description p", value).text())
+                        );
+                    }
                 }
-            }
-        });
+            });
+        }
     }
     if(document.URL.indexOf("/match?m=") != -1) {
         if(LoungeUser.userSettings["streamRemove"] == "1") {
