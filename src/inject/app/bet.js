@@ -79,8 +79,10 @@ chrome.runtime.onMessage.addListener(function(request,sender,sendResponse){
 	if (request.autoBet === true) { // bet succeeded
 		betStatus.enabled = false;
 		document.querySelector(".destroyer.auto-info").className = "destroyer auto-info hidden";
-		localStorage.playedbet = false;
-		document.location.reload();
+		if (!streamPlaying) {
+			localStorage.playedbet = false;
+			document.location.reload();
+		}
 		return;
 	}
 

@@ -5,6 +5,18 @@ if(document.URL.indexOf("/mytrades") != -1 || $("a:contains('Clean messages')").
     $("body").addClass("mytrades");
 }
 
+// cannot check if actually playing, unfortunately
+// only if it's been clicked while on the page
+var streamPlaying = false;
+
+// onclick/onmousedown doesn't fire on flash objects
+document.getElementById("mainstream").addEventListener("mousedown", function(){
+    streamPlaying = true;
+});
+// onmousedown won't fire unless wmode=transparent, don't ask me why
+document.getElementById("live_embed_player_flash").setAttribute("wmode", "transparent");
+
+
 /*
  Wrap the init code here, because for this to function properly, we need user settings to be loaded first
  */
