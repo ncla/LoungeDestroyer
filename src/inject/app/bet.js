@@ -106,10 +106,10 @@ chrome.runtime.onMessage.addListener(function(request,sender,sendResponse){
 			var ordinalEnding = ((request.autoBet.numTries||0)+"").slice(-1);
 			ordinalEnding = (request.autoBet.numTries < 20 &&
 							request.autoBet.numTries > 10) ? "th" : // if a "teen" number, end in th
-							1ordinalEnding === "1" ? "st":
+							ordinalEnding === "1" ? "st":
 				            ordinalEnding === "2" ? "nd":
 				            ordinalEnding === "3" ? "rd":
-				            "th");
+				            "th";
 			document.querySelector(".destroyer.auto-info .num-tries").textContent = (request.autoBet.numTries||0) + ordinalEnding;
 
 			betStatus.betTime = request.autoBet.time;
