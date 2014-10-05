@@ -79,12 +79,8 @@ chrome.runtime.onMessage.addListener(function(request,sender,sendResponse){
 	if (request.autoBet === true) { // bet succeeded
 		betStatus.enabled = false;
 		document.querySelector(".destroyer.auto-info").className = "destroyer auto-info hidden";
-		if (request.navigate) { // and we're the chosen tab
-			localStorage.playedbet = false;
-			window.location.href = request.navigate;
-		} else {
-			document.location.reload();
-		}
+		localStorage.playedbet = false;
+		document.location.reload();
 		return;
 	}
 
