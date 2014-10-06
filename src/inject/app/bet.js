@@ -30,8 +30,8 @@ function enableAuto(worth, match, tries, error) {
 	ordinalEnding = (tries%100 < 20 &&
 					tries%100 > 10) ? "th" : // if a "teen" number, end in th
 					ordinalEnding === "1" ? "st":
-		            ordinalEndin === "2" ? "nd":
-		            ordinalEndin === "3" ? "rd":
+		            ordinalEnding === "2" ? "nd":
+		            ordinalEnding === "3" ? "rd":
 		            "th";
 
 	// update info-box in top-right
