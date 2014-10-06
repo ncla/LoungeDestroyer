@@ -12,8 +12,23 @@ var streamPlaying = false;
 (function(){
     var container = document.getElementById("mainstream"),
         flash = document.getElementById("live_embed_player_flash");
-    if (!container || !flash)
+
+    if (!flash) { // it's a hitbox stream
+        flash = document.querySelector("#mainstream iframe:first-child");
+        if (!flash)
+            return;
+
+        flash.contentWindow.document.addEventListener("click", function(){
+            streamPlaying = true
+        });
+
+        return
+    }
+    
+    if (!container)
         return;
+
+    flash = flash.document;
 
     // onclick/onmousedown doesn't fire on flash objects
     container.addEventListener("mousedown", function(){

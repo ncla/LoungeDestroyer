@@ -27,10 +27,12 @@ function enableAuto(worth, match, tries, error) {
 	betStatus.enabled = true;
 
 	var ordinalEnding = ((tries||0)+"").slice(-1);
-	ordinalEnding = (ordinalEnding === "1" ? "st":
-		             ordinalEnding === "2" ? "nd":
-		             ordinalEnding === "3" ? "rd":
-		             "th");
+	ordinalEnding = (tries%100 < 20 &&
+					tries%100 > 10) ? "th" : // if a "teen" number, end in th
+					tries === "1" ? "st":
+		            tries === "2" ? "nd":
+		            tries === "3" ? "rd":
+		            "th";
 
 	// update info-box in top-right
     document.querySelector(".destroyer.auto-info").className = "destroyer auto-info";
@@ -102,8 +104,8 @@ chrome.runtime.onMessage.addListener(function(request,sender,sendResponse){
 			document.querySelector(".destroyer.auto-info .error-text").textContent = request.autoBet.error;
 			
 			var ordinalEnding = ((request.autoBet.numTries||0)+"").slice(-1);
-			ordinalEnding = (request.autoBet.numTries < 20 &&
-							request.autoBet.numTries > 10) ? "th" : // if a "teen" number, end in th
+			ordinalEnding = (request.autoBet.numTries%100 < 20 &&
+							request.autoBet.numTries%100 > 10) ? "th" : // if a "teen" number, end in th
 							ordinalEnding === "1" ? "st":
 				            ordinalEnding === "2" ? "nd":
 				            ordinalEnding === "3" ? "rd":
