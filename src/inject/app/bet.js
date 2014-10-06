@@ -29,9 +29,9 @@ function enableAuto(worth, match, tries, error) {
 	var ordinalEnding = ((tries||0)+"").slice(-1);
 	ordinalEnding = (tries%100 < 20 &&
 					tries%100 > 10) ? "th" : // if a "teen" number, end in th
-					tries === "1" ? "st":
-		            tries === "2" ? "nd":
-		            tries === "3" ? "rd":
+					ordinalEnding === "1" ? "st":
+		            ordinalEndin === "2" ? "nd":
+		            ordinalEndin === "3" ? "rd":
 		            "th";
 
 	// update info-box in top-right
