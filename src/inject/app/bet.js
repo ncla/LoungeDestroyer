@@ -1,4 +1,4 @@
-var inventory = new Inventory();
+var inventory;
 
 // If on match page, add "FUCKING PLACE A BET" button
 (function(){

@@ -24,7 +24,7 @@ var streamPlaying = false;
 
         return
     }
-    
+
     if (!container)
         return;
 
@@ -47,7 +47,7 @@ function init() {
      When bot status changes (detected by background.js), a message gets send from background script to content script (here).
      TODO: Pass bot status through listener.
      */
-    var inv = new Inventory();
+    var inv = inventory;
     chrome.extension.onMessage.addListener(function(msg, sender, sendResponse) {
         if(msg.action == "updateBotStatus") {
             BotStatus.updateStatus(msg.status);
@@ -62,7 +62,7 @@ function init() {
         }
     });
     if((document.URL.indexOf("/mytrades") != -1 || document.URL.indexOf("/trade?t=") != -1 || document.URL.indexOf("/mybets") != -1) && (LoungeUser.userSettings["itemMarketPrices"] == "1")) {
-        inv.getMarketPrices(false);
+        inventory.getMarketPrices(false);
     }
     if(document.URL.indexOf("/mybets") != -1) {
         $(".matchmain").each(function(index, value) {
@@ -108,25 +108,25 @@ function init() {
         var tabWrapper = $("div[style='float: left; width: 96%;margin: 0 2%;height: 26px;border-radius: 5px;position: relative;overflow: hidden;']");
         $(tabWrapper).append('<a class="tab" id="ld_cache" onclick="returns = false;">Cached inventory</div>');
         $(tabWrapper).find(".tab").width("33%").click(function() {
-            inv.stopLoadingInventory();
+            inventory.stopLoadingInventory();
         });
         $("#ld_cache", tabWrapper).click(function() {
             $(".left").html("");
             document.getElementById("backpack").innerHTML = '<div id="LDloading" class="spin-1"></div>';
-            inv.getCachedInventory("bettingInventory" + appID + "_" + readCookie("id"), function(bpHTML) {
+            inventory.getCachedInventory("bettingInventory" + appID + "_" + readCookie("id"), function(bpHTML) {
                 document.getElementById("backpack").innerHTML = bpHTML;
                 this.bettingInventoryType = "inventory";
                 // Move appID check to epicStuff method instead
                 if(appID == "730") {
                     epicStuff();
                 }
-                inv.getMarketPrices(true);
+                inventory.getMarketPrices(true);
             });
         });
     }
     if(document.URL.indexOf("/addtrade") != -1) {
         $(".tabholder .tab").click(function() {
-            inv.stopLoadingInventory();
+            inventory.stopLoadingInventory();
         });
     }
 }
@@ -137,6 +137,7 @@ function init() {
 var LoungeUser = new User();
 LoungeUser.loadUserSettings(function() {
     console.log("User settings have been loaded in content script!");
+    inventory = new Inventory();
     init();
 });
 
