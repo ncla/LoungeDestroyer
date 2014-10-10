@@ -61,6 +61,7 @@ function init() {
             }
         }
     });
+
     if((document.URL.indexOf("/mytrades") != -1 || document.URL.indexOf("/trade?t=") != -1 || document.URL.indexOf("/mybets") != -1) && (LoungeUser.userSettings["itemMarketPrices"] == "1")) {
         inventory.getMarketPrices(false);
     }

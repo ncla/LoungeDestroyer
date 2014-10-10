@@ -2,9 +2,7 @@ var LoungeUser = new User();
 LoungeUser.loadUserSettings(function() {
     console.log("Settings for background.js have loaded!");
 });
-/*
-    Make changes to LoungeUser user settings once the settings are changed from extension pop-up
- */
+
 chrome.extension.onMessage.addListener(function (request, sender, sendResponse) {
     // Make changes to LoungeUser user settings once the settings are changed from extension pop-up
     if(request.hasOwnProperty("changeSetting")) {
@@ -136,13 +134,20 @@ chrome.webRequest.onHeadersReceived.addListener(
              */
             if(headers[i].name == 'Location' && headers[i].value.indexOf("/wait.html") != -1 && LoungeUser.userSettings.redirect == "1") {
                 details.responseHeaders.splice(i, 1); // Removes it
-                chrome.tabs.update(details.tabId, {url: originalURL});
+                var errHtml = "<h1>LoungeDestroyer</h1><p>LoungeDestroyer is redirecting you away from wait.html redirect page to the page you intended to visit. " +
+                    "You can disable this feature in extension settings.</p>";
+                chrome.tabs.executeScript(details.tabId, {code: "document.body.innerHTML += '"+errHtml+"'"});
+                chrome.tabs.executeScript(details.tabId, {code: "setTimeout(function() { window.location = '"+originalURL+"';}, 1000);"});
+                //chrome.tabs.update(details.tabId, {url: originalURL});
             }
         }
         blockingResponse.responseHeaders = headers;
         return blockingResponse;
     },
-    {urls: ["*://csgolounge.com/*", "*://dota2lounge.com/*"]},
+    {
+        urls: ["*://csgolounge.com/*", "*://dota2lounge.com/*"],
+        types: ["main_frame"]
+    },
     ["responseHeaders", "blocking"]
 );
 var lastBackpackAjaxURL = null;
@@ -171,14 +176,18 @@ setInterval(function() {
         oReq.onload = function() {
             var doc = document.implementation.createHTMLDocument("");
             doc.body.innerHTML = this.responseText;
-
-            var botStatus = doc.getElementsByTagName("center")[0].innerText.replace("BOTS ARE ", "");
-            if(botStatus == "ONLINE") {
-                setBotstatus(1);
-            } else if(botStatus == "OFFLINE") {
-                setBotstatus(0);
-            }
-            else {
+            try {
+                var botStatus = doc.getElementsByTagName("center")[0].innerText.replace("BOTS ARE ", "");
+                if(botStatus == "ONLINE") {
+                    setBotstatus(1);
+                } else if(botStatus == "OFFLINE") {
+                    setBotstatus(0);
+                }
+                else {
+                    setBotstatus(-1);
+                }
+            } catch(e) {
+                console.log("Setting bot status to unknown, error getting bot status: " + e.message);
                 setBotstatus(-1);
             }
         };
