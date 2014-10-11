@@ -40,7 +40,7 @@ function addJS_Node(text, s_URL, funcToRun, funcName, local) {
     CSGL horribleness, not mine
  */
 function textToUrl(text) {
-    return text.replace(/(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig,"<a href='http://csgolounge.com/goto?url=$1'>$1</a>");
+    return text.replace(/(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig,"<a href='https://steamcommunity.com/linkfilter/$1'>$1</a>");
 }
 
 /**
