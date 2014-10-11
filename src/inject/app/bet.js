@@ -1,6 +1,6 @@
 var inventory;
 
-// If on match page, add "FUCKING PLACE A BET" button
+// If on match page, add "FUCKING PLACE BET" button
 (function(){
 	if (window.location.pathname === "/match") {
 		var placebut;
@@ -9,7 +9,7 @@ var inventory;
 			var newBtn = document.createElement("a");
 			newBtn.id = "realbetbutton";
 			newBtn.className = "buttonright";
-			newBtn.textContent = "FUCKING PLACE A BET";
+			newBtn.textContent = "FUCKING PLACE BET";
 			newBtn.setAttribute("data-tlss", placebut.getAttribute("onclick").match(/\('[0-9]+', '([0-9A-Za-z]+)/)[1]);
 			newBtn.addEventListener("click", onAutobetClicked);
 			placebut.parentNode.insertBefore(newBtn, placebut);
@@ -34,11 +34,14 @@ function enableAuto(worth, match, tries, error) {
 		            ordinalEnding === "3" ? "rd":
 		            "th";
 
+	var worth = worth === -1 ? "key(s)" :
+	                      "$"+(worth || 0).toFixed(2);
+
 	// update info-box in top-right
     document.querySelector(".destroyer.auto-info").className = "destroyer auto-info";
-    document.querySelector(".destroyer.auto-info .worth").textContent = "$"+(worth || 0).toFixed(2);
+    document.querySelector(".destroyer.auto-info .worth").textContent = worth;
     document.querySelector(".destroyer.auto-info .match-link").textContent = match;
-    document.querySelector(".destroyer.auto-info .match-link").href = "http://csgolounge.com/match?m="+match;
+    document.querySelector(".destroyer.auto-info .match-link").href = "match?m="+match;
     document.querySelector(".destroyer.auto-info .num-tries").textContent = (tries||0) + ordinalEnding;
     document.querySelector(".destroyer.auto-info .error-text").textContent = error;
     document.getElementById("bet-time").valueAsNumber = betStatus.rebetDelay / 1000;
@@ -133,9 +136,9 @@ function onAutobetClicked() {
 			url;
         // TODO: Rewrite this.
 		if (inventory.determineBackpackType() === "returns") {
-			url = "http://" + window.location.host + "/ajax/postBet.php";
+			url = window.location.origin+"/ajax/postBet.php";
 		} else if (inventory.determineBackpackType() === "inventory") {
-			url = "http://" + window.location.host + "/ajax/postBetOffer.php";
+			url = window.location.origin+"/ajax/postBetOffer.php";
 		} else {
 			return;
 		}
