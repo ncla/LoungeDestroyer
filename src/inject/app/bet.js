@@ -1,6 +1,6 @@
 var inventory;
 
-// If on match page, add "FUCKING PLACE A BET" button
+// If on match page, add "FUCKING PLACE BET" button
 (function(){
 	if (window.location.pathname === "/match") {
 		var placebut;
@@ -9,7 +9,7 @@ var inventory;
 			var newBtn = document.createElement("a");
 			newBtn.id = "realbetbutton";
 			newBtn.className = "buttonright";
-			newBtn.textContent = "FUCKING PLACE A BET";
+			newBtn.textContent = "FUCKING PLACE BET";
 			newBtn.setAttribute("data-tlss", placebut.getAttribute("onclick").match(/\('[0-9]+', '([0-9A-Za-z]+)/)[1]);
 			newBtn.addEventListener("click", onAutobetClicked);
 			placebut.parentNode.insertBefore(newBtn, placebut);
@@ -38,7 +38,7 @@ function enableAuto(worth, match, tries, error) {
     document.querySelector(".destroyer.auto-info").className = "destroyer auto-info";
     document.querySelector(".destroyer.auto-info .worth").textContent = "$"+(worth || 0).toFixed(2);
     document.querySelector(".destroyer.auto-info .match-link").textContent = match;
-    document.querySelector(".destroyer.auto-info .match-link").href = "http://csgolounge.com/match?m="+match;
+    document.querySelector(".destroyer.auto-info .match-link").href = "match?m="+match;
     document.querySelector(".destroyer.auto-info .num-tries").textContent = (tries||0) + ordinalEnding;
     document.querySelector(".destroyer.auto-info .error-text").textContent = error;
     document.getElementById("bet-time").valueAsNumber = betStatus.rebetDelay / 1000;
@@ -72,6 +72,9 @@ chrome.runtime.sendMessage({get: "autoBet"}, function(data){
 
 // listen for auto-betting updates
 chrome.runtime.onMessage.addListener(function(request,sender,sendResponse){
+	console.log("Received message: ");
+	console.log(request);
+
 	if (request.autoBet === false) { // autobetting has stopped
 		betStatus.enabled = false;
 		document.querySelector(".destroyer.auto-info").className = "destroyer auto-info hidden";
@@ -133,9 +136,9 @@ function onAutobetClicked() {
 			url;
 
 		if (inventory.determineBackpackType() === "returns") {
-			url = "http://csgolounge.com/ajax/postBet.php";
+			url = window.location.origin+"/ajax/postBet.php";
 		} else if (inventory.determineBackpackType() === "inventory") {
-			url = "http://csgolounge.com/ajax/postBetOffer.php"
+			url = window.location.origin+"/ajax/postBetOffer.php";
 		} else {
 			return;
 		}

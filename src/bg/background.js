@@ -23,34 +23,38 @@ chrome.extension.onMessage.addListener(function (request, sender, sendResponse) 
         chrome.tabs.executeScript(sender.tab.id, {file: "src/inject/app/"+request.injectScript}); // TODO: support relative path
     }
 
+    var game = sender.url.indexOf("http://csgolounge.com/") === 0 ? 0 :
+               sender.url.indexOf("http://dota2lounge.com/") === 0 ? 1 :
+               -1;
+
     // Enable auto-betting
-    if(request.hasOwnProperty("autoBet") && request.autoBet) {
-        if (bet.autoBetting || !request.autoBet.data || !request.autoBet.url || !request.autoBet.matchNum) {
+    if(request.hasOwnProperty("autoBet") && request.autoBet && game !== -1) {
+        if (bet.autoBetting[game] || !request.autoBet.data || !request.autoBet.url || !request.autoBet.matchNum) {
             sendResponse(false);    
             return;
         }
 
         console.log("Enabling autobet with data:");
         console.log(request.autoBet.data);
-        bet.matchNum = request.autoBet.matchNum;
-        bet.enableAuto(request.autoBet.url, request.autoBet.data);
+        bet.matchNum[game] = request.autoBet.matchNum;
+        bet.enableAuto(request.autoBet.url, request.autoBet.data, !game);
     }
 
     // Disable auto-betting
-    if (request.hasOwnProperty("autoBet") && request.autoBet === false) {
-        bet.disableAuto();
+    if (request.hasOwnProperty("autoBet") && request.autoBet === false && game !== -1) {
+        bet.disableAuto(false, game);
     }
 
     // Get current state of auto-betting
     if(request.hasOwnProperty("get")) {
-        if (request.get === "autoBet") {
-            sendResponse({enabled: bet.autoBetting,
-                          time: bet.lastBetTime,
-                          worth: bet.betData.worth,
+        if (request.get === "autoBet" && game !== -1) {
+            sendResponse({enabled: bet.autoBetting[game],
+                          time: bet.lastBetTime[game],
+                          worth: bet.betData[game].worth,
                           rebetDelay: bet.autoDelay,
-                          error: bet.lastError,
-                          matchId: bet.matchNum,
-                          numTries: bet.numTries});
+                          error: bet.lastError[game],
+                          matchId: bet.matchNum[game],
+                          numTries: bet.numTries[game]});
         }
     }
 
@@ -102,7 +106,8 @@ function setBotstatus(value) {
  * @param int tabId - ID of tab to send to, 0 for all HTTP/HTTPS tabs,
  *                    -1 for all CSGOLounge tabs,
  *                    -2 for all Dota2Lounge tabs,
- *                    -3 for both
+ *                    -3 for both (NOTE: currently all CSGOLounge tabs)
+ * Don't ask me why I chose negativ numbers. I don't know.
  */
 function sendMessageToContentScript(message, tabId) {
     if(tabId>0) {
@@ -110,6 +115,8 @@ function sendMessageToContentScript(message, tabId) {
     } else {
         // Although they claim to, Chrome do not support arrays as url parameter for query
         // Therefore, -3 is currently the same as -1
+        console.log("Sending message to "+tabId);
+        console.log(message);
         var url = ["*://*/*", "*://csgolounge.com/*", "*://dota2lounge.com/*", "*://csgolounge.com/*"][tabId*-1 || 0] || "*://*/*";
         chrome.tabs.query({url: url}, function(tabs) {
             for (var i=0; i<tabs.length; ++i) {
@@ -123,6 +130,8 @@ function sendMessageToContentScript(message, tabId) {
  http://stackoverflow.com/questions/15891827/chrome-api-responseheaders
  http://stackoverflow.com/questions/16928912/url-forwarding-using-chrome-webrequest-after-response-is-received
  */
+// Error in event handler for webRequest.onHeadersReceived/1: Invalid value for argument 1. Value must not be less than 0.
+// if bot status update is redirected
 chrome.webRequest.onHeadersReceived.addListener(
     function(details) {
         var headers = details.responseHeaders,
@@ -171,8 +180,12 @@ setInterval(function() {
         oReq.onload = function() {
             var doc = document.implementation.createHTMLDocument("");
             doc.body.innerHTML = this.responseText;
-
-            var botStatus = doc.getElementsByTagName("center")[0].innerText.replace("BOTS ARE ", "");
+            var center = doc.getElementsByTagName("center")[0];
+            if (!center) {
+                setBotstatus(-1);
+                return;
+            }
+            var botStatus = center.innerText.replace("BOTS ARE ", "");
             if(botStatus == "ONLINE") {
                 setBotstatus(1);
             } else if(botStatus == "OFFLINE") {
@@ -336,6 +349,7 @@ setInterval(function() {
 /**
  * Bet-a-tron 9000 
  * Based on oldshit.js
+ * Uses arrays for keeping track of csgo/dota2lounge, format: [csgo, dota2]
  *
  * Sends messages to content scripts with updates. Possible messages are:
  * {autoBet: {worth: <worth>, // when autobet starts
@@ -352,19 +366,22 @@ setInterval(function() {
 // TO-DO: support for seperate CSGOLounge and Dota2Lounge betting
 var bet = { // not a class - don't instantiate
     autoDelay: 10000,
-    autoBetting: false,
-    matchNum: 0, // for hash purposes
-    betData: {},
-    lastError: "",
-    lastBetTime: 0,
-    numTries: 0
+    autoBetting: [false, false],
+    matchNum: [0,0], // for hash purposes
+    betData: [{},{}],
+    lastError: ["",""],
+    lastBetTime: [0,0],
+    numTries: [0,0],
+    baseUrls: ["http://csgolounge.com/", "http://dota2lounge.com/"]
 };
 
 // example data:
 // ldef_index%5B%5D=2682&lquality%5B%5D=0&id%5B%5D=711923886&worth=0.11&on=a&match=1522&tlss=2e7877e8d42fb969c5f6f517243c2d19
-bet.enableAuto = function(url, data) {
+bet.enableAuto = function(url, data, csgo) {
     console.log("Auto-betting");
-    if (bet.autoBetting) {
+    var g = csgo ? 0 : 1; // short for game
+
+    if (bet.autoBetting[g]) {
         console.log("Already auto-betting");
         return false;
     }
@@ -373,9 +390,9 @@ bet.enableAuto = function(url, data) {
         return false;
     }
 
-    bet.autoBetting = true;
-    bet.lastBetTime = Date.now();
-    bet.numTries = 0;
+    bet.autoBetting[g] = true;
+    bet.lastBetTime[g] = Date.now();
+    bet.numTries[g] = 0;
 
     // extract data
     var hash = /tlss=([0-9a-z]*)/.exec(data)[1],
@@ -389,92 +406,111 @@ bet.enableAuto = function(url, data) {
             worth += parsed;
     }
 
-    bet.betData = {
+    bet.betData[g] = {
         hash: hash,
         data: data,
         url: url,
         worth: worth
     };
 
-    bet.autoBetting = bet.autoLoop();
-    if (bet.autoBetting) {
+    bet.autoBetting[g] = bet.autoLoop(g);
+    console.log("Enabling for "+g+": "+bet.autoBetting[g]);
+    if (bet.autoBetting[g]) {
         // send event to all lounge tabs
         sendMessageToContentScript({autoBet: 
             {
                 worth: worth, 
-                time: bet.lastBetTime, 
+                time: bet.lastBetTime[g], 
                 rebetDelay: bet.autoDelay,
-                error: bet.lastError,
-                matchId: bet.matchNum
-            }}, -3);
+                error: bet.lastError[g],
+                matchId: bet.matchNum[g]
+            }}, -1-g);
     }
     return bet.autoBetting;
 };
-bet.disableAuto = function(success) {
+bet.disableAuto = function(success, game) {
     console.log("Disabling auto-bet");
-    this.autoBetting = false;
-    sendMessageToContentScript({autoBet: (success || false)}, -3);
-};
-bet.autoLoop = function() {
-    if (bet.betData.data.indexOf("&on=") === -1) { // if not a betting request
-        console.log("Not a betting request");
-        return false;
-    }
-    if (!bet.autoBetting) { // if no longer auto-betting, for some reason
-        console.log("No longer auto-betting");
-        return false;
-    }
 
-    // repeat request
-    console.log("Performing request:");
-    console.log({url: bet.betData.url, data: bet.betData.data + "tlss="+bet.betData.hash});
-    $.ajax({
-        url: bet.betData.url,
-        type: "POST",
-        data: bet.betData.data + "tlss="+bet.betData.hash,
-        success: function(data) {
-            // Lounge returns nothing if success
-            if (data) {
-                console.log("Received error from auto:");
-                console.log(data.substr(0,500));
-                bet.lastError = data;
-                bet.lastBetTime = Date.now();
-                bet.numTries++;
-                sendMessageToContentScript({
-                    autoBet: {
-                        time: bet.lastBetTime,
-                        error: data,
-                        numTries: bet.numTries
-                    }},-3);
-                if (data.indexOf("You have to relog in order to place a bet.") !== -1) {
-                    bet.renewHash();
-                }
-                setTimeout(bet.autoLoop, bet.autoDelay); // recall
-            } else {
-                // happy times
-                console.log("Bet was succesfully placed");
-                bet.disableAuto(true);
-                // tell tabs of our great success
-                sendMessageToContentScript({autoBet: true});
-            }
-        },
-        error: function(xhr) {
-            var err = "Error (#"+xhr.status+") while autoing. Retrying";
-            bet.lastBetTime = Date.now();
-            console.log(err);
-            sendMessageToContentScript({autoBet: {time: bet.lastBetTime, error: err}}, -3);
-            setTimeout(bet.autoLoop, bet.autoDelay);
+    this.autoBetting[game] = false;
+    sendMessageToContentScript({autoBet: (success || false)}, -1-game);
+};
+bet.autoLoop = function(game) {
+    var success = [true,true];
+
+    for (var g = 0; g < 2; ++g) {
+        console.log("Game: " + g);
+        console.log("Betdata:");
+        console.log(bet.betData);
+
+        if (Object.getOwnPropertyNames(bet.betData[g]).length === 0) { // if not betting
+            success[g] = false;
+            continue;
         }
-    });
+        if (bet.betData[g].data.indexOf("&on=") === -1) { // if not a betting request
+            console.log("Not a betting request");
+            success[g] = false;
+            continue;
+        }
+        if (!bet.autoBetting[g]) { // if no longer auto-betting, for some reason
+            success[g] = false;
+            console.log("No longer auto-betting");
+            continue;
+        }
+
+        // repeat request
+        console.log("Performing request:");
+        console.log({url: bet.betData[g].url, data: bet.betData[g].data + "tlss="+bet.betData[g].hash});
+        $.ajax({
+            url: bet.betData[g].url,
+            type: "POST",
+            data: bet.betData[g].data + "tlss="+bet.betData[g].hash,
+            success: (function(g){return function(data) {
+                // Lounge returns nothing if success
+                if (data) {
+                    console.log("Received error from auto ("+(["CS:GO", "Dota 2"])[g]+"):");
+                    console.log(data.substr(0,500));
+                    bet.lastError[g] = data;
+                    bet.lastBetTime[g] = Date.now();
+                    bet.numTries[g]++;
+                    sendMessageToContentScript({
+                        autoBet: {
+                            time: bet.lastBetTime[g],
+                            error: data,
+                            numTries: bet.numTries[g]
+                        }},-1-g);
+                    if (data.indexOf("You have to relog in order to place a bet.") !== -1) {
+                        bet.renewHash(0, g);
+                    }
+                    setTimeout(bet.autoLoop, bet.autoDelay); // recall
+                } else {
+                    // happy times
+                    console.log("Bet was succesfully placed ("+(["CS:GO", "Dota 2"])[g]+")");
+                    bet.disableAuto(true, g);
+                    // tell tabs of our great success
+                    sendMessageToContentScript({autoBet: true}, -1-g);
+                }
+            }})(g),
+            error: (function(g){return function(xhr) {
+                var err = "Error (#"+xhr.status+") while autoing. Retrying";
+                bet.lastBetTime[g] = Date.now();
+                console.log(err);
+                sendMessageToContentScript({autoBet: {time: bet.lastBetTime[g], error: err}}, -1-g);
+                setTimeout(bet.autoLoop, bet.autoDelay);
+            }})(g)
+        });
+    }
+    if (game===0 || game===1)
+        return success[game];
+    
     return true;
 };
-bet.renewHash = function(numTries) {
+bet.renewHash = function(numTries, game) {
     console.log("Renewing hash");
     var numTries = numTries || 0;
 
     // let's just assume match num works
     $.ajax({
-        url: "http://csgolounge.com/match?m="+bet.matchNum,
+        url: bet.baseUrls[game]+"match?m="+bet.matchNum,
         type: "GET",
         async: false,
         success: function(data) {
@@ -486,7 +522,7 @@ bet.renewHash = function(numTries) {
 
             if (!hash) {
                 console.log("Failed to find hash");
-                bet.disableAuto();
+                bet.disableAuto(false, game);
                 return;
             }
 
@@ -494,23 +530,31 @@ bet.renewHash = function(numTries) {
 
             if (startInd === -1) {
                 console.log("Failed to get button element, re-attempting in 5s");
-                setTimeout(function(){bet.renewHash()}, 5000);
+                setTimeout((function(g){
+                    return function(){
+                        bet.renewHash(false,g)
+                    }
+                })(game), 5000);
             } else {
                 console.log("Elm text: "+elmText);
                 console.log("Found a hash: "+hash);
-                bet.betData.hash = hash;
+                bet.betData[game].hash = hash;
             }
         },
         error: function() {
             console.log("Error while renewing hash (#"+numTries+"), re-attempting in 5s");
             numTries++;
             if (numTries < 5) {
-                setTimeout((function(x){return function(){bet.renewHash(x)}})(numTries), 5000);
+                setTimeout((function(x,g){
+                    return function(){
+                        bet.renewHash(x,g)
+                    }
+                })(numTries,game), 5000);
                 return;
             }
 
             console.log("Retried too many times!");
-            bet.disableAuto();
+            bet.disableAuto(false, game);
         }
     });
 };
