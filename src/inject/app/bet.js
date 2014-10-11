@@ -75,9 +75,6 @@ chrome.runtime.sendMessage({get: "autoBet"}, function(data){
 
 // listen for auto-betting updates
 chrome.runtime.onMessage.addListener(function(request,sender,sendResponse){
-	console.log("Received message: ");
-	console.log(request);
-
 	if (request.autoBet === false) { // autobetting has stopped
 		betStatus.enabled = false;
 		document.querySelector(".destroyer.auto-info").className = "destroyer auto-info hidden";
