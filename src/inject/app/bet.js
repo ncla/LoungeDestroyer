@@ -134,7 +134,7 @@ function onAutobetClicked() {
 		document.getElementById("realbetbutton").style.display = "none";
 		var data = $("#betpoll").serialize()+"&match="+window.location.search.substr(3)+"&tlss="+this.getAttribute("data-tlss"),
 			url;
-
+        // TODO: Rewrite this.
 		if (inventory.determineBackpackType() === "returns") {
 			url = window.location.origin+"/ajax/postBet.php";
 		} else if (inventory.determineBackpackType() === "inventory") {

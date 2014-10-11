@@ -185,11 +185,6 @@ setInterval(function() {
         oReq.onload = function() {
             var doc = document.implementation.createHTMLDocument("");
             doc.body.innerHTML = this.responseText;
-            var center = doc.getElementsByTagName("center")[0];
-            if (!center) {
-                setBotstatus(-1);
-                return;
-            }
             try {
                 var botStatus = doc.getElementsByTagName("center")[0].innerText.replace("BOTS ARE ", "");
                 if(botStatus == "ONLINE") {
