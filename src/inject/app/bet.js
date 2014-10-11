@@ -34,9 +34,12 @@ function enableAuto(worth, match, tries, error) {
 		            ordinalEnding === "3" ? "rd":
 		            "th";
 
+	var worth = worth === -1 ? "key(s)" :
+	                      "$"+(worth || 0).toFixed(2);
+
 	// update info-box in top-right
     document.querySelector(".destroyer.auto-info").className = "destroyer auto-info";
-    document.querySelector(".destroyer.auto-info .worth").textContent = "$"+(worth || 0).toFixed(2);
+    document.querySelector(".destroyer.auto-info .worth").textContent = worth;
     document.querySelector(".destroyer.auto-info .match-link").textContent = match;
     document.querySelector(".destroyer.auto-info .match-link").href = "match?m="+match;
     document.querySelector(".destroyer.auto-info .num-tries").textContent = (tries||0) + ordinalEnding;

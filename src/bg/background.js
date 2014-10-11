@@ -2,9 +2,7 @@ var LoungeUser = new User();
 LoungeUser.loadUserSettings(function() {
     console.log("Settings for background.js have loaded!");
 });
-/*
-    Make changes to LoungeUser user settings once the settings are changed from extension pop-up
- */
+
 chrome.extension.onMessage.addListener(function (request, sender, sendResponse) {
     // Make changes to LoungeUser user settings once the settings are changed from extension pop-up
     if(request.hasOwnProperty("changeSetting")) {
@@ -400,6 +398,11 @@ bet.enableAuto = function(url, data, csgo) {
         worthArr = data.match(/worth=[0-9.0-9]*/g),
         worth = 0;
 
+    if (!worthArr) { // keys don't have worth, don't ask me why
+        worthArr = [];
+        worth = -1;
+    }
+
     for (var i = 0, j = worthArr.length; i < j; i++) {
         var parsed = parseFloat(worthArr[i].substr(6));
         if (!isNaN(parsed))
@@ -501,7 +504,7 @@ bet.autoLoop = function(game) {
     }
     if (game===0 || game===1)
         return success[game];
-    
+
     return true;
 };
 bet.renewHash = function(numTries, game) {
