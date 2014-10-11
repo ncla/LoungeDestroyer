@@ -287,3 +287,68 @@ http://codepen.io/larrygeams/pen/nhgze
         -webkit-transform: rotate(360deg);
     }
 }
+
+#itemValuesTable {
+    margin-top: 20px;
+    width: 60%;
+}
+@media (min-width: 1500px) {
+    #itemValuesTable {
+        width: 60%;
+    }
+}
+
+@media (min-width: 983px) and (max-width: 1499px) {
+    #itemValuesTable {
+        width: 95%;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 982px) {
+    #itemValuesTable {
+        width: 80%;
+    }
+}
+
+@media (max-width: 600px) {
+    #itemValuesTable {
+        width: 80%;
+    }
+}
+
+table#betSize {
+    font-size: 10px;
+    margin-top: 15px;
+}
+
+#betSize td, #itemValuesTable td {
+    padding: 5px 20px;
+}
+
+#itemValuesTable span {
+    font-weight: 700;
+}
+
+#itemValuesTable span.covert {
+    color: #EB4B4B;
+}
+
+#itemValuesTable span.industrial {
+    color: #5E98D9;
+}
+
+.classified {
+    color: #D32CE6;
+}
+
+.consumer {
+    color: #5E98D9;
+}
+
+.restricted {
+    color: #8847FF;
+}
+
+.milspec {
+    color: #4B69FF;
+}

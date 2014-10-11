@@ -117,9 +117,8 @@ function init() {
             inventory.getCachedInventory("bettingInventory" + appID + "_" + readCookie("id"), function(bpHTML) {
                 document.getElementById("backpack").innerHTML = bpHTML;
                 this.bettingInventoryType = "inventory";
-                // Move appID check to epicStuff method instead
                 if(appID == "730") {
-                    epicStuff();
+                    addInventoryStatistics();
                 }
                 inventory.getMarketPrices(true);
             });
@@ -167,36 +166,3 @@ $(document).on("mouseover", ".item", function() {
         });
     }
 });
-/*
-    Credit goes to /u/ekim43
-    Might want to refactor this with Item class, but at the moment just don't touch it because it looks dirty
- */
-function epicStuff() {
-    var total = covert = classified = restricted = milspec = consumer = industrial = other = 0;
-    $("#backpack")[0] ? ($("#backpack > .item").each(function () {
-        var t = $(this).children("div.rarity")[0].classList[1],
-            e = $(this).children("div.value")[0].innerHTML;
-        switch (e = parseFloat(e.replace("$ ", "")), total += e, t) {
-            case "Covert":
-                covert += e;
-                break;
-            case "Classified":
-                classified += e;
-                break;
-            case "Restricted":
-                restricted += e;
-                break;
-            case "Mil-Spec":
-                milspec += e;
-                break;
-            case "Consumer":
-                consumer += e;
-                break;
-            case "Industrial":
-                industrial += e;
-                break;
-            default:
-                other += e
-        }
-    }), total = total.toFixed(2), covert = covert.toFixed(2), classified = classified.toFixed(2), restricted = restricted.toFixed(2), milspec = milspec.toFixed(2), industrial = industrial.toFixed(2), consumer = consumer.toFixed(2), other = other.toFixed(2), small = .05 * total, small = small.toFixed(2), medium = .1 * total, medium = medium.toFixed(2), large = .2 * total, large = large.toFixed(2), $(".bpheader").prepend("<div class='winsorloses' style='padding: 10px;width:95%;'><table align=center><tr><td>Your items are worth: <strong>" + total + "</strong></td></tr></table><table style='margin-top:20px;' width='60%' align=center><tr><td style='padding:5px 20px'><span style='color:#EB4B4B;font-weight:700;'>Covert</span>: " + covert + "</td><td style='padding:5px 20px'><span style='color:#5E98D9;font-weight:700'>Industrial</span>: " + industrial + "</td></tr><tr><td style='padding:5px 20px'><span style='color:#D32CE6;font-weight:700'>Classified</span>: " + classified + "</td><td style='padding:5px 20px'><span style='color:#5E98D9;font-weight:700'>Consumer</span>: " + consumer + "</td></tr><tr><td style='padding:5px 20px'><span style='color:#8847FF;font-weight:700'>Restricted</span>: " + restricted + "</td><td style='padding:5px 20px'><span style='font-weight:700'>Other</span>: " + other + "</td></tr><td style='padding:5px 20px' colspan=2><span style='color:#4B69FF;font-weight:700'>Mil-Spec</span>: " + milspec + "</td></tr></table><table style='font-size: 10px;margin-top:15px;' align=center><tr><td style='padding:5px 20px'>Small bet: " + small + "</td><td style='padding:5px 20px'>Medium Bet: " + medium + "</td><td style='padding:5px 20px'>Large Bet: " + large + "</td></tr></table></div>")) : $(".bpheader").prepend("<p style='color:red'>Could not find items.  Please re-load backback</p>");
-}
