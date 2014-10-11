@@ -337,18 +337,18 @@ table#betSize {
     color: #5E98D9;
 }
 
-.classified {
+#itemValuesTable span.classified {
     color: #D32CE6;
 }
 
-.consumer {
+#itemValuesTable span.consumer {
     color: #5E98D9;
 }
 
-.restricted {
+#itemValuesTable span.restricted {
     color: #8847FF;
 }
 
-.milspec {
+#itemValuesTable span.milspec {
     color: #4B69FF;
 }
