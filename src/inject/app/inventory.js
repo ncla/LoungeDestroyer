@@ -149,7 +149,7 @@ Inventory.prototype.onInventoryLoaded = function(url) {
                 this.cacheInventory("bettingInventory" + appID + "_" + readCookie("id"), $("#backpack").html());
             }
             if(appID == 730) {
-                epicStuff();
+                addInventoryStatistics();
             }
         }
         if(document.URL.indexOf("/trade?t=") != -1) {
@@ -190,3 +190,68 @@ Inventory.prototype.addInventoryLoadButton = function(element) {
         });
         $(element).append(btn);
 };
+/*
+ Originally created by /u/ekim43, code cleaned up by us
+ */
+function addInventoryStatistics() {
+    var total = 0,
+        itemValues = {
+            covert: 0,
+            classified: 0,
+            restricted: 0,
+            milspec: 0,
+            consumer: 0,
+            industrial: 0,
+            other: 0
+        },
+        betSizes = {};
+    $("#backpack > .item").each(function () {
+        var t = $(this).children("div.rarity")[0].classList[1],
+            e = $(this).children("div.value")[0].innerHTML;
+        switch (e = parseFloat(e.replace("$ ", "")), total += e, t) {
+            case "Covert":
+                itemValues.covert += e;
+                break;
+            case "Classified":
+                itemValues.classified += e;
+                break;
+            case "Restricted":
+                itemValues.restricted += e;
+                break;
+            case "Mil-Spec":
+                itemValues.milspec += e;
+                break;
+            case "Consumer":
+                itemValues.consumer += e;
+                break;
+            case "Industrial":
+                itemValues.industrial += e;
+                break;
+            default:
+                itemValues.other += e
+        }
+    });
+    for (var key in itemValues) {
+        if (itemValues.hasOwnProperty(key)) {
+            itemValues[key] = itemValues[key].toFixed(2);
+        }
+    }
+    betSizes.small = (.05 * total).toFixed(2);
+    betSizes.medium = (.1 * total).toFixed(2);
+    betSizes.large = (.2 * total).toFixed(2);
+    $(".bpheader").prepend("<div class='winsorloses' style='padding: 10px;width:95%;'>" +
+        "<table align=center>" +
+        "<tr><td>Your items are worth: <strong>" + total.toFixed(2) + "</strong></td></tr></table>" +
+        "<table align=center id='itemValuesTable'>" +
+        "<tr><td><span class='covert'>Covert</span>: " + itemValues.covert + "</td>" +
+        "<td><span class='industrial'>Industrial</span>: " + itemValues.industrial + "</td></tr>" +
+        "<tr><td><span class='classified'>Classified</span>: " + itemValues.classified + "</td>" +
+        "<td><span class='consumer'>Consumer</span>: " + itemValues.consumer + "</td></tr>" +
+        "<tr><td><span class='restricted'>Restricted</span>: " + itemValues.restricted + "</td>" +
+        "<td><span>Other</span>: " + itemValues.other + "</td></tr>" +
+        "<td colspan=2><span class='milspec'>Mil-Spec</span>: " + itemValues.milspec + "</td></tr></table>" +
+        "<table id='betSize' align=center>" +
+        "<tr><td>Small bet: " + betSizes.small + "</td>" +
+        "<td>Medium Bet: " + betSizes.medium + "</td>" +
+        "<td>Large Bet: " + betSizes.large + "</td></tr></table></div>");
+}
