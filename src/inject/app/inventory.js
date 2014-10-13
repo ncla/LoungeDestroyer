@@ -17,9 +17,6 @@ var Inventory = function() {
             This backpack is like one of the twins, except this one is the retarded one.
             This backpack appends itself to #offer instead of replacing contents of #backpack
          */
-        $unwantedChild = $("#offer");
-        $unwantedChild.attr("id", "fakeBackpack"); // ehehheheh
-        $unwantedChild.append('<div id="offer"></div>');
         this.backpackElement = $("#offer");
     } else {
         this.backpackElement = false;
@@ -43,9 +40,15 @@ Inventory.prototype.loadInventory = function() {
                     Ok, before you ask questions, jQuery's html() method doesn't execute scripts inside script tags
                     from HTML string, but this dirty workaround works. If you know less dirtier solution, go ahead and fix it.
                  */
-                var hax = document.getElementById($(self.backpackElement).attr("id"));
-                hax.innerHTML = null;
-                hax.innerHTML = data;
+                if(document.URL.indexOf("/trade?t=") != -1) {
+                    $("#loading", self.backpackElement).nextAll().remove();
+                    $(self.backpackElement).append(data);
+                } else {
+                    var hax = document.getElementById($(self.backpackElement).attr("id"));
+                    hax.innerHTML = null;
+                    hax.innerHTML = data;
+                }
+
 
                 self.inventoryIsLoading = false;
             }
@@ -131,15 +134,30 @@ Inventory.prototype.onInventoryLoaded = function(url) {
     if(!this.backpackElement || this.inventoryIsLoading) {
         return false;
     }
+    console.log("onInventoryLoaded fired");
     this.backpackAjaxURL = url;
-    var whereToLookAt = (document.URL.indexOf("/trade?t=") != -1 ? $("#offer") : $("#backpack"));
+    var whereToLookAt;
+    if(document.URL.indexOf("/trade?t=") != -1) {
+        whereToLookAt = $("#loading", this.backpackElement).nextAll();
+
+        var testFake = $("<div/>");
+        $(whereToLookAt).each(function(i, v) {
+            var theClone = $(v).clone();
+            $(testFake).append(theClone);
+        });
+
+        whereToLookAt = testFake;
+
+    } else {
+        whereToLookAt = $("#backpack");
+    }
 
     if($(whereToLookAt).text().indexOf("Can't get items.") != -1) {
         console.log("Failure to get items!");
-        this.addInventoryLoadButton(whereToLookAt);
+        this.addInventoryLoadButton(this.backpackElement);
     } else if($(whereToLookAt).text().trim().length == 0) {
         console.log("Empty response!");
-        this.addInventoryLoadButton(whereToLookAt);
+        this.addInventoryLoadButton(this.backpackElement);
     } else {
         console.log("Assuming the backpack has loaded!");
         $("#loading", whereToLookAt).hide();
@@ -151,10 +169,6 @@ Inventory.prototype.onInventoryLoaded = function(url) {
             if(appID == 730) {
                 addInventoryStatistics();
             }
-        }
-        if(document.URL.indexOf("/trade?t=") != -1) {
-            $("#fakeBackpack .left").show();
-            $("#loading").hide();
         }
         this.getMarketPrices(true);
         this.determineBackpackType();
@@ -181,10 +195,20 @@ Inventory.prototype.addInventoryLoadButton = function(element) {
         $(btn).click(function() {
             self.loadInventory();
             $(btn).hide();
-            $(self.backpackElement).html('<div class="inventory-loading-wrapper"><div id="LDloading" class="spin-1"></div><div id="LDerr"></div><div><a class="button" id="stopLD">Stop loading inventory</a></div></div>');
+            var invLoadingHtml = '<div class="inventory-loading-wrapper"><div id="LDloading" class="spin-1"></div><div id="LDerr"></div><div><a class="button" id="stopLD">Stop loading inventory</a></div></div>';
+            if(document.URL.indexOf("/trade?t=") != -1) {
+                $("#loading", self.backpackElement).nextAll().remove();
+                $(self.backpackElement).append(invLoadingHtml);
+            } else {
+                $(self.backpackElement).html(invLoadingHtml);
+            }
             $("#stopLD").click(function() {
                 self.stopLoadingInventory();
-                $(self.backpackElement).html('');
+                if(document.URL.indexOf("/trade?t=") != -1) {
+                    $("#loading", self.backpackElement).nextAll().remove();
+                } else {
+                    $(self.backpackElement).html('');
+                }
             });
             self.inventoryIsLoading = true;
         });
