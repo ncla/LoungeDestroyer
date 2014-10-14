@@ -230,7 +230,7 @@ function onAutobetClicked() {
 (function(){
 	var container = document.createElement("div");
 	container.className = "destroyer auto-info hidden";
-	container.innerHTML = '<p>Auto-<span class="type">betting</span> items <span class="worth-container">worth <span class="worth"></span> on match <a class="match-link"></a></span>. <span class="type capitalize">Betting</span> for the <span class="num-tries">0th</span> time.</p><button class="red">Disable auto-bet</button><p class="destroyer error-title">Last error (<span class="destroyer time-since">0s</span>):</p><p class="destroyer error-text"></p><label>Seconds between retries:</label><input id="bet-time" type="number" min="5" max="60" step="1">';
+	container.innerHTML = '<p>Auto-<span class="type">betting</span> items<span class="worth-container"> worth <span class="worth"></span> on match <a class="match-link"></a></span>. <span class="type capitalize">Betting</span> for the <span class="num-tries">0th</span> time.</p><button class="red">Disable auto-bet</button><p class="destroyer error-title">Last error (<span class="destroyer time-since">0s</span>):</p><p class="destroyer error-text"></p><label>Seconds between retries:</label><input id="bet-time" type="number" min="5" max="60" step="1">';
 
 	container.querySelector("button").addEventListener("click", function(){
 	        chrome.runtime.sendMessage({type: "autoBet", autoBet: false});
