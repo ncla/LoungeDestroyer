@@ -2,6 +2,7 @@ var Inventory = function() {
     this.inventoryIsLoading = false; // LD loading it, not site loading it
     this.backpackAjaxURL = null;
     var self = this;
+    this.lastElementInBackpack = null; // only used for trade pages
     /*
         Construct for backpack
      */
@@ -13,11 +14,8 @@ var Inventory = function() {
             });
         }
     } else if(document.URL.indexOf("/trade?t=") != -1) {
-        /*
-            This backpack is like one of the twins, except this one is the retarded one.
-            This backpack appends itself to #offer instead of replacing contents of #backpack
-         */
         this.backpackElement = $("#offer");
+        this.lastElementInBackpack = $(self.backpackElement).children().last();
     } else {
         this.backpackElement = false;
     }
@@ -28,28 +26,23 @@ var Inventory = function() {
 Inventory.prototype.loadInventory = function() {
     var self = this;
     var theURL = self.backpackAjaxURL;
-    if(this.backpackAjaxURL.indexOf("Backpack") != -1) {
-        theURL = (Math.random() < 0.5 ? theURL.replace("BackpackApi", "Backpack"): theURL);
-    }
 
     this.ajaxRequest = $.ajax({
         url: theURL,
         success: function(data) {
             if($(data).text().indexOf("Can't get items.") == -1 && data.length != 0) {
-                /*
-                    Ok, before you ask questions, jQuery's html() method doesn't execute scripts inside script tags
-                    from HTML string, but this dirty workaround works. If you know less dirtier solution, go ahead and fix it.
-                 */
                 if(document.URL.indexOf("/trade?t=") != -1) {
-                    $("#loading", self.backpackElement).nextAll().remove();
-                    $(self.backpackElement).append(data);
+                    self.removeBackpackElements();
+                    self.addElementsToBackpack(data);
                 } else {
+                    /*
+                     Ok, before you ask questions, jQuery's html() method doesn't execute scripts inside script tags
+                     from HTML string, but this dirty workaround works. If you know less dirtier solution, go ahead and fix it.
+                     */
                     var hax = document.getElementById($(self.backpackElement).attr("id"));
                     hax.innerHTML = null;
                     hax.innerHTML = data;
                 }
-
-
                 self.inventoryIsLoading = false;
             }
             else {
@@ -57,10 +50,12 @@ Inventory.prototype.loadInventory = function() {
                 self.loadInventory();
             }
         },
-        error: function() {
-            setTimeout(function() {
-                self.loadInventory();
-            }, 5000);
+        error: function (xhr, text_status, error_thrown) {
+            if (text_status != "abort") {
+                setTimeout(function() {
+                    self.loadInventory();
+                }, 5000);
+            }
         }
     });
 };
@@ -134,12 +129,16 @@ Inventory.prototype.onInventoryLoaded = function(url) {
     if(!this.backpackElement || this.inventoryIsLoading) {
         return false;
     }
-    console.log("onInventoryLoaded fired");
+    console.log("onInventoryLoaded has been fired");
     this.backpackAjaxURL = url;
-    var whereToLookAt;
-    if(document.URL.indexOf("/trade?t=") != -1) {
-        whereToLookAt = $("#loading", this.backpackElement).nextAll();
 
+    var whereToLookAt = $("#backpack");
+    /*
+        Special care for trade page backpacks, since backpack is appended and not replaced on trade page,
+        we have to wrap all elements and then check against that
+     */
+    if(document.URL.indexOf("/trade?t=") != -1) {
+        whereToLookAt = $(this.lastElementInBackpack).nextAll();
         var testFake = $("<div/>");
         $(whereToLookAt).each(function(i, v) {
             var theClone = $(v).clone();
@@ -147,9 +146,6 @@ Inventory.prototype.onInventoryLoaded = function(url) {
         });
 
         whereToLookAt = testFake;
-
-    } else {
-        whereToLookAt = $("#backpack");
     }
 
     if($(whereToLookAt).text().indexOf("Can't get items.") != -1) {
@@ -160,7 +156,7 @@ Inventory.prototype.onInventoryLoaded = function(url) {
         this.addInventoryLoadButton(this.backpackElement);
     } else {
         console.log("Assuming the backpack has loaded!");
-        $("#loading", whereToLookAt).hide();
+        $("#loading", this.backpackElement).hide();
         if(document.URL.indexOf("/match?m=") != -1) {
             // At the moment caching only betting inventories
             if($(".bpheader", self.backpackElement).text().indexOf("CS:GO Inventory") != -1 || $(".bpheader .title", self.backpackElement).text().indexOf("Armory") != -1) {
@@ -195,24 +191,38 @@ Inventory.prototype.addInventoryLoadButton = function(element) {
         $(btn).click(function() {
             self.loadInventory();
             $(btn).hide();
+
             var invLoadingHtml = '<div class="inventory-loading-wrapper"><div id="LDloading" class="spin-1"></div><div id="LDerr"></div><div><a class="button" id="stopLD">Stop loading inventory</a></div></div>';
-            if(document.URL.indexOf("/trade?t=") != -1) {
-                $("#loading", self.backpackElement).nextAll().remove();
-                $(self.backpackElement).append(invLoadingHtml);
-            } else {
-                $(self.backpackElement).html(invLoadingHtml);
-            }
+            self.removeBackpackElements();
+            self.addElementsToBackpack(invLoadingHtml);
+
             $("#stopLD").click(function() {
                 self.stopLoadingInventory();
-                if(document.URL.indexOf("/trade?t=") != -1) {
-                    $("#loading", self.backpackElement).nextAll().remove();
-                } else {
-                    $(self.backpackElement).html('');
-                }
+                self.removeBackpackElements();
             });
             self.inventoryIsLoading = true;
         });
         $(element).append(btn);
+};
+/*
+    Adds elements to backpack element
+ */
+Inventory.prototype.addElementsToBackpack = function(elements) {
+    if(document.URL.indexOf("/trade?t=") != -1) {
+        $(this.backpackElement).append(elements);
+    } else {
+        $(this.backpackElement).html(elements);
+    }
+};
+/*
+    Clears elements added by LoungeDestroyer and also clears backpack errors
+ */
+Inventory.prototype.removeBackpackElements = function() {
+    if(document.URL.indexOf("/trade?t=") != -1) {
+        $("#loading", self.backpackElement).nextAll().remove();
+    } else {
+        $(this.backpackElement).html('');
+    }
 };
 /*
  Originally created by /u/ekim43, code cleaned up by us
