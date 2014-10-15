@@ -53,12 +53,13 @@ function setBotstatus(value) {
             sendMessageToContentScript(message, null);
             if(value == 1 && result.botsOnline != -1) {
                 /* Might not want to notify when installed for first time */
-                var notify = new Notification("CS:GO Lounge Bot status",
-                    {body: "Bots appear to be online since " + new Date().toLocaleString(),
-                        icon: "../../icons/icon_normal_notification.png"});
-                setTimeout(function() {
-                    notify.close();
-                }, 10000);
+                createNotification(
+                    "CS:GO Lounge Bot status",
+                    "Bots appear to be online since " + new Date().toLocaleString(),
+                    "regular",
+                    null,
+                    false
+                );
             }
         }
     });
@@ -138,6 +139,42 @@ chrome.webRequest.onCompleted.addListener(
     }
 );
 
+var notificationID = 0;
+var notifications = {};
+
+chrome.notifications.onButtonClicked.addListener(
+    function(notificationID) {
+        if(notificationID.indexOf("_match") != -1 || notificationID.indexOf("_mytrade") != -1 || notificationID.indexOf("_myoffer") != -1) {
+            chrome.tabs.create({url: notifications[notificationID]});
+        }
+    }
+);
+/*
+    A function to easily create a notification
+
+    @param title - Notification title
+    @param message - Notification message
+    @param messageType - This is used to determine what kind of notification that is for buttons when onButtonClicked triggers
+    @param buttons - Object containing Chrome notification buttons
+    @param buttonUrl - What page should it open when clicked on the button (currently only one URL for all buttons)
+ */
+function createNotification(title, message, messageType, buttons, buttonUrl) {
+    notificationID++;
+    notifications[notificationID + "_" + messageType] = buttonUrl;
+    var tempButtons = [];
+    if(buttons !== null) {
+        tempButtons.push(buttons);
+    }
+    console.log("Button url : " + buttonUrl);
+    chrome.notifications.create(notificationID + "_" + messageType, {
+        type: "basic",
+        iconUrl: "../../icons/icon_normal2.png",
+        title: title,
+        message: message,
+        buttons: tempButtons
+    }, function() {});
+}
+
 /*
     Performance is the key for background tasks. Using jQuery selectors is fine, createHTMLDocument() doesn't parse
     HTML string in such a way that it loads external resources.
@@ -172,6 +209,7 @@ setInterval(function() {
         oReq.send();
     }
 }, 5000);
+
 function checkNewMatches(ajaxResponse, appID) {
     var activeMatches = {};
 
@@ -209,25 +247,27 @@ function checkNewMatches(ajaxResponse, appID) {
 
         /* Store new fresh bullshit */
         var tempObj = {}; tempObj[storageName] = activeMatches;
-        //console.log(tempObj);
         chrome.storage.local.set(tempObj);
 
         var countNotify = Object.keys(matchesToNotificate).length;
         if(countNotify >= 3) {
-            var notify = new Notification("New matches have been added for betting on " + (appID == 730 ? "CS:GO" : "DOTA2") + " Lounge",
-                {icon: "../../icons/icon_normal_notification.png"});
-            setTimeout(function() {
-                notify.close();
-            }, 10000);
+            createNotification(
+                "New matches have been added for betting on " + (appID == 730 ? "CS:GO" : "DOTA2") + " Lounge",
+                "",
+                "regular",
+                {},
+                false
+            );
         }
         else {
             $.each(matchesToNotificate, function(index, value) {
-                var notify = new Notification("A new " + (appID == 730 ? "CS:GO" : "DOTA2") + " match has been added!",
-                    {body: value.teamA + " vs. " + value.teamB + " @ " + value.tournament + "\nMatch begins " + value.when,
-                        icon: "../../icons/icon_normal_notification.png"});
-                setTimeout(function() {
-                    notify.close();
-                }, 10000);
+                createNotification(
+                    "A new " + (appID == 730 ? "CS:GO" : "DOTA2") + " match has been added!",
+                    value.teamA + " vs. " + value.teamB + " @ " + value.tournament + "\nMatch begins " + value.when,
+                    "match",
+                    {title: "Open match page"},
+                    (appID == 730 ? "http://csgolounge.com/" : "http://dota2lounge.com/") + "match?m=" + value.matchID
+                );
             });
         }
     });
@@ -245,28 +285,53 @@ function checkForNewTradeOffers(data, appID) {
     var urlStart = (appID == 730 ? "http://csgolounge.com/" : "http://dota2lounge.com/");
 
     if(trades.find(".notification").length > 0) {
-        $.get(urlStart + "mytrades"); /* Yeah so someone please slap me for doing this */
-        var notification = trades.find(".notification");
-        var newCount = notification.text();
-
-        var notify = new Notification("Trade update on " + (appID == 730 ? "CS:GO Lounge" : "DOTA2 Lounge"),
-            {body: newCount == 1 ? "You have 1 new comment on your trades" : "You have " + newCount + " new comments on your trades",
-                icon: "../../icons/icon_normal_notification.png"});
-        setTimeout(function() {
-            notify.close();
-        }, 10000);
+        var url = urlStart + "mytrades";
+        $.ajax({
+            url: url,
+            type: "GET",
+            success: function(data) {
+                var doc = document.implementation.createHTMLDocument("");
+                doc.body.innerHTML = data;
+                $(".tradepoll", doc).each(function(i, v) {
+                    if($(".notification", v).length) {
+                        var notifyAmount = parseInt($(".notification", v).text(), 10);
+                        var tradeURL = urlStart + $("a[href]:eq(0)", v).attr("href");
+                        var tradeID = $(v).attr("id").replace("trade", "");
+                        console.log(tradeURL);
+                        createNotification(
+                            "Trade update on " + (appID == 730 ? "CS:GO Lounge" : "DOTA2 Lounge"),
+                            notifyAmount == 1 ? "You have 1 new comment on your trade #" + tradeID : "You have " + notifyAmount + " new comments on your trade # " + tradeID,
+                            "mytrade",
+                            {title: "Open trade page"},
+                            tradeURL
+                        );
+                    }
+                });
+            }
+        });
     }
     if(offers.find(".notification").length > 0) {
-        $.get(urlStart + "myoffers");
-        var notification = offers.find(".notification");
-        var newCount = notification.text();
-
-        var notify = new Notification("Offer update on " + (appID == 730 ? "CS:GO Lounge" : "DOTA2 Lounge"),
-            {body: newCount == 1 ? "You have 1 new comment on your offers" : "You have " + newCount + " new comments on your offers",
-                icon: "../../icons/icon_normal_notification.png"});
-        setTimeout(function() {
-            notify.close();
-        }, 10000);
+        var url = urlStart + "myoffers";
+        $.ajax({
+            url: url,
+            type: "GET",
+            success: function(data) {
+                var doc = document.implementation.createHTMLDocument("");
+                doc.body.innerHTML = data;
+                $(".tradepoll", doc).each(function(i, v) {
+                    if($(".notification", v).length) {
+                        var offerURL = urlStart + $("a[href]:eq(0)", v).attr("href");
+                        createNotification(
+                            "Trade update for your offer on " + (appID == 730 ? "CS:GO Lounge" : "DOTA2 Lounge"),
+                            "A user has replied to your offer",
+                            "myoffer",
+                            {title: "Open offer page"},
+                            offerURL
+                        );
+                    }
+                });
+            }
+        });
     }
 }
 
