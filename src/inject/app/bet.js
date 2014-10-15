@@ -1,7 +1,7 @@
 var inventory;
 
-// If on match page, add "FUCKING PLACE BET" button
 (function(){
+	// If on match page, add "FUCKING PLACE BET" button
 	if (window.location.pathname === "/match") {
 		var placebut;
 		if ((placebut = document.getElementById("placebut")) &&
@@ -15,10 +15,52 @@ var inventory;
 			placebut.parentNode.insertBefore(newBtn, placebut);
 		}
 	}
+
+	// If on bets page, add "FUCKING REQUEST RETURNS" button 
+	if (window.location.pathname === "/mybets") {
+		var freezebtn;
+		if ((freezebtn = document.getElementById("freezebutton"))) {
+			var newBtn = document.createElement("a");
+			newBtn.id = "realreturnbutton";
+			newBtn.className = "button";
+			newBtn.textContent = "FUCKING REQUEST RETURNS";
+			newBtn.addEventListener("click", function self(){
+				var toreturn = !document.querySelector(".tofreeze"),
+				    msg = {
+						autoReturn: {
+							url: window.location.origin+"/ajax/postToReturn.php"
+						}
+					};
+
+				if (!toreturn) {
+					$.ajax({
+						url: "ajax/postToFreeze.php",
+						type: "POST",
+						data: $("#freeze").serialize(),
+						success: function(data) {
+							if (data) window.alert(data);
+							else {
+								chrome.runtime.sendMessage(msg);
+								betStatus.type = "autoReturn";
+								enableAuto();
+							}
+						}
+					});
+				} else {
+					chrome.runtime.sendMessage(msg);
+					betStatus.type = "autoReturn";
+					enableAuto();
+				}
+			});
+
+			freezebtn.parentNode.appendChild(newBtn);
+		}
+	}
 })();
 
 var betStatus = {
 	enabled: false,
+	type: "autoBet", // autoBet || autoReturn
 	betTime: 0,
 	rebetDelay: 10000
 };
@@ -34,14 +76,32 @@ function enableAuto(worth, match, tries, error) {
 		            ordinalEnding === "3" ? "rd":
 		            "th";
 
-	var worth = worth === -1 ? "key(s)" :
-	                      "$"+(worth || 0).toFixed(2);
+	if (betStatus.type === "autoBet") {
+		var worth = worth === -1 ? "key(s)" :
+		                      "$"+(worth || 0).toFixed(2);
+
+		document.querySelector(".destroyer.auto-info .worth-container").className = "worth-container";
+   		document.querySelector(".destroyer.auto-info .worth").textContent = worth;
+	    document.querySelector(".destroyer.auto-info .match-link").textContent = match;
+	    document.querySelector(".destroyer.auto-info .match-link").href = "match?m="+match;
+	    document.querySelector(".destroyer.auto-info button").textContent = "Disable auto-bet";
+
+	    var typeSpans = document.querySelectorAll(".destroyer.auto-info .type");
+		for (var i = 0; i < typeSpans.length; ++i) {
+			typeSpans[i].textContent = "betting";
+		}
+	} else {
+		document.querySelector(".destroyer.auto-info .worth-container").className = "worth-container hidden";
+		document.querySelector(".destroyer.auto-info button").textContent = "Disable auto-return";
+
+		var typeSpans = document.querySelectorAll(".destroyer.auto-info .type");
+		for (var i = 0; i < typeSpans.length; ++i) {
+			typeSpans[i].textContent = "returning";
+		}
+	}
 
 	// update info-box in top-right
     document.querySelector(".destroyer.auto-info").className = "destroyer auto-info";
-    document.querySelector(".destroyer.auto-info .worth").textContent = worth;
-    document.querySelector(".destroyer.auto-info .match-link").textContent = match;
-    document.querySelector(".destroyer.auto-info .match-link").href = "match?m="+match;
     document.querySelector(".destroyer.auto-info .num-tries").textContent = (tries||0) + ordinalEnding;
     document.querySelector(".destroyer.auto-info .error-text").textContent = error;
     document.getElementById("bet-time").valueAsNumber = betStatus.rebetDelay / 1000;
@@ -70,52 +130,62 @@ chrome.runtime.sendMessage({get: "autoBet"}, function(data){
 	betStatus.betTime = data.time;
 	betStatus.rebetDelay = data.rebetDelay;
 	betStatus.enabled = true;
+	betStatus.type = data.type;
+
 	enableAuto(data.worth, data.matchId, data.numTries, data.error);
 });
 
 // listen for auto-betting updates
 chrome.runtime.onMessage.addListener(function(request,sender,sendResponse){
-	if (request.autoBet === false) { // autobetting has stopped
+	var data = request[request.autoBet ? "autoBet" : "autoReturn"];
+	console.log("Received message:");
+	console.log(request);
+
+	if (data === false) { // autobetting has stopped
 		betStatus.enabled = false;
 		document.querySelector(".destroyer.auto-info").className = "destroyer auto-info hidden";
 		return;
 	}
 
-	if (request.autoBet === true) { // bet succeeded
+	if (data === true) { // bet succeeded
+		console.log("Success.");
 		betStatus.enabled = false;
 		document.querySelector(".destroyer.auto-info").className = "destroyer auto-info hidden";
 		if (!streamPlaying) {
 			localStorage.playedbet = false;
+			localStorage.playedreturn = false;
 			document.location.reload();
 		}
 		return;
 	}
 
-	if (request.autoBet) {
-		// autobetting has started
-		if (request.autoBet.worth && request.autoBet.time && request.autoBet.rebetDelay) {
-			betStatus.enabled = true;
-			betStatus.betTime = request.autoBet.time;
-			betStatus.rebetDelay = request.autoBet.rebetDelay;
+	if (data) {
+		betStatus.type = request.autoBet ? "autoBet" : "autoReturn";
 
-			enableAuto(request.autoBet.worth, request.autoBet.matchId, request.autoBet.numTries, request.autoBet.error);
+		// autobetting has started
+		if (data.hasOwnProperty("worth") && data.time && data.rebetDelay) {
+			betStatus.enabled = true;
+			betStatus.time = data.time;
+			betStatus.rebetDelay = data.rebetDelay;
+
+			enableAuto(data.worth, data.matchId, data.numTries, data.error);
 			return;
 		}
 
 		// autobetting has received an error from Lounge
-		if (request.autoBet.time && request.autoBet.error) {
-			document.querySelector(".destroyer.auto-info .error-text").textContent = request.autoBet.error;
+		if (data.time && data.error) {
+			document.querySelector(".destroyer.auto-info .error-text").textContent = data.error;
 			
-			var ordinalEnding = ((request.autoBet.numTries||0)+"").slice(-1);
-			ordinalEnding = (request.autoBet.numTries%100 < 20 &&
-							request.autoBet.numTries%100 > 10) ? "th" : // if a "teen" number, end in th
+			var ordinalEnding = ((data.numTries||0)+"").slice(-1);
+			ordinalEnding = (data.numTries%100 < 20 &&
+							data.numTries%100 > 10) ? "th" : // if a "teen" number, end in th
 							ordinalEnding === "1" ? "st":
 				            ordinalEnding === "2" ? "nd":
 				            ordinalEnding === "3" ? "rd":
 				            "th";
-			document.querySelector(".destroyer.auto-info .num-tries").textContent = (request.autoBet.numTries||0) + ordinalEnding;
+			document.querySelector(".destroyer.auto-info .num-tries").textContent = (data.numTries||0) + ordinalEnding;
 
-			betStatus.betTime = request.autoBet.time;
+			betStatus.betTime = data.time;
 			return;
 		}
 	}
@@ -158,59 +228,17 @@ function onAutobetClicked() {
 
 // create info box in top-right
 (function(){
-	var container = document.createElement("div"),
-	    paragraphs = [document.createElement("p"),document.createElement("p"),document.createElement("p")],
-	    worthSpan = document.createElement("span"),
-	    matchLink = document.createElement("a"),
-	    triesSpan = document.createElement("span"),
-	    btn = document.createElement("button"),
-	    timeSpan = document.createElement("span"),
-	    label = document.createElement("label"),
-	    betTime = document.createElement("input");
-
+	var container = document.createElement("div");
 	container.className = "destroyer auto-info hidden";
-	paragraphs[0].textContent = "Auto-betting items worth ";
-	paragraphs[1].textContent = "Last error (";
-	timeSpan.className = "destroyer time-since";
-	timeSpan.textContent = "0s";
-	paragraphs[1].appendChild(timeSpan);
-	paragraphs[1].appendChild(document.createTextNode("):"));
-	paragraphs[1].className = "destroyer error-title";
-	paragraphs[2].className = "destroyer error-text";
-	worthSpan.className = "worth";
-	matchLink.className = "match-link";
-	triesSpan.className = "num-tries";
-	triesSpan.textContent = "0th"
-	btn.className = "red";
-	btn.textContent = "Disable auto-bet";
-	label.textContent = "Seconds between retries:";
-	betTime.id = "bet-time";
-	betTime.type = "number";
-	betTime.min = "5";
-	betTime.max = "60";
-	betTime.step = "1";
+	container.innerHTML = '<p>Auto-<span class="type">betting</span> items<span class="worth-container"> worth <span class="worth"></span> on match <a class="match-link"></a></span>. <span class="type capitalize">Betting</span> for the <span class="num-tries">0th</span> time.</p><button class="red">Disable auto-bet</button><p class="destroyer error-title">Last error (<span class="destroyer time-since">0s</span>):</p><p class="destroyer error-text"></p><label>Seconds between retries:</label><input id="bet-time" type="number" min="5" max="60" step="1">';
 
-	btn.addEventListener("click", function(){
-		chrome.runtime.sendMessage({"autoBet": false});
+	container.querySelector("button").addEventListener("click", function(){
+	        chrome.runtime.sendMessage({type: "autoBet", autoBet: false});
 	});
-	betTime.addEventListener("input", function(){
-		if (this.valueAsNumber)
-			chrome.runtime.sendMessage({"set": {bet: {autoDelay: this.valueAsNumber * 1000}}});
+	container.querySelector("input").addEventListener("input", function(){
+	        if (this.valueAsNumber)
+	                chrome.runtime.sendMessage({"set": {bet: {autoDelay: this.valueAsNumber * 1000}}});
 	}); // TO-DO: save setting
-
-	paragraphs[0].appendChild(worthSpan);
-	paragraphs[0].appendChild(document.createTextNode(" on match "));
-	paragraphs[0].appendChild(matchLink);
-	paragraphs[0].appendChild(document.createTextNode(". Betting for the "));
-	paragraphs[0].appendChild(triesSpan);
-	paragraphs[0].appendChild(document.createTextNode(" time."));
-
-	container.appendChild(paragraphs[0]);
-	container.appendChild(btn);
-	container.appendChild(paragraphs[1]);
-	container.appendChild(paragraphs[2]);
-	container.appendChild(label);
-	container.appendChild(betTime);
 
 	document.body.appendChild(container);
 })();

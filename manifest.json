@@ -14,7 +14,8 @@
             "src/inject/jquery-2.1.1.min.js",
             "src/inject/helpers.js",
             "src/inject/app/user.js",
-            "src/bg/background.js"
+            "src/bg/background.js",
+            "src/bg/bet_bg.js"
         ],
         "persistent": true
     },
