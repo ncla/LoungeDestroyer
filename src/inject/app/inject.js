@@ -117,9 +117,7 @@ function init() {
             inventory.getCachedInventory("bettingInventory" + appID + "_" + readCookie("id"), function(bpHTML) {
                 document.getElementById("backpack").innerHTML = bpHTML;
                 this.bettingInventoryType = "inventory";
-                if(appID == "730") {
-                    addInventoryStatistics();
-                }
+                addInventoryStatistics();
                 inventory.getMarketPrices(true);
             });
         });

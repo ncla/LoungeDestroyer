@@ -162,9 +162,7 @@ Inventory.prototype.onInventoryLoaded = function(url) {
             if($(".bpheader", self.backpackElement).text().indexOf("CS:GO Inventory") != -1 || $(".bpheader .title", self.backpackElement).text().indexOf("Armory") != -1) {
                 this.cacheInventory("bettingInventory" + appID + "_" + readCookie("id"), $("#backpack").html());
             }
-            if(appID == 730) {
-                addInventoryStatistics();
-            }
+            addInventoryStatistics();
         }
         this.getMarketPrices(true);
         this.determineBackpackType();
@@ -229,41 +227,19 @@ Inventory.prototype.removeBackpackElements = function() {
  */
 function addInventoryStatistics() {
     var total = 0,
-        itemValues = {
-            covert: 0,
-            classified: 0,
-            restricted: 0,
-            milspec: 0,
-            consumer: 0,
-            industrial: 0,
-            other: 0
-        },
+        itemValues = {},
         betSizes = {};
-    $("#backpack > .item").each(function () {
-        var t = $(this).children("div.rarity")[0].classList[1],
+    $("#backpack .item").each(function () {
+        var rarity = $(this).children("div.rarity")[0].classList[1],
             e = $(this).children("div.value")[0].innerHTML;
-        switch (e = parseFloat(e.replace("$ ", "")), total += e, t) {
-            case "Covert":
-                itemValues.covert += e;
-                break;
-            case "Classified":
-                itemValues.classified += e;
-                break;
-            case "Restricted":
-                itemValues.restricted += e;
-                break;
-            case "Mil-Spec":
-                itemValues.milspec += e;
-                break;
-            case "Consumer":
-                itemValues.consumer += e;
-                break;
-            case "Industrial":
-                itemValues.industrial += e;
-                break;
-            default:
-                itemValues.other += e
+        var itemPrice = parseFloat(e.replace("$ ", ""));
+        rarity = (rarity === undefined ? "base" : rarity.toLowerCase());
+        if(itemValues.hasOwnProperty(rarity)) {
+            itemValues[rarity] = itemValues[rarity] + itemPrice;
+        } else {
+            itemValues[rarity] = itemPrice;
         }
+        total += itemPrice;
     });
     for (var key in itemValues) {
         if (itemValues.hasOwnProperty(key)) {
@@ -273,19 +249,18 @@ function addInventoryStatistics() {
     betSizes.small = (.05 * total).toFixed(2);
     betSizes.medium = (.1 * total).toFixed(2);
     betSizes.large = (.2 * total).toFixed(2);
-    $(".bpheader").prepend("<div class='winsorloses' style='padding: 10px;width:95%;'>" +
-        "<table align=center>" +
-        "<tr><td>Your items are worth: <strong>" + total.toFixed(2) + "</strong></td></tr></table>" +
-        "<table align=center id='itemValuesTable'>" +
-        "<tr><td><span class='covert'>Covert</span>: " + itemValues.covert + "</td>" +
-        "<td><span class='industrial'>Industrial</span>: " + itemValues.industrial + "</td></tr>" +
-        "<tr><td><span class='classified'>Classified</span>: " + itemValues.classified + "</td>" +
-        "<td><span class='consumer'>Consumer</span>: " + itemValues.consumer + "</td></tr>" +
-        "<tr><td><span class='restricted'>Restricted</span>: " + itemValues.restricted + "</td>" +
-        "<td><span>Other</span>: " + itemValues.other + "</td></tr>" +
-        "<td colspan=2><span class='milspec'>Mil-Spec</span>: " + itemValues.milspec + "</td></tr></table>" +
-        "<table id='betSize' align=center>" +
-        "<tr><td>Small bet: " + betSizes.small + "</td>" +
-        "<td>Medium Bet: " + betSizes.medium + "</td>" +
-        "<td>Large Bet: " + betSizes.large + "</td></tr></table></div>");
+    if(total > 0) {
+        $("#backpack").prepend('<div class="inventoryStatisticsBox">' +
+            '<div id="totalInvValue">Your items are worth: <span>' + total.toFixed(2) + '</span></div>' +
+            '<div id="rarityValuesWrapper"><div id="rarityValues"></div></div>' +
+            '<div id="betSizeValues">' +
+            '<span>Small bet: ' + betSizes.small + '</span>' +
+            '<span>Medium bet: ' + betSizes.medium + '</span>' +
+            '<span>Large bet: ' + betSizes.large + '</span>' +
+            '</div>' +
+            '</div>');
+        $.each(itemValues, function(i, v) {
+            $("#rarityValues").append('<div class="rarityContainer"><div><span class="' + i + '">' + capitaliseFirstLetter(i) + '</span>: ' + v + '</div></div>');
+        });
+    }
 }
