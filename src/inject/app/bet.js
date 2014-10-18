@@ -2,7 +2,7 @@ var inventory;
 
 (function(){
 	// If on match page, add "FUCKING PLACE BET" button
-	if (window.location.pathname === "/match") {
+	if (window.location.pathname === "/match" || document.URL.indexOf("/predict") != -1) {
 		var placebut;
 		if ((placebut = document.getElementById("placebut")) &&
 			placebut.getAttribute("onclick").indexOf("placeBetNew") !== -1) {
