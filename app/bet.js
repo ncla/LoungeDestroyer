@@ -194,10 +194,19 @@ chrome.runtime.onMessage.addListener(function(request,sender,sendResponse){
 // when the auto-bet button is clicked
 function onAutobetClicked() {
 	// if no team was selected, error out
-	if (!document.getElementById("on").value) {
-		alert("You didn't select a team.");
-		return;
-	}
+    if (window.location.pathname === "/match") {
+        if (!document.getElementById("on").value) {
+            alert("You didn't select a team.");
+            return;
+        }
+    }
+    if (window.location.pathname === "/predict") {
+        console.log("Predict");
+        if (!$("#betpoll input[name=on]:checked").val()) {
+            alert("You didn't select a team.");
+            return;
+        }
+    }
 
 	// if items have been added to the bet
 	if (document.querySelector(".left").children.length > 0) {

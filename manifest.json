@@ -1,9 +1,9 @@
 {
     "name": "LoungeDestroyer",
-    "version": "0.7.2.5",
+    "version": "0.7.2.6",
     "manifest_version": 2,
-    "description": "Improves the experience of CSGOLounge.com/Dota2Lounge.com",
-    "homepage_url": "http://github.com/iamncla/LoungeDestroyer",
+    "description": "Improves the experience of CS:GO Lounge and DOTA2 Lounge",
+    "homepage_url": "http://github.com/ncla/LoungeDestroyer",
     "icons": {
         "16": "icons/icon_normal.png",
         "48": "icons/icon_normal.png",
@@ -11,18 +11,18 @@
     },
     "background": {
         "scripts": [
-            "src/inject/jquery-2.1.1.min.js",
-            "src/inject/helpers.js",
-            "src/inject/app/user.js",
-            "src/bg/background.js",
-            "src/bg/bet_bg.js"
+            "lib/js/jquery-2.1.1.min.js",
+            "app/helpers.js",
+            "app/user.js",
+            "app/bg/background.js",
+            "app/bg/bet_bg.js"
         ],
         "persistent": true
     },
     "browser_action": {
         "default_icon": "icons/icon_unknown.png",
         "default_title": "LoungeDestroyer settings",
-        "default_popup": "src/browser_action/browser_action.html"
+        "default_popup": "popup/popup.html"
     },
     "options_page": "settings/options.html",
     "permissions": [
@@ -42,7 +42,7 @@
                 "http://dota2lounge.com/*"
             ],
             "css": [
-                "src/inject/inject.css"
+                "app/css/inject.css"
             ]
         },
         {
@@ -51,18 +51,18 @@
                 "http://dota2lounge.com/*"
             ],
             "js": [
-                "src/inject/jquery-2.1.1.min.js",
-                "src/inject/helpers.js",
-                "src/inject/app/user.js",
-                "src/inject/app/items.js",
-                "src/inject/app/inventory.js",
-                "src/inject/app/inject.js",
-                "src/inject/app/bet.js"
+                "lib/js/jquery-2.1.1.min.js",
+                "app/helpers.js",
+                "app/user.js",
+                "app/items.js",
+                "app/inventory.js",
+                "app/inject.js",
+                "app/bet.js"
             ],
             "run-at": "document_start"
         }
     ],
     "web_accessible_resources": [
-        "src/inject/app/prefilter.js"
+        "app/prefilter.js"
     ]
 }
