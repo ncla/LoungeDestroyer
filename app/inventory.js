@@ -2,10 +2,11 @@ var Inventory = function() {
     this.inventoryIsLoading = false; // LD loading it, not site loading it
     this.backpackAjaxURL = null;
     var self = this;
+    this.lastElementInBackpack = null; // only used for trade pages
     /*
         Construct for backpack
      */
-    if(document.URL.indexOf("/match?m=") != -1 || document.URL.indexOf("/search") != -1 || document.URL.indexOf("/addtrade") != -1) {
+    if(document.URL.indexOf("/match?m=") != -1 || document.URL.indexOf("/predict") != -1 || document.URL.indexOf("/search") != -1 || document.URL.indexOf("/addtrade") != -1) {
         this.backpackElement = $("#backpack");
         if($("#backpack #loading").length == 0) {
             chrome.runtime.sendMessage({giveMeBackpackURL: "pls"}, function(response) {
@@ -13,11 +14,8 @@ var Inventory = function() {
             });
         }
     } else if(document.URL.indexOf("/trade?t=") != -1) {
-        /*
-            This backpack is like one of the twins, except this one is the retarded one.
-            This backpack appends itself to #offer instead of replacing contents of #backpack
-         */
         this.backpackElement = $("#offer");
+        this.lastElementInBackpack = $(self.backpackElement).children().last();
     } else {
         this.backpackElement = false;
     }
@@ -28,28 +26,23 @@ var Inventory = function() {
 Inventory.prototype.loadInventory = function() {
     var self = this;
     var theURL = self.backpackAjaxURL;
-    if(this.backpackAjaxURL.indexOf("Backpack") != -1) {
-        theURL = (Math.random() < 0.5 ? theURL.replace("BackpackApi", "Backpack"): theURL);
-    }
 
     this.ajaxRequest = $.ajax({
         url: theURL,
         success: function(data) {
             if($(data).text().indexOf("Can't get items.") == -1 && data.length != 0) {
-                /*
-                    Ok, before you ask questions, jQuery's html() method doesn't execute scripts inside script tags
-                    from HTML string, but this dirty workaround works. If you know less dirtier solution, go ahead and fix it.
-                 */
                 if(document.URL.indexOf("/trade?t=") != -1) {
-                    $("#loading", self.backpackElement).nextAll().remove();
-                    $(self.backpackElement).append(data);
+                    self.removeBackpackElements();
+                    self.addElementsToBackpack(data);
                 } else {
+                    /*
+                     Ok, before you ask questions, jQuery's html() method doesn't execute scripts inside script tags
+                     from HTML string, but this dirty workaround works. If you know less dirtier solution, go ahead and fix it.
+                     */
                     var hax = document.getElementById($(self.backpackElement).attr("id"));
                     hax.innerHTML = null;
                     hax.innerHTML = data;
                 }
-
-
                 self.inventoryIsLoading = false;
             }
             else {
@@ -57,10 +50,12 @@ Inventory.prototype.loadInventory = function() {
                 self.loadInventory();
             }
         },
-        error: function() {
-            setTimeout(function() {
-                self.loadInventory();
-            }, 5000);
+        error: function (xhr, text_status, error_thrown) {
+            if (text_status != "abort") {
+                setTimeout(function() {
+                    self.loadInventory();
+                }, 5000);
+            }
         }
     });
 };
@@ -134,12 +129,16 @@ Inventory.prototype.onInventoryLoaded = function(url) {
     if(!this.backpackElement || this.inventoryIsLoading) {
         return false;
     }
-    console.log("onInventoryLoaded fired");
+    console.log("onInventoryLoaded has been fired");
     this.backpackAjaxURL = url;
-    var whereToLookAt;
-    if(document.URL.indexOf("/trade?t=") != -1) {
-        whereToLookAt = $("#loading", this.backpackElement).nextAll();
 
+    var whereToLookAt = $("#backpack");
+    /*
+        Special care for trade page backpacks, since backpack is appended and not replaced on trade page,
+        we have to wrap all elements and then check against that
+     */
+    if(document.URL.indexOf("/trade?t=") != -1) {
+        whereToLookAt = $(this.lastElementInBackpack).nextAll();
         var testFake = $("<div/>");
         $(whereToLookAt).each(function(i, v) {
             var theClone = $(v).clone();
@@ -147,9 +146,6 @@ Inventory.prototype.onInventoryLoaded = function(url) {
         });
 
         whereToLookAt = testFake;
-
-    } else {
-        whereToLookAt = $("#backpack");
     }
 
     if($(whereToLookAt).text().indexOf("Can't get items.") != -1) {
@@ -160,15 +156,13 @@ Inventory.prototype.onInventoryLoaded = function(url) {
         this.addInventoryLoadButton(this.backpackElement);
     } else {
         console.log("Assuming the backpack has loaded!");
-        $("#loading", whereToLookAt).hide();
+        $("#loading", this.backpackElement).hide();
         if(document.URL.indexOf("/match?m=") != -1) {
             // At the moment caching only betting inventories
             if($(".bpheader", self.backpackElement).text().indexOf("CS:GO Inventory") != -1 || $(".bpheader .title", self.backpackElement).text().indexOf("Armory") != -1) {
                 this.cacheInventory("bettingInventory" + appID + "_" + readCookie("id"), $("#backpack").html());
             }
-            if(appID == 730) {
-                addInventoryStatistics();
-            }
+            addInventoryStatistics();
         }
         this.getMarketPrices(true);
         this.determineBackpackType();
@@ -195,65 +189,57 @@ Inventory.prototype.addInventoryLoadButton = function(element) {
         $(btn).click(function() {
             self.loadInventory();
             $(btn).hide();
+
             var invLoadingHtml = '<div class="inventory-loading-wrapper"><div id="LDloading" class="spin-1"></div><div id="LDerr"></div><div><a class="button" id="stopLD">Stop loading inventory</a></div></div>';
-            if(document.URL.indexOf("/trade?t=") != -1) {
-                $("#loading", self.backpackElement).nextAll().remove();
-                $(self.backpackElement).append(invLoadingHtml);
-            } else {
-                $(self.backpackElement).html(invLoadingHtml);
-            }
+            self.removeBackpackElements();
+            self.addElementsToBackpack(invLoadingHtml);
+
             $("#stopLD").click(function() {
                 self.stopLoadingInventory();
-                if(document.URL.indexOf("/trade?t=") != -1) {
-                    $("#loading", self.backpackElement).nextAll().remove();
-                } else {
-                    $(self.backpackElement).html('');
-                }
+                self.removeBackpackElements();
             });
             self.inventoryIsLoading = true;
         });
         $(element).append(btn);
 };
 /*
+    Adds elements to backpack element
+ */
+Inventory.prototype.addElementsToBackpack = function(elements) {
+    if(document.URL.indexOf("/trade?t=") != -1) {
+        $(this.backpackElement).append(elements);
+    } else {
+        $(this.backpackElement).html(elements);
+    }
+};
+/*
+    Clears elements added by LoungeDestroyer and also clears backpack errors
+ */
+Inventory.prototype.removeBackpackElements = function() {
+    if(document.URL.indexOf("/trade?t=") != -1) {
+        $("#loading", self.backpackElement).nextAll().remove();
+    } else {
+        $(this.backpackElement).html('');
+    }
+};
+/*
  Originally created by /u/ekim43, code cleaned up by us
  */
 function addInventoryStatistics() {
     var total = 0,
-        itemValues = {
-            covert: 0,
-            classified: 0,
-            restricted: 0,
-            milspec: 0,
-            consumer: 0,
-            industrial: 0,
-            other: 0
-        },
+        itemValues = {},
         betSizes = {};
-    $("#backpack > .item").each(function () {
-        var t = $(this).children("div.rarity")[0].classList[1],
+    $("#backpack .item").each(function () {
+        var rarity = $(this).children("div.rarity")[0].classList[1],
             e = $(this).children("div.value")[0].innerHTML;
-        switch (e = parseFloat(e.replace("$ ", "")), total += e, t) {
-            case "Covert":
-                itemValues.covert += e;
-                break;
-            case "Classified":
-                itemValues.classified += e;
-                break;
-            case "Restricted":
-                itemValues.restricted += e;
-                break;
-            case "Mil-Spec":
-                itemValues.milspec += e;
-                break;
-            case "Consumer":
-                itemValues.consumer += e;
-                break;
-            case "Industrial":
-                itemValues.industrial += e;
-                break;
-            default:
-                itemValues.other += e
+        var itemPrice = parseFloat(e.replace("$ ", ""));
+        rarity = (rarity === undefined ? "base" : rarity.toLowerCase());
+        if(itemValues.hasOwnProperty(rarity)) {
+            itemValues[rarity] = itemValues[rarity] + itemPrice;
+        } else {
+            itemValues[rarity] = itemPrice;
         }
+        total += itemPrice;
     });
     for (var key in itemValues) {
         if (itemValues.hasOwnProperty(key)) {
@@ -263,19 +249,18 @@ function addInventoryStatistics() {
     betSizes.small = (.05 * total).toFixed(2);
     betSizes.medium = (.1 * total).toFixed(2);
     betSizes.large = (.2 * total).toFixed(2);
-    $(".bpheader").prepend("<div class='winsorloses' style='padding: 10px;width:95%;'>" +
-        "<table align=center>" +
-        "<tr><td>Your items are worth: <strong>" + total.toFixed(2) + "</strong></td></tr></table>" +
-        "<table align=center id='itemValuesTable'>" +
-        "<tr><td><span class='covert'>Covert</span>: " + itemValues.covert + "</td>" +
-        "<td><span class='industrial'>Industrial</span>: " + itemValues.industrial + "</td></tr>" +
-        "<tr><td><span class='classified'>Classified</span>: " + itemValues.classified + "</td>" +
-        "<td><span class='consumer'>Consumer</span>: " + itemValues.consumer + "</td></tr>" +
-        "<tr><td><span class='restricted'>Restricted</span>: " + itemValues.restricted + "</td>" +
-        "<td><span>Other</span>: " + itemValues.other + "</td></tr>" +
-        "<td colspan=2><span class='milspec'>Mil-Spec</span>: " + itemValues.milspec + "</td></tr></table>" +
-        "<table id='betSize' align=center>" +
-        "<tr><td>Small bet: " + betSizes.small + "</td>" +
-        "<td>Medium Bet: " + betSizes.medium + "</td>" +
-        "<td>Large Bet: " + betSizes.large + "</td></tr></table></div>");
+    if(total > 0) {
+        $("#backpack").prepend('<div class="inventoryStatisticsBox">' +
+            '<div id="totalInvValue">Your items are worth: <span>' + total.toFixed(2) + '</span></div>' +
+            '<div id="rarityValuesWrapper"><div id="rarityValues"></div></div>' +
+            '<div id="betSizeValues">' +
+            '<span>Small bet: ' + betSizes.small + '</span>' +
+            '<span>Medium bet: ' + betSizes.medium + '</span>' +
+            '<span>Large bet: ' + betSizes.large + '</span>' +
+            '</div>' +
+            '</div>');
+        $.each(itemValues, function(i, v) {
+            $("#rarityValues").append('<div class="rarityContainer"><div><span class="' + i + '">' + capitaliseFirstLetter(i) + '</span>: ' + v + '</div></div>');
+        });
+    }
 }

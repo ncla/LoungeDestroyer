@@ -8,7 +8,7 @@
     #ld_popup {
         display: block;
         width: 280px;
-        height: 160px;
+        height: 220px;
         background: white;
     }
 
@@ -55,7 +55,7 @@
         width: 100%;
         position: absolute;
         bottom: 0;
-        height: 56px;
+        height: 116px;
         background: #f8f8f8;
         border-top: 1px solid #e4e4e4;
         color: #c2c2c2;
@@ -90,6 +90,10 @@
     .big-ol-btn:hover a {
         text-decoration: underline;
     }
+    .donate .fa {
+        position: relative;
+        left: -1px;
+    }
 </style>
 
 <div id="ld_popup">
@@ -101,15 +105,19 @@
         <a href="#">Open settings page</a>
     </div>
     <div class="footerino">
-        <div>created by <a href="http://ncla.me" target="_blank">NCLA</a></div>
-        <div style="font-weight: bold;font-size:11px;">
-            <a href="http://github.com/iamncla/LoungeDestroyer" target="_blank">Contribute to extension</a>
-        </div>
+        <div>created by <a href="http://ncla.me" target="_blank">NCLA</a>,</div>
         <div>
-            <span style="color: #a0a0a0;"><b>BTC:</b> <span style="font-size: 10px;">1JPiadmQsRPKxR7ADzYNpdP7LL7xV1vVaq</span></span>
+            additional features by <a href="https://github.com/ncla/LoungeDestroyer/graphs/contributors">contributors</a>
+        </div>
+        <div style="margin-top: 15px;" class="contribute">
+            <a href="http://github.com/iamncla/LoungeDestroyer" target="_blank"><i class="fa fa-github fa-2x"></i><span style="position: relative; left: 10px; bottom: 5px;">Contribute to extension</span></a>
+        </div>
+        <div style="margin-top: 8px;" class="donate">
+            <a href="http://steamcommunity.com/tradeoffer/new/?partner=106750833&token=CXFPs7ON" target="_blank"><i class="fa fa-heart fa-2x"></i><span style="position: relative; left: 7px; bottom: 5px;">Donate items</span></a>
         </div>
     </div>
 </div>
-<script src="../inject/jquery-2.1.1.min.js"></script>
-<script src="../inject/app/user.js"></script>
+<link href="../../lib/css/font-awesome.min.css" rel="stylesheet">
+<script src="../../lib/js/jquery-2.1.1.min.js"></script>
+<script src="../../app/user.js"></script>
 <script src="popup.js"></script>

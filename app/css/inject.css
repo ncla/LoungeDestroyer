@@ -301,67 +301,116 @@ http://codepen.io/larrygeams/pen/nhgze
     }
 }
 
-#itemValuesTable {
-    margin-top: 20px;
-    width: 60%;
+#rarityValues {
+    margin: 20px auto;
+    width: 65%;
 }
 @media (min-width: 1500px) {
-    #itemValuesTable {
+    #rarityValues {
         width: 60%;
     }
 }
 
 @media (min-width: 983px) and (max-width: 1499px) {
-    #itemValuesTable {
+    #rarityValues {
         width: 95%;
     }
 }
 
 @media (min-width: 768px) and (max-width: 982px) {
-    #itemValuesTable {
+    #rarityValues {
         width: 80%;
     }
 }
 
 @media (max-width: 600px) {
-    #itemValuesTable {
+    #rarityValues {
         width: 80%;
     }
 }
 
-table#betSize {
+#betSizeValues {
     font-size: 10px;
     margin-top: 15px;
 }
 
-#betSize td, #itemValuesTable td {
+#betSizeValues span, #rarityValues div.rarityContainer div {
     padding: 5px 20px;
 }
-
-#itemValuesTable span {
+#rarityValues div.rarityContainer {
+    width: 50%;
+    float: left;
+    text-align: left;
+}
+#rarityValues span {
     font-weight: 700;
 }
-
-#itemValuesTable span.covert {
+/* CSGO */
+#rarityValues span.covert {
     color: #EB4B4B;
 }
 
-#itemValuesTable span.industrial {
+#rarityValues span.industrial {
     color: #5E98D9;
 }
 
-#itemValuesTable span.classified {
+#rarityValues span.classified {
     color: #D32CE6;
 }
 
-#itemValuesTable span.consumer {
+#rarityValues span.consumer {
     color: #5E98D9;
 }
 
-#itemValuesTable span.restricted {
+#rarityValues span.restricted {
     color: #8847FF;
 }
 
-#itemValuesTable span.milspec {
+#rarityValues span.mil-spec {
     color: #4B69FF;
+}
+/* DOTO2 */
+#rarityValues span.common {
+    color: rgb(135, 154, 175);
+}
+#rarityValues span.uncommon {
+    color: rgb(94, 152, 217);
+}
+#rarityValues span.rare {
+    color: rgb(75, 105, 255);
+}
+#rarityValues span.mythical {
+    color: rgb(136, 71, 255);
+}
+#rarityValues span.immortal {
+    color: rgb(228, 174, 57);
+}
+#rarityValues span.legendary {
+    color: rgb(211, 44, 230);
+}
+#rarityValues span.arcana {
+    color: rgb(173, 229, 92);
+}
+#rarityValues span.ancient {
+    color: rgb(235, 75, 75);
+}
+.inventoryStatisticsBox {
+    /* Stuff copied from CSGL */
+    float: left;
+    width: 98%;
+    max-width: 100%;
+    margin: .5em 1%;
+    background: #BBB;
+    border-radius: 5px;
+    /* Not anymore */
+    text-align: center;
+    width: 95%;
+    padding: 10px;
+}
+.inventoryStatisticsBox > div {
+    width: 100%;
+    float: left;
+}
+#totalInvValue span {
+    font-weight: bold;
 }

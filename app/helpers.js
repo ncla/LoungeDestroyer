@@ -113,3 +113,8 @@ errorElm.addEventListener("mouseleave", function leaveHandler(e){
                 }
             }})(e), 1500);
 });
+
+function capitaliseFirstLetter(string)
+{
+    return string.charAt(0).toUpperCase() + string.slice(1);
+}
