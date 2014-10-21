@@ -378,3 +378,57 @@ setInterval(function() {
         oReq.send();
     }
 }, 20000);
+
+function updateMarketPriceList() {
+    var oReq = new XMLHttpRequest();
+    oReq.onload = function() {
+        console.log(JSON.parse(this.responseText));
+        chrome.storage.local.set({"marketPriceList": JSON.parse(this.responseText)});
+    };
+    oReq.onerror = function() {
+        chrome.storage.local.set({"marketPriceList": {}});
+    };
+    oReq.open("get", "http://api.ncla.me/items.json", true);
+    oReq.send();
+}
+
+function updateCurrencyConversion() {
+    var oReq = new XMLHttpRequest();
+    oReq.onload = function() {
+        var parsed = JSON.parse(this.responseText);
+        var rates = parsed['query']['results']['rate'];
+        var conversionList = {};
+        $.each(rates, function(i, v) {
+            conversionList[v["id"]] = parseFloat(v["Rate"]);
+        });
+        console.log("Currency conversion rates:");
+        console.log(conversionList);
+        chrome.storage.local.set({"currencyConversionRates": conversionList});
+    };
+    oReq.open("get", "https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20yahoo.finance.xchange%20where%20pair%20in%20(%22USDUSD%22%2C%20%22USDGBP%22%2C%20%22USDEUR%22%2C%20%22USDRUB%22%2C%20%22USDCAD%22%2C%20%22USDAUD%22)&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback=", true);
+    oReq.send();
+}
+
+chrome.alarms.create('itemListUpdate', {
+    periodInMinutes: 60
+});
+chrome.alarms.create('currencyUpdate', {
+    periodInMinutes: 10080 // once a week
+});
+chrome.alarms.onAlarm.addListener(function(alarm) {
+    if(alarm.name == "itemListUpdate") {
+        console.log("Checking if user has visited CS:GO Lounge recently..");
+        updateMarketPriceList();
+    }
+    if(alarm.name == "currencyUpdate") {
+        console.log("Currency update!");
+        updateCurrencyConversion();
+    }
+});
+/*
+ Fired when the extension is first installed, when the extension is updated to a new version, and when Chrome is updated to a new version.
+ https://developer.chrome.com/extensions/runtime#event-onInstalled
+ */
+chrome.runtime.onInstalled.addListener(function() {
+    updateCurrencyConversion();
+});
