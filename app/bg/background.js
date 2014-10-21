@@ -3,6 +3,8 @@ LoungeUser.loadUserSettings(function() {
     console.log("Settings for background.js have loaded!");
 });
 
+var lastTimeUserVisitedCSGL = null;
+
 chrome.extension.onMessage.addListener(function (request, sender, sendResponse) {
     // Make changes to LoungeUser user settings once the settings are changed from extension pop-up
     if(request.hasOwnProperty("changeSetting")) {
@@ -98,6 +100,9 @@ function sendMessageToContentScript(message, tabId) {
 // if bot status update is redirected
 chrome.webRequest.onHeadersReceived.addListener(
     function(details) {
+        if(details.url.indexOf("csgolounge.com") != -1) {
+            lastTimeUserVisitedCSGL = new Date().getTime();
+        }
         var headers = details.responseHeaders,
             blockingResponse = {};
         var originalURL = details.url;
@@ -418,7 +423,12 @@ chrome.alarms.create('currencyUpdate', {
 chrome.alarms.onAlarm.addListener(function(alarm) {
     if(alarm.name == "itemListUpdate") {
         console.log("Checking if user has visited CS:GO Lounge recently..");
-        updateMarketPriceList();
+        var msSinceLastVisit = (new Date().getTime() - lastTimeUserVisitedCSGL);
+        console.log("Since last visit on CS:GL has passed: " + msSinceLastVisit);
+        // Updating only if the user has recently visited CS:GL (less than 2 hours). Might want to rethink this.
+        if(msSinceLastVisit < 7200000) {
+            updateMarketPriceList();
+        }
     }
     if(alarm.name == "currencyUpdate") {
         console.log("Currency update!");
@@ -430,5 +440,6 @@ chrome.alarms.onAlarm.addListener(function(alarm) {
  https://developer.chrome.com/extensions/runtime#event-onInstalled
  */
 chrome.runtime.onInstalled.addListener(function() {
+    console.log("onInstalled event");
     updateCurrencyConversion();
 });
