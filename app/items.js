@@ -39,10 +39,23 @@ Item.prototype.getMarketPrice = function() {
 
     var self = this;
 
+    if(storageMarketItems.hasOwnProperty(appID)) {
+        if(storageMarketItems[appID].hasOwnProperty(this.itemName)) {
+            var currData = currencyData[LoungeUser.userSettings["marketCurrency"]];
+            var conversionRate = currencies[currData["name"]];
+            var convertedPrice = (storageMarketItems[appID][this.itemName]["value"] * conversionRate).toFixed(2);
+            var priceHtml = (currData["symbolBeforeValue"] === true ? currData["htmlSymbol"] + " " + convertedPrice : convertedPrice + " " + currData["htmlSymbol"]);
+            return this.insertMarketValue(priceHtml);
+        } else {
+            console.log("Item not in our item price list storage - " + this.itemName);
+        }
+    }
+
     if(marketedItems.hasOwnProperty(this.itemName)) {
         // Not sure if I am genius for returning something and calling a function at the same time
         return this.insertMarketValue(marketedItems[this.itemName]);
     }
+
     if(nonMarketItems.indexOf(self.itemName) == -1 && !nonMarketItems.hasOwnProperty($(".rarity", this.item).text()) && !loadingItems.hasOwnProperty(this.itemName)) {
         loadingItems[this.itemName] = true;
         $.ajax({

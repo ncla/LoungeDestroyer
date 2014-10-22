@@ -38,6 +38,49 @@ var streamPlaying = false;
     // onmousedown won't fire unless wmode=transparent, don't ask me why
     flash.setAttribute("wmode", "transparent");
 })();
+/*
+    Based on Steam market API
+ */
+var currencyData = {
+    1: {
+        "name": "USDUSD",
+        "htmlSymbol": "&#36;",
+        symbolBeforeValue: true
+    },
+    2: {
+        "name": "USDGBP",
+        "htmlSymbol": "&#163;",
+        symbolBeforeValue: true
+    },
+    3: {
+        "name": "USDEUR",
+        "htmlSymbol": "&#8364;",
+        symbolBeforeValue: false
+    },
+    5: {
+        "name": "USDRUB",
+        "htmlSymbol": "p&#1091;&#1073;.",
+        symbolBeforeValue: false
+    },
+    20: {
+        "name": "USDCAD",
+        "htmlSymbol": "CDN&#36;",
+        symbolBeforeValue: true
+    },
+    21: {
+        "name": "USDAUD",
+        "htmlSymbol": "A&#36;",
+        symbolBeforeValue: true
+    }
+};
+
+var storageMarketItems,
+    currencies = {};
+
+chrome.storage.local.get(['marketPriceList', 'currencyConversionRates'], function(result) {
+    storageMarketItems = result.marketPriceList;
+    currencies = result.currencyConversionRates;
+});
 
 /*
  Wrap the init code here, because for this to function properly, we need user settings to be loaded first
