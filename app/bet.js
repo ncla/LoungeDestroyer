@@ -250,7 +250,6 @@ function onAutobetClicked() {
 	        if (this.valueAsNumber) {
                 chrome.runtime.sendMessage({"set": {bet: {autoDelay: this.valueAsNumber * 1000}},
                                             "saveSetting": {autoDelay: this.valueAsNumber}});
-                LoungeUser.saveSetting("autoDelay", this.valueAsNumber);
             }
 	}); // TO-DO: save setting
 
