@@ -43,6 +43,8 @@ chrome.extension.onMessage.addListener(function (request, sender, sendResponse) 
                           error: bet.lastError[game],
                           matchId: bet.matchNum[game],
                           numTries: bet.numTries[game]});
+        } else {
+            sendResponse(window[request.get]);
         }
     }
 });
