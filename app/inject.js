@@ -81,8 +81,8 @@ var storageMarketItems,
     currencies = {};
 
 chrome.storage.local.get(['marketPriceList', 'currencyConversionRates'], function(result) {
-    storageMarketItems = result.marketPriceList;
-    currencies = result.currencyConversionRates;
+    storageMarketItems = result.marketPriceList || {};
+    currencies = result.currencyConversionRates || {};
 });
 
 /*

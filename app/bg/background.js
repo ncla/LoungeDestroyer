@@ -170,7 +170,6 @@ function createNotification(title, message, messageType, buttons, buttonUrl) {
     if(buttons !== null) {
         tempButtons.push(buttons);
     }
-    console.log("Button url : " + buttonUrl);
     chrome.notifications.create(notificationID + "_" + messageType, {
         type: "basic",
         iconUrl: "../../icons/icon_normal2.png",
@@ -260,7 +259,7 @@ function checkNewMatches(ajaxResponse, appID) {
                 "New matches have been added for betting on " + (appID == 730 ? "CS:GO" : "DOTA2") + " Lounge",
                 "",
                 "regular",
-                {},
+                null,
                 false
             );
         }
