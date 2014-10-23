@@ -245,9 +245,13 @@ function onAutobetClicked() {
 	container.querySelector("button").addEventListener("click", function(){
 	        chrome.runtime.sendMessage({type: "autoBet", autoBet: false});
 	});
+	container.querySelector("input").value = LoungeUser.userSettings.autoDelay || 5;
 	container.querySelector("input").addEventListener("input", function(){
-	        if (this.valueAsNumber)
-	                chrome.runtime.sendMessage({"set": {bet: {autoDelay: this.valueAsNumber * 1000}}});
+	        if (this.valueAsNumber) {
+                chrome.runtime.sendMessage({"set": {bet: {autoDelay: this.valueAsNumber * 1000}},
+                                            "saveSetting": {autoDelay: this.valueAsNumber}});
+                LoungeUser.saveSetting("autoDelay", this.valueAsNumber);
+            }
 	}); // TO-DO: save setting
 
 	document.body.appendChild(container);

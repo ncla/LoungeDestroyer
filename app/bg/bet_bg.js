@@ -69,7 +69,7 @@ chrome.extension.onMessage.addListener(function (request, sender, sendResponse) 
  */
 
 var bet = { // not a class - don't instantiate
-    autoDelay: 10000,
+    autoDelay: 5000,
     type: ["autoBet","autoBet"], // autoBet || autoReturn
     autoBetting: [false, false],
     matchNum: [0,0], // for hash purposes
@@ -316,6 +316,9 @@ var pathRegexp = new RegExp("https?://.*?/(.*)");
 // overwrite betting/return requests for autoing
 chrome.webRequest.onBeforeRequest.addListener(
     function(details) {
+        if (LoungeUser.userSettings.enableAuto === "0")
+            return;
+
         var data,
             newCallback,
             game = details.url.indexOf("http://csgolounge.com/") === 0 ? 0 :
