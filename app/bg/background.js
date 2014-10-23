@@ -441,4 +441,5 @@ chrome.alarms.onAlarm.addListener(function(alarm) {
 chrome.runtime.onInstalled.addListener(function() {
     console.log("onInstalled event");
     updateCurrencyConversion();
+    updateMarketPriceList();
 });
