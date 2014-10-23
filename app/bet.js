@@ -1,6 +1,6 @@
 var inventory;
 
-(function(){
+/*(function(){
 	// If on match page, add "FUCKING PLACE BET" button
 	if (window.location.pathname === "/match" || document.URL.indexOf("/predict") != -1) {
 		var placebut;
@@ -56,7 +56,7 @@ var inventory;
 			freezebtn.parentNode.appendChild(newBtn);
 		}
 	}
-})();
+})();*/
 
 var betStatus = {
 	enabled: false,
@@ -81,7 +81,7 @@ function enableAuto(worth, match, tries, error) {
 		                      "$"+(worth || 0).toFixed(2);
 
 		document.querySelector(".destroyer.auto-info .worth-container").className = "worth-container";
-   		document.querySelector(".destroyer.auto-info .worth").textContent = worth;
+   		//document.querySelector(".destroyer.auto-info .worth").textContent = worth;
 	    document.querySelector(".destroyer.auto-info .match-link").textContent = match;
 	    document.querySelector(".destroyer.auto-info .match-link").href = "match?m="+match;
 	    document.querySelector(".destroyer.auto-info button").textContent = "Disable auto-bet";
@@ -137,9 +137,10 @@ chrome.runtime.sendMessage({get: "autoBet"}, function(data){
 
 // listen for auto-betting updates
 chrome.runtime.onMessage.addListener(function(request,sender,sendResponse){
-	var data = request[request.autoBet ? "autoBet" : "autoReturn"];
-	console.log("Received message:");
+	var data = request[request.autoBet !== undefined ? "autoBet" : "autoReturn"];
+	/*console.log("Received message:");
 	console.log(request);
+	console.log(data);*/
 
 	if (data === false) { // autobetting has stopped
 		betStatus.enabled = false;
@@ -239,7 +240,7 @@ function onAutobetClicked() {
 (function(){
 	var container = document.createElement("div");
 	container.className = "destroyer auto-info hidden";
-	container.innerHTML = '<p>Auto-<span class="type">betting</span> items<span class="worth-container"> worth <span class="worth"></span> on match <a class="match-link"></a></span>. <span class="type capitalize">Betting</span> for the <span class="num-tries">0th</span> time.</p><button class="red">Disable auto-bet</button><p class="destroyer error-title">Last error (<span class="destroyer time-since">0s</span>):</p><p class="destroyer error-text"></p><label>Seconds between retries:</label><input id="bet-time" type="number" min="5" max="60" step="1">';
+	container.innerHTML = '<p>Auto-<span class="type">betting</span> items<span class="worth-container"> on match <a class="match-link"></a></span>. <span class="type capitalize">Betting</span> for the <span class="num-tries">0th</span> time.</p><button class="red">Disable auto-bet</button><p class="destroyer error-title">Last error (<span class="destroyer time-since">0s</span>):</p><p class="destroyer error-text"></p><label>Seconds between retries:</label><input id="bet-time" type="number" min="5" max="60" step="1">';
 
 	container.querySelector("button").addEventListener("click", function(){
 	        chrome.runtime.sendMessage({type: "autoBet", autoBet: false});

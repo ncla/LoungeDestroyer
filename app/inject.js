@@ -28,7 +28,10 @@ var streamPlaying = false;
     if (!container)
         return;
 
-    flash = flash.document;
+    flash = flash.document || flash;
+
+    if (!flash)
+        return;
 
     // onclick/onmousedown doesn't fire on flash objects
     container.addEventListener("mousedown", function(){
