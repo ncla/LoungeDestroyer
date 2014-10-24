@@ -4,28 +4,12 @@
  *   autoReturn - for autoReturn
  */
 chrome.extension.onMessage.addListener(function (request, sender, sendResponse) {
+    if (!sender.url)
+        return;
+
     var game = sender.url.indexOf("http://csgolounge.com/") === 0 ? 0 :
                sender.url.indexOf("http://dota2lounge.com/") === 0 ? 1 :
                -1;
-
-    // Enable auto-betting/auto-returning
-    /*if((request.autoBet || request.autoReturn) && game !== -1) {
-        if (bet.autoBetting[game]) {
-            sendResponse(false);    
-            return;
-        }
-
-        console.log("Enabling auto due to request:");
-        console.log(request);
-
-        bet.type[game] = request.autoBet ? "autoBet" : "autoReturn";
-        if (request.autoBet) {
-            bet.matchNum[game] = request.autoBet.matchNum;
-            bet.enableAuto(request.autoBet.url, request.autoBet.data, !game);
-        } else {
-            bet.enableAuto(request.autoReturn.url, "", !game);
-        }
-    }*/
 
     // Disable auto-betting
     if ((request.autoBet === false || request.autoReturn === false) && game !== -1) {
@@ -95,18 +79,7 @@ bet.enableAuto = function(url, data, csgo) {
         console.log("Can't autobet without URL and data");
         return false;
     }
-
-    /*if (typeof data === "object") {
-        var tmp = [];
-
-        for (var k in data) {
-            tmp.push(encodeURIComponent(k) + "=" + encodeURIComponent(data[k]));
-        }
-        data = tmp.join("&");
-
-        console.log(data);
-    }*/
-
+    
     bet.autoBetting[g] = true;
     bet.lastBetTime[g] = Date.now();
     bet.numTries[g] = 0;
