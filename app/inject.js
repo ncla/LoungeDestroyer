@@ -80,9 +80,16 @@ var currencyData = {
 var storageMarketItems,
     currencies = {};
 
+var LoungeUser = new User();
+
 chrome.storage.local.get(['marketPriceList', 'currencyConversionRates'], function(result) {
-    storageMarketItems = result.marketPriceList;
-    currencies = result.currencyConversionRates;
+    storageMarketItems = result.marketPriceList || {};
+    currencies = result.currencyConversionRates || {};
+    LoungeUser.loadUserSettings(function() {
+        console.log("User settings have been loaded in content script!");
+        inventory = new Inventory();
+        init();
+    });
 });
 
 /*
@@ -174,16 +181,6 @@ function init() {
         });
     }
 }
-
-/*
- Asynchronous bullshit. Load settings from storage, merge new settings, then start script
- */
-var LoungeUser = new User();
-LoungeUser.loadUserSettings(function() {
-    console.log("User settings have been loaded in content script!");
-    inventory = new Inventory();
-    init();
-});
 
 /*
     Mouseover action for items

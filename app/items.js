@@ -46,8 +46,6 @@ Item.prototype.getMarketPrice = function() {
             var convertedPrice = (storageMarketItems[appID][this.itemName]["value"] * conversionRate).toFixed(2);
             var priceHtml = (currData["symbolBeforeValue"] === true ? currData["htmlSymbol"] + " " + convertedPrice : convertedPrice + " " + currData["htmlSymbol"]);
             return this.insertMarketValue(priceHtml);
-        } else {
-            console.log("Item not in our item price list storage - " + this.itemName);
         }
     }
 
