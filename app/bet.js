@@ -1,63 +1,5 @@
 var inventory;
 
-/*(function(){
-	// If on match page, add "FUCKING PLACE BET" button
-	if (window.location.pathname === "/match" || document.URL.indexOf("/predict") != -1) {
-		var placebut;
-		if ((placebut = document.getElementById("placebut")) &&
-			placebut.getAttribute("onclick").indexOf("placeBetNew") !== -1) {
-			var newBtn = document.createElement("a");
-			newBtn.id = "realbetbutton";
-			newBtn.className = "buttonright";
-			newBtn.textContent = "FUCKING PLACE BET";
-			newBtn.setAttribute("data-tlss", placebut.getAttribute("onclick").match(/\('[0-9]+', '([0-9A-Za-z]+)/)[1]);
-			newBtn.addEventListener("click", onAutobetClicked);
-			placebut.parentNode.insertBefore(newBtn, placebut);
-		}
-	}
-
-	// If on bets page, add "FUCKING REQUEST RETURNS" button 
-	if (window.location.pathname === "/mybets") {
-		var freezebtn;
-		if ((freezebtn = document.getElementById("freezebutton"))) {
-			var newBtn = document.createElement("a");
-			newBtn.id = "realreturnbutton";
-			newBtn.className = "button";
-			newBtn.textContent = "FUCKING REQUEST RETURNS";
-			newBtn.addEventListener("click", function self(){
-				var toreturn = !document.querySelector(".tofreeze"),
-				    msg = {
-						autoReturn: {
-							url: window.location.origin+"/ajax/postToReturn.php"
-						}
-					};
-
-				if (!toreturn) {
-					$.ajax({
-						url: "ajax/postToFreeze.php",
-						type: "POST",
-						data: $("#freeze").serialize(),
-						success: function(data) {
-							if (data) window.alert(data);
-							else {
-								chrome.runtime.sendMessage(msg);
-								betStatus.type = "autoReturn";
-								enableAuto();
-							}
-						}
-					});
-				} else {
-					chrome.runtime.sendMessage(msg);
-					betStatus.type = "autoReturn";
-					enableAuto();
-				}
-			});
-
-			freezebtn.parentNode.appendChild(newBtn);
-		}
-	}
-})();*/
-
 var betStatus = {
 	enabled: false,
 	type: "autoBet", // autoBet || autoReturn
@@ -137,7 +79,7 @@ chrome.runtime.sendMessage({get: "autoBet"}, function(data){
 
 // listen for auto-betting updates
 chrome.runtime.onMessage.addListener(function(request,sender,sendResponse){
-	var data = request[request.autoBet !== undefined ? "autoBet" : "autoReturn"];
+	var data = request[request.hasOwnProperty("autoBet") ? "autoBet" : "autoReturn"];
 	/*console.log("Received message:");
 	console.log(request);
 	console.log(data);*/
@@ -164,7 +106,7 @@ chrome.runtime.onMessage.addListener(function(request,sender,sendResponse){
 		betStatus.type = request.autoBet ? "autoBet" : "autoReturn";
 
 		// autobetting has started
-		if (data.hasOwnProperty("worth") && data.time && data.rebetDelay) {
+		if (data.time && data.rebetDelay) {
 			betStatus.enabled = true;
 			betStatus.time = data.time;
 			betStatus.rebetDelay = data.rebetDelay;

@@ -317,9 +317,14 @@ chrome.webRequest.onBeforeRequest.addListener(
             }
         }
 
-        newCallback = (function(url, data){return function(){
+        newCallback = (function(url, data){return function(response){
             bet.type[game] = data ? "autoBet" : "autoReturn";
             bet.matchNum[game] = data ? data.match : "";
+
+            if (!response) {
+                bet.disableAuto(true, game);
+                return;
+            }
 
             bet.enableAuto(url, data || "", !game);
         }})(details.url, data);

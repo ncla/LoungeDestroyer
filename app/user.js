@@ -19,7 +19,8 @@ User.prototype.defaultSettings =
     notifyMatches: "3",
     notifyTrades: "1",
     autoDelay: "5",
-    enableAuto: "1"
+    enableAuto: "1",
+    renameButtons: "1"
 };
 
 User.prototype.loadUserSettings = function(callback) {
