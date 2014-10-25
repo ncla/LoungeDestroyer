@@ -29,7 +29,7 @@ var streamPlaying = false;
         return;
 
     flash = flash.document || flash;
-    
+
     if (!flash)
         return;
 

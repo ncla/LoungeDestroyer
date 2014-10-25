@@ -1,6 +1,7 @@
 var LoungeUser = new User();
 LoungeUser.loadUserSettings(function() {
     console.log("Settings for background.js have loaded!");
+    bet.autoDelay = parseInt(LoungeUser.userSettings.autoDelay) * 1000 || 5000;
 });
 
 var lastTimeUserVisitedCSGL = null;
@@ -10,6 +11,13 @@ chrome.extension.onMessage.addListener(function (request, sender, sendResponse) 
     if(request.hasOwnProperty("changeSetting")) {
         for(var name in request.changeSetting) {
             LoungeUser.userSettings[name] = request.changeSetting[name];
+        }
+    }
+
+    // sets user setting and sends sync message to every other tab
+    if (request.hasOwnProperty("saveSetting")) {
+        for(var name in request.saveSetting) {
+            LoungeUser.saveSetting(name, request.saveSetting[name]);
         }
     }
 
