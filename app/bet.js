@@ -177,23 +177,3 @@ function onAutobetClicked() {
 		alert("You didn't pick any item.");
 	}
 }
-
-// create info box in top-right
-(function(){
-	var container = document.createElement("div");
-	container.className = "destroyer auto-info hidden";
-	container.innerHTML = '<p>Auto-<span class="type">betting</span> items<span class="worth-container"> on match <a class="match-link"></a></span>. <span class="type capitalize">Betting</span> for the <span class="num-tries">0th</span> time.</p><button class="red">Disable auto-bet</button><p class="destroyer error-title">Last error (<span class="destroyer time-since">0s</span>):</p><p class="destroyer error-text"></p><label>Seconds between retries:</label><input id="bet-time" type="number" min="5" max="60" step="1">';
-
-	container.querySelector("button").addEventListener("click", function(){
-	        chrome.runtime.sendMessage({type: "autoBet", autoBet: false});
-	});
-	container.querySelector("input").value = LoungeUser.userSettings.autoDelay || 5;
-	container.querySelector("input").addEventListener("input", function(){
-	        if (this.valueAsNumber) {
-                chrome.runtime.sendMessage({"set": {bet: {autoDelay: this.valueAsNumber * 1000}},
-                                            "saveSetting": {autoDelay: this.valueAsNumber}});
-            }
-	}); // TO-DO: save setting
-
-	document.body.appendChild(container);
-})();

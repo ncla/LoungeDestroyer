@@ -8,11 +8,6 @@ var Inventory = function() {
      */
     if(document.URL.indexOf("/match?m=") != -1 || document.URL.indexOf("/predict") != -1 || document.URL.indexOf("/search") != -1 || document.URL.indexOf("/addtrade") != -1) {
         this.backpackElement = $("#backpack");
-        if($("#backpack #loading").length == 0) {
-            chrome.runtime.sendMessage({giveMeBackpackURL: "pls"}, function(response) {
-                self.onInventoryLoaded(response);
-            });
-        }
     } else if(document.URL.indexOf("/trade?t=") != -1) {
         this.backpackElement = $("#offer");
         this.lastElementInBackpack = $(self.backpackElement).children().last();

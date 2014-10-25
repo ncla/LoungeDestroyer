@@ -43,15 +43,6 @@
                 "http://csgolounge.com/*",
                 "http://dota2lounge.com/*"
             ],
-            "css": [
-                "app/css/inject.css"
-            ]
-        },
-        {
-            "matches": [
-                "http://csgolounge.com/*",
-                "http://dota2lounge.com/*"
-            ],
             "js": [
                 "lib/js/jquery-2.1.1.min.js",
                 "app/helpers.js",
@@ -60,6 +51,9 @@
                 "app/inventory.js",
                 "app/inject.js",
                 "app/bet.js"
+            ],
+            "css": [
+                "app/css/inject.css"
             ],
             "run_at": "document_start"
         }
