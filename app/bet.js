@@ -138,9 +138,9 @@ chrome.runtime.sendMessage({get: "autoBet"}, function(data){
 // listen for auto-betting updates
 chrome.runtime.onMessage.addListener(function(request,sender,sendResponse){
 	var data = request[request.hasOwnProperty("autoBet") ? "autoBet" : "autoReturn"];
-	console.log("Received message:");
+	/*console.log("Received message:");
 	console.log(request);
-	console.log(data);
+	console.log(data);*/
 
 	if (data === false) { // autobetting has stopped
 		betStatus.enabled = false;
