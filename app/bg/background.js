@@ -54,14 +54,7 @@ function setBotstatus(value) {
         if(result.botsOnline != value) {
             console.log("Bot status changed!!!!111");
             chrome.storage.local.set({"botsOnline": value});
-            /*
-                Notifications
-                https://developer.mozilla.org/en/docs/Web/API/notification
-            */
-            var message = {action: "updateBotStatus",
-                           status: value};
-            sendMessageToContentScript(message, null);
-            if(value == 1 && result.botsOnline != -1) {
+             if(value == 1 && result.botsOnline != -1) {
                 /* Might not want to notify when installed for first time */
                 createNotification(
                     "CS:GO Lounge Bot status",
