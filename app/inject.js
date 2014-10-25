@@ -119,6 +119,12 @@ function init() {
         inventory.getMarketPrices(false);
     }
     if(document.URL.indexOf("/mybets") != -1) {
+        if (LoungeUser.userSettings.renameButtons === "1") {
+            var btn = document.getElementById("freezebutton");
+            if (btn)
+                btn.textContent = "FUCKING REQUEST RETURNS";
+        }
+
         $(".matchmain").each(function(index, value) {
             var total = 0;
             $(".item", value).each(function(itemIndex, itemValue) {
@@ -158,6 +164,11 @@ function init() {
     if(document.URL.indexOf("/match?m=") != -1 || document.URL.indexOf("/predict") != -1) {
         if(LoungeUser.userSettings["streamRemove"] == "1") {
             $("#stream object, #stream iframe").remove();
+        }
+        if (LoungeUser.userSettings.renameButtons === "1") {
+            var btn = document.getElementById("placebut");
+            if (btn)
+                btn.textContent = "FUCKING PLACE BET";
         }
         var tabWrapper = $("div[style='float: left; width: 96%;margin: 0 2%;height: 26px;border-radius: 5px;position: relative;overflow: hidden;']");
         $(tabWrapper).append('<a class="tab" id="ld_cache" onclick="returns = false;">Cached inventory</div>');
