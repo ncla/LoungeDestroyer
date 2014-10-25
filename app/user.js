@@ -1,5 +1,7 @@
 var User = function() {
-    this.profileNumber = ($("#logout").length ? readCookie("id") : null);
+    $(document).ready((function(){
+        this.profileNumber = ($("#logout").length ? readCookie("id") : null);
+    }).bind(this));
 
     /* User settings */
     this.userSettings = this.defaultSettings;

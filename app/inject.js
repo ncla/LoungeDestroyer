@@ -38,7 +38,8 @@ var currencyData = {
 var storageMarketItems,
     currencies = {};
 
-var LoungeUser = new User();
+var LoungeUser = new User(),
+    streamPlaying = false;
 
 chrome.storage.local.get(['marketPriceList', 'currencyConversionRates'], function(result) {
     storageMarketItems = result.marketPriceList || {};
@@ -78,8 +79,6 @@ function init() {
         }
         // cannot check if actually playing, unfortunately
         // only if it's been clicked while on the page
-        var streamPlaying = false;
-
         (function(){
             var container = document.getElementById("mainstream"),
                 flash = document.getElementById("live_embed_player_flash");

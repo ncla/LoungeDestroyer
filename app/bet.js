@@ -4,7 +4,7 @@ var betStatus = {
 	enabled: false,
 	type: "autoBet", // autoBet || autoReturn
 	betTime: 0,
-	rebetDelay: 10000
+	rebetDelay: 5000
 };
 
 function enableAuto(worth, match, tries, error) {
@@ -65,16 +65,18 @@ function enableAuto(worth, match, tries, error) {
 }
 
 // load data if auto-betting
-chrome.runtime.sendMessage({get: "autoBet"}, function(data){
-	if (!data.enabled)
-		return;
+$(document).ready(function(){
+	chrome.runtime.sendMessage({get: "autoBet"}, function(data){
+		if (!data.enabled)
+			return;
 
-	betStatus.betTime = data.time;
-	betStatus.rebetDelay = data.rebetDelay;
-	betStatus.enabled = true;
-	betStatus.type = data.type;
+		betStatus.betTime = data.time;
+		betStatus.rebetDelay = data.rebetDelay;
+		betStatus.enabled = true;
+		betStatus.type = data.type;
 
-	enableAuto(data.worth, data.matchId, data.numTries, data.error);
+		enableAuto(data.worth, data.matchId, data.numTries, data.error);
+	});
 });
 
 // listen for auto-betting updates
