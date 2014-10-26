@@ -1,5 +1,3 @@
-var inventory;
-
 var betStatus = {
 	enabled: false,
 	type: "autoBet", // autoBet || autoReturn
@@ -74,7 +72,9 @@ chrome.runtime.sendMessage({get: "autoBet"}, function(data){
 	betStatus.enabled = true;
 	betStatus.type = data.type;
 
-	enableAuto(data.worth, data.matchId, data.numTries, data.error);
+    $(document).ready(function(){
+        enableAuto(data.worth, data.matchId, data.numTries, data.error);
+    });
 });
 
 // listen for auto-betting updates
@@ -86,14 +86,18 @@ chrome.runtime.onMessage.addListener(function(request,sender,sendResponse){
 
 	if (data === false) { // autobetting has stopped
 		betStatus.enabled = false;
-		document.querySelector(".destroyer.auto-info").className = "destroyer auto-info hidden";
+        $(document).ready(function() {
+            document.querySelector(".destroyer.auto-info").className = "destroyer auto-info hidden";
+        });
 		return;
 	}
 
 	if (data === true) { // bet succeeded
 		console.log("Success.");
 		betStatus.enabled = false;
-		document.querySelector(".destroyer.auto-info").className = "destroyer auto-info hidden";
+        $(document).ready(function() {
+            document.querySelector(".destroyer.auto-info").className = "destroyer auto-info hidden";
+        });
 		if (!streamPlaying) {
 			localStorage.playedbet = false;
 			localStorage.playedreturn = false;
@@ -110,25 +114,29 @@ chrome.runtime.onMessage.addListener(function(request,sender,sendResponse){
 			betStatus.enabled = true;
 			betStatus.time = data.time;
 			betStatus.rebetDelay = data.rebetDelay;
-
-			enableAuto(data.worth, data.matchId, data.numTries, data.error);
+            $(document).ready(function(){
+                enableAuto(data.worth, data.matchId, data.numTries, data.error);
+            });
 			return;
 		}
 
 		// autobetting has received an error from Lounge
 		if (data.time && data.error) {
-			document.querySelector(".destroyer.auto-info .error-text").textContent = data.error;
-			
-			var ordinalEnding = ((data.numTries||0)+"").slice(-1);
-			ordinalEnding = (data.numTries%100 < 20 &&
-							data.numTries%100 > 10) ? "th" : // if a "teen" number, end in th
-							ordinalEnding === "1" ? "st":
-				            ordinalEnding === "2" ? "nd":
-				            ordinalEnding === "3" ? "rd":
-				            "th";
-			document.querySelector(".destroyer.auto-info .num-tries").textContent = (data.numTries||0) + ordinalEnding;
+            $(document).ready(function() {
+                document.querySelector(".destroyer.auto-info .error-text").textContent = data.error;
 
-			betStatus.betTime = data.time;
+                var ordinalEnding = ((data.numTries||0)+"").slice(-1);
+                ordinalEnding = (data.numTries%100 < 20 &&
+                    data.numTries%100 > 10) ? "th" : // if a "teen" number, end in th
+                    ordinalEnding === "1" ? "st":
+                        ordinalEnding === "2" ? "nd":
+                            ordinalEnding === "3" ? "rd":
+                                "th";
+                document.querySelector(".destroyer.auto-info .num-tries").textContent = (data.numTries||0) + ordinalEnding;
+
+                betStatus.betTime = data.time;
+            });
+
 			return;
 		}
 	}

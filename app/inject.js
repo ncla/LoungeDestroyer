@@ -36,16 +36,18 @@ var currencyData = {
 };
 
 var storageMarketItems,
-    currencies = {};
+    currencies = {},
+    streamPlaying = false,
+    inventory = false;
+
+var container = document.createElement("div");
 
 var LoungeUser = new User();
-
 chrome.storage.local.get(['marketPriceList', 'currencyConversionRates'], function(result) {
     storageMarketItems = result.marketPriceList || {};
     currencies = result.currencyConversionRates || {};
     LoungeUser.loadUserSettings(function() {
         console.log("User settings have been loaded in content script!");
-        inventory = new Inventory();
         init();
     });
 });
@@ -58,10 +60,10 @@ function init() {
      When bot status changes (detected by background.js), a message gets send from background script to content script (here).
      TODO: Pass bot status through listener.
      */
-    var inv = inventory;
+    inventory = new Inventory();
     chrome.extension.onMessage.addListener(function(msg, sender, sendResponse) {
         if(msg.inventory) {
-            inv.onInventoryLoaded(msg.inventory);
+            inventory.onInventoryLoaded(msg.inventory);
         }
         if(msg.hasOwnProperty("changeSetting")) {
             for(var name in msg.changeSetting) {
@@ -78,8 +80,6 @@ function init() {
         }
         // cannot check if actually playing, unfortunately
         // only if it's been clicked while on the page
-        var streamPlaying = false;
-
         (function(){
             var container = document.getElementById("mainstream"),
                 flash = document.getElementById("live_embed_player_flash");
@@ -190,25 +190,28 @@ function init() {
             });
         }
 
-        // create info box in top-right
-        var container = document.createElement("div");
-        container.className = "destroyer auto-info hidden";
-        container.innerHTML = '<p>Auto-<span class="type">betting</span> items<span class="worth-container"> on match <a class="match-link"></a></span>. <span class="type capitalize">Betting</span> for the <span class="num-tries">0th</span> time.</p><button class="red">Disable auto-bet</button><p class="destroyer error-title">Last error (<span class="destroyer time-since">0s</span>):</p><p class="destroyer error-text"></p><label>Seconds between retries:</label><input id="bet-time" type="number" min="5" max="60" step="1">';
-
-        container.querySelector("button").addEventListener("click", function(){
-            chrome.runtime.sendMessage({type: "autoBet", autoBet: false});
-        });
         container.querySelector("input").value = LoungeUser.userSettings.autoDelay || 5;
-        container.querySelector("input").addEventListener("input", function(){
-            if (this.valueAsNumber) {
-                chrome.runtime.sendMessage({"set": {bet: {autoDelay: this.valueAsNumber * 1000}},
-                    "saveSetting": {autoDelay: this.valueAsNumber}});
-            }
-        }); // TO-DO: save setting
-
-        document.body.appendChild(container);
     });
 }
+/*
+    Code that does not rely heavily on Chrome storage data
+ */
+$(document).ready(function() {
+    // create info box in top-right
+    container.className = "destroyer auto-info hidden";
+    container.innerHTML = '<p>Auto-<span class="type">betting</span> items<span class="worth-container"> on match <a class="match-link"></a></span>. <span class="type capitalize">Betting</span> for the <span class="num-tries">0th</span> time.</p><button class="red">Disable auto-bet</button><p class="destroyer error-title">Last error (<span class="destroyer time-since">0s</span>):</p><p class="destroyer error-text"></p><label>Seconds between retries:</label><input id="bet-time" type="number" min="5" max="60" step="1">';
+
+    container.querySelector("button").addEventListener("click", function(){
+        chrome.runtime.sendMessage({type: "autoBet", autoBet: false});
+    });
+    container.querySelector("input").addEventListener("input", function(){
+        if (this.valueAsNumber) {
+            chrome.runtime.sendMessage({"set": {bet: {autoDelay: this.valueAsNumber * 1000}},
+                "saveSetting": {autoDelay: this.valueAsNumber}});
+        }
+    }); // TO-DO: save setting
+    document.body.appendChild(container);
+});
 
 /*
     Mouseover action for items

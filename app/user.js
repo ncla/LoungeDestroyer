@@ -1,5 +1,5 @@
 var User = function() {
-    this.profileNumber = ($("#logout").length ? readCookie("id") : null);
+    this.profileNumber = readCookie("id");
 
     /* User settings */
     this.userSettings = this.defaultSettings;
@@ -9,7 +9,7 @@ var User = function() {
 User.prototype.defaultSettings =
 {
     marketCurrency: "1",
-    itemMarketPrices: "1",
+    itemMarketPricesv2: "1",
     redirect: "1",
     streamRemove: "1",
     delayBotsOff: "30000",
