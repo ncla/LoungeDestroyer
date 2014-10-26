@@ -39,13 +39,15 @@ Item.prototype.getMarketPrice = function() {
 
     var self = this;
 
-    if(storageMarketItems.hasOwnProperty(appID)) {
-        if(storageMarketItems[appID].hasOwnProperty(this.itemName)) {
-            var currData = currencyData[LoungeUser.userSettings["marketCurrency"]];
-            var conversionRate = currencies[currData["name"]];
-            var convertedPrice = (storageMarketItems[appID][this.itemName]["value"] * conversionRate).toFixed(2);
-            var priceHtml = (currData["symbolBeforeValue"] === true ? currData["htmlSymbol"] + " " + convertedPrice : convertedPrice + " " + currData["htmlSymbol"]);
-            return this.insertMarketValue(priceHtml);
+    if(LoungeUser.userSettings["useCachedPriceList"] == "1") {
+        if(storageMarketItems.hasOwnProperty(appID)) {
+            if(storageMarketItems[appID].hasOwnProperty(this.itemName)) {
+                var currData = currencyData[LoungeUser.userSettings["marketCurrency"]];
+                var conversionRate = currencies[currData["name"]];
+                var convertedPrice = (storageMarketItems[appID][this.itemName]["value"] * conversionRate).toFixed(2);
+                var priceHtml = (currData["symbolBeforeValue"] === true ? currData["htmlSymbol"] + " " + convertedPrice : convertedPrice + " " + currData["htmlSymbol"]);
+                return this.insertMarketValue(priceHtml);
+            }
         }
     }
 

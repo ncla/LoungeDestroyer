@@ -48,6 +48,16 @@
                     </select>
                 </div>
                 <div class="col-md-6 ld-setting">
+                    <label class="control-label">Use cached item price list <a href="#" data-toggle="tooltip" data-original-title="LoungeDestroyer can provide item price values where available from our own dedicated API. The item price list cache updates periodically.">(?)</a>:</label>
+                    <select id="useCachedPriceList" class="form-control">
+                        <option value="1">Enabled</option>
+                        <option value="0">Disabled</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 ld-setting">
                     <label class="control-label">Steam market currency:</label>
                     <select id="marketCurrency" class="form-control">
                         <option value="1">USD</option>
@@ -58,9 +68,6 @@
                         <option value="21">AUD</option>
                     </select>
                 </div>
-            </div>
-
-            <div class="row">
                 <div class="col-md-6 ld-setting">
                     <label class="control-label">Redirect from item draft page <a href="#" data-toggle="tooltip" data-original-title="CS:GO Lounge does an annoying redirect to item drafting page, which can be stopped by extension. This may cause some lag issues as this will keep redirecting to intended page instead of item drafting page.">(?)</a>:</label>
                     <select id="redirect" class="form-control">
@@ -68,6 +75,9 @@
                         <option value="0">Disabled</option>
                     </select>
                 </div>
+            </div>
+
+            <div class="row">
                 <div class="col-md-6 ld-setting">
                     <label class="control-label">Remove stream from match page:</label>
                     <select id="streamRemove" class="form-control">
@@ -75,9 +85,6 @@
                         <option value="0">Disabled</option>
                     </select>
                 </div>
-            </div>
-
-            <div class="row">
                 <div class="col-md-6 ld-setting">
                     <label class="control-label">Show trade descriptions</label>
                     <select id="showDescriptions" class="form-control">
@@ -85,6 +92,9 @@
                         <option value="0">Disabled</option>
                     </select>
                 </div>
+            </div>
+
+            <div class="row">
                 <div class="col-md-6 ld-setting">
                     <label class="control-label">Enable auto-betting/-returning</label>
                     <select id="enableAuto" class="form-control">

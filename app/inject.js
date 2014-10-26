@@ -113,7 +113,7 @@ function init() {
             flash.setAttribute("wmode", "transparent");
         })();
 
-        if(LoungeUser.userSettings["itemMarketPrices"] == "1") {
+        if(LoungeUser.userSettings["itemMarketPricesv2"] == "2") {
             inventory.getMarketPrices(false);
         }
         if(document.URL.indexOf("/mybets") != -1) {
@@ -218,7 +218,8 @@ $(document).ready(function() {
  */
 $(document).on("mouseover", ".item", function() {
     var LoungeItem = new Item($(this));
-    if(LoungeUser.userSettings["itemMarketPrices"] == "1") {
+    var settingMarketPrices = LoungeUser.userSettings["itemMarketPricesv2"];
+    if(settingMarketPrices == "1" || settingMarketPrices == "2") {
         LoungeItem.getMarketPrice();
     }
     if($(this).find(".steamMarketURL").length == 0) {
@@ -232,7 +233,8 @@ $(document).on("mouseover", ".item", function() {
 
         $(this).find(elementToAppendAfter).after('<br/>' +
             '<br/><a class="steamMarketURL" href="' + LoungeItem.generateMarketURL() + '" target="_blank">Market Listings</a><br/>' +
-            '<a href="' + LoungeItem.generateMarketSearchURL() + '" target="_blank">Market Search</a>');
+            '<a href="' + LoungeItem.generateMarketSearchURL() + '" target="_blank">Market Search</a><br/><br/>' +
+            '<small><a class="refreshPriceMarket">Fetch Steam market price</a></small>');
         $("a", this).click(function(e) {
             e.stopPropagation();
         });

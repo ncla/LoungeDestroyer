@@ -20,7 +20,8 @@ User.prototype.defaultSettings =
     notifyTrades: "1",
     autoDelay: "5",
     enableAuto: "1",
-    renameButtons: "1"
+    renameButtons: "1",
+    useCachedPriceList: "1"
 };
 
 User.prototype.loadUserSettings = function(callback) {

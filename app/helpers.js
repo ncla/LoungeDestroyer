@@ -111,3 +111,6 @@ function get(url, callback) {
     // send
     xhr.send();
 }
+function isDevMode() {
+    return !('update_url' in chrome.runtime.getManifest());
+}

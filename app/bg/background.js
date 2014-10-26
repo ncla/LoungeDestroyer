@@ -389,6 +389,16 @@ function updateMarketPriceList() {
     oReq.onload = function() {
         console.log(JSON.parse(this.responseText));
         chrome.storage.local.set({"marketPriceList": JSON.parse(this.responseText)});
+        if(isDevMode()) {
+            console.log(new Date() + " -- Item price list has been updated!");
+            createNotification(
+                "Item price list has been updated!",
+                "",
+                "regular",
+                null,
+                false
+            );
+        }
     };
     oReq.onerror = function() {
         chrome.storage.local.set({"marketPriceList": {}});
