@@ -187,6 +187,21 @@ function init() {
  */
 $(document).on("mouseover", ".item", function() {
     var LoungeItem = new Item($(this));
+    var tradeBlock = $(this).parent();
+    if(tradeBlock.find('.total-price').length==0) {
+        if(tradeBlock.find('.item').length == tradeBlock.find('.item.marketPriced').length) {
+            // all items in current set have been priced
+            var total = 0.0;
+            tradeBlock.find('.item').each(function() {
+                var price = $(this).find('.rarity').text();
+                price = price.replace("$","");
+                price = parseFloat(price);
+                total += price;
+            });
+            total = total.toFixed(2);
+            tradeBlock.append("<div class='total-price'>Total: $"+total+"</div>");
+        } 
+    }
     if(LoungeUser.userSettings["itemMarketPrices"] == "1") {
         LoungeItem.getMarketPrice();
     }

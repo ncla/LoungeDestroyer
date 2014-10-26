@@ -5,6 +5,12 @@
     background: rgba(255, 255, 255, 0.7) !important;
     text-shadow: 0px 0px 1px rgba(255, 255, 255, 1);
 }
+.appID730 .total-price {
+    clear: both;
+    text-align: center;
+    font-weight: bold;
+    font-style: italic;
+}
 .appID570 .marketPriced .rarity {
     color: #ececec;
 }
