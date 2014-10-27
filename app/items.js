@@ -57,27 +57,32 @@ Item.prototype.getMarketPrice = function() {
     }
 
     if(nonMarketItems.indexOf(self.itemName) == -1 && !nonMarketItems.hasOwnProperty($(".rarity", this.item).text()) && !loadingItems.hasOwnProperty(this.itemName)) {
-        loadingItems[this.itemName] = true;
-        $.ajax({
-            url: this.generateMarketApiURL(),
-            type: "GET",
-            success: function(data) {
-                if(data.success == true && data.hasOwnProperty("lowest_price")) {
-                    var lowestPrice = data["lowest_price"].replace("&#36;", "&#36; ");
-                    marketedItems[self.itemName] = lowestPrice;
-                    self.insertMarketValue(lowestPrice);
-                }
-                else {
-                    $(self.item).find('.rarity').html('Not Found');
-                }
-            },
-            error: function() {
-                console.log("Error getting response for item " + self.itemName);
-            }
-        }).done(function() {
-                delete loadingItems[self.itemName];
-            });
+        this.fetchSteamMarketPrice();
     }
+};
+
+Item.prototype.fetchSteamMarketPrice = function() {
+    var self = this;
+    loadingItems[this.itemName] = true;
+    $.ajax({
+        url: this.generateMarketApiURL(),
+        type: "GET",
+        success: function(data) {
+            if(data.success == true && data.hasOwnProperty("lowest_price")) {
+                var lowestPrice = data["lowest_price"].replace("&#36;", "&#36; ");
+                marketedItems[self.itemName] = lowestPrice;
+                self.insertMarketValue(lowestPrice);
+            }
+            else {
+                $(self.item).find('.rarity').html('Not Found');
+            }
+        },
+        error: function() {
+            console.log("Error getting response for item " + self.itemName);
+        }
+    }).done(function() {
+            delete loadingItems[self.itemName];
+        });
 };
 
 Item.prototype.generateMarketURL = function() {

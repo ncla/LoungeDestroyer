@@ -223,7 +223,6 @@ $(document).on("mouseover", ".item", function() {
         LoungeItem.getMarketPrice();
     }
     if($(this).find(".steamMarketURL").length == 0) {
-        var itemName = encodeURI($(this).find(".smallimg").attr("alt"));
         $("a:contains('Market')", this).remove();
         try {
             $("a:contains('Preview')", this)[0].nextSibling.remove();
@@ -234,9 +233,14 @@ $(document).on("mouseover", ".item", function() {
         $(this).find(elementToAppendAfter).after('<br/>' +
             '<br/><a class="steamMarketURL" href="' + LoungeItem.generateMarketURL() + '" target="_blank">Market Listings</a><br/>' +
             '<a href="' + LoungeItem.generateMarketSearchURL() + '" target="_blank">Market Search</a><br/><br/>' +
-            '<small><a class="refreshPriceMarket">Fetch Steam market price</a></small>');
+            '<small><a class="refreshPriceMarket">Show Steam market price</a></small>');
         $("a", this).click(function(e) {
             e.stopPropagation();
+            if($(this).hasClass("refreshPriceMarket")) {
+                $(".rarity", LoungeItem.item).html("Fetching...");
+                $(LoungeItem.item).removeClass("marketPriced");
+                LoungeItem.fetchSteamMarketPrice();
+            }
         });
     }
 });
