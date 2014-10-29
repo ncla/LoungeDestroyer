@@ -7,9 +7,13 @@ var uniqueItemsFetched = 0;
 var Item = function(item) {
     var self = this;
     this.item = item;
-    $(document).ready((function(){
+    if (["complete", "interactive"].indexOf(document.readyState) !== -1)
         this.itemName = $(".smallimg", this.item).attr("alt");
-    }).bind(this));
+    else {
+        $(document).ready((function(){
+            this.itemName = $(".smallimg", this.item).attr("alt");
+        }).bind(this));
+    }
 };
 
 Item.prototype.insertMarketValue = function(lowestPrice) {
