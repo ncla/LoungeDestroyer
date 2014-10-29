@@ -3,6 +3,7 @@ var queue = {
 	offer: false, // offer URL, or false if no offer
 	time: 0, // timestamp of offer end, or 0 if no offer
 	protectionCode: false, // protection code, or false if no offer
+	tabOpened: false
 };
 
 // init
@@ -15,9 +16,6 @@ $(document).ready(function(){
 
 	// create observer for queue element
 	var obs = new MutationObserver(function(records){
-		console.log("Mutation record:");
-		console.log(records);
-
 		for (var i = 0; i < records.length; ++i) {
 			var record = records[i];
 			if (!record.type === "childList" || !record.addedNodes)
@@ -47,7 +45,15 @@ $(document).ready(function(){
 		}
 
 		// save queue data to storage
-		chrome.storage.local.set({queue: queue});
+		chrome.storage.local.set({queue: queue}, function(){
+			if (queue.tabOpened)
+				return;
+			if (!queue.offer)
+				return;
+
+			queue.tabOpened = true;
+			chrome.runtime.sendMessage({tab: queue.offer});
+		});
 	});
 	obs.observe(queueElm, {
 		childList: true
