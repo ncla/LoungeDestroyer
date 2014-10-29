@@ -289,7 +289,7 @@ var pathRegexp = new RegExp("https?://.*?/(.*)");
 // overwrite betting/return requests for autoing
 chrome.webRequest.onBeforeRequest.addListener(
     function(details) {
-        if (LoungeUser.userSettings.enableAuto === "0")
+        if (["0","3"].indexOf(LoungeUser.userSettings.enableAuto) !== -1)
             return;
 
         var data,

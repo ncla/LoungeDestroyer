@@ -16,6 +16,9 @@ $(document).ready(function(){
 
 	// create observer for queue element
 	var obs = new MutationObserver(function(records){
+		if (["0","2"].indexOf(LoungeUser.userSettings.enableAuto) !== -1)
+			return;
+
 		for (var i = 0; i < records.length; ++i) {
 			var record = records[i];
 			if (!record.type === "childList" || !record.addedNodes)

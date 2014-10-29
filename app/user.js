@@ -21,7 +21,8 @@ User.prototype.defaultSettings =
     autoDelay: "5",
     enableAuto: "1",
     renameButtons: "1",
-    useCachedPriceList: "1"
+    useCachedPriceList: "1",
+    
 };
 
 User.prototype.loadUserSettings = function(callback) {

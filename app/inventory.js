@@ -6,16 +6,14 @@ var Inventory = function() {
     /*
         Construct for backpack
      */
-     $(document).ready((function(){
-        if(document.URL.indexOf("/match?m=") != -1 || document.URL.indexOf("/predict") != -1 || document.URL.indexOf("/search") != -1 || document.URL.indexOf("/addtrade") != -1) {
-            this.backpackElement = $("#backpack");
-        } else if(document.URL.indexOf("/trade?t=") != -1) {
-            this.backpackElement = $("#offer");
-            this.lastElementInBackpack = $(self.backpackElement).children().last();
-        } else {
-            this.backpackElement = false;
-        }
-    }).bind(this));
+    if(document.URL.indexOf("/match?m=") != -1 || document.URL.indexOf("/predict") != -1 || document.URL.indexOf("/search") != -1 || document.URL.indexOf("/addtrade") != -1) {
+        this.backpackElement = $("#backpack");
+    } else if(document.URL.indexOf("/trade?t=") != -1) {
+        this.backpackElement = $("#offer");
+        this.lastElementInBackpack = $(self.backpackElement).children().last();
+    } else {
+        this.backpackElement = false;
+    }
 };
 /*
     Goes into a loop and stops when the response is acceptable
@@ -61,23 +59,21 @@ Inventory.prototype.loadInventory = function() {
     @param onlyForBackpack true or false, either load market prices for the backpack or the whole page
  */
 Inventory.prototype.getMarketPrices = function(onlyForBackpack) {
-    $(document).ready(function(){
-        var selector = (onlyForBackpack ? $("#backpack .item") : $(".item"));
-        var cachedItemList = [];
-        $(selector).each(function(index, value) {
-            var item = new Item(value);
-            if(!cachedItemList.hasOwnProperty(item.itemName)) {
-                cachedItemList[item.itemName] = [];
-            }
-            cachedItemList[item.itemName].push(item);
-        });
-
-        for (var index in cachedItemList) {
-            var itemForScience = cachedItemList[index][0];
-            itemForScience.myFriends = cachedItemList[index];
-            itemForScience.getMarketPrice();
+    var selector = (onlyForBackpack ? $("#backpack .item") : $(".item"));
+    var cachedItemList = [];
+    $(selector).each(function(index, value) {
+        var item = new Item(value);
+        if(!cachedItemList.hasOwnProperty(item.itemName)) {
+            cachedItemList[item.itemName] = [];
         }
+        cachedItemList[item.itemName].push(item);
     });
+
+    for (var index in cachedItemList) {
+        var itemForScience = cachedItemList[index][0];
+        itemForScience.myFriends = cachedItemList[index];
+        itemForScience.getMarketPrice();
+    }
 };
 
 /*
@@ -185,27 +181,25 @@ Inventory.prototype.determineBackpackType = function() {
     Adds LD `load inventory` button
  */
 Inventory.prototype.addInventoryLoadButton = function(element) {
-    $(document).ready(function(){
-        var self = this,
-            btn = $('<a class="button">Initiate backpack loading</a>');
+    var self = this,
+        btn = $('<a class="button">Initiate backpack loading</a>');
 
-        $(btn).click(function() {
-            self.loadInventory();
-            $(btn).hide();
+    $(btn).click(function() {
+        self.loadInventory();
+        $(btn).hide();
 
-            var invLoadingHtml = '<div class="inventory-loading-wrapper"><div id="LDloading" class="spin-1"></div><div id="LDerr"></div><div><a class="button" id="stopLD">Stop loading inventory</a></div></div>';
+        var invLoadingHtml = '<div class="inventory-loading-wrapper"><div id="LDloading" class="spin-1"></div><div id="LDerr"></div><div><a class="button" id="stopLD">Stop loading inventory</a></div></div>';
+        self.removeBackpackElements();
+        self.addElementsToBackpack(invLoadingHtml);
+
+        $("#stopLD").click(function() {
+            self.stopLoadingInventory();
             self.removeBackpackElements();
-            self.addElementsToBackpack(invLoadingHtml);
-
-            $("#stopLD").click(function() {
-                self.stopLoadingInventory();
-                self.removeBackpackElements();
-            });
-            self.inventoryIsLoading = true;
         });
-
-        $(element).append(btn);
+        self.inventoryIsLoading = true;
     });
+
+    $(element).append(btn);
 };
 /*
     Adds elements to backpack element
@@ -231,43 +225,41 @@ Inventory.prototype.removeBackpackElements = function() {
  Originally created by /u/ekim43, code cleaned up by us
  */
 function addInventoryStatistics() {
-    $(document).ready(function(){
-        var total = 0,
-            itemValues = {},
-            betSizes = {};
-        $("#backpack .item").each(function () {
-            var rarity = $(this).children("div.rarity")[0].classList[1],
-                e = $(this).children("div.value")[0].innerHTML;
-            var itemPrice = parseFloat(e.replace("$ ", ""));
-            rarity = (rarity === undefined ? "base" : rarity.toLowerCase());
-            if(itemValues.hasOwnProperty(rarity)) {
-                itemValues[rarity] = itemValues[rarity] + itemPrice;
-            } else {
-                itemValues[rarity] = itemPrice;
-            }
-            total += itemPrice;
-        });
-        for (var key in itemValues) {
-            if (itemValues.hasOwnProperty(key)) {
-                itemValues[key] = itemValues[key].toFixed(2);
-            }
+    var total = 0,
+        itemValues = {},
+        betSizes = {};
+    $("#backpack .item").each(function () {
+        var rarity = $(this).children("div.rarity")[0].classList[1],
+            e = $(this).children("div.value")[0].innerHTML;
+        var itemPrice = parseFloat(e.replace("$ ", ""));
+        rarity = (rarity === undefined ? "base" : rarity.toLowerCase());
+        if(itemValues.hasOwnProperty(rarity)) {
+            itemValues[rarity] = itemValues[rarity] + itemPrice;
+        } else {
+            itemValues[rarity] = itemPrice;
         }
-        betSizes.small = (.05 * total).toFixed(2);
-        betSizes.medium = (.1 * total).toFixed(2);
-        betSizes.large = (.2 * total).toFixed(2);
-        if(total > 0) {
-            $("#backpack").prepend('<div class="inventoryStatisticsBox">' +
-                '<div id="totalInvValue">Your items are worth: <span>' + total.toFixed(2) + '</span></div>' +
-                '<div id="rarityValuesWrapper"><div id="rarityValues"></div></div>' +
-                '<div id="betSizeValues">' +
-                '<span>Small bet: ' + betSizes.small + '</span>' +
-                '<span>Medium bet: ' + betSizes.medium + '</span>' +
-                '<span>Large bet: ' + betSizes.large + '</span>' +
-                '</div>' +
-                '</div>');
-            $.each(itemValues, function(i, v) {
-                $("#rarityValues").append('<div class="rarityContainer"><div><span class="' + i + '">' + capitaliseFirstLetter(i) + '</span>: ' + v + '</div></div>');
-            });
-        }
+        total += itemPrice;
     });
+    for (var key in itemValues) {
+        if (itemValues.hasOwnProperty(key)) {
+            itemValues[key] = itemValues[key].toFixed(2);
+        }
+    }
+    betSizes.small = (.05 * total).toFixed(2);
+    betSizes.medium = (.1 * total).toFixed(2);
+    betSizes.large = (.2 * total).toFixed(2);
+    if(total > 0) {
+        $("#backpack").prepend('<div class="inventoryStatisticsBox">' +
+            '<div id="totalInvValue">Your items are worth: <span>' + total.toFixed(2) + '</span></div>' +
+            '<div id="rarityValuesWrapper"><div id="rarityValues"></div></div>' +
+            '<div id="betSizeValues">' +
+            '<span>Small bet: ' + betSizes.small + '</span>' +
+            '<span>Medium bet: ' + betSizes.medium + '</span>' +
+            '<span>Large bet: ' + betSizes.large + '</span>' +
+            '</div>' +
+            '</div>');
+        $.each(itemValues, function(i, v) {
+            $("#rarityValues").append('<div class="rarityContainer"><div><span class="' + i + '">' + capitaliseFirstLetter(i) + '</span>: ' + v + '</div></div>');
+        });
+    }
 }

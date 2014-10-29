@@ -7,37 +7,29 @@ var uniqueItemsFetched = 0;
 var Item = function(item) {
     var self = this;
     this.item = item;
-    if (["complete", "interactive"].indexOf(document.readyState) !== -1)
-        this.itemName = $(".smallimg", this.item).attr("alt");
-    else {
-        $(document).ready((function(){
-            this.itemName = $(".smallimg", this.item).attr("alt");
-        }).bind(this));
-    }
+    this.itemName = $(".smallimg", this.item).attr("alt");
 };
 
 Item.prototype.insertMarketValue = function(lowestPrice) {
 	var self = this;
-    $(document).ready(function(){
-        if(this.myFriends) {
-            for (var index in self.myFriends) {
-                var $myLittleItem = $(self.myFriends[index]["item"]);
-                $myLittleItem.addClass('marketPriced');
-                $myLittleItem.find(".rarity").html(lowestPrice);
-            }
+    if(this.myFriends) {
+        for (var index in self.myFriends) {
+            var $myLittleItem = $(self.myFriends[index]["item"]);
+            $myLittleItem.addClass('marketPriced');
+            $myLittleItem.find(".rarity").html(lowestPrice);
         }
-        else {
-            $(".item").each(function() {
-                var $theItem = $(this);
-                if(!$theItem.hasClass('marketPriced')) {
-                    if ($theItem.find("img.smallimg").attr("alt") == self.itemName) {
-                        $theItem.find(".rarity").html(lowestPrice);
-                        $theItem.addClass('marketPriced');
-                    }
+    }
+    else {
+        $(".item").each(function() {
+            var $theItem = $(this);
+            if(!$theItem.hasClass('marketPriced')) {
+                if ($theItem.find("img.smallimg").attr("alt") == self.itemName) {
+                    $theItem.find(".rarity").html(lowestPrice);
+                    $theItem.addClass('marketPriced');
                 }
-            });
-        }
-    });
+            }
+        });
+    }
 };
 
 Item.prototype.getMarketPrice = function() {
