@@ -433,12 +433,28 @@ function updateCurrencyConversion() {
     oReq.open("get", "https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20yahoo.finance.xchange%20where%20pair%20in%20(%22USDUSD%22%2C%20%22USDGBP%22%2C%20%22USDEUR%22%2C%20%22USDRUB%22%2C%20%22USDCAD%22%2C%20%22USDAUD%22)&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback=", true);
     oReq.send();
 }
+function checkForExpiredItems(appID) {
+    console.log("Checking for expired items on " + appID);
+    var urlStart = (appID == 730 ? "http://csgolounge.com/" : "http://dota2lounge.com/");
+
+    get(urlStart + "mybets", function() {
+        var doc = document.implementation.createHTMLDocument("");
+        doc.body.innerHTML = this.responseText;
+        var items = $(doc).find('.item.Warning');
+        if(items.length) {
+            createNotification("Items expiring soon", "There are items on " + (appID == 730 ? "CS:GO Lounge" : "DOTA2 Lounge") + " about to expire.\nRequest them back if you don't want to lose them." , "regular", null, false);
+        }
+    });
+}
 
 chrome.alarms.create('itemListUpdate', {
     periodInMinutes: 60
 });
 chrome.alarms.create('currencyUpdate', {
     periodInMinutes: 10080 // once a week
+});
+chrome.alarms.create('expiredReturnsChecking', {
+    periodInMinutes: 360
 });
 chrome.alarms.onAlarm.addListener(function(alarm) {
     if(alarm.name == "itemListUpdate") {
@@ -453,6 +469,14 @@ chrome.alarms.onAlarm.addListener(function(alarm) {
     if(alarm.name == "currencyUpdate") {
         console.log("Currency update!");
         updateCurrencyConversion();
+    }
+    if(alarm.name == "expiredReturnsChecking") {
+        if(["1","2"].indexOf(LoungeUser.userSettings.enableAuto) !== -1) {
+            checkForExpiredItems(570);
+        }
+        if(["1","3"].indexOf(LoungeUser.userSettings.enableAuto) !== -1) {
+            checkForExpiredItems(730);
+        }
     }
 });
 /*
