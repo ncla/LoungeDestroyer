@@ -39,9 +39,13 @@ $(document).ready(function(){
 
 				// link to offer
 				if (elm.className === "button") {
+					var placedTime = parseInt(localStorage.whenbet) - parseInt(localStorage.whenret) > 0 ?
+					                 parseInt(localStorage.whenbet) :
+					                 parseInt(localStorage.whenret);
+
 					queue.offer = elm.href || false;
-					queue.time = parseInt(localStorage.whenbet) ?
-					             parseInt(localStorage.whenbet) + 420000 :
+					queue.time = placedTime ?
+					             placedTime + 420000 :
 					             0;
 				}
 			}
