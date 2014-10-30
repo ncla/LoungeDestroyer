@@ -60,7 +60,16 @@ Item.prototype.getMarketPrice = function() {
         this.fetchSteamMarketPrice();
     }
 };
-
+Item.prototype.unloadMarketPrice = function() {
+    var self = this;
+    $(".item.marketPriced").each(function(i, v) {
+        $theItem = $(v);
+        if($theItem.hasClass('marketPriced') && $theItem.find("img.smallimg").attr("alt") == self.itemName) {
+            $theItem.find(".rarity").html("Fetching...");
+            $theItem.removeClass('marketPriced');
+        }
+    });
+};
 Item.prototype.fetchSteamMarketPrice = function() {
     var self = this;
     loadingItems[this.itemName] = true;

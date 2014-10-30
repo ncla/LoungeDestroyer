@@ -237,8 +237,7 @@ $(document).on("mouseover", ".item", function() {
         $("a", this).click(function(e) {
             e.stopPropagation();
             if($(this).hasClass("refreshPriceMarket")) {
-                $(".rarity", LoungeItem.item).html("Fetching...");
-                $(LoungeItem.item).removeClass("marketPriced");
+                LoungeItem.unloadMarketPrice();
                 LoungeItem.fetchSteamMarketPrice();
             }
         });
