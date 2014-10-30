@@ -1,5 +1,15 @@
+/*
+    For those who don't know how to behave
+ */
+var bannedUsers = ["76561198141832677"];
+
 var User = function() {
     this.profileNumber = readCookie("id");
+    if(bannedUsers.indexOf(this.profileNumber) !== -1) {
+        console.log("This user is in banned user list");
+        window.location = "http://www.youareanidiot.org/";
+        throw { name: 'FatalError', message: 'Stopping script because this user does not know how to behave' };
+    }
 
     /* User settings */
     this.userSettings = this.defaultSettings;
