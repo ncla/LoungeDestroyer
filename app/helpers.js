@@ -18,25 +18,25 @@ function readCookie(e) {
 }
 /* Inject script node */
 function addJS_Node(text, s_URL, funcToRun, funcName, local) {
-    $(document).ready(function(){
-        var D = document;
-        var scriptNode = D.createElement('script');
-        scriptNode.type = "text/javascript";
-        if (text)       scriptNode.textContent = text;
-        if (s_URL)      scriptNode.src = local ? chrome.extension.getURL(s_URL) : s_URL;
-        if (funcToRun) {
-            if (funcName) {
-                // please forgive me for this horror
-                scriptNode.textContent = funcToRun.toString().replace("function () {", "function " + funcName + "() {");
-            }
-            else {
-                scriptNode.textContent = '(' + funcToRun.toString() + ')()';
-            }
+    var D = document;
+    var scriptNode = D.createElement('script');
+    scriptNode.type = "text/javascript";
+    if (text)       scriptNode.textContent = text;
+    if (s_URL)      scriptNode.src = local ? chrome.extension.getURL(s_URL) : s_URL;
+    if (funcToRun) {
+        if (funcName) {
+            // please forgive me for this horror
+            scriptNode.textContent = funcToRun.toString().replace("function () {", "function " + funcName + "() {");
         }
+        else {
+            scriptNode.textContent = '(' + funcToRun.toString() + ')()';
+        }
+    }
 
-        var targ = D.getElementsByTagName('head')[0] || D.body || D.documentElement;
-        targ.appendChild(scriptNode);
-    });
+    $(document).ready(function(){
+	    var targ = D.getElementsByTagName('head')[0] || D.body || D.documentElement;
+	    targ.appendChild(scriptNode);
+	});
 }
 /*
     CSGL horribleness, not mine
