@@ -4,7 +4,7 @@ LoungeUser.loadUserSettings(function() {
     bet.autoDelay = parseInt(LoungeUser.userSettings.autoDelay) * 1000 || 5000;
 });
 
-var lastTimeUserVisitedCSGL = null;
+var lastTimeUserVisited = null;
 
 chrome.extension.onMessage.addListener(function (request, sender, sendResponse) {
     // Make changes to LoungeUser user settings once the settings are changed from extension pop-up
@@ -111,9 +111,8 @@ function sendMessageToContentScript(message, tabId) {
 // if bot status update is redirected
 chrome.webRequest.onHeadersReceived.addListener(
     function(details) {
-        if(details.url.indexOf("csgolounge.com") != -1) {
-            lastTimeUserVisitedCSGL = new Date().getTime();
-        }
+        lastTimeUserVisited = new Date().getTime(); // Used for price list updating, be careful if the URL list gets a new domain though
+
         var headers = details.responseHeaders,
             blockingResponse = {};
         var originalURL = details.url;
@@ -413,7 +412,7 @@ function updateMarketPriceList() {
     oReq.onerror = function() {
         chrome.storage.local.set({"marketPriceList": {}});
     };
-    oReq.open("get", "http://api.ncla.me/items.json", true);
+    oReq.open("get", "http://api.ncla.me/itemlist.php", true);
     oReq.send();
 }
 
@@ -459,7 +458,7 @@ chrome.alarms.create('expiredReturnsChecking', {
 chrome.alarms.onAlarm.addListener(function(alarm) {
     if(alarm.name == "itemListUpdate") {
         console.log("Checking if user has visited CS:GO Lounge recently..");
-        var msSinceLastVisit = (new Date().getTime() - lastTimeUserVisitedCSGL);
+        var msSinceLastVisit = (new Date().getTime() - lastTimeUserVisited);
         console.log("Since last visit on CS:GL has passed: " + msSinceLastVisit);
         // Updating only if the user has recently visited CS:GL (less than 2 hours). Might want to rethink this.
         if(msSinceLastVisit < 7200000) {
