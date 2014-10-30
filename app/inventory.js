@@ -181,23 +181,25 @@ Inventory.prototype.determineBackpackType = function() {
     Adds LD `load inventory` button
  */
 Inventory.prototype.addInventoryLoadButton = function(element) {
-    var self = this;
-        var btn = $('<a class="button">Initiate backpack loading</a>');
-        $(btn).click(function() {
-            self.loadInventory();
-            $(btn).hide();
+    var self = this,
+        btn = $('<a class="button">Initiate backpack loading</a>');
 
-            var invLoadingHtml = '<div class="inventory-loading-wrapper"><div id="LDloading" class="spin-1"></div><div id="LDerr"></div><div><a class="button" id="stopLD">Stop loading inventory</a></div></div>';
+    $(btn).click(function() {
+        self.loadInventory();
+        $(btn).hide();
+
+        var invLoadingHtml = '<div class="inventory-loading-wrapper"><div id="LDloading" class="spin-1"></div><div id="LDerr"></div><div><a class="button" id="stopLD">Stop loading inventory</a></div></div>';
+        self.removeBackpackElements();
+        self.addElementsToBackpack(invLoadingHtml);
+
+        $("#stopLD").click(function() {
+            self.stopLoadingInventory();
             self.removeBackpackElements();
-            self.addElementsToBackpack(invLoadingHtml);
-
-            $("#stopLD").click(function() {
-                self.stopLoadingInventory();
-                self.removeBackpackElements();
-            });
-            self.inventoryIsLoading = true;
         });
-        $(element).append(btn);
+        self.inventoryIsLoading = true;
+    });
+
+    $(element).append(btn);
 };
 /*
     Adds elements to backpack element

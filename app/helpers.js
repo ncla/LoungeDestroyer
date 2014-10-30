@@ -33,8 +33,10 @@ function addJS_Node(text, s_URL, funcToRun, funcName, local) {
         }
     }
 
-    var targ = D.getElementsByTagName('head')[0] || D.body || D.documentElement;
-    targ.appendChild(scriptNode);
+    $(document).ready(function(){
+	    var targ = D.getElementsByTagName('head')[0] || D.body || D.documentElement;
+	    targ.appendChild(scriptNode);
+	});
 }
 /*
     CSGL horribleness, not mine

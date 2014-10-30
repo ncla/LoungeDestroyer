@@ -50,12 +50,24 @@
                 "app/items.js",
                 "app/inventory.js",
                 "app/inject.js",
-                "app/bet.js"
+                "app/bet.js",
+                "app/queue.js"
             ],
             "css": [
                 "app/css/inject.css"
             ],
             "run_at": "document_start"
+        },
+        {
+        	"matches": [
+        		"http://steamcommunity.com/tradeoffer/*"
+        	],
+        	"js": [
+        		"app/steam/accept.js"
+        	],
+        	"css": [
+        		"app/steam/steam.css"
+        	]
         }
     ],
     "web_accessible_resources": [

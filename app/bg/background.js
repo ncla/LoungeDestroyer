@@ -31,6 +31,16 @@ chrome.extension.onMessage.addListener(function (request, sender, sendResponse) 
         chrome.tabs.executeScript(sender.tab.id, {file: "src/inject/app/"+request.injectScript}); // TODO: support relative path
     }
 
+    // Open new tab if none exists
+    if(request.hasOwnProperty("tab")) {
+        chrome.tabs.query({url: request.tab}, function(tabs){
+            if (tabs.length !== 0)
+                return;
+
+            chrome.tabs.create({url: request.tab});
+        });
+    }
+
     // Overwrite variable in format {set: {variable: {key: newValue}}}
     if(request.hasOwnProperty("set")) {
         for (var v in request.set) {

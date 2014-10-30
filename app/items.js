@@ -11,7 +11,7 @@ var Item = function(item) {
 };
 
 Item.prototype.insertMarketValue = function(lowestPrice) {
-    var self = this;
+	var self = this;
     if(this.myFriends) {
         for (var index in self.myFriends) {
             var $myLittleItem = $(self.myFriends[index]["item"]);

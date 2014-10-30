@@ -2,7 +2,7 @@ var betStatus = {
 	enabled: false,
 	type: "autoBet", // autoBet || autoReturn
 	betTime: 0,
-	rebetDelay: 10000
+	rebetDelay: 5000
 };
 
 function enableAuto(worth, match, tries, error) {
@@ -72,9 +72,9 @@ chrome.runtime.sendMessage({get: "autoBet"}, function(data){
 	betStatus.enabled = true;
 	betStatus.type = data.type;
 
-    $(document).ready(function(){
-        enableAuto(data.worth, data.matchId, data.numTries, data.error);
-    });
+	$(document).ready(function(){
+	    enableAuto(data.worth, data.matchId, data.numTries, data.error);
+	});
 });
 
 // listen for auto-betting updates
