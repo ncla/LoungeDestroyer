@@ -114,7 +114,7 @@ function init() {
         })();
 
         if(LoungeUser.userSettings["itemMarketPricesv2"] == "2") {
-            inventory.getMarketPrices(false);
+            getMarketPricesFromParent();
         }
         if(document.URL.indexOf("/mybets") != -1) {
             if (LoungeUser.userSettings.renameButtons === "1") {
@@ -189,6 +189,89 @@ function init() {
                 inventory.stopLoadingInventory();
             });
         }
+
+        // add custom 'Preview' buttons to trades that don't have it
+        // first create preview element if it doesn't exist
+        (function(){
+            if (LoungeUser.userSettings.addTradePreviews === "0")
+                return;
+
+            var previewElm = document.getElementById("preview");
+            
+            if (previewElm)
+                return;
+
+            if (document.querySelector(".tradepoll")) {
+                previewElm = document.createElement("section");
+                previewElm.id = "preview";
+                previewElm.className = "destroyer";
+                document.body.appendChild(previewElm);
+                customPreview = true;
+            }
+            previewElm = $(previewElm);
+
+            $(".tradepoll").each(function(ind, elm){
+                if (!elm.querySelector(".tradeheader > span > a.button")) {
+                    var header = elm.querySelector(".tradeheader"),
+                        span = header.querySelector("span[style=\"float: right;\"]");
+
+                    if (!header)
+                        return;
+                    if (!span) {
+                        span = document.createElement("span");
+                        span.style.float = "right";
+                        header.appendChild(span);
+                    }
+
+                    var tradeId = elm.querySelector("a[href^=\"trade?\"]").getAttribute("href").replace("trade?t=",""),
+                        self = this instanceof $ ? this : $(this),
+                        btn = document.createElement("a");
+
+                    btn.className = "button"
+                    btn.innerHTML = "Preview";
+                    btn.style.float = "none";
+                    // magic happens here
+                    btn.addEventListener("click", function(){
+                        if (previewElm.attr("data-index") == ind) {
+                            previewElm.hide();
+                            previewElm.attr("data-index", "-1");
+                            return;
+                        }
+
+                        previewElm.show();
+                        previewElm.html('<img src="../img/load.gif" id="loading" style="margin: 0.75em 2%">');
+
+                        var offset = self.offset();
+                        if ($(document).width() > offset.left + self.outerWidth() + Math.max(410, $(document).width()*0.5)) {
+                            offset.top = Math.floor(offset.top - 90);
+                            offset.left = Math.floor(offset.left + self.outerWidth() + 10);
+                        } else {
+                        // position below if not enough space on right
+                            offset.top = Math.floor(offset.top+self.height()+10);
+                            offset.left = Math.floor(offset.left);
+                        }
+                        previewElm.offset(offset);
+
+                        $.ajax({
+                            url: "ajax/livePreview.php",
+                            type: "POST",
+                            data: "t="+tradeId,
+                            success: function(d){
+                                previewElm.html(d).slideDown("fast");
+                                previewElm.attr("data-index", ind);
+
+                                // add market prices to items if they should auto-load
+                                if (LoungeUser.userSettings.itemMarketPricesv2 == "2") {
+                                    getMarketPricesFromParent(document.getElementById("preview"));
+                                }
+                            }
+                        })
+                    });
+
+                    span.appendChild(btn);
+                }
+            });
+        })();
 
         container.querySelector("input").value = LoungeUser.userSettings.autoDelay || 5;
     });
