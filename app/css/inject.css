@@ -423,5 +423,6 @@ http://codepen.io/larrygeams/pen/nhgze
     box-shadow: 0 5px 20px rgba(0,0,0,.5);
     max-width: 50%;
     min-width: 410px;
+    z-index: 9;
 }
 #preview.destroyer .tradepoll { min-height: 0; }
