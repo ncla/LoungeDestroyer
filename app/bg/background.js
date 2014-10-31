@@ -470,10 +470,10 @@ chrome.alarms.onAlarm.addListener(function(alarm) {
         updateCurrencyConversion();
     }
     if(alarm.name == "expiredReturnsChecking") {
-        if(["1","2"].indexOf(LoungeUser.userSettings.enableAuto) !== -1) {
+        if(["1","2"].indexOf(LoungeUser.userSettings.notifyExpiredItems) !== -1) {
             checkForExpiredItems(570);
         }
-        if(["1","3"].indexOf(LoungeUser.userSettings.enableAuto) !== -1) {
+        if(["1","3"].indexOf(LoungeUser.userSettings.notifyExpiredItems) !== -1) {
             checkForExpiredItems(730);
         }
     }
