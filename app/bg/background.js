@@ -233,7 +233,12 @@ function checkNewMatches(ajaxResponse, appID) {
             var tournament = $(".whenm:eq(1)", value).text().trim();
             var teamA = $(".teamtext:eq(0) b", value).text().trim();
             var teamB = $(".teamtext:eq(1) b", value).text().trim();
-            var when = $(".matchheader .whenm:eq(0)", value).text().trim();
+            var matchWhenTextNode = $(".matchheader .whenm:eq(0)", value)
+                .contents()
+                .filter(function() {
+                    return this.nodeType === 3;
+                });
+            var when = $(matchWhenTextNode).text().trim() || " in near future..";
             activeMatches[matchID] = {matchID: matchID, tournament: tournament, teamA: teamA, teamB: teamB, when: when };
         }
     });
