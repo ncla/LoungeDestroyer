@@ -51,7 +51,8 @@
                 "app/inventory.js",
                 "app/inject.js",
                 "app/bet.js",
-                "app/queue.js"
+                "app/queue.js",
+                "app/trades.js"
             ],
             "css": [
                 "app/css/inject.css"
@@ -69,8 +70,5 @@
         		"app/steam/steam.css"
         	]
         }
-    ],
-    "web_accessible_resources": [
-        "app/prefilter.js"
     ]
 }

@@ -280,6 +280,7 @@ function checkNewMatches(ajaxResponse, appID) {
         }
         else {
             $.each(matchesToNotificate, function(index, value) {
+                var msg = (value.teamA.length > 0) ? (value.teamA + " vs. " + value.teamB + " @ " + value.tournament + "\nMatch begins " + value.when) : (value.tournament + "\nMatch begins " + value.when);
                 createNotification(
                     "A new " + (appID == 730 ? "CS:GO" : "DOTA2") + " match has been added!",
                     value.teamA + " vs. " + value.teamB + " @ " + value.tournament + "\nMatch begins " + value.when,
@@ -403,16 +404,7 @@ function updateMarketPriceList() {
     oReq.onload = function() {
         console.log(JSON.parse(this.responseText));
         chrome.storage.local.set({"marketPriceList": JSON.parse(this.responseText)});
-        if(isDevMode()) {
-            console.log(new Date() + " -- Item price list has been updated!");
-            createNotification(
-                "Item price list has been updated!",
-                "",
-                "regular",
-                null,
-                false
-            );
-        }
+        console.log(new Date() + " -- Item price list has been updated!");
     };
     oReq.onerror = function() {
         chrome.storage.local.set({"marketPriceList": {}});
