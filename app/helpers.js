@@ -51,32 +51,6 @@ function capitaliseFirstLetter(string)
 }
 
 /**
- * Get market price for every item that is descendant of elm
- * @param {Element} elm - parent element
- */
-function getMarketPricesFromParent(elm) {
-    if (!elm)
-        elm = document.body;
-
-    var cachedItemList = [],
-        elms = elm.querySelectorAll(".item");
-
-    for (var i = 0, j = elms.length; i < j; ++i) {
-        var item = new Item(elms[i]);
-        if (!cachedItemList.hasOwnProperty(item.itemName)) {
-            cachedItemList[item.itemName] = [];
-        }
-        cachedItemList[item.itemName].push(item);
-    }
-
-    for (var index in cachedItemList) {
-        var itemForScience = cachedItemList[index][0];
-        itemForScience.myFriends = cachedItemList[index];
-        itemForScience.getMarketPrice();
-    }
-}
-
-/**
  * Perform a POST request to a url
  * @param {string} url - The URL to request to
  * @param {object} data - the POST data
