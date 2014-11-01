@@ -211,25 +211,32 @@ function init() {
             previewElm = $(previewElm);
 
             $(".tradepoll").each(function(ind, elm){
-                if (!elm.querySelector(".tradeheader > span > a.button")) {
+                if (!elm.querySelector(".tradeheader a.button[onclick^=\"livePreview\"]")) {
                     var header = elm.querySelector(".tradeheader"),
-                        span = header.querySelector("span[style=\"float: right;\"]");
+                        span = header.querySelector("span[style=\"float: right;\"]"),
+                        btn = document.createElement("a");
+
+                    btn.className = "button";
+                    btn.innerHTML = "Preview";
 
                     if (!header)
                         return;
                     if (!span) {
-                        span = document.createElement("span");
-                        span.style.float = "right";
-                        header.appendChild(span);
+                        // if buttons already exist in header, don't place within span
+                        if (elm.querySelector(".tradeheader > a.button")) {
+                            span = header;
+                            btn.className = "buttonright";
+                        } else {
+                            span = document.createElement("span");
+                            span.style.float = "right";
+                            header.appendChild(span);
+                            btn.style.float = "none";
+                        }
                     }
 
                     var tradeId = elm.querySelector("a[href^=\"trade?\"]").getAttribute("href").replace("trade?t=",""),
-                        self = this instanceof $ ? this : $(this),
-                        btn = document.createElement("a");
+                        self = this instanceof $ ? this : $(this);
 
-                    btn.className = "button"
-                    btn.innerHTML = "Preview";
-                    btn.style.float = "none";
                     // magic happens here
                     btn.addEventListener("click", function(){
                         if (previewElm.attr("data-index") == ind) {
