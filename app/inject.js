@@ -306,24 +306,26 @@ $(document).ready(function() {
 /*
     Mouseover action for items
  */
-$(document).on("mouseover", ".item", function() {
+$(document).on("mouseover", (appID == 730 ? ".item" : ".oitm"), function() {
     var LoungeItem = new Item($(this));
     var settingMarketPrices = LoungeUser.userSettings["itemMarketPricesv2"];
     if(settingMarketPrices == "1" || settingMarketPrices == "2") {
         LoungeItem.getMarketPrice();
     }
-    if($(this).find(".steamMarketURL").length == 0) {
-        $("a:contains('Market')", this).remove();
-        try {
-            $("a:contains('Preview')", this)[0].nextSibling.remove();
-        } catch(e) {} // Shut the fuck up :)
+    if(!$(this).hasClass("ld-appended")) {
+        if(nonMarketItems.indexOf(LoungeItem.itemName) == -1) {
+            if($("a:contains('Market')", this).length) {
+                $("a:contains('Market')", this).html("Market Listings");
+            } else {
+                $(".name", this).append('<br/><a href="' + LoungeItem.generateMarketURL() + '" target="_blank">Market Listings</a>');
+            }
 
-        var elementToAppendAfter = ($(this).find("a.button").length ? $(this).find("b:eq(0)") : $(this).find('.name a[onclick="previewItem($(this))"]'));
+            $(".name", this).append('<br/><a href="' + LoungeItem.generateMarketSearchURL() + '" target="_blank">Market Search</a>' +
+                '<br/><br/><small><a class="refreshPriceMarket">Show Steam market price</a></small>');
+        }
 
-        $(this).find(elementToAppendAfter).after('<br/>' +
-            '<br/><a class="steamMarketURL" href="' + LoungeItem.generateMarketURL() + '" target="_blank">Market Listings</a><br/>' +
-            '<a href="' + LoungeItem.generateMarketSearchURL() + '" target="_blank">Market Search</a><br/><br/>' +
-            '<small><a class="refreshPriceMarket">Show Steam market price</a></small>');
+        $(this).addClass("ld-appended");
+        
         $("a", this).click(function(e) {
             e.stopPropagation();
             if($(this).hasClass("refreshPriceMarket")) {
