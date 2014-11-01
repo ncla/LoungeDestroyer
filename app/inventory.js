@@ -54,26 +54,13 @@ Inventory.prototype.loadInventory = function() {
         }
     });
 };
+
 /*
     Performance friendly version of loading market prices on huge backpacks
     @param onlyForBackpack true or false, either load market prices for the backpack or the whole page
  */
-Inventory.prototype.getMarketPrices = function(onlyForBackpack) {
-    var selector = (onlyForBackpack ? $("#backpack .item") : $(".item"));
-    var cachedItemList = [];
-    $(selector).each(function(index, value) {
-        var item = new Item(value);
-        if(!cachedItemList.hasOwnProperty(item.itemName)) {
-            cachedItemList[item.itemName] = [];
-        }
-        cachedItemList[item.itemName].push(item);
-    });
-
-    for (var index in cachedItemList) {
-        var itemForScience = cachedItemList[index][0];
-        itemForScience.myFriends = cachedItemList[index];
-        itemForScience.getMarketPrice();
-    }
+Inventory.prototype.getMarketPrices = function() {
+    getMarketPricesFromParent(document.getElementById("backpack"));
 };
 
 /*

@@ -32,7 +32,8 @@ User.prototype.defaultSettings =
     enableAuto: "1",
     renameButtons: "1",
     useCachedPriceList: "1",
-    notifyExpiredItems: "1"
+    notifyExpiredItems: "1",
+    addTradePreviews: "1"
 };
 
 User.prototype.loadUserSettings = function(callback) {
