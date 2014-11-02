@@ -39,9 +39,9 @@ $(document).ready(function(){
 
 				// link to offer
 				if (elm.className === "button") {
-					var placedTime = parseInt(localStorage.whenbet) - parseInt(localStorage.whenret) > 0 ?
-					                 parseInt(localStorage.whenbet) :
-					                 parseInt(localStorage.whenret);
+					var placedTime = parseInt(localStorage.whenret) > parseInt(localStorage.whenbet) ?
+					                 parseInt(localStorage.whenret) :
+					                 parseInt(localStorage.whenbet);
 
 					queue.offer = elm.href || false;
 					queue.time = placedTime ?

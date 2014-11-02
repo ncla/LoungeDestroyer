@@ -424,5 +424,6 @@ http://codepen.io/larrygeams/pen/nhgze
     max-width: 50%;
     min-width: 410px;
     z-index: 9;
+    display: none;
 }
 #preview.destroyer .tradepoll { min-height: 0; }
