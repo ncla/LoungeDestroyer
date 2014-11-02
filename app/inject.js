@@ -213,11 +213,14 @@ function init() {
             $(".tradepoll").each(function(ind, elm){
                 if (!elm.querySelector(".tradeheader a.button[onclick^=\"livePreview\"]")) {
                     var header = elm.querySelector(".tradeheader"),
-                        span = header.querySelector("span[style=\"float: right;\"]"),
+                        span = header.querySelector("span[style*=\"float: right\"]"),
                         btn = document.createElement("a");
 
                     btn.className = "button";
                     btn.innerHTML = "Preview";
+                    btn.style.float = "none";
+
+                    console.log(span);
 
                     if (!header)
                         return;
@@ -226,11 +229,11 @@ function init() {
                         if (elm.querySelector(".tradeheader > a.button")) {
                             span = header;
                             btn.className = "buttonright";
+                            btn.style.float = "right";
                         } else {
                             span = document.createElement("span");
                             span.style.float = "right";
                             header.appendChild(span);
-                            btn.style.float = "none";
                         }
                     }
 
