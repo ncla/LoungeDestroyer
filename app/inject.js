@@ -229,11 +229,11 @@ function init() {
                         if (elm.querySelector(".tradeheader > a.button")) {
                             span = header;
                             btn.className = "buttonright";
+                            btn.style.float = "right";
                         } else {
                             span = document.createElement("span");
                             span.style.float = "right";
                             header.appendChild(span);
-                            btn.style.float = "none";
                         }
                     }
 
