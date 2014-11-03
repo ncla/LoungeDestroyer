@@ -220,8 +220,6 @@ function init() {
                     btn.innerHTML = "Preview";
                     btn.style.float = "none";
 
-                    console.log(span);
-
                     if (!header)
                         return;
                     if (!span) {
