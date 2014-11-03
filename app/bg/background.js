@@ -426,6 +426,9 @@ function updateCurrencyConversion() {
         console.log(conversionList);
         chrome.storage.local.set({"currencyConversionRates": conversionList});
     };
+    oReq.onerror = function() {
+    	setTimeout(updateCurrencyConversion, 30000);
+    }
     oReq.open("get", "https://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20yahoo.finance.xchange%20where%20pair%20in%20(%22USDUSD%22%2C%20%22USDGBP%22%2C%20%22USDEUR%22%2C%20%22USDRUB%22%2C%20%22USDCAD%22%2C%20%22USDAUD%22)&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback=", true);
     oReq.send();
 }
