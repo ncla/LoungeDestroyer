@@ -6,9 +6,8 @@ An enhancer for CS:GL site, here is a [video demonstration](http://youtu.be/JT2a
 LoungeDestroyer is currently being converted/developed into a Chrome extension so the feature list is not full.
 
 ## Features
-* ~~Place bet properly~~
-* Automatically loads market prices for all the items in your backpack
-* ~~Request your hard earned items to be returned, properly of course~~
+* Auto-bet/-return/-accept trade offers
+* Automatically loads market prices for all items
 * Redirect from wait.html to the page you intended to visit
 * Steam market prices for items when you hover on an item
 * ~~Auto-bump your trade offers~~
@@ -20,7 +19,9 @@ LoungeDestroyer is currently being converted/developed into a Chrome extension s
 * Notifications for new comments on trades and offers
 * Notifications for new matches
 * Notifications for when the bots go online
+* Notifications for when your returns are about to expire
 * Trade descriptions
+* Trade preview on all trades
 * Statistics about your betting inventory (credit to ekim43)
 
 ## Discussion
@@ -37,5 +38,5 @@ It is possible that CSGOLounge.com might update their site which breaks LoungeDe
 
 ## Screenshots
 
-![Market prices for items, market listing links and market search added in popup](http://puu.sh/ax80W/4aa5cf71e2.png)
-![LoungeDestroyer settings window](http://puu.sh/az3tA/beb6194190.png)
+![Trade previews & descriptions](http://i.imgur.com/CpYE0lB.png)
+![Auto-betting/-returning](http://i.imgur.com/ug7U0bE.png)
