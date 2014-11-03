@@ -114,7 +114,6 @@ div.trade-description {
     white-space: pre-wrap;
     border-radius: 3px;
     overflow: hidden;
-    z-index: -100;
 }
 .trade-description p {
     padding: 12px 5px;
