@@ -38,5 +38,8 @@ It is possible that CSGOLounge.com might update their site which breaks LoungeDe
 
 ## Screenshots
 
-![Trade previews & descriptions](http://i.imgur.com/CpYE0lB.png)
-![Auto-betting/-returning](http://i.imgur.com/ug7U0bE.png)
+<p align="center" style="text-align: center">
+<img alt="Trade previews & descriptions" src="http://i.imgur.com/CpYE0lB.png">
+<img style="margin 0 10px" alt="Auto-betting/-returning" src="http://i.imgur.com/lBzcM8V.png">
+<img style="margin: 0 10px" alt="Auto-accept offer" src="http://i.imgur.com/vhhKvb8.png">
+</p>
