@@ -1,6 +1,6 @@
 The epic CONTRIBUTING.md file. If you are willing to contribute to LoungeDestroyer, this file is for you.
 
-#Application structure:
+#Application structure
 
 Everything that is LoungeDestroyer application can be found in `app/` directory.
 With this project I want MVC and OOP feel in the application. Trades, bets, queues, items and so on have their own class and their own seperate file. Those should all be considered as *models* part of application, except for `inject.js` which is supposed to be controller part of application. `inject.js` should not have any *model* part of MVC, this file is for interecating with the *view* part of the application (which is the pages we develop for). There is another exception `helpers.js` which is supposed to be for 3rd party functions and not application related stuff. 
