@@ -45,7 +45,7 @@ Item.prototype.getMarketPrice = function() {
                 var currData = currencyData[LoungeUser.userSettings["marketCurrency"]];
                 var conversionRate = currencies[currData["name"]];
                 var convertedPrice = (storageMarketItems[appID][this.itemName]["value"] * conversionRate).toFixed(2);
-                if (convertedPrice) {
+                if (!isNaN(convertedPrice)) {
 	                var priceHtml = (currData["symbolBeforeValue"] === true ? currData["htmlSymbol"] + " " + convertedPrice : convertedPrice + " " + currData["htmlSymbol"]);
 	                return this.insertMarketValue(priceHtml);
 	            }

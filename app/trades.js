@@ -9,15 +9,13 @@ var Trade = function(tradeElement) {
     } else {
         console.log("Anchor not found");
     }
-
-    //console.log(self.tradeID.match(/\d+$/)[0]);
 };
 Trade.prototype.generateTradeURL = function() {
     return;
 };
-$(document).ready(function() {
-    $(".tradepoll").each(function(i, v) {
-        var derpTest = new Trade($(v));
-        console.log(derpTest);
-    });
-});
+//$(document).ready(function() {
+//    $(".tradepoll").each(function(i, v) {
+//        var derpTest = new Trade($(v));
+//        console.log(derpTest);
+//    });
+//});
