@@ -16,6 +16,11 @@ chrome.extension.onMessage.addListener(function (request, sender, sendResponse) 
         bet.disableAuto(false, game);
     }
 
+    // Queue offer has been received
+    if(request.hasOwnProperty("queue")) {
+        handleQueue(request.queue, game);
+    }
+
     // Get current state of auto-betting
     if(request.hasOwnProperty("get")) {
         if ((request.get === "autoBet" || request.get === "autoReturn") && game !== -1) {
@@ -32,6 +37,38 @@ chrome.extension.onMessage.addListener(function (request, sender, sendResponse) 
         }
     }
 });
+
+/**
+ * Queue storage
+ * In bg, since this allows us to only open tab once
+ */
+var queue = {
+    lastOffer: ["",""]
+};
+
+// Handle queue update (offer received)
+function handleQueue(data, game) {
+    if (data.offer !== queue.lastOffer[game]) {
+        if (LoungeUser.userSettings.notifyTradeOffer == "1") {
+            createNotification("Queue trade offer received", 
+                "CSGOLounge has sent you a trade offer",
+                "offer",
+                {title: "Open trade offer"},
+                data.offer);
+        }
+
+        if (["0","2"].indexOf(LoungeUser.userSettings.enableAuto) === -1) {
+            chrome.tabs.query({url: data.offer}, function(tabs){
+                if (tabs.length !== 0)
+                    return;
+
+                chrome.tabs.create({url: data.offer});
+            });
+        }
+
+        queue.lastOffer[game] = data.offer;
+    }
+}
 
 /**
  * Bet-a-tron 9000 
@@ -51,7 +88,6 @@ chrome.extension.onMessage.addListener(function (request, sender, sendResponse) 
  *
  * autoBet can be replaced with autoReturn in all messages, with some keys missing
  */
-
 var bet = { // not a class - don't instantiate
     autoDelay: 5000,
     type: ["autoBet","autoBet"], // autoBet || autoReturn
