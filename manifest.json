@@ -61,7 +61,7 @@
         },
         {
         	"matches": [
-        		"http://steamcommunity.com/tradeoffer/*"
+        		"*://steamcommunity.com/tradeoffer/*"
         	],
         	"js": [
         		"app/steam/accept.js"
