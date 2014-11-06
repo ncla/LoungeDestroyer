@@ -168,12 +168,11 @@ function init() {
                 if (btn)
                     btn.textContent = "FUCKING PLACE BET";
             }
-            var tabWrapper = $("div[style='float: left; width: 96%;margin: 0 2%;height: 26px;border-radius: 5px;position: relative;overflow: hidden;']");
-            $(tabWrapper).append('<a class="tab" id="ld_cache" onclick="returns = false;">Cached inventory</div>');
-            $(tabWrapper).find(".tab").width("33%").click(function() {
+            $("a.tab:contains('Returns')").after('<a class="tab" id="ld_cache" onclick="returns = false;">Cached inventory</div>');
+            $("section.box .tab").width("33%").click(function() {
                 inventory.stopLoadingInventory();
             });
-            $("#ld_cache", tabWrapper).click(function() {
+            $("#ld_cache").click(function() {
                 $(".left").html("");
                 document.getElementById("backpack").innerHTML = '<div id="LDloading" class="spin-1"></div>';
                 inventory.getCachedInventory("bettingInventory" + appID + "_" + readCookie("id"), function(bpHTML) {
@@ -307,7 +306,7 @@ $(document).ready(function() {
 /*
     Mouseover action for items
  */
-$(document).on("mouseover", (appID == 730 ? ".item" : ".oitm"), function() {
+$(document).on("mouseover", ".oitm", function() {
     var LoungeItem = new Item($(this));
     var settingMarketPrices = LoungeUser.userSettings["itemMarketPricesv2"];
     if(settingMarketPrices == "1" || settingMarketPrices == "2") {
