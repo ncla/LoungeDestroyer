@@ -8,13 +8,14 @@ chrome.storage.local.get("queue", function(data){
 		return;
 
 	var code = /Protection code: ([0-9A-Z]{4})/.exec(document.querySelector(".quote").textContent)[1],
-	    acceptTime = Math.min(data.time, Date.now()+30000);
+	    acceptTime = Math.min(data.time, Date.now()+30000),
+	    urlRegex = /https?:\/\/(.*)/;
 	
 	if (!code || code !== data.protectionCode)
 		return;
-	if (!document.URL || document.URL !== data.offer)
+	if (!document.URL || urlRegex.exec(document.URL)[1] !== urlRegex.exec(data.offer)[1])
 		return;
-	if (!data.time || acceptTime-Date.now() < 10) // won't accept offers with <10 sec left
+	if (!data.time || acceptTime-Date.now() < 10000) // won't accept offers with <10 sec left
 		return;
 
 	console.log("Enabling");

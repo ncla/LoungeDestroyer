@@ -42,6 +42,12 @@ chrome.extension.onMessage.addListener(function (request, sender, sendResponse) 
         });
     }
 
+    // Create notification
+    if (request.hasOwnProperty("notification")) {
+    	var data = request.notification;
+    	createNotification(data.title, data.message, data.messageType, data.buttons, data.buttonUrl);
+    }
+
     // Overwrite variable in format {set: {variable: {key: newValue}}}
     if(request.hasOwnProperty("set")) {
         for (var v in request.set) {
@@ -160,7 +166,7 @@ var notifications = {};
 
 chrome.notifications.onButtonClicked.addListener(
     function(notificationID) {
-        if(notificationID.indexOf("_match") != -1 || notificationID.indexOf("_mytrade") != -1 || notificationID.indexOf("_myoffer") != -1) {
+        if(notificationID.indexOf("_match") != -1 || notificationID.indexOf("_mytrade") != -1 || notificationID.indexOf("_myoffer") != -1 || notificationID.indexOf("_offer") !== -1) {
             chrome.tabs.create({url: notifications[notificationID]});
         }
     }
