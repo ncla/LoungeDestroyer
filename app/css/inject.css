@@ -4,6 +4,7 @@
 .appID730 .marketPriced .rarity {
     background: rgba(255, 255, 255, 0.7) !important;
     text-shadow: 0px 0px 1px rgba(255, 255, 255, 1);
+    color: #555;
 }
 .appID570 .marketPriced .rarity {
     color: #ececec;
