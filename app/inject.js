@@ -76,7 +76,16 @@ function init() {
     if (LoungeUser.userSettings.currentTheme) {
         var themePath = "themes/"+LoungeUser.userSettings.currentTheme+"/inject.css";
         console.log("Injecting "+themePath);
-        chrome.runtime.sendMessage({injectCSS: themePath});
+        chrome.runtime.sendMessage({getFile: themePath}, function(data){
+            if (data.error) {
+                console.error(data.error);
+                return;
+            }
+
+            var style = document.createElement("style");
+            style.textContent = data.data;
+            document.head.appendChild(style);
+        });
     }
 
     $(document).ready(function() {

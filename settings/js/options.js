@@ -34,6 +34,16 @@ $(".ld-settings select").on('change', function() {
 // THEMES
 var themes = {};
 
+document.querySelector(".curTheme").addEventListener("click", function(){
+    // TODO: confirm before deleting current theme
+    defaultUser.saveSetting("currentTheme", "");
+    var current = document.querySelector(".item.current");
+    if (current);
+        current.classList.remove("current");
+
+    this.textContent = "None";
+});
+
 // get themes directories
 chrome.runtime.getPackageDirectoryEntry(function(entry){
     entry.getDirectory("themes", {create: false}, function(dir){

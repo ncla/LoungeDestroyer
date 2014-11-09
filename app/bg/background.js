@@ -48,6 +48,29 @@ chrome.extension.onMessage.addListener(function (request, sender, sendResponse) 
         });
     }
 
+    // Get content of file
+    if(request.hasOwnProperty("getFile")) {
+    	var dir = chrome.runtime.getPackageDirectoryEntry(function(entry){
+    		// get specific file
+    		entry.getFile(request.getFile, {create: false}, function(fileEntry){
+    			// read file content
+    			var reader = new FileReader();
+    			reader.addEventListener("loadend", function(val){
+    				sendResponse({data: this.result});
+    			});
+    			reader.addEventListener("error", function(err){
+    				sendResponse({error: err});
+    			})
+
+    			fileEntry.file(function(file){
+    				reader.readAsText(file);
+    			});
+
+    		}, function(err){sendResponse({error: err})});
+    	});
+    	return true;
+    }
+
     // Create notification
     if (request.hasOwnProperty("notification")) {
     	var data = request.notification;
