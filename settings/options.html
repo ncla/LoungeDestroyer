@@ -4,9 +4,52 @@
     <title>LoungeDestroyer dashboard</title>
     <link href="../lib/css/bootstrap.min.css" rel="stylesheet">
     <link href="../lib/css/ld.css" rel="stylesheet">
+
+    <style>
+        .carousel-inner .item > a > img {
+            width: 100%;
+        }
+        #themes-carousel .carousel-caption .icon {
+            max-width: 50px;
+        }
+        #themes-carousel .carousel-caption .author {
+            display: block;
+            margin-top: -0.8em;
+        }
+        .carousel-inner .item > a > .highlight {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 100%;
+            background: rgba(0,0,0,.3);
+            box-shadow: inset 0 0 0 10px rgba(92,184,92,0);
+            transition: .25s linear box-shadow;
+        }
+        .carousel-inner .item.current > a > .highlight {
+            box-shadow: inset 0 0 0 10px #5cb85c;
+        }
+
+        @-webkit-keyframes highlight {
+            from {
+                box-shadow: inset 0 0 red;
+            }
+            to {
+                box-shadow: inset 0 0 0 10px #5cb85c;
+            }
+        }
+        @keyframes highlight {
+            from {
+                box-shadow: inset 0 0 red;
+            }
+            to {
+                box-shadow: inset 0 0 0 10px #5cb85c;
+            }
+        }
+    </style>
 </head>
 
-<body>
+<body data-spy="scroll" data-target=".navbar-collapse">
 
 <!-- Fixed navbar -->
 <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -22,14 +65,16 @@
         </div>
         <div class="collapse navbar-collapse">
             <ul class="nav navbar-nav">
-                <li class="active"><a href="#">Settings</a></li>
+                <li class="active"><a href="#settings">Settings</a></li>
+                <li><a href="#themes">Themes</a></li>
+                <li><a href="#about">About</a></li>
             </ul>
         </div><!--/.nav-collapse -->
     </div>
 </div>
 
 <!-- Begin page content -->
-<div class="container">
+<div class="container" id="settings">
     <div class="togglerino">
         <div class="page-header">
             <h1>LoungeDestroyer settings <small>version <span id="version"></span></small></h1>
@@ -174,7 +219,33 @@
             </div>
         </div>
     </div>
-    <div class="togglerino" style="margin-bottom: 40px;">
+
+    <!-- THEMES -->
+    <div class="togglerino" id="themes">
+        <div class="page-header">
+            <h1>Themes</h1>
+        </div>
+
+        <h3 class="text-center">Current theme: <span class="curTheme text-primary"></span></h3>
+
+        <div id="themes-carousel" class="carousel slide" data-ride="carousel" data-interval="false">
+            <div class="carousel-inner" role="listbox">
+                <!-- Populated in JS -->
+            </div>
+
+            <!-- Controls -->
+            <a class="left carousel-control" href="#themes-carousel" role="button" data-slide="prev">
+                <span class="glyphicon glyphicon-chevron-left"></span>
+                <span class="sr-only">Previous</span>
+            </a>
+            <a class="right carousel-control" href="#themes-carousel" role="button" data-slide="next">
+                <span class="glyphicon glyphicon-chevron-right"></span>
+                <span class="sr-only">Next</span>
+            </a>
+        </div>
+    </div>
+
+    <div class="togglerino" id="about" style="margin-bottom: 40px;">
         <div class="page-header">
             <h1>About</h1>
         </div>

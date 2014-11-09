@@ -72,6 +72,13 @@ function init() {
         }
     });
 
+    // inject theme CSS
+    if (LoungeUser.userSettings.currentTheme) {
+        var themePath = "themes/"+LoungeUser.userSettings.currentTheme+"/inject.css";
+        console.log("Injecting "+themePath);
+        chrome.runtime.sendMessage({injectCSS: themePath});
+    }
+
     $(document).ready(function() {
         $("body").addClass("appID" + appID);
 
