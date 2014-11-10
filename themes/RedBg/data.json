@@ -2,5 +2,15 @@
 	"author": "birjolaxew",
 	"version": "1.0",
 	"title": "Red Background",
-	"description": "For when white just isn't fancy enough"
+	"description": "For when white just isn't fancy enough",
+	"options": {
+		"class1": {
+			"description": "Change every background",
+			"checked": true
+		},
+		"class2": {
+			"description": "Option #2",
+			"checked": false
+		}
+	}
 }

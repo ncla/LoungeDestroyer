@@ -86,6 +86,25 @@ function init() {
             style.textContent = data.data;
             document.head.appendChild(style);
         });
+
+        // load options
+        chrome.storage.local.get("themes", function(themes){
+            var theme = themes.themes[LoungeUser.userSettings.currentTheme];
+            console.log("Got theme: ",theme);
+            if (!theme)
+                return;
+            if (!theme.options)
+                return;
+
+            var classes = " ";
+            for (var k in theme.options) {
+                if (theme.options[k].checked)
+                    classes += k+" ";
+            }
+            $(document).ready(function(){
+                document.body.className += classes;
+            });
+        });
     }
 
     $(document).ready(function() {
