@@ -35,7 +35,8 @@ User.prototype.defaultSettings =
     notifyExpiredItems: "1",
     addTradePreviews: "1",
     notifyTradeOffer: "1",
-    currentTheme: ""
+    currentTheme: "",
+    showExtraMatchInfo: "2"
 };
 
 User.prototype.loadUserSettings = function(callback) {
