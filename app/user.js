@@ -34,7 +34,8 @@ User.prototype.defaultSettings =
     useCachedPriceList: "1",
     notifyExpiredItems: "1",
     addTradePreviews: "1",
-    notifyTradeOffer: "1"
+    notifyTradeOffer: "1",
+    showExtraMatchInfo: "2"
 };
 
 User.prototype.loadUserSettings = function(callback) {

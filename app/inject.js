@@ -281,6 +281,16 @@ function init() {
         })();
 
         container.querySelector("input").value = LoungeUser.userSettings.autoDelay || 5;
+
+        if(LoungeUser.userSettings.showExtraMatchInfo == "2") {
+            $(".matchmain").each(function(i, v) {
+                if(!$(v).find(".notavailable").length) {
+                    // Instead of repeating myself with the same code I have in .mouseover part or moving logic to somewhere else,
+                    // I just trigger the hover event
+                    $(v).trigger('mouseenter');
+                }
+            });
+        }
     });
 }
 /*
@@ -333,5 +343,32 @@ $(document).on("mouseover", ".oitm", function() {
                 LoungeItem.fetchSteamMarketPrice();
             }
         });
+    }
+});
+$(document).on("mouseover", ".matchmain", function() {
+    if(LoungeUser.userSettings.showExtraMatchInfo != "0" && !$(this).hasClass("extraMatchInfo") && !$(this).hasClass("loading")) {
+        $(this).addClass("loading");
+        var matchURL = $("a:eq(0)", this).attr("href");
+        var matchElement = this;
+        $.ajax({
+            url: matchURL,
+            type: "GET",
+            success: function(data){
+                var doc = document.implementation.createHTMLDocument("");
+                doc.body.innerHTML = data;
+                var bestOfType = $(doc).find(".box-shiny-alt:eq(0) .half:eq(1)").text().trim();
+                var exactTime = $(doc).find(".box-shiny-alt:eq(0) .half:eq(2)").text().trim();
+                if(bestOfType && exactTime) {
+                    $(".matchheader .whenm:eq(0)", matchElement)
+                        .append('<span class="matchExactTime"> <span class="seperator">|</span> ' + exactTime + ' <span class="seperator">|</span> </span>')
+                        .append('<span class="bestoftype">' + bestOfType + '</span>')
+                }
+                $(matchElement).addClass("extraMatchInfo");
+                $(matchElement).removeClass("loading");
+            },
+            error: function() {
+                $(matchElement).removeClass("loading");
+            }
+        })
     }
 });
