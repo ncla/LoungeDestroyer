@@ -79,7 +79,9 @@ chrome.storage.local.get("themes", function(result){
     });
 
     for (var theme in result.themes) {
+        console.log("Checking theme "+theme);
         if (themes[theme].custom) {
+            console.log("Theme "+theme+" was custom");
             theme_data_handler.call({
                 result: "{}",
                 obj: themes[theme],
@@ -159,16 +161,19 @@ function theme_data_handler(){
     var data = this.result,
         json = JSON.parse(data),
         obj = this.obj,
-        name = this.themeName;;
+        name = this.themeName;
 
     // overwrite settings with saved settings
-    for (var k in obj.options) {
-        if (json.options.hasOwnProperty(k)) {
-            json.options[k].checked = obj.options[k].checked;
-        } else {
-            delete obj.options[k];
+    if (json.options) {
+        for (var k in obj.options) {
+            if (json.options.hasOwnProperty(k)) {
+                json.options[k].checked = obj.options[k].checked;
+            } else {
+                delete obj.options[k];
+            }
         }
     }
+
     // merge obj and json
     $.extend(true, obj, json);
 
@@ -210,7 +215,9 @@ function theme_create_element(name, obj, active) {
         document.querySelector(".curTheme").textContent = obj.title;
     }
     if (active) {
-        document.querySelector("#themes-carousel .item.active").classList.remove("active");
+        var act;
+        if (act = document.querySelector("#themes-carousel .item.active"))
+            act.classList.remove("active");
         item.classList.add("active");
     }
 
@@ -298,7 +305,7 @@ function create_theme(name, json, css, bg, callback, remoteUrl, icon, active) {
         callback = error_proxy;
 
     if (!name || !json || !css || (!bg && !json.bg)) {
-        callback("Necesarry information not provided: "+name+", "+json+", "+css+", "+bg);
+        callback("Necesarry information not provided.");
         return;
     }
 
@@ -320,8 +327,8 @@ function create_theme(name, json, css, bg, callback, remoteUrl, icon, active) {
 
     console.log("Added theme ",name," : ",theme);
     themes[name] = theme;
+    theme_create_element(name, theme, active);
     chrome.storage.local.set({themes: themes}, function(){
-        theme_create_element(name, theme, active);
         callback(true);
     });
 }
@@ -331,6 +338,54 @@ function create_theme(name, json, css, bg, callback, remoteUrl, icon, active) {
 /**
  * USER INPUT
  */
+
+/**
+ * Hook remote add theme button
+ */
+document.querySelector("#add-theme-remote button[type='submit']").addEventListener("click", function(ev){
+    ev.preventDefault();
+
+    var url = document.getElementById("add-theme-url").value;
+    if (!url) {
+        alert("Missing the following information: url");
+        return;
+    }
+
+    get(url, function(){
+        if (this.status === 0) {
+            alert("Failed to connect to the URL - please make sure it's spelled correctly");
+            return;
+        }
+
+        try {
+            var data = this.responseText,
+                json = JSON.parse(data),
+                err = "";
+                required = ["name", "title", "author", "version", "css", "bg"]
+
+            for (var i = 0; i < required.length; ++i) {
+                if (!json[required[i]]) {
+                    if (!err)
+                        err = "The following information is missing from the JSON: ";
+
+                    err += required[i] + " ";
+                }
+            }
+
+            if (err) {
+                alert(err);
+                return;
+            }
+        } catch (err) {
+            alert("JSON could not be parsed. Please make sure you're using the correct URL");
+            return;
+        }
+        create_theme(json.name, json, json.css, json.bg, function(val){
+            if (val !== true)
+                error_proxy.apply({}, arguments);
+        }, url, json.icon, true);
+    });
+});
 
 /**
  * Hook local add theme button
@@ -345,7 +400,23 @@ document.querySelector("#add-theme-local button[type='submit']").addEventListene
         author = document.getElementById("add-theme-author").value,
         version = document.getElementById("add-theme-version").value,
         css = document.getElementById("add-theme-css").value,
-        name = "custom_";
+        name = "custom_",
+        err = "",
+        vals = [title, bg, author, version, css],
+        names = ["title", "background", "author", "version", "css"];
+
+    for (var i = 0; i < vals.length; ++i) {
+        if (!vals[i]) {
+            if (!err)
+                err = "We're missing the following information: ";
+
+            err += names[i] + " ";
+        }
+    }
+    if (err) {
+        alert(err);
+        return;
+    }
 
     var i = 0;
     while (themes.hasOwnProperty(name+i)) { ++i }
@@ -356,8 +427,9 @@ document.querySelector("#add-theme-local button[type='submit']").addEventListene
         description: description,
         version: version,
         author: author
-    }, css, bg, function(msg){
-
+    }, css, bg, function(val){
+        if (val !== true)
+            error_proxy.apply({}, arguments);
     }, false, undefined, true);
 });
 
