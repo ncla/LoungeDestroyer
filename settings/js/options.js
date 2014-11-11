@@ -222,7 +222,7 @@ function theme_create_element(name, obj, active) {
     }
 
     
-    var optionsHTML = "<h2 class='text-primary'>Options <small>"+obj.title+"</small></h2>";
+    var optionsHTML = "<h2 class='text-primary'>Options <small>"+obj.title+(obj.remote && obj.url ? " - <a href='"+obj.url+"' class='text-info'>"+obj.url+"</a>" : "")+"</small></h2>";
     if (obj.options || obj.custom) {
         item.innerHTML += "<input id='"+name+"-options-toggle' type='checkbox' class='options-toggle glyphicon glyphicon-cog'>";
         for (var k in obj.options) {
