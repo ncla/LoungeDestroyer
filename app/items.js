@@ -1,7 +1,7 @@
 var marketedItems = [];
 var loadingItems = [];
 var nonMarketItems = ["Dota Items", "Any Offers", "Knife", "Gift", "TF2 Items", "Real Money", "Offers", "Any Common", "Any Uncommon", "Any Rare", "Any Mythical", "Any Legendary",
-    "Any Ancient", "Any Immortal", "Real Money", "+ More", "Any Set", "Any Key", "Undefined / Not Tradeable"];
+    "Any Ancient", "Any Immortal", "Real Money", "+ More", "Any Set", "Any Key", "Undefined / Not Tradeable", "Card", "Background", "Icon", "Gift", "DLC"];
 var uniqueItemsFetched = 0;
 
 var Item = function(item) {
@@ -58,7 +58,7 @@ Item.prototype.getMarketPrice = function() {
         return this.insertMarketValue(marketedItems[this.itemName]);
     }
 
-    if(nonMarketItems.indexOf(self.itemName) == -1 && !nonMarketItems.hasOwnProperty($(".rarity", this.item).text()) && !loadingItems.hasOwnProperty(this.itemName)) {
+    if(nonMarketItems.indexOf(self.itemName) == -1 && nonMarketItems.indexOf($(".rarity", this.item).text()) == -1 && !loadingItems.hasOwnProperty(this.itemName)) {
         this.fetchSteamMarketPrice();
     }
 };
