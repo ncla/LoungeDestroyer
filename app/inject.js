@@ -348,7 +348,7 @@ $(document).on("mouseover", ".oitm", function() {
 $(document).on("mouseover", ".matchmain", function() {
     if(LoungeUser.userSettings.showExtraMatchInfo != "0" && !$(this).hasClass("extraMatchInfo") && !$(this).hasClass("loading")) {
         $(this).addClass("loading");
-        var matchURL = $("a:eq(0)", this).attr("href");
+        var matchURL = $("a[href]:eq(0)", this).attr("href");
         var matchElement = this;
         $.ajax({
             url: matchURL,
