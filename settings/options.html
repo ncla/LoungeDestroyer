@@ -72,6 +72,11 @@
         .options-toggle:checked ~ .theme-option {
             display: block;
         }
+        .theme-remove {
+            position: absolute;
+            left: 100px;
+            bottom: 50px;
+        }
 
         @-webkit-keyframes highlight {
             from {
@@ -286,6 +291,66 @@
                 <span class="sr-only">Next</span>
             </a>
         </div>
+
+        <h3>Add your own!</h3>
+        <div class="row">
+            <div class="col-md-6">
+                <h4>From URL:</h4>
+                <form role="form">
+                    <div class="form-group">
+                        <label for="add-theme-url">URL of JSON</label>
+                        <div class="input-group">
+                            <input type="url" class="form-control" id="add-theme-url" placeholder="Enter URL">
+                            <span class="input-group-btn">
+                                <button class="btn btn-primary" type="button">Add theme</button>
+                            </span>
+                        </div>
+                        <p class="help-block">There are strict rules for the structure of the remote directory.</p>
+                        <p class="help-block">The following must be true for the JSON at the URL, in addition to the rules found in [insert link to THEMES.md]:</p>
+                        <ul class="help-block">
+                            <li>Must have a <code>name</code> key, with the value being the shortname of the extension. Same rules apply to the shortname, as does for Javascript variable names</li>
+                            <li>Must have a <code>css</code> key, with a value of the absolute URL of the CSS for the theme</li>
+                            <li>Must have a <code>bg</code> key, with a value of the absolute URL of the background image</li>
+                            <li>If an icon is wanted, must have an <code>icon</code> key, with a value of the absolute URL of the icon image</li>
+                        </ul>
+                        <p class="help-block">In addition to this, the server the JSON is hosted on must allow cross-origin <code>GET</code> requests from all domains (i.e. return the <code>Access-Control-Allow-Origin: *</code> and, optionally, <code>Access-Control-Allow-Methods: GET</code> headers).</p>
+                        <p class="help-block">Background, icon and CSS are hotlinked.</p>
+                        <p class="help-block">Themes are automatically updated when the version number is raised. This is checked once a day.</p>
+                    </div>
+                </form>
+            </div>
+            <div class="col-md-6">
+                <h4>User-inputted:</h4>
+                <form role="form" id="add-theme-local">
+                    <div class="form-group">
+                        <label for="add-theme-title">Title of theme</label>
+                        <input type="text" class="form-control" id="add-theme-title" placeholder="Enter title">
+                    </div>
+                    <div class="form-group">
+                        <label for="add-theme-description">Description (optional)</label>
+                        <textarea id="add-theme-description" class="form-control" rows="3" placeholder="Enter description" style="resize: none" maxlength="140"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="add-theme-bg">Background URL</label>
+                        <input type="url" class="form-control" id="add-theme-bg" placeholder="Enter absolute URL">
+                        <p class="help-block">Suggested size is 960x540</p>
+                    </div>
+                    <div class="form-group col-md-6" style="padding-left: 0">
+                        <label for="add-theme-author">Author</label>
+                        <input type="text" class="form-control" id="add-theme-author" placeholder="Enter author">
+                    </div>
+                    <div class="form-group col-md-6" style="padding-right: 0">
+                        <label for="add-theme-version">Version number</label>
+                        <input type="text" class="form-control" id="add-theme-version" placeholder="Enter version">
+                    </div>
+                    <div class="form-group">
+                        <label for="add-theme-css">Theme CSS</label>
+                        <textarea id="add-theme-css" class="form-control" rows="6" placeholder="Enter CSS"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-block btn-primary">Add theme</button>
+                </form>
+            </div>
+        </div>
     </div>
 
     <div class="togglerino" id="about" style="margin-bottom: 40px;">
@@ -305,6 +370,25 @@
 <div class="footer">
     <div class="container">
         <p class="text-muted">Developed with hate by NCLA and <a href="https://github.com/ncla/LoungeDestroyer/graphs/contributors">contributors on GitHub</a></p>
+    </div>
+</div>
+
+<div class="modal fade theme-modal-confirm-delete in" tabindex="-1" role="dialog" aria-hidden="false">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                Confirm delete
+                <button type="button" class="close" data-dismiss="modal"><span>&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete this theme?</p>
+                <p>This action cannot be undone</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Nevermind</button>
+                <button type="button" class="btn btn-danger confirm">Delete</button>
+            </div>
+        </div>
     </div>
 </div>
 

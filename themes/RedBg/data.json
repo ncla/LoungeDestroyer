@@ -3,13 +3,15 @@
 	"version": "1.0",
 	"title": "Red Background",
 	"description": "For when white just isn't fancy enough",
+	"bg": "$dir/bg.png",
+	"icon": "$dir/icon.png",
 	"options": {
-		"class1": {
-			"description": "Change every background",
+		"redHeader": {
+			"description": "Change header background too",
 			"checked": true
 		},
-		"class2": {
-			"description": "Option #2",
+		"rainbowBg": {
+			"description": "Use rainbow background instead",
 			"checked": false
 		}
 	}
