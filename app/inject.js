@@ -318,7 +318,7 @@ function init() {
 
                         var offset = self.offset();
                         if ($(document).width() > offset.left + self.outerWidth() + Math.max(410, $(document).width()*0.5)) {
-                            offset.top = Math.floor(offset.top - 90);
+                            offset.top = Math.floor(offset.top - 20);
                             offset.left = Math.floor(offset.left + self.outerWidth() + 10);
                         } else {
                         // position below if not enough space on right
@@ -380,8 +380,19 @@ $(document).ready(function() {
     }); // TO-DO: save setting
     document.body.appendChild(container);
 
-    $('body > :not(#modalPreview)').click(function() {
-        $("#modalPreview").hide();
+    document.body.addEventListener("click",function(ev) {
+        if (ev.srcElement) {
+            if (ev.srcElement.id !== "preview"
+                && !$("#preview").find(ev.srcElement).length) {
+
+                $("#preview").hide();
+                $("#preview").attr("data-index", "-1");
+            }
+            if (ev.srcElement.id !== "modalPreview"
+                && !$("#modalPreview").find(ev.srcElement).length) {
+                $("#modalPreview").fadeOut();
+            }
+        }
     });
 });
 

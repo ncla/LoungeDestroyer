@@ -16,7 +16,7 @@
         }
         #themes-carousel .carousel-caption .author {
             display: block;
-            margin-top: -0.8em;
+            margin-top: -0.5em;
         }
         .carousel-inner .item > .theme-container > .highlight {
             position: absolute;
@@ -285,7 +285,11 @@
             <h1>Themes</h1>
         </div>
 
-        <h3 class="text-center">Current theme: <span class="curTheme text-primary">None</span></h3>
+        <h3 class="text-center form-inline">Current theme: 
+            <select class="cur-theme form-control text-primary">
+                <option value="-none">None</option>
+            </select>
+        </h3>
 
         <div id="themes-carousel" class="carousel slide" data-ride="carousel" data-interval="false">
             <div class="carousel-inner" role="listbox">
