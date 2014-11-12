@@ -66,11 +66,11 @@ The following JSON structure is understood by the theme parser. Note that, when 
     </tr>
     <tr>
       <td>bg</td>
-      <td>Overwrites the default background image used in carousel. Must be absolute URL to new image, or link relative to `options.html`. `$dir` will be replaced by the folder path in local themes. Suggested size is 960x540. <em>Required</em> for remote themes</td>
+      <td>Overwrites the default background image used in carousel. Must be absolute URL to new image, or link relative to <code>options.html</code>. <code>$dir</code> will be replaced by the folder path in local themes. Suggested size is 960x540. <em>Required</em> for remote themes</td>
     </tr>
     <tr>
       <td>icon</td>
-      <td>Overwrites the default icon image used in carousel. Must be absolute URL to new image, or link relative to `options.html`. `$dir` will be replaced by the folder path in local themes. Suggested size is 50x50. Icon images are optional.</td>
+      <td>Overwrites the default icon image used in carousel. Must be absolute URL to new image, or link relative to <code>options.html</code>. <code>$dir</code> will be replaced by the folder path in local themes. Suggested size is 50x50. Icon images are optional.</td>
     </tr>
     <tr>
       <td>name</td>
@@ -85,7 +85,7 @@ The following JSON structure is understood by the theme parser. Note that, when 
             <tr>
               <td>[option-name]</td>
               <td>
-                <p>The class name to add to `body` if option is enabled.</p>
+                <p>The class name to add to <code>body</code> if option is enabled.</p>
                 <table>
                   <tbody>
                     <tr>
@@ -94,7 +94,7 @@ The following JSON structure is understood by the theme parser. Note that, when 
                     </tr>
                     <tr>
                       <td>checked</td>
-                      <td>Default value - must be either `true` or `false`</td>
+                      <td>Default value - must be either <code>true</code> or <code>false</code></td>
                     </tr>
                   </tbody>
                 </table>
