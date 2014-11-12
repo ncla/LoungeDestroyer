@@ -26,10 +26,16 @@ chrome.extension.onMessage.addListener(function (request, sender, sendResponse) 
         sendResponse(lastBackpackAjaxURL);
     }
 
-    // Inject AJAX prefilter to specific tab
+    // Inject JS file to specific tab
     if(request.hasOwnProperty("injectScript")) {
         console.log("Injecting script ("+request.injectScript+") into tab "+sender.tab.id);
         chrome.tabs.executeScript(sender.tab.id, {file: "src/inject/app/"+request.injectScript}); // TODO: support relative path
+    }
+
+    // Injext CSS file to specific tab
+    if(request.hasOwnProperty("injectCSS")) {
+    	console.log("Injecting CSS ("+request.injectCSS+") into tab "+sender.tab.id);
+    	chrome.tabs.insertCSS(sender.tab.id, {file: request.injectCSS, runAt: "document_start"}, function(x){console.log(x)});
     }
 
     // Open new tab if none exists
@@ -40,6 +46,29 @@ chrome.extension.onMessage.addListener(function (request, sender, sendResponse) 
 
             chrome.tabs.create({url: request.tab});
         });
+    }
+
+    // Get content of file
+    if(request.hasOwnProperty("getFile")) {
+    	var dir = chrome.runtime.getPackageDirectoryEntry(function(entry){
+    		// get specific file
+    		entry.getFile(request.getFile, {create: false}, function(fileEntry){
+    			// read file content
+    			var reader = new FileReader();
+    			reader.addEventListener("loadend", function(val){
+    				sendResponse({data: this.result});
+    			});
+    			reader.addEventListener("error", function(err){
+    				sendResponse({error: err});
+    			})
+
+    			fileEntry.file(function(file){
+    				reader.readAsText(file);
+    			});
+
+    		}, function(err){sendResponse({error: err})});
+    	});
+    	return true;
     }
 
     // Create notification
@@ -463,6 +492,9 @@ chrome.alarms.create('currencyUpdate', {
 chrome.alarms.create('expiredReturnsChecking', {
     periodInMinutes: 360
 });
+chrome.alarms.create('remoteThemesUpdate', {
+	periodInMinutes: 1440 // once a day
+})
 chrome.alarms.onAlarm.addListener(function(alarm) {
     if(alarm.name == "itemListUpdate") {
         console.log("Checking if user has visited CS:GO Lounge recently..");
@@ -484,6 +516,63 @@ chrome.alarms.onAlarm.addListener(function(alarm) {
         if(["1","3"].indexOf(LoungeUser.userSettings.notifyExpiredItems) !== -1) {
             checkForExpiredItems(730);
         }
+    }
+    if(alarm.name == "remoteThemesUpdate") {
+    	console.log("Updating themes!");
+    	chrome.storage.local.get("themes", function(result){
+    		var themes = result.themes;
+    		for (var theme in themes) {
+    			if (themes[theme].remote) {
+    				console.log("Updating theme "+theme);
+    				// get JSON
+    				var url = themes[theme].url;
+    				if (!url)
+    					continue;
+
+    				get(url, function(){
+    					try {
+    						var data = this.responseText,
+				                json = JSON.parse(data),
+				                err = "";
+				                required = ["name", "title", "author", "version", "css", "bg"]
+
+				            for (var i = 0; i < required.length; ++i) {
+				                if (!json[required[i]]) {
+				                    if (!err)
+				                        err = "The following information is missing from the JSON: ";
+
+				                    err += required[i] + " ";
+				                }
+				            }
+
+				            if (err) {
+				                console.error(err);
+				                return;
+				            }
+
+				            console.log("Everything looks good");
+
+				            // merge new JSON into old, keeping options
+				            if (json.options) {
+						        for (var k in themes[theme].options) {
+						            if (json.options.hasOwnProperty(k)) {
+						                json.options[k].checked = themes[theme].options[k].checked;
+						            } else {
+						                delete themes[theme].options[k];
+						            }
+						        }
+						    }
+
+						    // merge obj and json
+						    $.extend(true, themes[theme], json);
+						    chrome.storage.local.set({themes: themes});
+    					} catch (err) {
+    						console.error("["+theme+"] Failed to update: ",err);
+    					}
+    				});
+    			}
+    		}
+    	});
     }
 });
 /*

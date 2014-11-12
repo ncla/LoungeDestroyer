@@ -37,15 +37,17 @@ var currencyData = {
 
 var storageMarketItems,
     currencies = {},
+    themes = {},
     streamPlaying = false,
     inventory = false;
 
 var container = document.createElement("div");
 
 var LoungeUser = new User();
-chrome.storage.local.get(['marketPriceList', 'currencyConversionRates'], function(result) {
+chrome.storage.local.get(['marketPriceList', 'currencyConversionRates', 'themes'], function(result) {
     storageMarketItems = result.marketPriceList || {};
     currencies = result.currencyConversionRates || {};
+    themes = result.themes || {};
     LoungeUser.loadUserSettings(function() {
         console.log("User settings have been loaded in content script!");
         init();
@@ -71,6 +73,59 @@ function init() {
             }
         }
     });
+
+    // inject theme CSS
+    if (LoungeUser.userSettings.currentTheme) {
+        var name = LoungeUser.userSettings.currentTheme;
+        if (themes.hasOwnProperty(name)) {
+            var theme = themes[name],
+                style;
+
+            console.log("Theme: "+theme);
+
+            if (!theme.css) {
+                var themePath = "themes/"+LoungeUser.userSettings.currentTheme+"/inject.css";
+                chrome.runtime.sendMessage({getFile: themePath}, function(data){
+                    if (data.error) {
+                        console.error(data.error);
+                        return;
+                    }
+
+                    style = document.createElement("style");
+                    style.textContent = data.data;
+                    $(document).ready(function(){
+                        document.head.appendChild(style);
+                    });
+                });
+            } else {
+                if (!theme.remote) {
+                    style = document.createElement("style");
+                    style.textContent = theme.css;
+                } else {
+                    style = document.createElement("link");
+                    style.setAttribute("href", theme.css);
+                    style.setAttribute("rel", "stylesheet");
+                }
+
+                $(document).ready(function(){
+                    document.head.appendChild(style);
+                });
+            }
+
+            // load options
+            console.log("Got theme: ",theme);
+            if (theme.options) {
+                var classes = " ";
+                for (var k in theme.options) {
+                    if (theme.options[k].checked)
+                        classes += k+" ";
+                }
+                $(document).ready(function(){
+                    document.body.className += classes;
+                });
+            }
+        }
+    }
 
     $(document).ready(function() {
         $("body").addClass("appID" + appID);
