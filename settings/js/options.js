@@ -361,7 +361,7 @@ document.querySelector("#add-theme-remote button[type='submit']").addEventListen
             var data = this.responseText,
                 json = JSON.parse(data),
                 err = "";
-                required = ["name", "title", "author", "version", "css", "bg"]
+                required = ["name", "title", "css", "bg"]
 
             for (var i = 0; i < required.length; ++i) {
                 if (!json[required[i]]) {

@@ -73,6 +73,10 @@ The following JSON structure is understood by the theme parser. Note that, when 
       <td>Overwrites the default icon image used in carousel. Must be absolute URL to new image, or link relative to <code>options.html</code>. <code>$dir</code> will be replaced by the folder path in local themes. Suggested size is 50x50. Icon images are optional.</td>
     </tr>
     <tr>
+      <td>css</td>
+      <td>Overwrites the default CSS injected into page. Must be absolute URL to new CSS. <em>Required</em> for remote themes.</td>
+    </tr>
+    <tr>
       <td>name</td>
       <td><em>Required</em> for remote themes. Not used for local themes. Shorthand name of theme, used internally. Must be valid Javascript variable name.</td>
     </tr>
