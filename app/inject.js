@@ -279,7 +279,7 @@ function init() {
                         span = header.querySelector("span[style*=\"float: right\"]"),
                         btn = document.createElement("a");
 
-                    btn.className = "button";
+                    btn.className = "button destroyer live-preview";
                     btn.innerHTML = "Preview";
                     btn.style.float = "none";
 
@@ -298,8 +298,12 @@ function init() {
                         }
                     }
 
-                    var tradeId = elm.querySelector("a[href^=\"trade?\"]").getAttribute("href").replace("trade?t=",""),
+                    var tradeId = elm.querySelector("a[href^=\"trade?\"]"),
                         self = this instanceof $ ? this : $(this);
+                    if (tradeId)
+                        tradeId = tradeId.getAttribute("href").replace("trade?t=","");
+                    else
+                        return;
 
                     // magic happens here
                     btn.addEventListener("click", function(){
