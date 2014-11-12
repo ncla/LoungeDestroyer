@@ -382,8 +382,7 @@ $(document).ready(function() {
 
     document.body.addEventListener("click",function(ev) {
         if (ev.srcElement) {
-            if (ev.srcElement.id !== "preview" 
-                && !ev.srcElement.classList.contains("live-preview")
+            if (ev.srcElement.id !== "preview"
                 && !$("#preview").find(ev.srcElement).length) {
 
                 $("#preview").hide();

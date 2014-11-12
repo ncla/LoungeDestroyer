@@ -38,16 +38,6 @@ $(".ld-settings select").on('change', function() {
 var themes = {},
     themeDirectory;
 
-document.querySelector(".curTheme").addEventListener("click", function(){
-    // TODO: confirm before deleting current theme
-    defaultUser.saveSetting("currentTheme", "");
-    var current = document.querySelector(".item.current");
-    if (current);
-        current.classList.remove("current");
-
-    this.textContent = "None";
-});
-
 // load themes from storage first
 chrome.storage.local.get("themes", function(result){
     if (result.hasOwnProperty("themes")) {
@@ -206,14 +196,7 @@ function theme_create_element(name, obj, active) {
     a.className = "theme-container";
     item.className = "item "+(!document.querySelectorAll("#themes-carousel .item.active").length ? "active" : "");
     item.setAttribute("data-theme-name", name);
-    if (name === Settings.currentTheme) {
-        var active = document.querySelector("#themes-carousel .item.active");
-        if (active)
-            active.classList.remove("active");
 
-        item.classList.add("current","active");
-        document.querySelector(".curTheme").textContent = obj.title;
-    }
     if (active) {
         var act;
         if (act = document.querySelector("#themes-carousel .item.active"))
@@ -277,17 +260,27 @@ function theme_create_element(name, obj, active) {
 
     // on click, select new theme
     a.addEventListener("click", function(){
-        defaultUser.saveSetting("currentTheme", name);
-
-        var current = document.querySelector("#themes-carousel .item.current");
-        if (current)
-            current.classList.remove("current");
-
-        this.parentNode.classList.add("current");
-        document.querySelector(".curTheme").textContent = obj.title;
+        select_theme(name);
     });
 
     document.querySelector("#themes-carousel .carousel-inner").appendChild(item);
+
+
+    // add to dropdown
+    var dropdownOption = document.createElement("option");
+    dropdownOption.setAttribute("value", name);
+    dropdownOption.textContent = obj.title;
+    document.querySelector(".cur-theme").appendChild(dropdownOption);
+
+    if (name === Settings.currentTheme) {
+        var act = document.querySelector("#themes-carousel .item.active");
+        if (act)
+            act.classList.remove("active");
+
+        item.classList.add("active");
+
+        select_theme(name);
+    }
 }
 
 
@@ -333,6 +326,26 @@ function create_theme(name, json, css, bg, callback, remoteUrl, icon, active) {
     chrome.storage.local.set({themes: themes}, function(){
         callback(true);
     });
+}
+
+
+/**
+ * Set a specific theme to currently selected
+ * @param String name - name of theme, falsy if selecting none
+ */
+function select_theme(name) {
+    defaultUser.saveSetting("currentTheme", name);
+
+    var current = document.querySelector("#themes-carousel .item.current"),
+        ownElm = document.querySelector("#themes-carousel .item[data-theme-name='"+name+"']");
+    
+    if (current)
+        current.classList.remove("current");
+
+    if (name && ownElm)
+        ownElm.classList.add("current");
+
+    document.querySelector(".cur-theme").value = name || "-none";
 }
 
 
@@ -459,6 +472,14 @@ document.querySelector(".theme-modal-confirm-delete .confirm").addEventListener(
 
     delete themes[theme];
     chrome.storage.local.set({themes: themes});
+});
+
+/**
+ * Hook the "current theme" dropdown
+ */
+document.querySelector(".cur-theme").addEventListener("change", function(){
+    var val = this.value;
+    select_theme(val)
 });
 
 /**
