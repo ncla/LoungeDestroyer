@@ -379,6 +379,10 @@ $(document).ready(function() {
         }
     }); // TO-DO: save setting
     document.body.appendChild(container);
+
+    $('body > :not(#modalPreview)').click(function() {
+        $("#modalPreview").hide();
+    });
 });
 
 /*
@@ -426,10 +430,12 @@ $(document).on("mouseover", ".matchmain", function() {
                 doc.body.innerHTML = data;
                 var bestOfType = $(doc).find(".box-shiny-alt:eq(0) .half:eq(1)").text().trim();
                 var exactTime = $(doc).find(".box-shiny-alt:eq(0) .half:eq(2)").text().trim();
-                if(bestOfType && exactTime) {
-                    $(".matchheader .whenm:eq(0)", matchElement)
-                        .append('<span class="matchExactTime"> <span class="seperator">|</span> ' + exactTime + ' <span class="seperator">|</span> </span>')
-                        .append('<span class="bestoftype">' + bestOfType + '</span>')
+                var matchHeaderBlock = $(".matchheader .whenm:eq(0)", matchElement);
+                if(exactTime) {
+                    $(matchHeaderBlock).append('<span class="matchExactTime"> <span class="seperator">|</span> ' + exactTime + '</span>');
+                }
+                if(bestOfType) {
+                    $(matchHeaderBlock).append(' <span class="seperator">|</span> <span class="bestoftype">' + bestOfType + '</span>');
                 }
                 $(matchElement).addClass("extraMatchInfo");
                 $(matchElement).removeClass("loading");
