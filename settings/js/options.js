@@ -221,6 +221,8 @@ function theme_create_element(name, obj, active) {
         item.classList.add("active");
     }
 
+    // avoid HTML injection
+    obj = escape_obj(obj);
     
     var optionsHTML = "<h2 class='text-primary'>Options <small>"+obj.title+(obj.remote && obj.url ? " - <a href='"+obj.url+"' class='text-info'>"+obj.url+"</a>" : "")+"</small></h2>";
     if (obj.options || obj.custom) {
@@ -445,7 +447,7 @@ document.querySelector(".theme-modal-confirm-delete .confirm").addEventListener(
 
     $(".theme-modal-confirm-delete").modal("hide");
     var themeElm = document.querySelector("#themes-carousel .item[data-theme-name='"+theme+"']"),
-        nextThemeElm = themeElm.nextSibling || themeElm.parentNode.firstChild;
+        nextThemeElm = themeElm.nextSibling || themeElm.parentNode.querySelector(".item:first-of-type");
 
     if (themeElm.classList.contains("current")) {
         defaultUser.saveSetting("currentTheme", "");
@@ -465,4 +467,34 @@ document.querySelector(".theme-modal-confirm-delete .confirm").addEventListener(
  */
 function error_proxy(err) {
     console.error(err);
+}
+
+/**
+ * Escapes all string properties in an object
+ * Deeply (mhmm)
+ * @param Object obj - object to escape
+ */
+function escape_obj(obj) {
+    for (var k in obj) {
+        if (!obj.hasOwnProperty(k))
+            continue;
+
+        var val = obj[k];
+        if (typeof val === "string") {
+            obj[k] = val.replace(/[<>"']/g, function(s){
+                return ({
+                    "<": "&lt;",
+                    ">": "&gt;",
+                    '"': "&quot;",
+                    "'": "&#39;",
+                })[s];
+            });
+        } else if (val instanceof Object) {
+            obj[k] = escape_obj(val);
+        } else {
+            continue;
+        }
+    }
+
+    return obj;
 }
