@@ -128,7 +128,16 @@ function init() {
     }
 
     $(document).ready(function() {
+        // add describing classes to body
         $("body").addClass("appID" + appID);
+        var themeChangeElm;
+        // dark/light theme
+        if (themeChangeElm = document.querySelector(".ddbtn a:nth-of-type(2)")) {
+            var theme = /\?skin=([0-9])/.exec(themeChangeElm.href)[1];
+            document.body.classList.add(["dark", "light"][theme]);
+        }
+        // main/match/whatever
+        document.body.classList.add(window.location.pathname.replace("/","") || "main");
 
         if(document.URL.indexOf("/mytrades") != -1 || $("a:contains('Clean messages')").length) {
             $("body").addClass("mytrades");
@@ -270,7 +279,7 @@ function init() {
                         span = header.querySelector("span[style*=\"float: right\"]"),
                         btn = document.createElement("a");
 
-                    btn.className = "button";
+                    btn.className = "button destroyer live-preview";
                     btn.innerHTML = "Preview";
                     btn.style.float = "none";
 
@@ -289,8 +298,12 @@ function init() {
                         }
                     }
 
-                    var tradeId = elm.querySelector("a[href^=\"trade?\"]").getAttribute("href").replace("trade?t=",""),
+                    var tradeId = elm.querySelector("a[href^=\"trade?\"]"),
                         self = this instanceof $ ? this : $(this);
+                    if (tradeId)
+                        tradeId = tradeId.getAttribute("href").replace("trade?t=","");
+                    else
+                        return;
 
                     // magic happens here
                     btn.addEventListener("click", function(){
