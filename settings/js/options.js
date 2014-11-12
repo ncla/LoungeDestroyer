@@ -478,6 +478,8 @@ function escape_obj(obj) {
     for (var k in obj) {
         if (!obj.hasOwnProperty(k))
             continue;
+        if(k === "css")
+            continue;
 
         var val = obj[k];
         if (typeof val === "string") {
