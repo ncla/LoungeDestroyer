@@ -128,7 +128,16 @@ function init() {
     }
 
     $(document).ready(function() {
+        // add describing classes to body
         $("body").addClass("appID" + appID);
+        var themeChangeElm;
+        // dark/light theme
+        if (themeChangeElm = document.querySelector(".ddbtn a:nth-of-type(2)")) {
+            var theme = /\?skin=([0-9])/.exec(themeChangeElm.href)[1];
+            document.body.classList.add(["dark", "light"][theme]);
+        }
+        // main/match/whatever
+        document.body.classList.add(window.location.pathname.replace("/","") || "main");
 
         if(document.URL.indexOf("/mytrades") != -1 || $("a:contains('Clean messages')").length) {
             $("body").addClass("mytrades");
