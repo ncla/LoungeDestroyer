@@ -134,10 +134,10 @@ function init() {
         // dark/light theme
         if (themeChangeElm = document.querySelector(".ddbtn a:nth-of-type(2)")) {
             var theme = /\?skin=([0-9])/.exec(themeChangeElm.href)[1];
-            document.body.classList.add(["dark", "light"][theme]);
+            document.body.classList.add(["ld-dark", "ld-light"][theme]);
         }
         // main/match/whatever
-        document.body.classList.add(window.location.pathname.replace("/","") || "main");
+        document.body.classList.add("ld-"+(window.location.pathname.replace("/","") || "main"));
 
         if(document.URL.indexOf("/mytrades") != -1 || $("a:contains('Clean messages')").length) {
             $("body").addClass("mytrades");
