@@ -138,3 +138,15 @@ An example JSON file for a remote theme is below:
   }
 }
 ```
+
+## Styling the theme
+
+Extension provides classes for `<body>` tag to help you style for each page and each Lounge site (classes `appID730`, `main`, `mybets` and so on). You can only modify CSS of the site, we do not provide scripting. It's the same reason that we have when developing extension, to hard code least amount of stuff possible. Another concern by us is security (possibilities to do some exploits with JS). 
+
+Their sites have inline styling in some places, and creating a CSS selector might be difficult task, but it is possible. Just because it doesn't have ID or class doesn't mean you can't select it. Take for example `.title` element that has background image showing a dice icon, you can select it like this `.title[style*="bets.png"]`.
+
+You have to test your theme on all pages there are (`/missingitems`, `/donations`, `/giveaway`). Do not forget about both site support. Although they are same structure now, make sure that everything looks fine. Don't forget about elements that are appended by extension, and think about other user-scripts/extension that add their elements.
+
+## Themes bundled with extension
+
+Styling a theme does not guarantee that we will bundle it with our extension, that is our decision whether or not to bundle your theme with extension. You will still be able to add it manually through options. If you create a theme that is an eye candy for us, we will most likely include it.
