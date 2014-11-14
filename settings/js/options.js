@@ -340,9 +340,10 @@ function select_theme(name) {
         active = document.querySelector("#themes-carousel .item.active"),
         ownElm = document.querySelector("#themes-carousel .item[data-theme-name='"+name+"']");
     
-    if (name && ownElm) {
-        if (current)
+    if (current)
         current.classList.remove("current");
+
+    if (name && ownElm) {
         if (active)
             active.classList.remove("active");
         
