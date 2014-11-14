@@ -240,7 +240,7 @@ function init() {
             }
         }
         if(document.URL.indexOf("/match?m=") != -1 || document.URL.indexOf("/predict") != -1) {
-            if(LoungeUser.userSettings["streamRemove"] == "1") {
+            if(LoungeUser.userSettings["streamRemove"] == "2") {
                 $("#stream object, #stream iframe").remove();
             }
             if (LoungeUser.userSettings.renameButtons === "1") {

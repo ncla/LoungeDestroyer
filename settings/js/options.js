@@ -12,6 +12,10 @@ function restore_options() {
     document.getElementById("version").innerHTML = manifesto.version;
     chrome.storage.local.get("userSettings", function(result) {
         var storageSettings = JSON.parse(result.userSettings);
+
+        if (storageSettings.streamRemove === "1") // temp
+            storageSettings.streamRemove = "0";
+
         $.each(storageSettings, function(index, value) {
             Settings[index] = value;
         });
@@ -346,7 +350,7 @@ function select_theme(name) {
     if (name && ownElm) {
         if (active)
             active.classList.remove("active");
-        
+
         ownElm.classList.add("current");
         ownElm.classList.add("active");
     }
