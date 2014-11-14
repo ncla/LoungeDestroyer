@@ -81,8 +81,6 @@ function init() {
             var theme = themes[name],
                 style;
 
-            console.log("Theme: "+theme);
-
             if (!theme.css) {
                 var themePath = "themes/"+LoungeUser.userSettings.currentTheme+"/inject.css";
                 chrome.runtime.sendMessage({getFile: themePath}, function(data){
@@ -111,6 +109,24 @@ function init() {
                     document.head.appendChild(style);
                 });
             }
+
+            $(document).ready(function(){
+                // collapsible menus and columns
+                if (theme.collapsibleColumns) {
+                    var collapsibleElms = document.querySelectorAll("#submenu, .box");
+                    for (var i = 0, j = collapsibleElms.length; i < j; ++i) {
+                        console.log("Collapsing ", collapsibleElms[i]);
+                        var hide_toggle = document.createElement("div"),
+                            parentFirst = collapsibleElms[i].firstChild;
+
+                        hide_toggle.className = "ld-collapse-toggle";
+                        hide_toggle.addEventListener("click", (function(elm){return function(){
+                            elm.classList.toggle("ld-collapsed");
+                        }})(collapsibleElms[i]));
+                        collapsibleElms[i].insertBefore(hide_toggle, parentFirst);
+                    }
+                }
+            });
 
             // load options
             console.log("Got theme: ",theme);

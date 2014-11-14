@@ -337,13 +337,18 @@ function select_theme(name) {
     defaultUser.saveSetting("currentTheme", name);
 
     var current = document.querySelector("#themes-carousel .item.current"),
+        active = document.querySelector("#themes-carousel .item.active"),
         ownElm = document.querySelector("#themes-carousel .item[data-theme-name='"+name+"']");
     
-    if (current)
+    if (name && ownElm) {
+        if (current)
         current.classList.remove("current");
-
-    if (name && ownElm)
+        if (active)
+            active.classList.remove("active");
+        
         ownElm.classList.add("current");
+        ownElm.classList.add("active");
+    }
 
     document.querySelector(".cur-theme").value = name || "-none";
 }
