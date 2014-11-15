@@ -1,6 +1,6 @@
 var betStatus = {
 	enabled: false,
-	type: "autoBet", // autoBet || autoReturn
+	type: "autoBet", // autoBet || autoReturn || autoFreeze
 	betTime: 0,
 	rebetDelay: 5000
 };
@@ -30,13 +30,21 @@ function enableAuto(worth, match, tries, error) {
 		for (var i = 0; i < typeSpans.length; ++i) {
 			typeSpans[i].textContent = "betting";
 		}
-	} else {
+	} else if (betStatus.type === "autoReturn") {
 		document.querySelector(".destroyer.auto-info .worth-container").className = "worth-container hidden";
 		document.querySelector(".destroyer.auto-info button").textContent = "Disable auto-return";
 
 		var typeSpans = document.querySelectorAll(".destroyer.auto-info .type");
 		for (var i = 0; i < typeSpans.length; ++i) {
 			typeSpans[i].textContent = "returning";
+		}
+	} else {
+		document.querySelector(".destroyer.auto-info .worth-container").className = "worth-container hidden";
+		document.querySelector(".destroyer.auto-info button").textContent = "Disable auto-freeze";
+
+		var typeSpans = document.querySelectorAll(".destroyer.auto-info .type");
+		for (var i = 0; i < typeSpans.length; ++i) {
+			typeSpans[i].textContent = "freezing";
 		}
 	}
 
@@ -79,7 +87,10 @@ chrome.runtime.sendMessage({get: "autoBet"}, function(data){
 
 // listen for auto-betting updates
 chrome.runtime.onMessage.addListener(function(request,sender,sendResponse){
-	var data = request[request.hasOwnProperty("autoBet") ? "autoBet" : "autoReturn"];
+	var data = request[request.hasOwnProperty("autoBet") ? "autoBet" : 
+	                   request.hasOwnProperty("autoReturn") ? "autoReturn" :
+	                   "autoFreeze"];
+
 	/*console.log("Received message:");
 	console.log(request);
 	console.log(data);*/
@@ -107,7 +118,10 @@ chrome.runtime.onMessage.addListener(function(request,sender,sendResponse){
 	}
 
 	if (data) {
-		betStatus.type = request.autoBet ? "autoBet" : "autoReturn";
+		betStatus.type = request.autoBet ? "autoBet" : 
+		                 request.autoReturn ? "autoReturn" :
+		                 request.autoFreeze ? "autoFreeze" : 
+		                 "";
 
 		// autobetting has started
 		if (data.time && data.rebetDelay) {
