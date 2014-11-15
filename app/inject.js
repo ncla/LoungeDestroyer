@@ -115,7 +115,6 @@ function init() {
                 if (theme.collapsibleColumns) {
                     var collapsibleElms = document.querySelectorAll("#submenu, .box");
                     for (var i = 0, j = collapsibleElms.length; i < j; ++i) {
-                        console.log("Collapsing ", collapsibleElms[i]);
                         var hide_toggle = document.createElement("div"),
                             parentFirst = collapsibleElms[i].firstChild;
 

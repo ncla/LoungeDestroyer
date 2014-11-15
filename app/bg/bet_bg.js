@@ -203,8 +203,8 @@ bet.autoLoop = function(game) {
         console.log({url: bet.betData[g].url, data: bet.betData[g].data});
         $.ajax({
             url: bet.betData[g].url,
-            type: bet.type[g] === "autoBet" ? "POST" : "GET",
-            data: bet.type[g] === "autoBet" ? bet.betData[g].data : "",
+            type: ["autoBet","autoFreeze"].indexOf(bet.type[g]) !== -1 ? "POST" : "GET",
+            data: ["autoBet","autoFreeze"].indexOf(bet.type[g]) !== -1 ? bet.betData[g].data : "",
             success: (function(g){return function(data) {
                 // Lounge returns nothing if success
                 if (data) {
@@ -235,6 +235,28 @@ bet.autoLoop = function(game) {
                     var msg = {};
                     msg[bet.type[g]] = true;
                     sendMessageToContentScript(msg, -1-g);
+
+                    // if it's an autoFreeze request, start returning
+                    if (bet.type[g] === "autoFreeze") {
+                        // start autoReturning if fails
+                        var newCallback = function(response){
+                            bet.type[game] = "autoReturn";
+
+                            if (!response) {
+                                bet.disableAuto(true, game);
+                                return;
+                            }
+
+                            bet.enableAuto(url, data || "", !game);
+                        };
+
+                        // send return request
+                        $.ajax({
+                            url: bet.baseUrls[game]+"ajax/postToReturn.php", 
+                            type: "GET",
+                            success: newCallback
+                        });
+                    }
                 }
             }})(g),
             error: (function(g){return function(xhr) {
@@ -354,8 +376,8 @@ chrome.webRequest.onBeforeRequest.addListener(
         }
 
         newCallback = (function(url, data){return function(response){
-            bet.type[game] = data ? "autoBet" : "autoReturn";
-            bet.matchNum[game] = data ? data.match : "";
+            bet.type[game] = this.type || bet.disableAuto(true, game);
+            bet.matchNum[game] = this.match ? data.match : "";
 
             if (!response) {
                 bet.disableAuto(true, game);
@@ -373,9 +395,13 @@ chrome.webRequest.onBeforeRequest.addListener(
             $.ajax({
                 url: details.url, 
                 type: "GET",
-                success: newCallback});
+                success: newCallback.bind({
+                    type: "autoReturn",
+                    match: false
+                })
+            });
 
-            console.log("Intercepting request:");
+            console.log("Intercepting return request:");
             console.log(details);
 
             return {cancel: true};
@@ -387,12 +413,36 @@ chrome.webRequest.onBeforeRequest.addListener(
                 url: details.url, 
                 type: "POST",
                 data: data,
-                success: newCallback});
+                success: newCallback.bind({
+                    type: "autoBet",
+                    match: true
+                })
+            });
 
-            console.log("Intercepting request:");
+            console.log("Intercepting bet request:");
             console.log(details);
 
             return {cancel: true};
+        }
+
+        // if it's a freeze request
+        if (data["lquality[]"] !== undefined && data.on === undefined) {
+            // unfortunately can't detect freeze purely from data
+            if (pathRegexp.exec(details.url)[1] !== "ajax/postToFreeze.php")
+                return;
+
+            $.ajax({
+                url: details.url,
+                type: "POST",
+                data: data,
+                success: newCallback.bind({
+                    type: "autoFreeze",
+                    match: false
+                })
+            });
+
+            console.log("Intercepting freeze request:");
+            console.log(details);
         }
     },
     {
