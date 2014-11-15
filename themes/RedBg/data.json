@@ -5,6 +5,7 @@
 	"description": "For when white just isn't fancy enough",
 	"bg": "$dir/bg.png",
 	"icon": "$dir/icon.png",
+	"collapsibleColumns": true,
 	"options": {
 		"redHeader": {
 			"description": "Change header background too",

@@ -21,7 +21,7 @@ User.prototype.defaultSettings =
     marketCurrency: "1",
     itemMarketPricesv2: "1",
     redirect: "1",
-    streamRemove: "1",
+    removeStream: "0",
     delayBotsOff: "30000",
     delayBotsOn: "5000",
     delayRelogError: "15000",

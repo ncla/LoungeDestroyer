@@ -81,6 +81,10 @@ The following JSON structure is understood by the theme parser. Note that, when 
       <td><em>Required</em> for remote themes. Not used for local themes. Shorthand name of theme, used internally. Must be valid Javascript variable name.</td>
     </tr>
     <tr>
+      <td>collapsibleColumns</td>
+      <td>Whether to prepend a <code>div.ld-collapse-toggle</code> to all columns (and the side menu), which toggles the <code>.ld-collapsed</code> class on click.</td>
+    </tr>
+    <tr>
       <td>options</td>
       <td>
         <p>Optional options for theme. Currently only supports checkboxes.</p>

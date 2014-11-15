@@ -427,3 +427,7 @@ http://codepen.io/larrygeams/pen/nhgze
     display: none;
 }
 #preview.destroyer .tradepoll { min-height: 0; }
+
+.ld-collapse-toggle {
+    display: none;
+}
