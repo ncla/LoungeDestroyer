@@ -93,6 +93,11 @@ function init() {
                     style.textContent = data.data;
                     $(document).ready(function(){
                         document.head.appendChild(style);
+                        // apply into all iframes
+                        /*var iframes = document.getElementsByTagName("iframe");
+                        for (var i = 0, j = iframes.length; i < j; ++i) {
+                            $(iframes[i]).contents().find("head")[0].appendChild(style);
+                        }*/
                     });
                 });
             } else {

@@ -56,6 +56,7 @@ chrome.extension.onMessage.addListener(function (request, sender, sendResponse) 
     			// read file content
     			var reader = new FileReader();
     			reader.addEventListener("loadend", function(val){
+                    chrome.tabs.insertCSS(sender.tab.id, {code: this.result, runAt: "document_start", allFrames: true}, function(x){console.log(x)});
     				sendResponse({data: this.result});
     			});
     			reader.addEventListener("error", function(err){
