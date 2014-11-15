@@ -93,11 +93,6 @@ function init() {
                     style.textContent = data.data;
                     $(document).ready(function(){
                         document.head.appendChild(style);
-                        // apply into all iframes
-                        /*var iframes = document.getElementsByTagName("iframe");
-                        for (var i = 0, j = iframes.length; i < j; ++i) {
-                            $(iframes[i]).contents().find("head")[0].appendChild(style);
-                        }*/
                     });
                 });
             } else {
@@ -244,7 +239,7 @@ function init() {
             }
         }
         if(document.URL.indexOf("/match?m=") != -1 || document.URL.indexOf("/predict") != -1) {
-            if(LoungeUser.userSettings["streamRemove"] == "2") {
+            if(LoungeUser.userSettings["removeStream"] == "1") {
                 $("#stream object, #stream iframe").remove();
             }
             if (LoungeUser.userSettings.renameButtons === "1") {

@@ -13,9 +13,6 @@ function restore_options() {
     chrome.storage.local.get("userSettings", function(result) {
         var storageSettings = JSON.parse(result.userSettings);
 
-        if (storageSettings.streamRemove === "1") // temp
-            storageSettings.streamRemove = "0";
-
         $.each(storageSettings, function(index, value) {
             Settings[index] = value;
         });
