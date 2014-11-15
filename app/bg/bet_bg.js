@@ -105,6 +105,7 @@ var bet = { // not a class - don't instantiate
 // ldef_index%5B%5D=2682&lquality%5B%5D=0&id%5B%5D=711923886&worth=0.11&on=a&match=1522&tlss=2e7877e8d42fb969c5f6f517243c2d19
 bet.enableAuto = function(url, data, csgo) {
     console.log("Auto-betting");
+    console.log(data);
     var g = csgo ? 0 : 1; // short for game
 
     if (bet.autoBetting[g]) {
@@ -142,6 +143,9 @@ bet.enableAuto = function(url, data, csgo) {
             data: data,
             worth: worth
         };
+    };
+    if (bet.type[g] === "autoFreeze") {
+        bet.betData[g] = data;
     }
 
     bet.betData[g].url = url;
@@ -203,8 +207,9 @@ bet.autoLoop = function(game) {
         console.log({url: bet.betData[g].url, data: bet.betData[g].data});
         $.ajax({
             url: bet.betData[g].url,
-            type: ["autoBet","autoFreeze"].indexOf(bet.type[g]) !== -1 ? "POST" : "GET",
-            data: ["autoBet","autoFreeze"].indexOf(bet.type[g]) !== -1 ? bet.betData[g].data : "",
+            timeout: 10000,
+            type: bet.type[g] === "autoBet" ? "POST" : "GET",
+            data: bet.type[g] === "autoBet" ? bet.betData[g].data : "",
             success: (function(g){return function(data) {
                 // Lounge returns nothing if success
                 if (data) {
@@ -235,28 +240,6 @@ bet.autoLoop = function(game) {
                     var msg = {};
                     msg[bet.type[g]] = true;
                     sendMessageToContentScript(msg, -1-g);
-
-                    // if it's an autoFreeze request, start returning
-                    if (bet.type[g] === "autoFreeze") {
-                        // start autoReturning if fails
-                        var newCallback = function(response){
-                            bet.type[game] = "autoReturn";
-
-                            if (!response) {
-                                bet.disableAuto(true, game);
-                                return;
-                            }
-
-                            bet.enableAuto(url, data || "", !game);
-                        };
-
-                        // send return request
-                        $.ajax({
-                            url: bet.baseUrls[game]+"ajax/postToReturn.php", 
-                            type: "GET",
-                            success: newCallback
-                        });
-                    }
                 }
             }})(g),
             error: (function(g){return function(xhr) {
@@ -346,7 +329,7 @@ var pathRegexp = new RegExp("https?://.*?/(.*)");
 
 // overwrite betting/return requests for autoing
 chrome.webRequest.onBeforeRequest.addListener(
-    function(details) {
+    function requestListener(details) {
         if (["0","3"].indexOf(LoungeUser.userSettings.enableAuto) !== -1)
             return;
 
@@ -398,7 +381,8 @@ chrome.webRequest.onBeforeRequest.addListener(
                 success: newCallback.bind({
                     type: "autoReturn",
                     match: false
-                })
+                }),
+                error: requestListener.bind(this, details)
             });
 
             console.log("Intercepting return request:");
@@ -416,33 +400,14 @@ chrome.webRequest.onBeforeRequest.addListener(
                 success: newCallback.bind({
                     type: "autoBet",
                     match: true
-                })
+                }),
+                error: requestListener.bind(this, details)
             });
 
             console.log("Intercepting bet request:");
             console.log(details);
 
             return {cancel: true};
-        }
-
-        // if it's a freeze request
-        if (data["lquality[]"] !== undefined && data.on === undefined) {
-            // unfortunately can't detect freeze purely from data
-            if (pathRegexp.exec(details.url)[1] !== "ajax/postToFreeze.php")
-                return;
-
-            $.ajax({
-                url: details.url,
-                type: "POST",
-                data: data,
-                success: newCallback.bind({
-                    type: "autoFreeze",
-                    match: false
-                })
-            });
-
-            console.log("Intercepting freeze request:");
-            console.log(details);
         }
     },
     {
