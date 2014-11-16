@@ -243,11 +243,11 @@ function init() {
                 $("#stream object, #stream iframe").remove();
             }
             if (LoungeUser.userSettings.renameButtons === "1") {
-                var btn = document.getElementById("placebut"),
-                    txt = btn.textContent.toUpperCase();
-                    
-                if (btn)
+                var btn = document.getElementById("placebut");
+                if (btn) {
+                    var txt = btn.textContent.toUpperCase();
                     btn.textContent = "FUCKING "+txt;
+                }
             }
             $("a.tab:contains('Returns')").after('<a class="tab" id="ld_cache" onclick="returns = false;">Cached inventory</div>');
             $("section.box .tab").width("33%").click(function() {
