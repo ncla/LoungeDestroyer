@@ -154,6 +154,11 @@ function theme_data_handler(){
         obj = this.obj,
         name = this.themeName;
 
+    if (!json.bg)
+        json.bg = obj.bg;
+    if (!json.icon)
+        json.icon = obj.icon;
+    
     // overwrite settings with saved settings
     if (json.options) {
         for (var k in obj.options) {
@@ -162,6 +167,15 @@ function theme_data_handler(){
             } else {
                 delete obj.options[k];
             }
+        }
+    }
+
+    // if JSON isn't empty, remove any key not found in JSON
+    if (Object.keys(json).length) {
+        console.log("Removing keys from ",obj, " based on ",json);
+        for (var k in obj) {
+            if (!json.hasOwnProperty(k))
+                delete obj[k];
         }
     }
 
