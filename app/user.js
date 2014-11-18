@@ -36,7 +36,8 @@ User.prototype.defaultSettings =
     addTradePreviews: "1",
     notifyTradeOffer: "1",
     currentTheme: "",
-    showExtraMatchInfo: "2"
+    showExtraMatchInfo: "2",
+    autoBump: "1"
 };
 
 User.prototype.loadUserSettings = function(callback) {
