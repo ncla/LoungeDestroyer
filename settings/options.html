@@ -51,11 +51,13 @@
             margin: 0 5px 0 0;
             vertical-align: middle;
         }
-        .options-toggle {
+        .theme-buttons {
             z-index: 999;
             position: absolute;
             right: 10px;
             top: 10px;
+        }
+        .theme-buttons * {
             padding: 5px !important;
             margin: 0 !important;
 
@@ -63,8 +65,13 @@
             appearance: none;
             outline: none !important;
             color: #fff;
-            font-size: 18px;
+            font-size: 16px;
             text-shadow: 1px 1px #000;
+            cursor: pointer;
+        }
+        .theme-buttons *:hover { 
+            color: #ccc !important;
+            text-decoration: none !important;
         }
         .options-toggle:checked ~ .theme-container > * {
             -webkit-filter: blur(5px);

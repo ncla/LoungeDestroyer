@@ -586,8 +586,17 @@ var itemObs = new MutationObserver(function(records){
         if (records[i].addedNodes && records[i].addedNodes.length) {
             for (var k = 0, l = records[i].addedNodes.length; k < l; ++k) {
                 var elm = records[i].addedNodes[k];
-                if (elm.classList && elm.classList.contains("oitm")) {
-                    marketItem($(elm));
+                if (elm.classList) {
+                    var oitmElms;
+                    if (elm.classList.contains("oitm")) {
+                        marketItem($(elm));
+                    } else if ((oitmElms = $(elm).find(".oitm")).length) {
+                        oitmElms.each(function(x){
+                            // MASSIVE LAG
+                            // loads for 1.4k+ items - possibly use web worker?
+                            //marketItem($(this));
+                        });
+                    }
                 }
             }
         }
