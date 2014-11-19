@@ -203,6 +203,27 @@ function init() {
                     btn.textContent = "FUCKING REQUEST RETURNS";
             }
 
+            // inject primitive auto-freeze
+            if (["2","1"].indexOf(LoungeUser.userSettings.enableAuto) !== -1) {
+                var btn = document.getElementById("freezebutton");
+                if (btn) {
+                    console.log("Replacing postToFreezeReturn");
+                    // remove old onclick listener
+                    btn.removeAttribute("onclick");
+                    btn.onclick = null;
+                    var oldBtn = btn,
+                        btn = oldBtn.cloneNode(true);
+                    oldBtn.parentNode.replaceChild(btn,oldBtn);
+
+                    // inject own
+                    btn.addEventListener("click", function(){
+                        if (this.textContent !== "Are you sure") {
+                            $(this).html("Are you sure").on("click", newFreezeReturn);
+                        }
+                    });
+                }
+            }
+
             $(".matchmain").each(function(index, value) {
                 var total = 0;
                 $(".item", value).each(function(itemIndex, itemValue) {
@@ -427,6 +448,68 @@ $(document).ready(function() {
         }
     });
 });
+
+// postToFreezeReturn overwrite
+function newFreezeReturn(tries){
+    var toreturn = retrieveWindowVariables("toreturn")["toreturn"];
+    if (toreturn === "true") {
+        // hacky hacky UI stuff
+        var toHide = document.querySelectorAll(".destroyer.auto-info > *:not(:first-child)");
+        for (var i = 0, j = toHide.length; i < j; ++i) {
+            if (toHide[i].classList)
+                toHide[i].classList.remove("hidden");
+        }
+        // end hacky hacky UI stuff
+
+        $.ajax({
+            url: "ajax/postToReturn.php",
+            success: function(data) {
+                if (data) { // this should never happen
+                    console.error("Whoops, this shouldn't happen: ",data);
+                } else {
+                    console.error("This shouldn't happen.");
+                }
+            }
+        });
+    } else {
+        // hacky hacky UI stuff
+        document.querySelector(".destroyer.auto-info").classList.remove("hidden");
+        var ordinalEnding = ((tries||0)+"").slice(-1);
+        ordinalEnding = (tries%100 < 20 &&
+                        tries%100 > 10) ? "th" : // if a "teen" number, end in th
+                        ordinalEnding === "1" ? "st":
+                        ordinalEnding === "2" ? "nd":
+                        ordinalEnding === "3" ? "rd":
+                        "th";
+        document.querySelector(".destroyer.auto-info .num-tries").textContent = (tries||0)+ordinalEnding;
+        var toHide = document.querySelectorAll(".destroyer.auto-info > *:not(:first-child)");
+        for (var i = 0, j = toHide.length; i < j; ++i) {
+            if (toHide[i].classList)
+                toHide[i].classList.add("hidden");
+        }
+
+        var typeSpans = document.querySelectorAll(".destroyer.auto-info .type");
+        for (var i = 0, j = typeSpans.length; i < j; ++i) {
+            typeSpans[i].textContent = "freezing";
+        }
+        // end hacky hacky UI stuff
+
+        $.ajax({
+            url: "ajax/postToFreeze.php",
+            data: $("#freeze").serialize(),
+            type: "POST",
+            success: function(data) {
+                console.error("Succeeded in freezing");
+                if (data) {
+                    console.error(data);
+                } else {
+                    setWindowVariables({toreturn: true});
+                }
+                newFreezeReturn(tries+1);
+            }
+        });
+    }
+}
 
 /*
     Mouseover action for items

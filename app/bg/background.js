@@ -30,12 +30,6 @@ chrome.extension.onMessage.addListener(function (request, sender, sendResponse) 
         sendResponse(lastBackpackAjaxURL);
     }
 
-    // Inject JS file to specific tab
-    if(request.hasOwnProperty("injectScript")) {
-        console.log("Injecting script ("+request.injectScript+") into tab "+sender.tab.id);
-        chrome.tabs.executeScript(sender.tab.id, {file: "src/inject/app/"+request.injectScript}); // TODO: support relative path
-    }
-
     // Injext CSS file to specific tab
     if(request.hasOwnProperty("injectCSS")) {
     	console.log("Injecting CSS ("+request.injectCSS+") into tab "+sender.tab.id);
