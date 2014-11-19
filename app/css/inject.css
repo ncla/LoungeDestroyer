@@ -431,3 +431,8 @@ http://codepen.io/larrygeams/pen/nhgze
 .ld-collapse-toggle {
     display: none;
 }
+#ld-streamRemovedWrapper {
+    padding: 10px 10px;
+    display: block;
+    float: left;
+}

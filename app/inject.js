@@ -39,7 +39,8 @@ var storageMarketItems,
     currencies = {},
     themes = {},
     streamPlaying = false,
-    inventory = false;
+    inventory = false,
+    streamHTML = null;
 
 var container = document.createElement("div");
 
@@ -240,7 +241,13 @@ function init() {
         }
         if(document.URL.indexOf("/match?m=") != -1 || document.URL.indexOf("/predict") != -1) {
             if(LoungeUser.userSettings["removeStream"] == "1") {
-                $("#stream object, #stream iframe").remove();
+                var $streamElement = $("#mainstream");
+                streamHTML = $streamElement.html();
+                $streamElement.children().remove();
+                $streamElement.html('<div id="ld-streamRemovedWrapper">Stream has been removed from page by LoungeDestroyer. <a id="ld-restoreStream">Show stream</a></div>');
+                $("#ld-restoreStream", $streamElement).click(function() {
+                    $streamElement.html(streamHTML);
+                });
             }
             if (LoungeUser.userSettings.renameButtons === "1") {
                 var btn = document.getElementById("placebut");
