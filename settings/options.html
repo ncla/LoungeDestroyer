@@ -51,13 +51,12 @@
             margin: 0 5px 0 0;
             vertical-align: middle;
         }
-        .theme-buttons {
+        .options-toggle, .theme-changelog {
             z-index: 999;
             position: absolute;
             right: 10px;
             top: 10px;
-        }
-        .theme-buttons * {
+
             padding: 5px !important;
             margin: 0 !important;
 
@@ -69,7 +68,11 @@
             text-shadow: 1px 1px #000;
             cursor: pointer;
         }
-        .theme-buttons *:hover { 
+        .options-toggle + .theme-changelog {
+            right: 32px;
+            top: 11px;
+        }
+        .theme-changelog:hover, .options-toggle:hover { 
             color: #ccc !important;
             text-decoration: none !important;
         }

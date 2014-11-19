@@ -224,11 +224,8 @@ function theme_create_element(name, obj, active) {
     
     var optionsHTML = "<h2 class='text-primary'>Options <small>"+obj.title+(obj.remote && obj.url ? " - <a href='"+obj.url+"' class='text-info'>"+obj.url+"</a>" : "")+"</small></h2>";
     if (obj.options || obj.custom || obj.changelog) {
-        var cont = document.createElement("div");
-        cont.className = "theme-buttons";
-
         if (obj.options || obj.custom) {
-            cont.innerHTML += "<input id='"+name+"-options-toggle' type='checkbox' class='options-toggle glyphicon glyphicon-cog'>";
+            item.innerHTML += "<input id='"+name+"-options-toggle' type='checkbox' class='options-toggle glyphicon glyphicon-cog'>";
             for (var k in obj.options) {
                 optionsHTML += "<div>";
                 optionsHTML += "<label for='"+name+"-"+k+"'>";
@@ -242,10 +239,8 @@ function theme_create_element(name, obj, active) {
             }
         }
         if (obj.changelog) {
-            cont.innerHTML += "<a target='_blank' href='"+obj.changelog+"' class='glyphicon glyphicon-list'></a>";
+            item.innerHTML += "<a target='_blank' href='"+obj.changelog+"' class='theme-changelog glyphicon glyphicon-list'></a>";
         }
-
-        item.appendChild(cont);
     }
     
     // dirty dirty
