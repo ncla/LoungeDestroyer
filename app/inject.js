@@ -282,6 +282,8 @@ function init() {
         (function(){
             if (LoungeUser.userSettings.addTradePreviews === "0")
                 return;
+            if (!document.getElementById("logout"))
+                return;
 
             var previewElm = document.getElementById("preview");
             
@@ -389,6 +391,12 @@ function init() {
     Code that does not rely heavily on Chrome storage data
  */
 $(document).ready(function() {
+    // listen for additions to items
+    itemObs.observe(document.body, {
+        childList: true,
+        subtree: true
+    });
+
     // create info box in top-right
     container.className = "destroyer auto-info hidden";
     container.innerHTML = '<p>Auto-<span class="type">betting</span> items<span class="worth-container"> on match <a class="match-link"></a></span>. <span class="type capitalize">Betting</span> for the <span class="num-tries">0th</span> time.</p><button class="red">Disable auto-bet</button><p class="destroyer error-title">Last error (<span class="destroyer time-since">0s</span>):</p><p class="destroyer error-text"></p><label>Seconds between retries:</label><input id="bet-time" type="number" min="5" max="60" step="1">';
@@ -423,13 +431,14 @@ $(document).ready(function() {
 /*
     Mouseover action for items
  */
-$(document).on("mouseover", ".oitm", function() {
-    var LoungeItem = new Item($(this));
-    var settingMarketPrices = LoungeUser.userSettings["itemMarketPricesv2"];
+function marketItem(jQElm) {
+    var LoungeItem = new Item(jQElm),
+        settingMarketPrices = LoungeUser.userSettings["itemMarketPricesv2"];
+
     if(settingMarketPrices == "1" || settingMarketPrices == "2") {
         LoungeItem.getMarketPrice();
     }
-    if(!$(this).hasClass("ld-appended")) {
+    if(!jQElm.hasClass("ld-appended")) {
         if(nonMarketItems.indexOf(LoungeItem.itemName) == -1) {
             if($("a:contains('Market')", this).length) {
                 $("a:contains('Market')", this).html("Market Listings");
@@ -441,9 +450,9 @@ $(document).on("mouseover", ".oitm", function() {
                 '<br/><br/><small><a class="refreshPriceMarket">Show Steam market price</a></small>');
         }
 
-        $(this).addClass("ld-appended");
+        jQElm.addClass("ld-appended");
         
-        $("a", this).click(function(e) {
+        $("a", jQElm[0]).click(function(e) {
             e.stopPropagation();
             if($(this).hasClass("refreshPriceMarket")) {
                 LoungeItem.unloadMarketPrice();
@@ -451,6 +460,9 @@ $(document).on("mouseover", ".oitm", function() {
             }
         });
     }
+}
+$(document).on("mouseover", ".oitm", function() {
+    marketItem($(this));
 });
 $(document).on("mouseover", ".matchmain", function() {
     if(LoungeUser.userSettings.showExtraMatchInfo != "0" && !$(this).hasClass("extraMatchInfo") && !$(this).hasClass("loading")) {
@@ -479,5 +491,22 @@ $(document).on("mouseover", ".matchmain", function() {
                 $(matchElement).removeClass("loading");
             }
         })
+    }
+});
+
+// auto-magically add market prices to newly added items
+var itemObs = new MutationObserver(function(records){
+    if (LoungeUser.userSettings["itemMarketPricesv2"] != "2")
+        return;
+
+    for (var i = 0, j = records.length; i < j; ++i) {
+        if (records[i].addedNodes && records[i].addedNodes.length) {
+            for (var k = 0, l = records[i].addedNodes.length; k < l; ++k) {
+                var elm = records[i].addedNodes[k];
+                if (elm.classList && elm.classList.contains("oitm")) {
+                    marketItem($(elm));
+                }
+            }
+        }
     }
 });
