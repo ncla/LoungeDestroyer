@@ -482,14 +482,19 @@ function checkForExpiredItems(appID) {
 }
 function autoBumpTrades() {
 	for (var appID in baseURLs) {
+		if (LoungeUser.userSettings.autoBump != appID && LoungeUser.userSettings.autoBump != "1")
+			continue;
+
 		var url = baseURLs[appID];
 		(function(url, appID){return function self(){
 			console.log("Checking ",url," for bumpable trades");
 			$.ajax({
 				url: url+"mytrades",
 				success: function(resp, txt, xhr){
-					var query = $(resp),
-					    bumpBtns = query.find(".buttonright[onclick*='bumpTrade']");
+					var doc = document.implementation.createHTMLDocument("");
+					doc.body.innerHTML = resp;
+
+					var bumpBtns = $(".buttonright[onclick*='bumpTrade']", doc);
 
 					if (!bumpBtns.length)
 						return;

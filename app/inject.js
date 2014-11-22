@@ -381,11 +381,6 @@ function init() {
                             success: function(d){
                                 previewElm.html(d).slideDown("fast");
                                 previewElm.attr("data-index", ind);
-
-                                // add market prices to items if they should auto-load
-                                if (LoungeUser.userSettings.itemMarketPricesv2 == "2") {
-                                    getMarketPricesFromParent(document.getElementById("preview"));
-                                }
                             }
                         })
                     });
@@ -590,12 +585,9 @@ var itemObs = new MutationObserver(function(records){
                     var oitmElms;
                     if (elm.classList.contains("oitm")) {
                         marketItem($(elm));
-                    } else if ((oitmElms = $(elm).find(".oitm")).length) {
-                        oitmElms.each(function(x){
-                            // MASSIVE LAG
-                            // loads for 1.4k+ items - possibly use web worker?
-                            //marketItem($(this));
-                        });
+                    } else if ($(elm).find(".oitm").length) {
+                        // Still slight lag, but we'll have to accept that (or implement web workers)
+                        getMarketPricesFromParent(elm);
                     }
                 }
             }
