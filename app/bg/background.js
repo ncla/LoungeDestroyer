@@ -26,6 +26,15 @@ chrome.extension.onMessage.addListener(function (request, sender, sendResponse) 
         }
     }
 
+    // for if the content script doesn't have access to User
+    if (request.hasOwnProperty("getSetting")) {
+        var resp = {};
+        for (var i = 0; i < request.getSetting.length; ++i) {
+            resp[request.getSetting[i]] = LoungeUser.userSettings[request.getSetting[i]];
+        }
+        sendResponse(resp);
+    }
+
     if(request.hasOwnProperty("giveMeBackpackURL")) {
         sendResponse(lastBackpackAjaxURL);
     }

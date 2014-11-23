@@ -446,6 +446,9 @@ $(document).ready(function() {
 
 // postToFreezeReturn overwrite
 function newFreezeReturn(tries){
+    if (typeof tries !== "number")
+        tries = 1;
+
     var toreturn = retrieveWindowVariables("toreturn")["toreturn"];
     if (toreturn === "true") {
         // hacky hacky UI stuff
@@ -494,13 +497,16 @@ function newFreezeReturn(tries){
             data: $("#freeze").serialize(),
             type: "POST",
             success: function(data) {
-                console.error("Succeeded in freezing");
                 if (data) {
                     console.error(data);
+                    setTimeout(function(){
+                        console.log("Retrying freeze for the ",tries,". time - ",data);
+                        newFreezeReturn(tries+1);
+                    }, 2000);
                 } else {
                     setWindowVariables({toreturn: true});
+                    newFreezeReturn(tries+1);
                 }
-                newFreezeReturn(tries+1);
             }
         });
     }

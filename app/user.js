@@ -37,7 +37,8 @@ User.prototype.defaultSettings =
     notifyTradeOffer: "1",
     currentTheme: "",
     showExtraMatchInfo: "2",
-    autoBump: "0"
+    autoBump: "0",
+    acceptDelay: 30
 };
 
 User.prototype.loadUserSettings = function(callback) {
