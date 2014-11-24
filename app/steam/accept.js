@@ -6,16 +6,12 @@ chrome.storage.local.get("queue", function(data){
 
 	if (!data)
 		return;
-
 	var code = /Protection code: ([0-9A-Z]{4})/.exec(document.querySelector(".quote").textContent)[1],
-	    acceptTime = Math.min(data.time, Date.now()+30000),
 	    urlRegex = /https?:\/\/(.*)/;
 	
 	if (!code || code !== data.protectionCode)
 		return;
 	if (!document.URL || urlRegex.exec(document.URL)[1] !== urlRegex.exec(data.offer)[1])
-		return;
-	if (!data.time || acceptTime-Date.now() < 10000) // won't accept offers with <10 sec left
 		return;
 
 	console.log("Enabling");
@@ -24,25 +20,40 @@ chrome.storage.local.get("queue", function(data){
 	// create UI
 	var container = document.createElement("div");
     container.className = "destroyer info";
-    container.innerHTML = '<p>LoungeDestroyer would like to accept this offer.</p><button class="red">Don\'t accept</button><p>Accepting in <b class="time-left"></b> seconds.</p>';
+    container.innerHTML = '<p>LoungeDestroyer would like to accept this offer.</p><button class="red">Don\'t accept</button><p>Accepting in <b class="time-left"></b> seconds.</p><label for="accept-time">Wait before accepting: </label><input id="accept-time" type="number" min="10" max="60" step="1" value="30">';
 
     container.querySelector("button").addEventListener("click", function(){
         clearTimeout(timer);
         container.className = "destroyer info hidden";
     });
 
-    timer = setTimeout(acceptOffer, acceptTime-Date.now());
+    container.querySelector("#accept-time").addEventListener("input", function(){
+		if (this.valueAsNumber) {
+            chrome.runtime.sendMessage({"saveSetting": {acceptDelay: this.valueAsNumber}});
+        }
+    });
 
-    // update timer
-    (function timerLoop(){
-    	if (!autoAccepting)
-    		return;
+    // load previously saved accept delay
+    chrome.runtime.sendMessage({"getSetting": ["acceptDelay"]}, function(resp){
+    	container.querySelector("#accept-time").valueAsNumber = resp.acceptDelay || 30;
 
-        var span = container.querySelector(".destroyer.info .time-left");
-        span.textContent = ((acceptTime - Date.now())/1000).toFixed(2) + "s";
+	    var acceptTime = Math.min(data.time, Date.now()+(resp.acceptDelay || 30)*1000);
+	    if (!data.time || acceptTime-Date.now() < 10000) // won't accept offers with <10 sec left
+			return;
 
-        requestAnimationFrame(timerLoop);
-    })();
+	    timer = setTimeout(acceptOffer, acceptTime-Date.now());
+
+	    // update timer
+	    (function timerLoop(){
+	    	if (!autoAccepting)
+	    		return;
+
+	        var span = container.querySelector(".destroyer.info .time-left");
+	        span.textContent = ((acceptTime - Date.now())/1000).toFixed(2) + "s";
+
+	        requestAnimationFrame(timerLoop);
+	    })();
+    });
 
     document.body.appendChild(container);
 });

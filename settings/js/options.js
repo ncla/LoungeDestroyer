@@ -154,6 +154,11 @@ function theme_data_handler(){
         obj = this.obj,
         name = this.themeName;
 
+    if (!json.bg)
+        json.bg = obj.bg;
+    if (!json.icon)
+        json.icon = obj.icon;
+    
     // overwrite settings with saved settings
     if (json.options) {
         for (var k in obj.options) {
@@ -162,6 +167,15 @@ function theme_data_handler(){
             } else {
                 delete obj.options[k];
             }
+        }
+    }
+
+    // if JSON isn't empty, remove any key not found in JSON
+    if (Object.keys(json).length) {
+        console.log("Removing keys from ",obj, " based on ",json);
+        for (var k in obj) {
+            if (!json.hasOwnProperty(k))
+                delete obj[k];
         }
     }
 
@@ -209,18 +223,23 @@ function theme_create_element(name, obj, active) {
     obj = escape_obj(obj);
     
     var optionsHTML = "<h2 class='text-primary'>Options <small>"+obj.title+(obj.remote && obj.url ? " - <a href='"+obj.url+"' class='text-info'>"+obj.url+"</a>" : "")+"</small></h2>";
-    if (obj.options || obj.custom) {
-        item.innerHTML += "<input id='"+name+"-options-toggle' type='checkbox' class='options-toggle glyphicon glyphicon-cog'>";
-        for (var k in obj.options) {
-            optionsHTML += "<div>";
-            optionsHTML += "<label for='"+name+"-"+k+"'>";
-            optionsHTML += "<input "+(obj.options[k].checked ? "checked ":"")+"type='checkbox' id='"+name+"-"+k+"' data-theme='"+name+"' data-option='"+k+"'>";
-            optionsHTML += obj.options[k].description+"</label>";
-            optionsHTML += "</div>";
-        }
+    if (obj.options || obj.custom || obj.changelog) {
+        if (obj.options || obj.custom) {
+            item.innerHTML += "<input id='"+name+"-options-toggle' type='checkbox' class='options-toggle glyphicon glyphicon-cog'>";
+            for (var k in obj.options) {
+                optionsHTML += "<div>";
+                optionsHTML += "<label for='"+name+"-"+k+"'>";
+                optionsHTML += "<input "+(obj.options[k].checked ? "checked ":"")+"type='checkbox' id='"+name+"-"+k+"' data-theme='"+name+"' data-option='"+k+"'>";
+                optionsHTML += obj.options[k].description+"</label>";
+                optionsHTML += "</div>";
+            }
 
-        if (obj.custom) {
-            optionsHTML += "<button class='btn btn-danger theme-remove' data-toggle='modal' data-target='.theme-modal-confirm-delete'>Delete theme</button>";
+            if (obj.custom) {
+                optionsHTML += "<button class='btn btn-danger theme-remove' data-toggle='modal' data-target='.theme-modal-confirm-delete'>Delete theme</button>";
+            }
+        }
+        if (obj.changelog) {
+            item.innerHTML += "<a target='_blank' href='"+obj.changelog+"' class='theme-changelog glyphicon glyphicon-list'></a>";
         }
     }
     

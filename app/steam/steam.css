@@ -42,3 +42,11 @@
 }
 .destroyer.info p { margin: 0; }
 .destroyer.info button { margin: 10px 0; width: 100%; }
+.destroyer.info input {
+    max-width: 40px;
+    background: #fff;
+    color: #000;
+    position: static;
+    border-color: #aaa;
+}
+.destroyer.info button + p { margin-bottom: 10px; }

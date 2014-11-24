@@ -116,3 +116,50 @@ function get(url, callback) {
 function isDevMode() {
     return !('update_url' in chrome.runtime.getManifest());
 }
+
+// http://stackoverflow.com/a/24344154/645768
+function retrieveWindowVariables(variables) {
+    if (typeof variables === "string")
+        variables = [variables];
+
+    var ret = {},
+        scriptContent = "";
+
+    for (var i = 0; i < variables.length; i++) {
+        var currVariable = variables[i];
+        scriptContent += "if (typeof " + currVariable + " !== 'undefined') $('body').attr('tmp_" + currVariable + "', " + currVariable + ");\n"
+    }
+
+    var script = document.createElement('script');
+    script.id = 'tmpScript';
+    script.appendChild(document.createTextNode(scriptContent));
+    (document.body || document.head || document.documentElement).appendChild(script);
+
+    for (var i = 0; i < variables.length; i++) {
+        var currVariable = variables[i];
+        ret[currVariable] = $("body").attr("tmp_" + currVariable);
+        $("body").removeAttr("tmp_" + currVariable);
+    }
+
+    $("#tmpScript").remove();
+
+    return ret;
+}
+
+// only supports strings/numbers/booleans
+function setWindowVariables(variables) {
+    var scriptContent = "";
+    for (var k in variables) {
+        if (typeof variables[k] === "string")
+            variables[k] = "'"+variables[k]+"'";
+
+        scriptContent += k + " = "+variables[k];
+    }
+
+    var script = document.createElement('script');
+    script.id = 'tmpScript';
+    script.appendChild(document.createTextNode(scriptContent));
+    (document.body || document.head || document.documentElement).appendChild(script);
+
+    $("#tmpScript").remove();
+}

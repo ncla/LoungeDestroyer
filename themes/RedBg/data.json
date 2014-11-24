@@ -15,5 +15,6 @@
 			"description": "Use rainbow background instead",
 			"checked": false
 		}
-	}
+	},
+	"changelog": "banana"
 }

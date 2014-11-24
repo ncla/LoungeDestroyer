@@ -12,6 +12,9 @@ function onload() {
             }
         });
     });
+    $("#close-btn").click(function(){
+        window.close();
+    });
 }
 
 document.addEventListener('DOMContentLoaded', onload);

@@ -5,7 +5,11 @@ LoungeUser.loadUserSettings(function() {
     bet.autoDelay = parseInt(LoungeUser.userSettings.autoDelay) * 1000 || 5000;
 });
 
-var lastTimeUserVisited = null;
+var lastTimeUserVisited = null,
+    baseURLs = {
+    	730: "http://csgolounge.com/", 
+    	570: "http://dota2lounge.com/"
+    };
 
 chrome.extension.onMessage.addListener(function (request, sender, sendResponse) {
     // Make changes to LoungeUser user settings once the settings are changed from extension pop-up
@@ -22,14 +26,17 @@ chrome.extension.onMessage.addListener(function (request, sender, sendResponse) 
         }
     }
 
-    if(request.hasOwnProperty("giveMeBackpackURL")) {
-        sendResponse(lastBackpackAjaxURL);
+    // for if the content script doesn't have access to User
+    if (request.hasOwnProperty("getSetting")) {
+        var resp = {};
+        for (var i = 0; i < request.getSetting.length; ++i) {
+            resp[request.getSetting[i]] = LoungeUser.userSettings[request.getSetting[i]];
+        }
+        sendResponse(resp);
     }
 
-    // Inject JS file to specific tab
-    if(request.hasOwnProperty("injectScript")) {
-        console.log("Injecting script ("+request.injectScript+") into tab "+sender.tab.id);
-        chrome.tabs.executeScript(sender.tab.id, {file: "src/inject/app/"+request.injectScript}); // TODO: support relative path
+    if(request.hasOwnProperty("giveMeBackpackURL")) {
+        sendResponse(lastBackpackAjaxURL);
     }
 
     // Injext CSS file to specific tab
@@ -322,7 +329,7 @@ function checkNewMatches(ajaxResponse, appID) {
                     value.teamA + " vs. " + value.teamB + " @ " + value.tournament + "\nMatch begins " + value.when,
                     "match",
                     {title: "Open match page"},
-                    (appID == 730 ? "http://csgolounge.com/" : "http://dota2lounge.com/") + "match?m=" + value.matchID
+                    baseURLs[appID] + "match?m=" + value.matchID
                 );
             });
         }
@@ -338,7 +345,7 @@ function checkForNewTradeOffers(data, appID) {
     var trades = data.find('a[href$="mytrades"]:first');
     var offers = data.find('a[href$="myoffers"]:first');
 
-    var urlStart = (appID == 730 ? "http://csgolounge.com/" : "http://dota2lounge.com/");
+    var urlStart = baseURLs[appID];
 
     if(trades.find(".notification").length > 0) {
         var url = urlStart + "mytrades";
@@ -471,7 +478,7 @@ function updateCurrencyConversion() {
 }
 function checkForExpiredItems(appID) {
     console.log("Checking for expired items on " + appID);
-    var urlStart = (appID == 730 ? "http://csgolounge.com/" : "http://dota2lounge.com/");
+    var urlStart = baseURLs[appID];
 
     get(urlStart + "mybets", function() {
         var doc = document.implementation.createHTMLDocument("");
@@ -481,6 +488,56 @@ function checkForExpiredItems(appID) {
             createNotification("Items expiring soon", "There are items on " + (appID == 730 ? "CS:GO Lounge" : "DOTA2 Lounge") + " about to expire.\nRequest them back if you don't want to lose them." , "regular", null, false);
         }
     });
+}
+function autoBumpTrades() {
+	for (var appID in baseURLs) {
+		if (LoungeUser.userSettings.autoBump != appID && LoungeUser.userSettings.autoBump != "1")
+			continue;
+
+		var url = baseURLs[appID];
+		(function(url, appID){return function self(){
+			console.log("Checking ",url," for bumpable trades");
+			$.ajax({
+				url: url+"mytrades",
+				success: function(resp, txt, xhr){
+					var doc = document.implementation.createHTMLDocument("");
+					doc.body.innerHTML = resp;
+
+					var bumpBtns = $(".buttonright[onclick*='bumpTrade']", doc);
+
+					if (!bumpBtns.length)
+						return;
+
+					bumpBtns.each(function(){
+						var onclick = this.getAttribute("onclick"),
+						    params = /bumpTrade\('([0-9]+)'(?:,'([0-9a-zA-Z]+))?/.exec(onclick);
+
+						// params[1] = trade, params[2] = code
+						if (!params[1])
+							return;
+
+						var data = "trade="+params[1]+(params[2] ? "&code="+params[2] : "");
+
+						$.ajax({
+							type: "POST",
+							url: url+"ajax/bumpTrade.php",
+							data: data,
+							success: function(){
+								console.log("Bumped ",params," from ",url);
+							},
+							error: function(err){
+								console.error("Failed to bump ",params," from ",url);
+							}
+						});
+					});
+				},
+				error: function(err){
+					console.error(err);
+					setTimeout(self, 6000);
+				}
+			});
+		}})(url, appID)();
+	}
 }
 
 chrome.alarms.create('itemListUpdate', {
@@ -494,7 +551,10 @@ chrome.alarms.create('expiredReturnsChecking', {
 });
 chrome.alarms.create('remoteThemesUpdate', {
 	periodInMinutes: 1440 // once a day
-})
+});
+chrome.alarms.create('autoBump', {
+	periodInMinutes: 10
+});
 chrome.alarms.onAlarm.addListener(function(alarm) {
     if(alarm.name == "itemListUpdate") {
         console.log("Checking if user has visited CS:GO Lounge recently..");
@@ -573,6 +633,10 @@ chrome.alarms.onAlarm.addListener(function(alarm) {
     			}
     		}
     	});
+    }
+    if (alarm.name == "autoBump") {
+    	if (LoungeUser.userSettings.autoBump == "1")
+    		autoBumpTrades();
     }
 });
 /*

@@ -203,6 +203,27 @@ function init() {
                     btn.textContent = "FUCKING REQUEST RETURNS";
             }
 
+            // inject primitive auto-freeze
+            if (["2","1"].indexOf(LoungeUser.userSettings.enableAuto) !== -1) {
+                var btn = document.getElementById("freezebutton");
+                if (btn) {
+                    console.log("Replacing postToFreezeReturn");
+                    // remove old onclick listener
+                    btn.removeAttribute("onclick");
+                    btn.onclick = null;
+                    var oldBtn = btn,
+                        btn = oldBtn.cloneNode(true);
+                    oldBtn.parentNode.replaceChild(btn,oldBtn);
+
+                    // inject own
+                    btn.addEventListener("click", function(){
+                        if (this.textContent !== "Are you sure") {
+                            $(this).html("Are you sure").on("click", newFreezeReturn);
+                        }
+                    });
+                }
+            }
+
             $(".matchmain").each(function(index, value) {
                 var total = 0;
                 $(".item", value).each(function(itemIndex, itemValue) {
@@ -282,6 +303,8 @@ function init() {
         (function(){
             if (LoungeUser.userSettings.addTradePreviews === "0")
                 return;
+            if (!document.getElementById("logout"))
+                return;
 
             var previewElm = document.getElementById("preview");
             
@@ -358,11 +381,6 @@ function init() {
                             success: function(d){
                                 previewElm.html(d).slideDown("fast");
                                 previewElm.attr("data-index", ind);
-
-                                // add market prices to items if they should auto-load
-                                if (LoungeUser.userSettings.itemMarketPricesv2 == "2") {
-                                    getMarketPricesFromParent(document.getElementById("preview"));
-                                }
                             }
                         })
                     });
@@ -389,6 +407,12 @@ function init() {
     Code that does not rely heavily on Chrome storage data
  */
 $(document).ready(function() {
+    // listen for additions to items
+    itemObs.observe(document.body, {
+        childList: true,
+        subtree: true
+    });
+
     // create info box in top-right
     container.className = "destroyer auto-info hidden";
     container.innerHTML = '<p>Auto-<span class="type">betting</span> items<span class="worth-container"> on match <a class="match-link"></a></span>. <span class="type capitalize">Betting</span> for the <span class="num-tries">0th</span> time.</p><button class="red">Disable auto-bet</button><p class="destroyer error-title">Last error (<span class="destroyer time-since">0s</span>):</p><p class="destroyer error-text"></p><label>Seconds between retries:</label><input id="bet-time" type="number" min="5" max="60" step="1">';
@@ -420,16 +444,85 @@ $(document).ready(function() {
     });
 });
 
+// postToFreezeReturn overwrite
+function newFreezeReturn(tries){
+    if (typeof tries !== "number")
+        tries = 1;
+
+    var toreturn = retrieveWindowVariables("toreturn")["toreturn"];
+    if (toreturn === "true") {
+        // hacky hacky UI stuff
+        var toHide = document.querySelectorAll(".destroyer.auto-info > *:not(:first-child)");
+        for (var i = 0, j = toHide.length; i < j; ++i) {
+            if (toHide[i].classList)
+                toHide[i].classList.remove("hidden");
+        }
+        // end hacky hacky UI stuff
+
+        $.ajax({
+            url: "ajax/postToReturn.php",
+            success: function(data) {
+                if (data) { // this should never happen
+                    console.error("Whoops, this shouldn't happen: ",data);
+                } else {
+                    console.error("This shouldn't happen.");
+                }
+            }
+        });
+    } else {
+        // hacky hacky UI stuff
+        document.querySelector(".destroyer.auto-info").classList.remove("hidden");
+        var ordinalEnding = ((tries||0)+"").slice(-1);
+        ordinalEnding = (tries%100 < 20 &&
+                        tries%100 > 10) ? "th" : // if a "teen" number, end in th
+                        ordinalEnding === "1" ? "st":
+                        ordinalEnding === "2" ? "nd":
+                        ordinalEnding === "3" ? "rd":
+                        "th";
+        document.querySelector(".destroyer.auto-info .num-tries").textContent = (tries||0)+ordinalEnding;
+        var toHide = document.querySelectorAll(".destroyer.auto-info > *:not(:first-child)");
+        for (var i = 0, j = toHide.length; i < j; ++i) {
+            if (toHide[i].classList)
+                toHide[i].classList.add("hidden");
+        }
+
+        var typeSpans = document.querySelectorAll(".destroyer.auto-info .type");
+        for (var i = 0, j = typeSpans.length; i < j; ++i) {
+            typeSpans[i].textContent = "freezing";
+        }
+        // end hacky hacky UI stuff
+
+        $.ajax({
+            url: "ajax/postToFreeze.php",
+            data: $("#freeze").serialize(),
+            type: "POST",
+            success: function(data) {
+                if (data) {
+                    console.error(data);
+                    setTimeout(function(){
+                        console.log("Retrying freeze for the ",tries,". time - ",data);
+                        newFreezeReturn(tries+1);
+                    }, 2000);
+                } else {
+                    setWindowVariables({toreturn: true});
+                    newFreezeReturn(tries+1);
+                }
+            }
+        });
+    }
+}
+
 /*
     Mouseover action for items
  */
-$(document).on("mouseover", ".oitm", function() {
-    var LoungeItem = new Item($(this));
-    var settingMarketPrices = LoungeUser.userSettings["itemMarketPricesv2"];
+function marketItem(jQElm) {
+    var LoungeItem = new Item(jQElm),
+        settingMarketPrices = LoungeUser.userSettings["itemMarketPricesv2"];
+
     if(settingMarketPrices == "1" || settingMarketPrices == "2") {
         LoungeItem.getMarketPrice();
     }
-    if(!$(this).hasClass("ld-appended")) {
+    if(!jQElm.hasClass("ld-appended")) {
         if(nonMarketItems.indexOf(LoungeItem.itemName) == -1) {
             if($("a:contains('Market')", this).length) {
                 $("a:contains('Market')", this).html("Market Listings");
@@ -441,9 +534,9 @@ $(document).on("mouseover", ".oitm", function() {
                 '<br/><br/><small><a class="refreshPriceMarket">Show Steam market price</a></small>');
         }
 
-        $(this).addClass("ld-appended");
+        jQElm.addClass("ld-appended");
         
-        $("a", this).click(function(e) {
+        $("a", jQElm[0]).click(function(e) {
             e.stopPropagation();
             if($(this).hasClass("refreshPriceMarket")) {
                 LoungeItem.unloadMarketPrice();
@@ -451,6 +544,9 @@ $(document).on("mouseover", ".oitm", function() {
             }
         });
     }
+}
+$(document).on("mouseover", ".oitm", function() {
+    marketItem($(this));
 });
 $(document).on("mouseover", ".matchmain", function() {
     if(LoungeUser.userSettings.showExtraMatchInfo != "0" && !$(this).hasClass("extraMatchInfo") && !$(this).hasClass("loading")) {
@@ -479,5 +575,28 @@ $(document).on("mouseover", ".matchmain", function() {
                 $(matchElement).removeClass("loading");
             }
         })
+    }
+});
+
+// auto-magically add market prices to newly added items
+var itemObs = new MutationObserver(function(records){
+    if (LoungeUser.userSettings["itemMarketPricesv2"] != "2")
+        return;
+
+    for (var i = 0, j = records.length; i < j; ++i) {
+        if (records[i].addedNodes && records[i].addedNodes.length) {
+            for (var k = 0, l = records[i].addedNodes.length; k < l; ++k) {
+                var elm = records[i].addedNodes[k];
+                if (elm.classList) {
+                    var oitmElms;
+                    if (elm.classList.contains("oitm")) {
+                        marketItem($(elm));
+                    } else if ($(elm).find(".oitm").length) {
+                        // Still slight lag, but we'll have to accept that (or implement web workers)
+                        getMarketPricesFromParent(elm);
+                    }
+                }
+            }
+        }
     }
 });

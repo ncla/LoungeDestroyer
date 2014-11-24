@@ -51,11 +51,12 @@
             margin: 0 5px 0 0;
             vertical-align: middle;
         }
-        .options-toggle {
+        .options-toggle, .theme-changelog {
             z-index: 999;
             position: absolute;
             right: 10px;
             top: 10px;
+
             padding: 5px !important;
             margin: 0 !important;
 
@@ -63,8 +64,17 @@
             appearance: none;
             outline: none !important;
             color: #fff;
-            font-size: 18px;
+            font-size: 16px;
             text-shadow: 1px 1px #000;
+            cursor: pointer;
+        }
+        .options-toggle + .theme-changelog {
+            right: 32px;
+            top: 11px;
+        }
+        .theme-changelog:hover, .options-toggle:hover { 
+            color: #ccc !important;
+            text-decoration: none !important;
         }
         .options-toggle:checked ~ .theme-container > * {
             -webkit-filter: blur(5px);
@@ -211,6 +221,15 @@
                     <select id="showExtraMatchInfo" class="form-control">
                         <option value="2">Load automatically for upcoming matches + on hover</option>
                         <option value="1">Trigger only when mouse is over the match</option>
+                        <option value="0">Disabled</option>
+                    </select>
+                </div>
+                <div class="col-md-6 ld-setting">
+                    <label class="control-label">Attempt to auto-bump trades every 10 minutes</label>
+                    <select id="autoBump" class="form-control">
+                        <option value="570">Dota 2 Lounge trades only</option>
+                        <option value="730">CS:GO Lounge trades only</option>
+                        <option value="1">Enabled</option>
                         <option value="0">Disabled</option>
                     </select>
                 </div>
@@ -377,6 +396,7 @@
         <div style="margin: 10px 0;">
             <a class="btn btn-primary" role="button" href="http://reddit.com/r/loungedestroyer" target="_blank">Subreddit</a>
             <a class="btn btn-primary" role="button" href="http://github.com/ncla/LoungeDestroyer" target="_blank">GitHub</a>
+            <a class="btn btn-primary" role="button" href="http://steamcommunity.com/groups/loungedestroyer" target="_blank">Steam group</a>
             <a class="btn btn-primary" role="button" href="https://github.com/ncla/LoungeDestroyer/issues" target="_blank">Report a bug</a>
         </div>
     </div>

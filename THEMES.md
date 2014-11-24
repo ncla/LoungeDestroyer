@@ -85,6 +85,10 @@ The following JSON structure is understood by the theme parser. Note that, when 
       <td>Whether to prepend a <code>div.ld-collapse-toggle</code> to all columns (and the side menu), which toggles the <code>.ld-collapsed</code> class on click.</td>
     </tr>
     <tr>
+      <td>changelog</td>
+      <td>An absolute URL of the changelog of the theme.</td>
+    </tr>
+    <tr>
       <td>options</td>
       <td>
         <p>Optional options for theme. Currently only supports checkboxes.</p>
