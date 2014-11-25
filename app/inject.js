@@ -291,6 +291,20 @@ function init() {
                     inventory.getMarketPrices(true);
                 });
             });
+            if(appID == "730" && LoungeUser.userSettings["easterEgg1"] == "1") {
+                /*
+                    HYPE TRAIN, HYPE TRAIN
+                 */
+                if($(".team[style*='cdn.csgolounge.com/img/teams/LC.jpg']").length) {
+                    var secondBox = $("section.box:eq(1)");
+                    $(secondBox).prepend("<div class='embed-container' style='margin-bottom:10px;'><iframe src='http://www.youtube.com/embed/B3vkL1nxQDI' frameborder='0' allowfullscreen></iframe></div>");
+                    $(secondBox).prepend("<div id='easteregg-ld'>Let's ride the hype train. Video appended by LoungeDestroyer. <span id='no-easteregg1'>Don't show anymore</span></div>");
+                    $("#no-easteregg1").click(function() {
+                        $("#easteregg-ld, .embed-container").remove();
+                        LoungeUser.saveSetting("easterEgg1", "0");
+                    });
+                }
+            }
         }
         if(document.URL.indexOf("/addtrade") != -1) {
             $(".tabholder .tab").click(function() {

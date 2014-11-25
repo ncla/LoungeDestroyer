@@ -38,7 +38,8 @@ User.prototype.defaultSettings =
     currentTheme: "",
     showExtraMatchInfo: "2",
     autoBump: "0",
-    acceptDelay: 30
+    acceptDelay: 30,
+    easterEgg1: "1"
 };
 
 User.prototype.loadUserSettings = function(callback) {
