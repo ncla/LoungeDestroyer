@@ -272,8 +272,8 @@ function checkNewMatches(ajaxResponse, appID) {
 
     $(".matchmain", ajaxResponse).each(function(index, value) {
         if(!$(".match", value).hasClass("notaviable")) {
-            var matchID = $("a", value).attr("href").replace("match?m=", "");
-            var tournament = $(".whenm:eq(1)", value).text().trim();
+            var matchID = $("a", value).attr("href").replace("match?m=", "").replace("predict?m=", "");
+            var tournament = $(".eventm:eq(0)", value).text().trim();
             var teamA = $(".teamtext:eq(0) b", value).text().trim();
             var teamB = $(".teamtext:eq(1) b", value).text().trim();
             var matchWhenTextNode = $(".matchheader .whenm:eq(0)", value)
