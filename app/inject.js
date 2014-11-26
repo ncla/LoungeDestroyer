@@ -529,14 +529,13 @@ function newFreezeReturn(tries){
 /*
     Mouseover action for items
  */
-function marketItem(jQElm) {
-    var LoungeItem = new Item(jQElm),
-        settingMarketPrices = LoungeUser.userSettings["itemMarketPricesv2"];
-
+$(document).on("mouseover", ".oitm", function() {
+    var LoungeItem = new Item($(this));
+    var settingMarketPrices = LoungeUser.userSettings["itemMarketPricesv2"];
     if(settingMarketPrices == "1" || settingMarketPrices == "2") {
         LoungeItem.getMarketPrice();
     }
-    if(!jQElm.hasClass("ld-appended")) {
+    if(!$(this).hasClass("ld-appended")) {
         if(nonMarketItems.indexOf(LoungeItem.itemName) == -1) {
             if($("a:contains('Market')", this).length) {
                 $("a:contains('Market')", this).html("Market Listings");
@@ -548,9 +547,9 @@ function marketItem(jQElm) {
                 '<br/><br/><small><a class="refreshPriceMarket">Show Steam market price</a></small>');
         }
 
-        jQElm.addClass("ld-appended");
-        
-        $("a", jQElm[0]).click(function(e) {
+        $(this).addClass("ld-appended");
+
+        $("a", this).click(function(e) {
             e.stopPropagation();
             if($(this).hasClass("refreshPriceMarket")) {
                 LoungeItem.unloadMarketPrice();
@@ -558,9 +557,6 @@ function marketItem(jQElm) {
             }
         });
     }
-}
-$(document).on("mouseover", ".oitm", function() {
-    marketItem($(this));
 });
 $(document).on("mouseover", ".matchmain", function() {
     if(LoungeUser.userSettings.showExtraMatchInfo != "0" && !$(this).hasClass("extraMatchInfo") && !$(this).hasClass("loading")) {
@@ -596,20 +592,23 @@ $(document).on("mouseover", ".matchmain", function() {
 var itemObs = new MutationObserver(function(records){
     if (LoungeUser.userSettings["itemMarketPricesv2"] != "2")
         return;
-
     for (var i = 0, j = records.length; i < j; ++i) {
         if (records[i].addedNodes && records[i].addedNodes.length) {
+            var hasItemNodes = false;
             for (var k = 0, l = records[i].addedNodes.length; k < l; ++k) {
                 var elm = records[i].addedNodes[k];
                 if (elm.classList) {
                     var oitmElms;
-                    if (elm.classList.contains("oitm")) {
-                        marketItem($(elm));
-                    } else if ($(elm).find(".oitm").length) {
-                        // Still slight lag, but we'll have to accept that (or implement web workers)
-                        getMarketPricesFromParent(elm);
+                    if (elm.classList.contains("oitm") || $(elm).find(".oitm").length) {
+                        hasItemNodes = true;
+                        break;
                     }
                 }
+            }
+            if(hasItemNodes) {
+                console.log(records[i].addedNodes);
+                console.log($(records[i].addedNodes));
+                getMarketPricesFromParent($(records[i].addedNodes));
             }
         }
     }

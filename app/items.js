@@ -132,7 +132,7 @@ Item.prototype.generateSteamStoreURL = function() {
 function getMarketPricesFromParent(elm) {
     if (!elm)
         elm = document.body;
-
+    // not sure how cachedItemList ended up inside this function? birjo???????????????
     var cachedItemList = [],
         elms = elm.querySelectorAll(".item");
 

@@ -146,9 +146,9 @@ Inventory.prototype.onInventoryLoaded = function(url) {
             }
             addInventoryStatistics();
         }
-        if(LoungeUser.userSettings["itemMarketPricesv2"] == "2") {
-            this.getMarketPrices(true);
-        }
+//        if(LoungeUser.userSettings["itemMarketPricesv2"] == "2") {
+//            this.getMarketPrices(true);
+//        }
         this.determineBackpackType();
     }
 };
