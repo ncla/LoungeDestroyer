@@ -165,6 +165,9 @@ chrome.webRequest.onHeadersReceived.addListener(
              I did it this way.
              What you gonna do now?
              */
+            console.log(headers);
+            console.log(headers[i].name);
+            console.log(headers[i]["name"]);
             if(headers[i].name == 'Location' && headers[i].value.indexOf("/wait.html") != -1 && LoungeUser.userSettings.redirect == "1") {
                 details.responseHeaders.splice(i, 1); // Removes it
                 var errHtml = "<h1>LoungeDestroyer</h1><p>LoungeDestroyer is redirecting you away from wait.html redirect page to the page you intended to visit. " +

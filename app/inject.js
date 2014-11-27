@@ -194,7 +194,7 @@ function init() {
         })();
 
         if(LoungeUser.userSettings["itemMarketPricesv2"] == "2") {
-            getMarketPricesFromParent();
+            getMarketPricesForElementList();
         }
         if(document.URL.indexOf("/mybets") != -1) {
             if (LoungeUser.userSettings.renameButtons === "1") {
@@ -236,27 +236,9 @@ function init() {
         }
         if($('a[href="/trades"]').length || document.URL.indexOf("/result?") != -1 || document.URL.indexOf("/trades") != -1) {
             if (LoungeUser.userSettings.showDescriptions !== "0") {
-                // On infinite scrolling trade page, new trades wont have expanded description
                 $(".tradepoll").each(function(index, value) {
-                    var description = $(value).find(".tradeheader").attr("title");
-                    var descriptionTextLength = description.length;
-                    if(descriptionTextLength > 0) {
-                        $(value).find(".tradecnt").after('<div class="trade-description"><p>' + $.trim(description) + (descriptionTextLength > 240 ? "..." : "") + '</p></div>');
-                        var tradeDescription = $(".trade-description", value);
-                        if(descriptionTextLength > 240) {
-                            $.ajax({
-                                url: $(value).find("a:eq(1)").attr("href"),
-                                type: "GET",
-                                success: function(data) {
-                                    $(".trade-description p", value).html(textToUrl($.trim($(data).find(".standard.msgtxt").text())));
-                                }
-                            });
-                        } else {
-                            $(".trade-description p", value).html(
-                                textToUrl($(".trade-description p", value).text())
-                            );
-                        }
-                    }
+                    var trade = new Trade(value);
+                    trade.addTradeDescription();
                 });
             }
         }
@@ -588,27 +570,27 @@ $(document).on("mouseover", ".matchmain", function() {
     }
 });
 
-// auto-magically add market prices to newly added items
+// auto-magically add market prices to newly added items, currently only for trade list
 var itemObs = new MutationObserver(function(records){
-    if (LoungeUser.userSettings["itemMarketPricesv2"] != "2")
-        return;
     for (var i = 0, j = records.length; i < j; ++i) {
-        if (records[i].addedNodes && records[i].addedNodes.length) {
-            var hasItemNodes = false;
+        if (records[i].addedNodes && records[i].addedNodes.length && records[i].target.id == "tradelist") {
+            var hasTradeNodes = false;
             for (var k = 0, l = records[i].addedNodes.length; k < l; ++k) {
                 var elm = records[i].addedNodes[k];
                 if (elm.classList) {
-                    var oitmElms;
-                    if (elm.classList.contains("oitm") || $(elm).find(".oitm").length) {
-                        hasItemNodes = true;
-                        break;
+                    if (elm.classList.contains("tradepoll")) {
+                        hasTradeNodes = true;
+                        if (LoungeUser.userSettings.showDescriptions !== "0") {
+                            var trade = new Trade(elm);
+                            trade.addTradeDescription();
+                        }
                     }
                 }
             }
-            if(hasItemNodes) {
-                console.log(records[i].addedNodes);
-                console.log($(records[i].addedNodes));
-                getMarketPricesFromParent($(records[i].addedNodes));
+            if(hasTradeNodes) {
+                if (LoungeUser.userSettings["itemMarketPricesv2"] == "2") {
+                    getMarketPricesForElementList($(records[i].addedNodes).find(".item"));
+                }
             }
         }
     }

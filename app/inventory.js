@@ -60,7 +60,7 @@ Inventory.prototype.loadInventory = function() {
     @param onlyForBackpack true or false, either load market prices for the backpack or the whole page
  */
 Inventory.prototype.getMarketPrices = function() {
-    getMarketPricesFromParent(document.getElementById("backpack"));
+    getMarketPricesForElementList($("#backpack .item"));
 };
 
 /*
@@ -146,9 +146,9 @@ Inventory.prototype.onInventoryLoaded = function(url) {
             }
             addInventoryStatistics();
         }
-//        if(LoungeUser.userSettings["itemMarketPricesv2"] == "2") {
-//            this.getMarketPrices(true);
-//        }
+        if(LoungeUser.userSettings["itemMarketPricesv2"] == "2") {
+            this.getMarketPrices(true);
+        }
         this.determineBackpackType();
     }
 };

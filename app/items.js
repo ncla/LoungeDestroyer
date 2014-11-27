@@ -126,18 +126,17 @@ Item.prototype.generateSteamStoreURL = function() {
 };
 
 /**
- * Get market price for every item that is descendant of elm
- * @param {Element} elm - parent element
+ * Get market prices for an element list in a performance friendly way
+ * @param {Element} elmList - list of jQuery element objects
  */
-function getMarketPricesFromParent(elm) {
-    if (!elm)
-        elm = document.body;
-    // not sure how cachedItemList ended up inside this function? birjo???????????????
-    var cachedItemList = [],
-        elms = elm.querySelectorAll(".item");
+function getMarketPricesForElementList(elmList) {
+    if(!elmList) {
+        elmList = $("body .item");
+    }
+    var cachedItemList = [];
 
-    for (var i = 0, j = elms.length; i < j; ++i) {
-        var item = new Item(elms[i]);
+    for (var i = 0, j = elmList.length; i < j; ++i) {
+        var item = new Item(elmList[i]);
         if (!cachedItemList.hasOwnProperty(item.itemName)) {
             cachedItemList[item.itemName] = [];
         }
