@@ -13,7 +13,7 @@ function onload() {
         });
     });
     $("#close-btn").click(function(){
-        window.close();
+        window.open(location, '_self').close();
     });
 }
 
