@@ -157,27 +157,26 @@ chrome.webRequest.onHeadersReceived.addListener(
         lastTimeUserVisited = new Date().getTime(); // Used for price list updating, be careful if the URL list gets a new domain though
 
         var headers = details.responseHeaders,
-            blockingResponse = {};
-        var originalURL = details.url;
+            blockingResponse = {},
+            originalURL = details.url,
+            newHeaders = [],
+            isWaitRedirect = false;
+        console.log("Old headers: ", headers);
         for(var i = 0, l = headers.length; i < l; ++i) {
-            /*
-             That's right.
-             I did it this way.
-             What you gonna do now?
-             */
-            console.log(headers);
-            console.log(headers[i].name);
-            console.log(headers[i]["name"]);
-            if(headers[i].name == 'Location' && headers[i].value.indexOf("/wait.html") != -1 && LoungeUser.userSettings.redirect == "1") {
-                details.responseHeaders.splice(i, 1); // Removes it
-                var errHtml = "<h1>LoungeDestroyer</h1><p>LoungeDestroyer is redirecting you away from wait.html redirect page to the page you intended to visit. " +
-                    "You can disable this feature in extension settings.</p>";
-                chrome.tabs.executeScript(details.tabId, {code: "document.body.innerHTML += '"+errHtml+"'"});
-                chrome.tabs.executeScript(details.tabId, {code: "setTimeout(function() { window.location = '"+originalURL+"';}, 1000);"});
-                //chrome.tabs.update(details.tabId, {url: originalURL});
+            if(headers[i]['name'] == 'Location' && headers[i].value.indexOf("/wait.html") != -1 && LoungeUser.userSettings.redirect == "1") {
+                isWaitRedirect = true;
+            } else {
+                newHeaders.push(headers[i]);
             }
         }
-        blockingResponse.responseHeaders = headers;
+        console.log("New headers: ", newHeaders);
+        if(isWaitRedirect) {
+            var errHtml = "<h1>LoungeDestroyer</h1><p>LoungeDestroyer is redirecting you away from wait.html redirect page to the page you intended to visit. " +
+                "You can disable this feature in extension settings.</p>";
+            chrome.tabs.executeScript(details.tabId, {code: "document.body.innerHTML += '"+errHtml+"'"});
+            chrome.tabs.executeScript(details.tabId, {code: "setTimeout(function() { window.location = '"+originalURL+"';}, 1000);"});
+            blockingResponse.responseHeaders = newHeaders;
+        }
         return blockingResponse;
     },
     {
