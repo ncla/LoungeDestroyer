@@ -645,8 +645,23 @@ chrome.alarms.onAlarm.addListener(function(alarm) {
  Fired when the extension is first installed, when the extension is updated to a new version, and when Chrome is updated to a new version.
  https://developer.chrome.com/extensions/runtime#event-onInstalled
  */
-chrome.runtime.onInstalled.addListener(function() {
-    console.log("onInstalled event");
+chrome.runtime.onInstalled.addListener(function(details) {
+    console.log("chrome.runtime.onInstalled event");
+    if (details.reason == "install") {
+        console.log("This is a first install!");
+    } else if(details.reason == "update") {
+        var thisVersion = chrome.runtime.getManifest().version;
+        if(thisVersion != details.previousVersion) {
+            console.log("Updated from " + details.previousVersion + " to " + thisVersion + "!");
+            createNotification(
+                "LoungeDestroyer " + thisVersion + " update",
+                "LoungeDestroyer has updated to " + thisVersion + " version, bringing bug fixes and possibly new stuff. You can read about the changes by pressing button bellow",
+                "offer", // does not matter.
+                {title: "Read changelog"},
+                "https://github.com/ncla/LoungeDestroyer/releases"
+            );
+        }
+    }
     updateCurrencyConversion();
     updateMarketPriceList();
 });
