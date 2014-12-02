@@ -12,6 +12,7 @@
     "background": {
         "scripts": [
             "lib/js/jquery-2.1.1.min.js",
+            "lib/js/css-lib.js",
             "app/helpers.js",
             "app/user.js",
             "app/bg/background.js",

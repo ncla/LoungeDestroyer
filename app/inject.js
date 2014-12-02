@@ -82,33 +82,15 @@ function init() {
             var theme = themes[name],
                 style;
 
-            if (!theme.css) {
-                var themePath = "themes/"+LoungeUser.userSettings.currentTheme+"/inject.css";
-                chrome.runtime.sendMessage({getFile: themePath}, function(data){
-                    if (data.error) {
-                        console.error(data.error);
-                        return;
-                    }
-
-                    style = document.createElement("style");
-                    style.textContent = data.data;
-                    $(document).ready(function(){
-                        document.head.appendChild(style);
-                    });
-                });
+            if (theme.cachedCSS) {
+                chrome.runtime.sendMessage({injectCSSCode: theme.cachedCSS});
             } else {
-                if (!theme.remote) {
-                    style = document.createElement("style");
-                    style.textContent = theme.css;
-                } else {
-                    style = document.createElement("link");
-                    style.setAttribute("href", theme.css);
-                    style.setAttribute("rel", "stylesheet");
-                }
-
+                style = document.createElement("link");
+                style.setAttribute("href", theme.css);
+                style.setAttribute("rel", "stylesheet");
                 $(document).ready(function(){
                     document.head.appendChild(style);
-                });
+                })
             }
 
             $(document).ready(function(){
@@ -551,9 +533,10 @@ $(document).on("mouseover", ".matchmain", function() {
             success: function(data){
                 var doc = document.implementation.createHTMLDocument("");
                 doc.body.innerHTML = data;
-                var bestOfType = $(doc).find(".box-shiny-alt:eq(0) .half:eq(1)").text().trim();
-                var exactTime = $(doc).find(".box-shiny-alt:eq(0) .half:eq(2)").text().trim();
-                var matchHeaderBlock = $(".matchheader .whenm:eq(0)", matchElement);
+                var bestOfType = $(doc).find(".box-shiny-alt:eq(0) .half:eq(1)").text().trim(),
+                    exactTime = $(doc).find(".box-shiny-alt:eq(0) .half:eq(2)").text().trim(),
+                    splitTime = /([0-9]{1,2}):([0-9]{1,2}) ([A-Za-z]*)/.exec(exactTime),
+                    matchHeaderBlock = $(".matchheader .whenm:eq(0)", matchElement);
                 if(exactTime) {
                     $(matchHeaderBlock).append('<span class="matchExactTime"> <span class="seperator">|</span> ' + exactTime + '</span>');
                 }

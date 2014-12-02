@@ -39,10 +39,38 @@ chrome.extension.onMessage.addListener(function (request, sender, sendResponse) 
         sendResponse(lastBackpackAjaxURL);
     }
 
-    // Injext CSS file to specific tab
+    // Inject CSS file to specific tab
     if(request.hasOwnProperty("injectCSS")) {
     	console.log("Injecting CSS ("+request.injectCSS+") into tab "+sender.tab.id);
     	chrome.tabs.insertCSS(sender.tab.id, {file: request.injectCSS, runAt: "document_start"}, function(x){console.log(x)});
+    }
+
+    // Inject CSS code to specific tab
+    if(request.hasOwnProperty("injectCSSCode")) {
+    	// put !important on *everything* because Chrome is fucking retarded
+    	console.log("Injected CSS code into tab "+sender.tab.id);
+    	var css = request.injectCSSCode;
+
+    	if (request.overwriteSiteCSS) {
+	    	try {
+	    		var cssTree = parseCSS(css),
+	    		    rules = cssTree.stylesheet.rules;
+
+	    		for (var i = 0; i < rules.length; ++i) {
+	    			var rule = rules[i],
+	    			    decls = rule.declarations;
+
+	    			for (var l = 0; l < decls.length; ++l) {
+	    				decls[l].value = decls[l].value.replace("!important","").trim() + " !important";
+	    			}
+	    		}
+
+	    		css = stringifyCSS(cssTree);
+	    	} catch (err) {
+	    		console.error("Tried to parse CSS, failed: ",err);
+	    	}
+	    }
+    	chrome.tabs.insertCSS(sender.tab.id, {code: css, runAt: "document_start"}, function(x){console.log(x)});
     }
 
     // Open new tab if none exists
@@ -96,6 +124,10 @@ chrome.extension.onMessage.addListener(function (request, sender, sendResponse) 
 
             window[v] = newVar;
         }
+    }
+
+    if(request.hasOwnProperty("updateThemes")) {
+    	updateThemes();
     }
 });
 
@@ -580,67 +612,100 @@ chrome.alarms.onAlarm.addListener(function(alarm) {
         }
     }
     if(alarm.name == "remoteThemesUpdate") {
-    	console.log("Updating themes!");
-    	chrome.storage.local.get("themes", function(result){
-    		var themes = result.themes;
-    		for (var theme in themes) {
-    			if (themes[theme].remote) {
-    				console.log("Updating theme "+theme);
-    				// get JSON
-    				var url = themes[theme].url;
-    				if (!url)
-    					continue;
-
-    				get(url, function(){
-    					try {
-    						var data = this.responseText,
-				                json = JSON.parse(data),
-				                err = "";
-				                required = ["name", "title", "author", "version", "css", "bg"]
-
-				            for (var i = 0; i < required.length; ++i) {
-				                if (!json[required[i]]) {
-				                    if (!err)
-				                        err = "The following information is missing from the JSON: ";
-
-				                    err += required[i] + " ";
-				                }
-				            }
-
-				            if (err) {
-				                console.error(err);
-				                return;
-				            }
-
-				            console.log("Everything looks good");
-
-				            // merge new JSON into old, keeping options
-				            if (json.options) {
-						        for (var k in themes[theme].options) {
-						            if (json.options.hasOwnProperty(k)) {
-						                json.options[k].checked = themes[theme].options[k].checked;
-						            } else {
-						                delete themes[theme].options[k];
-						            }
-						        }
-						    }
-
-						    // merge obj and json
-						    $.extend(true, themes[theme], json);
-						    chrome.storage.local.set({themes: themes});
-    					} catch (err) {
-    						console.error("["+theme+"] Failed to update: ",err);
-    					}
-    				});
-    			}
-    		}
-    	});
+    	updateThemes();
     }
     if (alarm.name == "autoBump") {
     	if (LoungeUser.userSettings.autoBump == "1")
     		autoBumpTrades();
     }
 });
+
+function updateThemes() {
+	console.log("Updating themes!");
+	chrome.storage.local.get("themes", function(result){
+		var themes = result.themes;
+		for (var theme in themes) {
+			if (themes[theme].remote) {
+				console.log("Updating theme "+theme);
+				// get JSON
+				var url = themes[theme].url;
+				if (!url)
+					continue;
+
+				get(url, function(){
+					try {
+						var data = this.responseText,
+			                json = JSON.parse(data),
+			                err = "";
+			                required = ["name", "title", "author", "version", "css", "bg"]
+
+			            for (var i = 0; i < required.length; ++i) {
+			                if (!json[required[i]]) {
+			                    if (!err)
+			                        err = "The following information is missing from the JSON: ";
+
+			                    err += required[i] + " ";
+			                }
+			            }
+
+			            if (err) {
+			                console.error(err);
+			                return;
+			            }
+
+			            console.log("Everything looks good");
+
+			            // merge new JSON into old, keeping options
+			            if (json.options) {
+					        for (var k in themes[theme].options) {
+					            if (json.options.hasOwnProperty(k)) {
+					                json.options[k].checked = themes[theme].options[k].checked;
+					            } else {
+					                delete themes[theme].options[k];
+					            }
+					        }
+					    }
+
+					    // merge obj and json
+					    $.extend(true, themes[theme], json);
+					    chrome.storage.local.set({themes: themes});
+					} catch (err) {
+						console.error("["+theme+"] Failed to update: ",err);
+					}
+
+					// cache CSS so we can inject instantly
+					get(themes[theme].css, function(){
+						if (!this.status) {
+							console.error("Failed to retrieve CSS");
+							return;
+						}
+						var css = this.responseText;
+						// very poor error handling - assuming parsing fails on non-CSS
+						try {
+							var cssTree = parseCSS(css),
+				    		    rules = cssTree.stylesheet.rules;
+
+				    		for (var i = 0; i < rules.length; ++i) {
+				    			var rule = rules[i],
+				    			    decls = rule.declarations;
+
+				    			for (var l = 0; l < decls.length; ++l) {
+				    				decls[l].value = decls[l].value.replace("!important","").trim() + " !important";
+				    			}
+				    		}
+
+				    		css = stringifyCSS(cssTree, {compress: true});
+				    		themes[theme].cachedCSS = css;
+					    	chrome.storage.local.set({themes: themes});
+					    } catch (err) {
+					    	console.error("Theme "+theme+" CSS most likely not CSS: ",err);
+					    }
+					});
+				});
+			}
+		}
+	});
+}
 /*
  Fired when the extension is first installed, when the extension is updated to a new version, and when Chrome is updated to a new version.
  https://developer.chrome.com/extensions/runtime#event-onInstalled
