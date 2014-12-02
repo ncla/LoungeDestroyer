@@ -171,7 +171,7 @@ function theme_data_handler(){
     }
 
     // if JSON isn't empty, remove any key not found in JSON
-    if (Object.keys(json).length) {
+    if (Object.keys(json).length > 2) {
         console.log("Removing keys from ",obj, " based on ",json);
         for (var k in obj) {
             if (!json.hasOwnProperty(k))
@@ -425,6 +425,8 @@ document.querySelector("#add-theme-remote button[type='submit']").addEventListen
             if (val !== true)
                 error_proxy.apply({}, arguments);
         }, url, json.icon, true);
+
+        chrome.runtime.sendMessage({updateThemes: true});
     });
 });
 
@@ -490,7 +492,7 @@ document.querySelector(".theme-modal-confirm-delete .confirm").addEventListener(
 
     if (themeElm.classList.contains("current")) {
         defaultUser.saveSetting("currentTheme", "");
-        document.querySelector(".curTheme").textContent = "None";
+        document.querySelector(".cur-theme").value = "-none";
     }
 
     themeElm.parentNode.removeChild(themeElm);
