@@ -1,8 +1,21 @@
 var LoungeUser = new User(),
-    currencyFallback = {"USDAUD":1.1503,"USDCAD":1.1359,"USDEUR":0.8006,"USDGBP":0.6256,"USDRUB":43.59,"USDUSD":1};
+    currencyFallback = {"USDAUD":1.1503,"USDCAD":1.1359,"USDEUR":0.8006,"USDGBP":0.6256,"USDRUB":43.59,"USDUSD":1},
+    themes = {};
+    themeCSS = "";
+
 LoungeUser.loadUserSettings(function() {
     console.log("Settings for background.js have loaded!");
     bet.autoDelay = parseInt(LoungeUser.userSettings.autoDelay) * 1000 || 5000;
+
+    chrome.storage.local.get("themes", function(result){
+    	themes = result.themes || {};
+    	if (LoungeUser.userSettings.currentTheme) {
+    		var name = LoungeUser.userSettings.currentTheme;
+    		if (themes.hasOwnProperty(name)) {
+    			themeCSS = themes[name].cachedCSS || "";
+    		}
+    	}
+    });
 });
 
 var lastTimeUserVisited = null,
@@ -71,6 +84,11 @@ chrome.extension.onMessage.addListener(function (request, sender, sendResponse) 
 	    	}
 	    }
     	chrome.tabs.insertCSS(sender.tab.id, {code: css, runAt: "document_start"}, function(x){console.log(x)});
+    }
+
+    // Inject theme CSS (in bg for speed purposes)
+    if(request.hasOwnProperty("injectCSSTheme")) {
+    	chrome.tabs.insertCSS(sender.tab.id, {code: themeCSS, runAt: "document_start"});
     }
 
     // Open new tab if none exists
