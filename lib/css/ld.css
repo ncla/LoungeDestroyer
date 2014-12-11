@@ -40,3 +40,105 @@ code {
 .ld-setting {
     margin-bottom: 10px;
 }
+
+#themes-carousel { max-width: 960px; margin: 0 auto; }
+.theme-container { cursor: pointer; }
+.carousel-inner .item > .theme-container > img {
+    width: 100%;
+}
+#themes-carousel .carousel-caption .icon {
+    max-width: 50px;
+}
+#themes-carousel .carousel-caption .author {
+    display: block;
+    margin-top: -0.5em;
+}
+.carousel-inner .item > .theme-container > .highlight {
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 100%;
+    background: rgba(0,0,0,.3);
+    box-shadow: inset 0 0 0 10px rgba(92,184,92,0);
+    transition: .25s linear box-shadow;
+}
+.carousel-inner .item.current > .theme-container > .highlight {
+    box-shadow: inset 0 0 0 10px #5cb85c;
+}
+.theme-option {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 99;
+    display: none;
+
+    background: rgba(0,0,0,.7);
+    padding: 30px 100px;
+    color: #fff;
+}
+.theme-option > div {
+    padding-left: 10px;
+}
+.theme-option > div input {
+    margin: 0 5px 0 0;
+    vertical-align: middle;
+}
+.options-toggle, .theme-changelog {
+    z-index: 999;
+    position: absolute;
+    right: 10px;
+    top: 10px;
+
+    padding: 5px !important;
+    margin: 0 !important;
+
+    -webkit-appearance: none;
+    appearance: none;
+    outline: none !important;
+    color: #fff;
+    font-size: 16px;
+    text-shadow: 1px 1px #000;
+    cursor: pointer;
+}
+.options-toggle + .theme-changelog {
+    right: 32px;
+    top: 11px;
+}
+.theme-changelog:hover, .options-toggle:hover {
+    color: #ccc !important;
+    text-decoration: none !important;
+}
+.options-toggle:checked ~ .theme-container > * {
+    -webkit-filter: blur(5px);
+}
+.options-toggle:checked ~ .theme-option {
+    display: block;
+}
+.theme-remove {
+    position: absolute;
+    left: 100px;
+    bottom: 50px;
+}
+
+@-webkit-keyframes highlight {
+    from {
+        box-shadow: inset 0 0 red;
+    }
+    to {
+        box-shadow: inset 0 0 0 10px #5cb85c;
+    }
+}
+@keyframes highlight {
+    from {
+        box-shadow: inset 0 0 red;
+    }
+    to {
+        box-shadow: inset 0 0 0 10px #5cb85c;
+    }
+}
+#settings, #themes, #about {
+    margin-bottom: 20px;
+}
