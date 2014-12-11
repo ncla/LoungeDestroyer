@@ -77,7 +77,7 @@ function init() {
         }
     });
 
-    // inject theme CSS
+    // do theme-related stuff
     if (LoungeUser.userSettings.currentTheme) {
         var name = LoungeUser.userSettings.currentTheme;
         if (themes.hasOwnProperty(name)) {
