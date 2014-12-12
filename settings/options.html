@@ -4,107 +4,6 @@
     <title>LoungeDestroyer dashboard</title>
     <link href="../lib/css/bootstrap.min.css" rel="stylesheet">
     <link href="../lib/css/ld.css" rel="stylesheet">
-
-    <style>
-        #themes-carousel { max-width: 960px; margin: 0 auto; }
-        .theme-container { cursor: pointer; }
-        .carousel-inner .item > .theme-container > img {
-            width: 100%;
-        }
-        #themes-carousel .carousel-caption .icon {
-            max-width: 50px;
-        }
-        #themes-carousel .carousel-caption .author {
-            display: block;
-            margin-top: -0.5em;
-        }
-        .carousel-inner .item > .theme-container > .highlight {
-            position: absolute;
-            left: 0;
-            top: 0;
-            height: 100%;
-            width: 100%;
-            background: rgba(0,0,0,.3);
-            box-shadow: inset 0 0 0 10px rgba(92,184,92,0);
-            transition: .25s linear box-shadow;
-        }
-        .carousel-inner .item.current > .theme-container > .highlight {
-            box-shadow: inset 0 0 0 10px #5cb85c;
-        }
-        .theme-option {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 99;
-            display: none;
-
-            background: rgba(0,0,0,.7);
-            padding: 30px 100px;
-            color: #fff;
-        }
-        .theme-option > div {
-            padding-left: 10px;
-        }
-        .theme-option > div input {
-            margin: 0 5px 0 0;
-            vertical-align: middle;
-        }
-        .options-toggle, .theme-changelog {
-            z-index: 999;
-            position: absolute;
-            right: 10px;
-            top: 10px;
-
-            padding: 5px !important;
-            margin: 0 !important;
-
-            -webkit-appearance: none;
-            appearance: none;
-            outline: none !important;
-            color: #fff;
-            font-size: 16px;
-            text-shadow: 1px 1px #000;
-            cursor: pointer;
-        }
-        .options-toggle + .theme-changelog {
-            right: 32px;
-            top: 11px;
-        }
-        .theme-changelog:hover, .options-toggle:hover { 
-            color: #ccc !important;
-            text-decoration: none !important;
-        }
-        .options-toggle:checked ~ .theme-container > * {
-            -webkit-filter: blur(5px);
-        }
-        .options-toggle:checked ~ .theme-option {
-            display: block;
-        }
-        .theme-remove {
-            position: absolute;
-            left: 100px;
-            bottom: 50px;
-        }
-
-        @-webkit-keyframes highlight {
-            from {
-                box-shadow: inset 0 0 red;
-            }
-            to {
-                box-shadow: inset 0 0 0 10px #5cb85c;
-            }
-        }
-        @keyframes highlight {
-            from {
-                box-shadow: inset 0 0 red;
-            }
-            to {
-                box-shadow: inset 0 0 0 10px #5cb85c;
-            }
-        }
-    </style>
 </head>
 
 <body data-spy="scroll" data-target=".navbar-collapse">
@@ -122,282 +21,281 @@
             <a class="navbar-brand" href="#">LoungeDestroyer</a>
         </div>
         <div class="collapse navbar-collapse">
-            <ul class="nav navbar-nav">
-                <li class="active"><a href="#settings">Settings</a></li>
-                <li><a href="#themes">Themes</a></li>
-                <li><a href="#about">About</a></li>
+            <ul class="nav navbar-nav" role="tablist" id="ld_tab">
+                <li class="active"><a href="#settings" aria-controls="settings" role="tab" data-toggle="tab">Settings</a></li>
+                <li><a href="#themes" aria-controls="themes" role="tab" data-toggle="tab">Themes</a></li>
+                <li><a href="#about" aria-controls="about" role="tab" data-toggle="tab">About</a></li>
             </ul>
         </div><!--/.nav-collapse -->
     </div>
 </div>
 
 <!-- Begin page content -->
-<div class="container" id="settings">
-    <div class="togglerino">
-        <div class="page-header">
-            <h1>LoungeDestroyer settings <small>version <span id="version"></span></small></h1>
+<div class="container" id="ld_hub">
+    <div class="tab-content">
+        <div role="tabpanel" class="tab-pane active" id="settings">
+            <div class="page-header">
+                <h1>LoungeDestroyer settings <small>version <span id="version"></span></small></h1>
+            </div>
+            <p>Settings are automatically saved once you have selected an option.</p>
+
+            <h3 class="page-header">CS:GO Lounge / Dota2 Lounge</h3>
+            <div class="ld-settings">
+                <div class="row">
+                    <div class="col-md-6 ld-setting">
+                        <label class="control-label">Market prices on items:</label>
+                        <select id="itemMarketPricesv2" class="form-control">
+                            <option value="2">Load market price automatically</option>
+                            <option value="1">Only when mouse is over an item</option>
+                            <option value="0">Disabled</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 ld-setting">
+                        <label class="control-label">Use cached item price list <a href="#" data-toggle="tooltip" data-original-title="LoungeDestroyer can provide item price values where available from our own dedicated API. The item price list cache updates periodically.">(?)</a>:</label>
+                        <select id="useCachedPriceList" class="form-control">
+                            <option value="1">Enabled</option>
+                            <option value="0">Disabled</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 ld-setting">
+                        <label class="control-label">Steam market currency:</label>
+                        <select id="marketCurrency" class="form-control">
+                            <option value="1">USD</option>
+                            <option value="2">GBP</option>
+                            <option value="3">EUR</option>
+                            <option value="5">RUB</option>
+                            <option value="20">CAD</option>
+                            <option value="21">AUD</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 ld-setting">
+                        <label class="control-label">Redirect from item draft page <a href="#" data-toggle="tooltip" data-original-title="CS:GO Lounge does an annoying redirect to item drafting page, which can be stopped by extension. This may cause some lag issues as this will keep redirecting to intended page instead of item drafting page.">(?)</a>:</label>
+                        <select id="redirect" class="form-control">
+                            <option value="1">Enabled</option>
+                            <option value="0">Disabled</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 ld-setting">
+                        <label class="control-label">Remove stream from match page:</label>
+                        <select id="removeStream" class="form-control">
+                            <option value="1">Enabled</option>
+                            <option value="0">Disabled</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 ld-setting">
+                        <label class="control-label">Show trade descriptions</label>
+                        <select id="showDescriptions" class="form-control">
+                            <option value="1">Enabled</option>
+                            <option value="0">Disabled</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 ld-setting">
+                        <label class="control-label">Enable auto-betting/-returning/-accept</label>
+                        <select id="enableAuto" class="form-control">
+                            <option value="3">Auto-accept only</option>
+                            <option value="2">Auto-betting/-returning only</option>
+                            <option value="1">Enabled</option>
+                            <option value="0">Disabled</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 ld-setting">
+                        <label class="control-label">Add preview buttons to trades</label>
+                        <select id="addTradePreviews" class="form-control">
+                            <option value="1">Enabled</option>
+                            <option value="0">Disabled</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 ld-setting">
+                        <label class="control-label">Show match type and exact time</label>
+                        <select id="showExtraMatchInfo" class="form-control">
+                            <option value="2">Load automatically for upcoming matches + on hover</option>
+                            <option value="1">Trigger only when mouse is over the match</option>
+                            <option value="0">Disabled</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 ld-setting">
+                        <label class="control-label">Attempt to auto-bump trades every 10 minutes</label>
+                        <select id="autoBump" class="form-control">
+                            <option value="570">Dota 2 Lounge trades only</option>
+                            <option value="730">CS:GO Lounge trades only</option>
+                            <option value="1">Enabled</option>
+                            <option value="0">Disabled</option>
+                        </select>
+                    </div>
+                </div>
+
+
+                <h3 class="page-header">Notifying</h3>
+                <div class="row">
+                    <div class="col-md-6 ld-setting">
+                        <label class="control-label">Notify when bots go online:</label>
+                        <select id="notifyBots" class="form-control">
+                            <option value="1">Enabled</option>
+                            <option value="0">Disabled</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 ld-setting">
+                        <label class="control-label">Notify about new matches:</label>
+                        <select id="notifyMatches" class="form-control">
+                            <option value="1">Both</option>
+                            <option value="2">Dota2 Lounge matches only</option>
+                            <option value="3">CS:GO Lounge matches only</option>
+                            <option value="4">Disabled</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 ld-setting">
+                        <label class="control-label">Notify about new trade offers:</label>
+                        <select id="notifyTrades" class="form-control">
+                            <option value="1">Both</option>
+                            <option value="2">Dota2 Lounge trades only</option>
+                            <option value="3">CS:GO Lounge trades only</option>
+                            <option value="4">Disabled</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 ld-setting">
+                        <label class="control-label">Notify about items that are going to expire soon:</label>
+                        <select id="notifyExpiredItems" class="form-control">
+                            <option value="1">Both</option>
+                            <option value="2">Dota2 Lounge only</option>
+                            <option value="3">CS:GO Lounge only</option>
+                            <option value="4">Disabled</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 ld-setting">
+                        <label class="control-label">Notify on queue trade offer:</label>
+                        <select id="notifyTradeOffer" class="form-control">
+                            <option value="1">Enabled</option>
+                            <option value="4">Disabled</option>
+                        </select>
+                    </div>
+                </div>
+
+                <h3 class="page-header">Misc</h3>
+                <div class="row">
+                    <div class="col-md-6 ld-setting">
+                        <label class="control-label">Profanity:</label>
+                        <select id="renameButtons" class="form-control">
+                            <option value="1">Enabled</option>
+                            <option value="0">Disabled</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
         </div>
-        <p>Settings are automatically saved once you have selected an option.</p>
+        <div role="tabpanel" class="tab-pane" id="themes">
+            <div class="page-header">
+                <h1>Themes</h1>
+            </div>
 
-        <h3 class="page-header">CS:GO Lounge / Dota2 Lounge</h3>
-        <div class="ld-settings">
+            <h3 class="text-center form-inline">Current theme:
+                <select class="cur-theme form-control text-primary">
+                    <option value="-none">None</option>
+                </select>
+            </h3>
+
+            <div id="themes-carousel" class="carousel slide" data-ride="carousel" data-interval="false">
+                <div class="carousel-inner" role="listbox">
+                    <!-- Populated in JS -->
+                </div>
+
+                <!-- Controls -->
+                <a class="left carousel-control" href="#themes-carousel" role="button" data-slide="prev">
+                    <span class="glyphicon glyphicon-chevron-left"></span>
+                    <span class="sr-only">Previous</span>
+                </a>
+                <a class="right carousel-control" href="#themes-carousel" role="button" data-slide="next">
+                    <span class="glyphicon glyphicon-chevron-right"></span>
+                    <span class="sr-only">Next</span>
+                </a>
+            </div>
+
+            <h3>Add your own!</h3>
             <div class="row">
-                <div class="col-md-6 ld-setting">
-                    <label class="control-label">Market prices on items:</label>
-                    <select id="itemMarketPricesv2" class="form-control">
-                        <option value="2">Load market price automatically</option>
-                        <option value="1">Only when mouse is over an item</option>
-                        <option value="0">Disabled</option>
-                    </select>
-                </div>
-                <div class="col-md-6 ld-setting">
-                    <label class="control-label">Use cached item price list <a href="#" data-toggle="tooltip" data-original-title="LoungeDestroyer can provide item price values where available from our own dedicated API. The item price list cache updates periodically.">(?)</a>:</label>
-                    <select id="useCachedPriceList" class="form-control">
-                        <option value="1">Enabled</option>
-                        <option value="0">Disabled</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-md-6 ld-setting">
-                    <label class="control-label">Steam market currency:</label>
-                    <select id="marketCurrency" class="form-control">
-                        <option value="1">USD</option>
-                        <option value="2">GBP</option>
-                        <option value="3">EUR</option>
-                        <option value="5">RUB</option>
-                        <option value="20">CAD</option>
-                        <option value="21">AUD</option>
-                    </select>
-                </div>
-                <div class="col-md-6 ld-setting">
-                    <label class="control-label">Redirect from item draft page <a href="#" data-toggle="tooltip" data-original-title="CS:GO Lounge does an annoying redirect to item drafting page, which can be stopped by extension. This may cause some lag issues as this will keep redirecting to intended page instead of item drafting page.">(?)</a>:</label>
-                    <select id="redirect" class="form-control">
-                        <option value="1">Enabled</option>
-                        <option value="0">Disabled</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-md-6 ld-setting">
-                    <label class="control-label">Remove stream from match page:</label>
-                    <select id="removeStream" class="form-control">
-                        <option value="1">Enabled</option>
-                        <option value="0">Disabled</option>
-                    </select>
-                </div>
-                <div class="col-md-6 ld-setting">
-                    <label class="control-label">Show trade descriptions</label>
-                    <select id="showDescriptions" class="form-control">
-                        <option value="1">Enabled</option>
-                        <option value="0">Disabled</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-md-6 ld-setting">
-                    <label class="control-label">Enable auto-betting/-returning/-accept</label>
-                    <select id="enableAuto" class="form-control">
-                        <option value="3">Auto-accept only</option>
-                        <option value="2">Auto-betting/-returning only</option>
-                        <option value="1">Enabled</option>
-                        <option value="0">Disabled</option>
-                    </select>
-                </div>
-                <div class="col-md-6 ld-setting">
-                    <label class="control-label">Add preview buttons to trades</label>
-                    <select id="addTradePreviews" class="form-control">
-                        <option value="1">Enabled</option>
-                        <option value="0">Disabled</option>
-                    </select>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-6 ld-setting">
-                    <label class="control-label">Show match type and exact time</label>
-                    <select id="showExtraMatchInfo" class="form-control">
-                        <option value="2">Load automatically for upcoming matches + on hover</option>
-                        <option value="1">Trigger only when mouse is over the match</option>
-                        <option value="0">Disabled</option>
-                    </select>
-                </div>
-                <div class="col-md-6 ld-setting">
-                    <label class="control-label">Attempt to auto-bump trades every 10 minutes</label>
-                    <select id="autoBump" class="form-control">
-                        <option value="570">Dota 2 Lounge trades only</option>
-                        <option value="730">CS:GO Lounge trades only</option>
-                        <option value="1">Enabled</option>
-                        <option value="0">Disabled</option>
-                    </select>
-                </div>
-            </div>
-
-
-            <h3 class="page-header">Notifying</h3>
-            <div class="row">
-                <div class="col-md-6 ld-setting">
-                    <label class="control-label">Notify when bots go online:</label>
-                    <select id="notifyBots" class="form-control">
-                        <option value="1">Enabled</option>
-                        <option value="0">Disabled</option>
-                    </select>
-                </div>
-                <div class="col-md-6 ld-setting">
-                    <label class="control-label">Notify about new matches:</label>
-                    <select id="notifyMatches" class="form-control">
-                        <option value="1">Both</option>
-                        <option value="2">Dota2 Lounge matches only</option>
-                        <option value="3">CS:GO Lounge matches only</option>
-                        <option value="4">Disabled</option>
-                    </select>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-6 ld-setting">
-                    <label class="control-label">Notify about new trade offers:</label>
-                    <select id="notifyTrades" class="form-control">
-                        <option value="1">Both</option>
-                        <option value="2">Dota2 Lounge trades only</option>
-                        <option value="3">CS:GO Lounge trades only</option>
-                        <option value="4">Disabled</option>
-                    </select>
-                </div>
-                <div class="col-md-6 ld-setting">
-                    <label class="control-label">Notify about items that are going to expire soon:</label>
-                    <select id="notifyExpiredItems" class="form-control">
-                        <option value="1">Both</option>
-                        <option value="2">Dota2 Lounge only</option>
-                        <option value="3">CS:GO Lounge only</option>
-                        <option value="4">Disabled</option>
-                    </select>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-6 ld-setting">
-                    <label class="control-label">Notify on queue trade offer:</label>
-                    <select id="notifyTradeOffer" class="form-control">
-                        <option value="1">Enabled</option>
-                        <option value="4">Disabled</option>
-                    </select>
-                </div>
-            </div>
-
-            <h3 class="page-header">Misc</h3>
-            <div class="row">
-                <div class="col-md-6 ld-setting">
-                    <label class="control-label">Profanity:</label>
-                    <select id="renameButtons" class="form-control">
-                        <option value="1">Enabled</option>
-                        <option value="0">Disabled</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- THEMES -->
-    <div class="togglerino" id="themes">
-        <div class="page-header">
-            <h1>Themes</h1>
-        </div>
-
-        <h3 class="text-center form-inline">Current theme: 
-            <select class="cur-theme form-control text-primary">
-                <option value="-none">None</option>
-            </select>
-        </h3>
-
-        <div id="themes-carousel" class="carousel slide" data-ride="carousel" data-interval="false">
-            <div class="carousel-inner" role="listbox">
-                <!-- Populated in JS -->
-            </div>
-
-            <!-- Controls -->
-            <a class="left carousel-control" href="#themes-carousel" role="button" data-slide="prev">
-                <span class="glyphicon glyphicon-chevron-left"></span>
-                <span class="sr-only">Previous</span>
-            </a>
-            <a class="right carousel-control" href="#themes-carousel" role="button" data-slide="next">
-                <span class="glyphicon glyphicon-chevron-right"></span>
-                <span class="sr-only">Next</span>
-            </a>
-        </div>
-
-        <h3>Add your own!</h3>
-        <div class="row">
-            <div class="col-md-6">
-                <h4>From URL:</h4>
-                <form role="form" id="add-theme-remote">
-                    <div class="form-group">
-                        <label for="add-theme-url">URL of JSON</label>
-                        <div class="input-group">
-                            <input type="url" class="form-control" id="add-theme-url" placeholder="Enter URL">
+                <div class="col-md-6">
+                    <h4>From URL:</h4>
+                    <form role="form" id="add-theme-remote">
+                        <div class="form-group">
+                            <label for="add-theme-url">URL of JSON</label>
+                            <div class="input-group">
+                                <input type="url" class="form-control" id="add-theme-url" placeholder="Enter URL">
                             <span class="input-group-btn">
                                 <button class="btn btn-primary" type="submit">Add theme</button>
                             </span>
+                            </div>
+                            <p class="help-block">There are strict rules for the structure of the remote directory.</p>
+                            <p class="help-block">The following must be true for the JSON at the URL, in addition to the rules found in <a href="http://github.com/ncla/LoungeDestroyer/blob/master/THEMES.md">THEMES.md</a>:</p>
+                            <ul class="help-block">
+                                <li>Must have a <code>name</code> key, with the value being the shortname of the extension. Same rules apply to the shortname, as does for Javascript variable names</li>
+                                <li>Must have a <code>css</code> key, with a value of the absolute URL of the CSS for the theme</li>
+                                <li>Must have a <code>bg</code> key, with a value of the absolute URL of the background image</li>
+                                <li>If an icon is wanted, must have an <code>icon</code> key, with a value of the absolute URL of the icon image</li>
+                            </ul>
+                            <p class="help-block">In addition to this, the server the JSON is hosted on must allow cross-origin <code>GET</code> requests from all domains (i.e. return the <code>Access-Control-Allow-Origin: *</code> and, optionally, <code>Access-Control-Allow-Methods: GET</code> headers).</p>
+                            <p class="help-block">Background, icon and CSS are hotlinked.</p>
+                            <p class="help-block">Themes are automatically updated once a day.</p>
                         </div>
-                        <p class="help-block">There are strict rules for the structure of the remote directory.</p>
-                        <p class="help-block">The following must be true for the JSON at the URL, in addition to the rules found in <a href="http://github.com/ncla/LoungeDestroyer/blob/master/THEMES.md">THEMES.md</a>:</p>
-                        <ul class="help-block">
-                            <li>Must have a <code>name</code> key, with the value being the shortname of the extension. Same rules apply to the shortname, as does for Javascript variable names</li>
-                            <li>Must have a <code>css</code> key, with a value of the absolute URL of the CSS for the theme</li>
-                            <li>Must have a <code>bg</code> key, with a value of the absolute URL of the background image</li>
-                            <li>If an icon is wanted, must have an <code>icon</code> key, with a value of the absolute URL of the icon image</li>
-                        </ul>
-                        <p class="help-block">In addition to this, the server the JSON is hosted on must allow cross-origin <code>GET</code> requests from all domains (i.e. return the <code>Access-Control-Allow-Origin: *</code> and, optionally, <code>Access-Control-Allow-Methods: GET</code> headers).</p>
-                        <p class="help-block">Background, icon and CSS are hotlinked.</p>
-                        <p class="help-block">Themes are automatically updated once a day.</p>
-                    </div>
-                </form>
-            </div>
-            <div class="col-md-6">
-                <h4>User-inputted:</h4>
-                <form role="form" id="add-theme-local">
-                    <div class="form-group">
-                        <label for="add-theme-title">Title of theme</label>
-                        <input type="text" class="form-control" id="add-theme-title" placeholder="Enter title">
-                    </div>
-                    <div class="form-group">
-                        <label for="add-theme-description">Description (optional)</label>
-                        <textarea id="add-theme-description" class="form-control" rows="3" placeholder="Enter description" style="resize: none" maxlength="140"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="add-theme-bg">Background URL</label>
-                        <input type="url" class="form-control" id="add-theme-bg" placeholder="Enter absolute URL">
-                        <p class="help-block">Suggested size is 960x540</p>
-                    </div>
-                    <div class="form-group col-md-6" style="padding-left: 0">
-                        <label for="add-theme-author">Author</label>
-                        <input type="text" class="form-control" id="add-theme-author" placeholder="Enter author">
-                    </div>
-                    <div class="form-group col-md-6" style="padding-right: 0">
-                        <label for="add-theme-version">Version number</label>
-                        <input type="text" class="form-control" id="add-theme-version" placeholder="Enter version">
-                    </div>
-                    <div class="form-group">
-                        <label for="add-theme-css">Theme CSS</label>
-                        <textarea id="add-theme-css" class="form-control" rows="6" placeholder="Enter CSS"></textarea>
-                    </div>
-                    <button type="submit" class="btn btn-block btn-primary">Add theme</button>
-                </form>
+                    </form>
+                </div>
+                <div class="col-md-6">
+                    <h4>User-inputted:</h4>
+                    <form role="form" id="add-theme-local">
+                        <div class="form-group">
+                            <label for="add-theme-title">Title of theme</label>
+                            <input type="text" class="form-control" id="add-theme-title" placeholder="Enter title">
+                        </div>
+                        <div class="form-group">
+                            <label for="add-theme-description">Description (optional)</label>
+                            <textarea id="add-theme-description" class="form-control" rows="3" placeholder="Enter description" style="resize: none" maxlength="140"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="add-theme-bg">Background URL</label>
+                            <input type="url" class="form-control" id="add-theme-bg" placeholder="Enter absolute URL">
+                            <p class="help-block">Suggested size is 960x540</p>
+                        </div>
+                        <div class="form-group col-md-6" style="padding-left: 0">
+                            <label for="add-theme-author">Author</label>
+                            <input type="text" class="form-control" id="add-theme-author" placeholder="Enter author">
+                        </div>
+                        <div class="form-group col-md-6" style="padding-right: 0">
+                            <label for="add-theme-version">Version number</label>
+                            <input type="text" class="form-control" id="add-theme-version" placeholder="Enter version">
+                        </div>
+                        <div class="form-group">
+                            <label for="add-theme-css">Theme CSS</label>
+                            <textarea id="add-theme-css" class="form-control" rows="6" placeholder="Enter CSS"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-block btn-primary">Add theme</button>
+                    </form>
+                </div>
             </div>
         </div>
-    </div>
-
-    <div class="togglerino" id="about" style="margin-bottom: 40px;">
-        <div class="page-header">
-            <h1>About</h1>
-        </div>
-        <p>LoungeDestroyer makes a shitty website more bearable, enough said.</p>
-        <a href="https://www.youtube.com/watch?v=fJrGo92Qwk0" target="_blank">Here is theme song for LoungeDestroyer</a>
-        <div style="margin: 10px 0;">
-            <a class="btn btn-primary" role="button" href="http://reddit.com/r/loungedestroyer" target="_blank">Subreddit</a>
-            <a class="btn btn-primary" role="button" href="http://github.com/ncla/LoungeDestroyer" target="_blank">GitHub</a>
-            <a class="btn btn-primary" role="button" href="http://steamcommunity.com/groups/loungedestroyer" target="_blank">Steam group</a>
-            <a class="btn btn-primary" role="button" href="https://github.com/ncla/LoungeDestroyer/issues" target="_blank">Report a bug</a>
+        <div role="tabpanel" class="tab-pane" id="about">
+            <div class="page-header">
+                <h1>About</h1>
+            </div>
+            <p>LoungeDestroyer makes a shitty website more bearable, enough said.</p>
+            <a href="https://www.youtube.com/watch?v=fJrGo92Qwk0" target="_blank">Here is theme song for LoungeDestroyer</a>
+            <div style="margin: 10px 0;">
+                <a class="btn btn-primary" role="button" href="http://reddit.com/r/loungedestroyer" target="_blank">Subreddit</a>
+                <a class="btn btn-primary" role="button" href="http://github.com/ncla/LoungeDestroyer" target="_blank">GitHub</a>
+                <a class="btn btn-primary" role="button" href="http://steamcommunity.com/groups/loungedestroyer" target="_blank">Steam group</a>
+                <a class="btn btn-primary" role="button" href="https://github.com/ncla/LoungeDestroyer/issues" target="_blank">Report a bug</a>
+            </div>
         </div>
     </div>
 </div>

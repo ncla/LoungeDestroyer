@@ -2,6 +2,10 @@ $(document).ready(function(){
     $(".ld-setting a").tooltip({
         placement : 'right'
     });
+    $('#ld_tab a').click(function (e) {
+        e.preventDefault()
+        $(this).tab('show')
+    })
 });
 
 var defaultUser = new User();
