@@ -67,7 +67,19 @@ chrome.extension.onMessage.addListener(function (request, sender, sendResponse) 
 
     // Inject theme CSS (in bg for speed purposes)
     if(request.hasOwnProperty("injectCSSTheme")) {
-    	chrome.tabs.insertCSS(sender.tab.id, {code: themeCSS, runAt: "document_start"});
+    	(function loop(id, tries){
+    		if (tries > 200)
+    			return;
+
+			chrome.tabs.insertCSS(id, {code: themeCSS, runAt: "document_start"}, function(x){
+				// retry if it's called before tab exists (dah fuck chrome?)
+				var e = chrome.runtime.lastError;
+				if (e) {
+					console.error("Error while inserting theme CSS: ",e);
+					setTimeout(loop.bind(this, id, tries+1), 5);
+				}
+			});
+		})(sender.tab.id, 0);
     }
 
     // Open new tab if none exists
@@ -125,6 +137,25 @@ chrome.extension.onMessage.addListener(function (request, sender, sendResponse) 
 
     if(request.hasOwnProperty("updateThemes")) {
     	updateThemes();
+    }
+
+    if(request.hasOwnProperty("setCurrentTheme")) {
+    	var newCurTheme = request.setCurrentTheme;
+    	if (typeof newCurTheme !== "string")
+    		newCurTheme = LoungeUser.userSettings.currentTheme;
+
+    	console.log("Setting current theme to ",newCurTheme);
+
+    	chrome.storage.local.get("themes", function(result){
+	    	themes = result.themes || {};
+	    	if (newCurTheme) {
+	    		if (themes.hasOwnProperty(newCurTheme)) {
+	    			themeCSS = themes[newCurTheme].cachedCSS || "";
+	    		}
+	    	} else {
+	    		themeCSS = "";
+	    	}
+	    });
     }
 });
 
@@ -673,19 +704,21 @@ function updateThemes() {
 					// cache CSS so we can inject instantly
 					get(themes[theme].css, function(){
 						if (!this.status) {
-							console.error("Failed to retrieve CSS");
+							console.error("["+theme+"] Failed to retrieve CSS");
 							return;
 						}
 						var css = importantifyCSS(this.responseText);
 						if (css) {
+							if (theme === LoungeUser.userSettings.currentTheme)
+								themeCSS = css;
+
 				    		themes[theme].cachedCSS = css;
+				    		chrome.storage.local.set({themes: themes});
 					    }
 					});
 				});
 			}
 		}
-		
-		chrome.storage.local.set({themes: themes});
 	});
 }
 
@@ -710,7 +743,7 @@ function importantifyCSS(css){
     			}
     		}
 
-    		css = stringifyCSS(cssTree);
+    		css = stringifyCSS(cssTree, {compress: true});
     	} catch (err) {
     		console.error("Tried to parse CSS, failed: ",err);
     		return "";

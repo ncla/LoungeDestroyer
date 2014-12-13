@@ -27,8 +27,15 @@ function restore_options() {
 
         var curTheme = document.querySelector(".item[data-theme-name='"+Settings.currentTheme+"']");
         if (curTheme) {
+            var act;
+            if (act = document.querySelector("#themes-carousel .item.active"))
+                act.classList.remove("active");
+            if (act = document.querySelector("#themes-carousel .item.current"))
+                act.classList.remove("current");
+
             curTheme.classList.add("current", "active");
-            document.querySelector(".curTheme").textContent = themes[Settings.currentTheme].title || "None";
+            console.log("Found curTheme! Setting to ",Settings.currentTheme);
+            document.querySelector(".cur-theme").value = Settings.currentTheme || "-none";
         }
     });
 }
@@ -49,100 +56,15 @@ chrome.storage.local.get("themes", function(result){
         themes = result.themes;
     }
 
-    // then load from directory
-    chrome.runtime.getPackageDirectoryEntry(function(entry){
-        entry.getDirectory("themes", {create: false}, function(dir){
-            themeDirectory = dir;
-
-            // get all dirs/files in themes/
-            var reader = dir.createReader();
-            reader.readEntries(function mainLoop(results){
-                if (!results)
-                    return;
-
-                for (var i = 0, j = results.length; i < j; ++i) {
-                    // if it's a directory
-                    if (results[i].isDirectory === true) {
-                        theme_format(results[i]);
-                    }
-                }
-
-                mainLoop();
-            }, error_proxy);
-
-        }, error_proxy);
-    });
-
     for (var theme in result.themes) {
-        console.log("Checking theme "+theme);
-        if (themes[theme].custom) {
-            console.log("Theme "+theme+" was custom");
-            theme_data_handler.call({
-                result: "{}",
-                obj: themes[theme],
-                themeName: theme
-            });
-        }
+        console.log("Creating theme "+theme);
+        theme_data_handler.call({
+            result: "{}",
+            obj: themes[theme],
+            themeName: theme
+        });
     }
 });
-
-/**
- * Formats a theme into an object, and pushes it to window.themes
- * @param DirectoryEntry dirEntry - directory entry of theme folder
- */
-function theme_format(dirEntry) {
-    console.log("Theme: "+dirEntry.name);
-    var obj = {},
-        reader = dirEntry.createReader(),
-        fileReader = new FileReader(),
-        dataFileEntry;
-
-    fileReader.addEventListener("loadend", theme_data_handler);
-    fileReader.addEventListener("error", error_proxy);
-
-    // if theme is in storage, load
-    if (themes[dirEntry.name]) {
-        obj = themes[dirEntry.name];
-    }
-
-    // then read from directory
-    reader.readEntries(function loop(results){
-        if (!results)
-            return;
-
-        // loop through every file in theme directory
-        for (var i = 0, j = results.length; i < j; ++i) {
-            if (results[i].isFile === true) {
-                // if it's bg.[ext]
-                if (/bg\.[^.]*$/.test(results[i].name)) {
-                    obj.bg = "$dir/"+results[i].name;
-                }
-
-                // if it's icon.[ext]
-                if (/icon\.[^.]*$/.test(results[i].name)) {
-                    obj.icon = "$dir/"+results[i].name;
-                }
-
-                // if it's data.json
-                if (results[i].name === "data.json") {
-                    dataFileEntry = results[i];
-                }
-            }
-        }
-
-        // placed outside of loop, so were sure bg & icon has been found
-        if (!dataFileEntry) {
-            console.error("["+dirEntry.name+"] Couldn't find data.json");
-            return;
-        }
-
-        dataFileEntry.file(function(file){
-            fileReader.themeName = dirEntry.name;
-            fileReader.obj = obj;
-            fileReader.readAsText(file);
-        });
-    }, error_proxy);
-}
 
 /**
  * Called when data.json has been loaded for a theme
@@ -186,12 +108,9 @@ function theme_data_handler(){
     // merge obj and json
     $.extend(true, obj, json);
 
-    if (!obj.bg) {
-        console.error("["+name+"] Couldn't find bg.[ext]");
+    if (!obj.title || !obj.bg || !obj.description || !obj.version) {
+        console.error("["+name+"] Invalid data.json - missing title, background, description or version");
         return;
-    }
-    if (!obj.title || !obj.description || !obj.version) {
-        console.error("["+name+"] Invalid data.json - missing title, description or version");
     }
 
     themes[name] = obj;
@@ -248,9 +167,9 @@ function theme_create_element(name, obj, active) {
     }
     
     // dirty dirty
-    a.innerHTML = "<img src='"+obj.bg.replace("$dir","../themes/"+name)+"'><div class='highlight'></div>"+
+    a.innerHTML = "<img src='"+obj.bg+"'><div class='highlight'></div>"+
                   "<div class='carousel-caption'>"+
-                      (obj.icon ? "<img class='icon' src='"+obj.icon.replace("$dir","../themes/"+name)+"'>" : "")+
+                      (obj.icon ? "<img class='icon' src='"+obj.icon+"'>" : "")+
                       "<h2>"+obj.title+"</h2><h4 class='author'>by "+obj.author+" (v "+obj.version+")</h4><p style='font-size: 18px'>"+obj.description+"</p>"+
                   "</div>";
 
@@ -313,7 +232,7 @@ function theme_create_element(name, obj, active) {
  * Creates/saves a custom theme, based on given data
  * @param String name - folder/theme name
  * @param Object json - JSON to get data from, only containing description, author and version if local
- * @param String css - css to be inserted into inject.css
+ * @param String css - css to be injected on page load/URL to load from if remote
  * @param String bg - URL of the background image
  * @param String remoteUrl - if set, theme is considered remote (css is URL)
  * @param Function callback - callback to call with true or error string
@@ -324,6 +243,7 @@ function create_theme(name, json, css, bg, callback, remoteUrl, icon, active) {
         callback = error_proxy;
 
     if (!name || !json || !css || (!bg && !json.bg)) {
+        console.error("Necesarry information not provided for create_theme on ",name);
         callback("Necesarry information not provided.");
         return;
     }
@@ -337,19 +257,53 @@ function create_theme(name, json, css, bg, callback, remoteUrl, icon, active) {
     if (json.options)
         theme.options = json.options;
     theme.bg = bg || json.bg;
-    theme.css = css;
 
     if (remoteUrl) {
         theme.remote = true;
         theme.url = remoteUrl;
-    }
 
-    console.log("Added theme ",name," : ",theme);
-    themes[name] = theme;
-    theme_create_element(name, theme, active);
-    chrome.storage.local.set({themes: themes}, function(){
-        callback(true);
-    });
+        $.ajax({
+            type: "GET",
+            url: css,
+            success: function(data, status) {
+                var css = data;
+                chrome.runtime.getBackgroundPage(function(bg){
+                    var newCSS = bg.importantifyCSS(css);
+                    if (newCSS) {
+                        theme.cachedCSS = newCSS;
+                        themes[name] = theme;
+                        theme_create_element(name, theme, active);
+                        chrome.storage.local.set({themes: themes}, function(){
+                            callback(true);
+                        });
+                    } else {
+                        alert("Failed to parse theme CSS!");
+                        console.error("Failed to parse CSS: ",{received: css, minimized: newCSS});
+                        return;
+                    }
+                });
+            },
+            error: function(xhr, status, err) {
+                alert("Failed to load theme CSS!\r\nError:\r\n"+err);
+            }
+        });
+    } else {
+        chrome.runtime.getBackgroundPage(function(bg){
+            console.log("Added local theme ",name," : ",theme);
+            var newCSS = bg.importantifyCSS(css);
+            if (newCSS) {
+                theme.cachedCSS = newCSS;
+                themes[name] = theme;
+                theme_create_element(name, theme, active);
+                chrome.storage.local.set({themes: themes}, function(){
+                    callback(true);
+                });
+            } else {
+                alert("Failed to parse theme CSS!");
+                console.error("Failed to parse CSS: ",{received: css, minimized: newCSS});
+            }
+        });
+    }
 }
 
 
@@ -376,6 +330,8 @@ function select_theme(name) {
     }
 
     document.querySelector(".cur-theme").value = name || "-none";
+
+    chrome.runtime.sendMessage({setCurrentTheme: true});
 }
 
 
@@ -428,6 +384,8 @@ document.querySelector("#add-theme-remote button[type='submit']").addEventListen
         create_theme(json.name, json, json.css, json.bg, function(val){
             if (val !== true)
                 error_proxy.apply({}, arguments);
+            else
+                select_theme(json.name);
         }, url, json.icon, true);
 
         chrome.runtime.sendMessage({updateThemes: true});
@@ -477,6 +435,8 @@ document.querySelector("#add-theme-local button[type='submit']").addEventListene
     }, css, bg, function(val){
         if (val !== true)
             error_proxy.apply({}, arguments);
+        else 
+            select_theme(name);
     }, false, undefined, true);
 });
 
@@ -504,6 +464,7 @@ document.querySelector(".theme-modal-confirm-delete .confirm").addEventListener(
 
     delete themes[theme];
     chrome.storage.local.set({themes: themes});
+    chrome.runtime.sendMessage({setCurrentTheme: true});
 });
 
 /**
@@ -531,7 +492,7 @@ function escape_obj(obj) {
     for (var k in obj) {
         if (!obj.hasOwnProperty(k))
             continue;
-        if(k === "css")
+        if(["cachedCSS"].indexOf(k) !== -1)
             continue;
 
         var val = obj[k];
