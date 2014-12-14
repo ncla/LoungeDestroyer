@@ -1,47 +1,34 @@
 #Themes
-A quick rundown of how to create themes for LoungeDestroyer - local or otherwise.
+A quick rundown of how to create themes for LoungeDestroyer.
 This'll mostly detail how the JSON used by the theme parser is to be structured.
 
-## Local (bundled) themes
-These are themes that are included with LoungeDestroyer by default - they're placed in the `/themes/` folder, and the directory structure is as follows:
+## CSS restrictions
+Due to technical restrictions imposed upon us by Chrome, the theme CSS is changed prior to injecting it into a page. Most importantly, **all** values have `!important` appended to them - as such, using `!important` in your theme may not work as intended. We are unfortunately unable to change this before the Chrome team fixes the priority level of injected CSS.
 
-<table>
-  <tbody>
-    <tr>
-      <td><code>/themes/[name]/</code></td>
-      <td>
-        <p>Base theme folder. All theme-related files are placed here. Note that <code>[name]</code> must be a valid Javascript variable.</p>
-        <table>
-          <tbody>
-            <tr>
-              <td><code>data.json</code></td>
-              <td>Main JSON file - all data is loaded from here. Structure detailed below.</td>
-            </tr>
-            <tr>
-              <td><code>bg.[ext]</code></td>
-              <td>Default background image used in carousel on settings page. Can be overwritten in <code>data.json</code>. Suggested size is 960x540.</td>
-            </tr>
-            <tr>
-              <td><code>icon.[ext]</code></td>
-              <td>Optional. Default icon used in carousel on settings page. Can be overwritten in <code>data.json</code>. Suggested size is 50x50.</td>
-            </tr>
-            <tr>
-              <td><code>inject.css</code></td>
-              <td>Default CSS file injected into page when theme is enabled. Can be overwritten in <code>data.json</code>.</td>
-            </tr>
-          </tbody>
-        </table>
-      </td>
-    </tr>
-  </tbody>
-</table>
+As an example, if the following CSS is linked as theme CSS:
+
+```
+body {
+    background: red;
+    box-shadow: inset 2px 0px 4px green;
+}
+```
+
+The following will be injected into the page (here shown prettified - actual injected CSS is minified):
+
+```
+body {
+    background: red !important;
+    box-shadow: inset 2px 0px 4px green !important;
+}
+```
 
 ## Remote themes
-These are themes loaded from a URL. Remote themes do not make use of the directory structure in the same way local themes do, instead they are required to specify the absolute URL of all needed files in `data.json`. More information can be found below.
+LoungeDestroyer supports themes loaded from a URL. Remote themes index their structure and basic information in a JSON file (from now on referred to as `data.json`), which is then loaded and parsed by LoungeDestroyer. The following details the structure of said JSON file, which must adhere to it for LoungeDestroyer to succesfully load the theme.
 
-In addition to this, the server on which the JSON is hosted must allow cross-origin `GET` requests - this means returning the `Access-Control-Allow-Origin: *` and, optionally, `Access-Control-Allow-Methods: GET` headers.
+In addition to this, the server on which the JSON and theme CSS is hosted, must allow cross-origin `GET` requests - this means returning the `Access-Control-Allow-Origin: *` and, optionally, `Access-Control-Allow-Methods: GET` headers.
 
-And finally, all resources (background, icon, CSS) are hotlinked - as such, they must be embedable through the default HTML tags (`img` and `link`).
+And finally, all images (background, icon) are hotlinked - as such, they must be embedable through the `img` HTML tag.
 
 ## JSON structure
 The following JSON structure is understood by the theme parser. Note that, when updating the theme, the `checked` values of all options are kept their local value, while everything else is overwritten by the remote value.
@@ -66,19 +53,19 @@ The following JSON structure is understood by the theme parser. Note that, when 
     </tr>
     <tr>
       <td>bg</td>
-      <td>Overwrites the default background image used in carousel. Must be absolute URL to new image, or link relative to <code>options.html</code>. <code>$dir</code> will be replaced by the folder path in local themes. Suggested size is 960x540. <em>Required</em> for remote themes</td>
+      <td><em>Required</em> - Absolute URL to the image displayed as background in the theme carousel on the options page. Suggested size is 960x540.</td>
     </tr>
     <tr>
       <td>icon</td>
-      <td>Overwrites the default icon image used in carousel. Must be absolute URL to new image, or link relative to <code>options.html</code>. <code>$dir</code> will be replaced by the folder path in local themes. Suggested size is 50x50. Icon images are optional.</td>
+      <td>Absolute URL to the image displayed as icon in the theme carousel on the options page. Suggested size is 50x50. Icon images are optional.</td>
     </tr>
     <tr>
       <td>css</td>
-      <td>Overwrites the default CSS injected into page. Must be absolute URL to new CSS. <em>Required</em> for remote themes.</td>
+      <td><em>Required</em> - Absolute URL to the CSS injected into the page. Must allow cross-origin `GET` requests.</td>
     </tr>
     <tr>
       <td>name</td>
-      <td><em>Required</em> for remote themes. Not used for local themes. Shorthand name of theme, used internally. Must be valid Javascript variable name.</td>
+      <td><em>Required</em> - Shorthand name of theme, used internally. Must be valid Javascript variable name.</td>
     </tr>
     <tr>
       <td>collapsibleColumns</td>
@@ -86,7 +73,7 @@ The following JSON structure is understood by the theme parser. Note that, when 
     </tr>
     <tr>
       <td>changelog</td>
-      <td>An absolute URL of the changelog of the theme.</td>
+      <td>An absolute URL of the changelog of the theme. Optional.</td>
     </tr>
     <tr>
       <td>options</td>
@@ -127,7 +114,7 @@ An example JSON file for a remote theme is below:
 
 ```json
 {
-  "name": "xmpl_theme",
+  "name": "example_theme",
   "css": "http://example.com/remote_theme.css",
   "author": "birjolaxew",
   "version": "1.0",
@@ -149,7 +136,7 @@ An example JSON file for a remote theme is below:
 
 ## Styling the theme
 
-Extension provides classes for `<body>` tag to help you style for each page and each Lounge site (classes `appID730`, `main`, `mybets` and so on). You can only modify CSS of the site, we do not provide scripting. It's the same reason that we have when developing extension, to hard code least amount of stuff possible. Another concern by us is security (possibilities to do some exploits with JS). 
+Extension provides classes for `<body>` tag to help you style for each page and each Lounge site (classes `appID730`, `main`, `mybets` and so on). You can only modify CSS of the site, we do not provide scripting. It's the same reason that we have when developing extension, to hard code least amount of stuff possible. Another concern by us is security (possibilities to do some exploits with JS).
 
 Their sites have inline styling in some places, and creating a CSS selector might be difficult task, but it is possible. Just because it doesn't have ID or class doesn't mean you can't select it. Take for example `.title` element that has background image showing a dice icon, you can select it like this `.title[style*="bets.png"]`.
 
@@ -157,4 +144,4 @@ You have to test your theme on all pages there are (`/missingitems`, `/donations
 
 ## Themes bundled with extension
 
-Styling a theme does not guarantee that we will bundle it with our extension, that is our decision whether or not to bundle your theme with extension. You will still be able to add it manually through options. If you create a theme that is an eye candy for us, we will most likely include it.
+We are open to bundling high-quality, polished themes into our extension as default themes - if you have created a theme that you believe should be included, please open an issue (using the menu to the right), and we'll have a look!
