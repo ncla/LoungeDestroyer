@@ -55,6 +55,8 @@ chrome.storage.local.get(['marketPriceList', 'currencyConversionRates', 'themes'
     });
 });
 
+// Inject theme as quickly as possible
+chrome.runtime.sendMessage({injectCSSTheme: true});
 /*
  Wrap the init code here, because for this to function properly, we need user settings to be loaded first
  */
@@ -75,7 +77,7 @@ function init() {
         }
     });
 
-    // inject theme CSS
+    // do theme-related stuff
     if (LoungeUser.userSettings.currentTheme) {
         var name = LoungeUser.userSettings.currentTheme;
         if (themes.hasOwnProperty(name)) {
@@ -83,7 +85,7 @@ function init() {
                 style;
 
             if (theme.cachedCSS) {
-                chrome.runtime.sendMessage({injectCSSCode: theme.cachedCSS});
+                //chrome.runtime.sendMessage({injectCSSCode: theme.cachedCSS});
             } else {
                 style = document.createElement("link");
                 style.setAttribute("href", theme.css);

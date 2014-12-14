@@ -1,8 +1,21 @@
 var LoungeUser = new User(),
-    currencyFallback = {"USDAUD":1.1503,"USDCAD":1.1359,"USDEUR":0.8006,"USDGBP":0.6256,"USDRUB":43.59,"USDUSD":1};
+    currencyFallback = {"USDAUD":1.1503,"USDCAD":1.1359,"USDEUR":0.8006,"USDGBP":0.6256,"USDRUB":43.59,"USDUSD":1},
+    themes = {};
+    themeCSS = "";
+
 LoungeUser.loadUserSettings(function() {
     console.log("Settings for background.js have loaded!");
     bet.autoDelay = parseInt(LoungeUser.userSettings.autoDelay) * 1000 || 5000;
+
+    chrome.storage.local.get("themes", function(result){
+    	themes = result.themes || {};
+    	if (LoungeUser.userSettings.currentTheme) {
+    		var name = LoungeUser.userSettings.currentTheme;
+    		if (themes.hasOwnProperty(name)) {
+    			themeCSS = themes[name].cachedCSS || "";
+    		}
+    	}
+    });
 });
 
 var lastTimeUserVisited = null,
@@ -49,28 +62,24 @@ chrome.extension.onMessage.addListener(function (request, sender, sendResponse) 
     if(request.hasOwnProperty("injectCSSCode")) {
     	// put !important on *everything* because Chrome is fucking retarded
     	console.log("Injected CSS code into tab "+sender.tab.id);
-    	var css = request.injectCSSCode;
+    	chrome.tabs.insertCSS(sender.tab.id, {code: importantifyCSS(request.injectCSSCode), runAt: "document_start"}, function(x){console.log(x)});
+    }
 
-    	if (request.overwriteSiteCSS) {
-	    	try {
-	    		var cssTree = parseCSS(css),
-	    		    rules = cssTree.stylesheet.rules;
+    // Inject theme CSS (in bg for speed purposes)
+    if(request.hasOwnProperty("injectCSSTheme")) {
+    	(function loop(id, tries){
+    		if (tries > 200)
+    			return;
 
-	    		for (var i = 0; i < rules.length; ++i) {
-	    			var rule = rules[i],
-	    			    decls = rule.declarations;
-
-	    			for (var l = 0; l < decls.length; ++l) {
-	    				decls[l].value = decls[l].value.replace("!important","").trim() + " !important";
-	    			}
-	    		}
-
-	    		css = stringifyCSS(cssTree);
-	    	} catch (err) {
-	    		console.error("Tried to parse CSS, failed: ",err);
-	    	}
-	    }
-    	chrome.tabs.insertCSS(sender.tab.id, {code: css, runAt: "document_start"}, function(x){console.log(x)});
+			chrome.tabs.insertCSS(id, {code: themeCSS, runAt: "document_start"}, function(x){
+				// retry if it's called before tab exists (dah fuck chrome?)
+				var e = chrome.runtime.lastError;
+				if (e) {
+					console.error("Error while inserting theme CSS: ",e);
+					setTimeout(loop.bind(this, id, tries+1), 5);
+				}
+			});
+		})(sender.tab.id, 0);
     }
 
     // Open new tab if none exists
@@ -128,6 +137,25 @@ chrome.extension.onMessage.addListener(function (request, sender, sendResponse) 
 
     if(request.hasOwnProperty("updateThemes")) {
     	updateThemes();
+    }
+
+    if(request.hasOwnProperty("setCurrentTheme")) {
+    	var newCurTheme = request.setCurrentTheme;
+    	if (typeof newCurTheme !== "string")
+    		newCurTheme = LoungeUser.userSettings.currentTheme;
+
+    	console.log("Setting current theme to ",newCurTheme);
+
+    	chrome.storage.local.get("themes", function(result){
+	    	themes = result.themes || {};
+	    	if (newCurTheme) {
+	    		if (themes.hasOwnProperty(newCurTheme)) {
+	    			themeCSS = themes[newCurTheme].cachedCSS || "";
+	    		}
+	    	} else {
+	    		themeCSS = "";
+	    	}
+	    });
     }
 });
 
@@ -676,35 +704,53 @@ function updateThemes() {
 					// cache CSS so we can inject instantly
 					get(themes[theme].css, function(){
 						if (!this.status) {
-							console.error("Failed to retrieve CSS");
+							console.error("["+theme+"] Failed to retrieve CSS");
 							return;
 						}
-						var css = this.responseText;
-						// very poor error handling - assuming parsing fails on non-CSS
-						try {
-							var cssTree = parseCSS(css),
-				    		    rules = cssTree.stylesheet.rules;
+						var css = importantifyCSS(this.responseText);
+						if (css) {
+							if (theme === LoungeUser.userSettings.currentTheme)
+								themeCSS = css;
 
-				    		for (var i = 0; i < rules.length; ++i) {
-				    			var rule = rules[i],
-				    			    decls = rule.declarations;
-
-				    			for (var l = 0; l < decls.length; ++l) {
-				    				decls[l].value = decls[l].value.replace("!important","").trim() + " !important";
-				    			}
-				    		}
-
-				    		css = stringifyCSS(cssTree, {compress: true});
 				    		themes[theme].cachedCSS = css;
-					    	chrome.storage.local.set({themes: themes});
-					    } catch (err) {
-					    	console.error("Theme "+theme+" CSS most likely not CSS: ",err);
+				    		chrome.storage.local.set({themes: themes});
 					    }
 					});
 				});
 			}
 		}
 	});
+}
+
+function importantifyCSS(css){
+	if (css) {
+    	try {
+    		var cssTree = parseCSS(css),
+    		    rules = cssTree.stylesheet.rules;
+
+    		for (var i = 0; i < rules.length; ++i) {
+    			var rule = rules[i],
+    			    decls = rule.declarations;
+
+    			if (!decls)
+    				continue;
+
+    			for (var l = 0; l < decls.length; ++l) {
+    				if (!decls[l].value)
+    					continue;
+
+    				decls[l].value = decls[l].value.replace("!important","").trim() + " !important";
+    			}
+    		}
+
+    		css = stringifyCSS(cssTree, {compress: true});
+    	} catch (err) {
+    		console.error("Tried to parse CSS, failed: ",err);
+    		return "";
+    	}
+    }
+
+    return css;
 }
 /*
  Fired when the extension is first installed, when the extension is updated to a new version, and when Chrome is updated to a new version.
