@@ -24,7 +24,7 @@ body {
 ```
 
 ## Remote themes
-LoungeDestroyer supports themes loaded from a URL. Remote themes index their structure and basic information in a JSON file (from now on referred to as `data.json`), which is then loaded and parsed by LoungeDestroyer. The following details the structure of said JSON file, which must adhere to it for LoungeDestroyer to succesfully load the theme.
+LoungeDestroyer supports themes loaded from a URL. Remote themes index their structure and basic information in a JSON file, which is then loaded and parsed by LoungeDestroyer. The following details the structure of said JSON file, which must adhere to it for LoungeDestroyer to succesfully load the theme.
 
 In addition to this, the server on which the JSON and theme CSS is hosted, must allow cross-origin `GET` requests - this means returning the `Access-Control-Allow-Origin: *` and, optionally, `Access-Control-Allow-Methods: GET` headers.
 
