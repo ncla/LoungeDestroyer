@@ -50,11 +50,22 @@ var queue = {
 function handleQueue(data, game) {
     if (data.offer !== queue.lastOffer[game]) {
         if (LoungeUser.userSettings.notifyTradeOffer == "1") {
-            createNotification("Queue trade offer received", 
-                "CSGOLounge has sent you a trade offer",
-                "offer",
-                {title: "Open trade offer"},
-                data.offer);
+            chrome.tabs.query({
+                active: true,
+                url: ["*://csgolounge.com/*",
+                      "*://dota2lounge.com/*"],
+                lastFocusedWindow: true
+            }, function(tabs){
+                if (tabs.length) {
+                    if (["0","2"].indexOf(LoungeUser.userSettings.enableAuto) !== -1) {
+                        createNotification("Queue trade offer received", 
+                            "CSGOLounge has sent you a trade offer",
+                            "offer",
+                            {title: "Open trade offer"},
+                            data.offer);
+                    }
+                }
+            });
         }
 
         if (["0","2"].indexOf(LoungeUser.userSettings.enableAuto) === -1) {
