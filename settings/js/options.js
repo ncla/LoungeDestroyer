@@ -167,11 +167,30 @@ function theme_create_element(name, obj, active) {
     }
     
     // dirty dirty
-    a.innerHTML = "<img src='"+obj.bg+"'><div class='highlight'></div>"+
+    a.innerHTML = "<div class='highlight'></div>"+
                   "<div class='carousel-caption'>"+
-                      (obj.icon ? "<img class='icon' src='"+obj.icon+"'>" : "")+
-                      "<h2>"+obj.title+"</h2><h4 class='author'>by "+obj.author+" (v "+obj.version+")</h4><p style='font-size: 18px'>"+obj.description+"</p>"+
+                        "<h2>"+obj.title+"</h2><h4 class='author'>by "+obj.author+" (v "+obj.version+")</h4><p style='font-size: 18px'>"+obj.description+"</p>"+
                   "</div>";
+
+    var bgImg = document.createElement("img");
+    bgImg.src = obj.bg;
+    bgImg.onerror = function(){
+        bgImg.src = "./bg_placeholder.png";
+    }
+    a.insertBefore(bgImg, a.firstChild);
+
+    if (obj.icon) {
+        var iconImg = document.createElement("img");
+        iconImg.className = "icon";
+        iconImg.src = obj.icon;
+        iconImg.onerror = function(){
+            iconImg.style.display = "none";
+        };
+
+        var caption = a.querySelector(".carousel-caption");
+        if (caption)
+            caption.insertBefore(iconImg, caption.firstChild);
+    }
 
     item.appendChild(a);
 
@@ -381,6 +400,12 @@ document.querySelector("#add-theme-remote button[type='submit']").addEventListen
             alert("JSON could not be parsed. Please make sure you're using the correct URL");
             return;
         }
+
+        if (themes.hasOwnProperty(json.name)) {
+            alert("A theme with that name is already installed\r\nPlease uninstall "+themes[json.name].title+" before re-attempting.");
+            return;
+        }
+
         create_theme(json.name, json, json.css, json.bg, function(val){
             if (val !== true)
                 error_proxy.apply({}, arguments);

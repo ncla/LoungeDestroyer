@@ -41,8 +41,11 @@ code {
     margin-bottom: 10px;
 }
 
-#themes-carousel { max-width: 960px; margin: 0 auto; }
-.theme-container { cursor: pointer; }
+#themes-carousel {
+    max-width: 960px;
+    margin: 0 auto;
+}
+.theme-container { cursor: pointer; max-height: 540px; }
 .carousel-inner .item > .theme-container > img {
     width: 100%;
 }
