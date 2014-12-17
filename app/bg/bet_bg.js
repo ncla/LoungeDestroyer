@@ -52,14 +52,13 @@ function handleQueue(data, game) {
         if (LoungeUser.userSettings.notifyTradeOffer == "1") {
             chrome.tabs.query({
                 active: true,
-                url: ["*://csgolounge.com/*",
-                      "*://dota2lounge.com/*"],
+                url: "*://"+(["csgo","dota"])[game]+"lounge.com/*",
                 lastFocusedWindow: true
             }, function(tabs){
-                if (tabs.length) {
+                if (!tabs.length) {
                     if (["0","2"].indexOf(LoungeUser.userSettings.enableAuto) !== -1) {
                         createNotification("Queue trade offer received", 
-                            "CSGOLounge has sent you a trade offer",
+                            (["CSGO","Dota2"])[game]+"Lounge has sent you a trade offer",
                             "offer",
                             {title: "Open trade offer"},
                             data.offer);
