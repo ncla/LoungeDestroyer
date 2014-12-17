@@ -333,7 +333,7 @@ function checkNewMatches(ajaxResponse, appID) {
     $(".matchmain", ajaxResponse).each(function(index, value) {
         if(!$(".match", value).hasClass("notaviable")) {
             var matchID = $("a", value).attr("href").replace("match?m=", "").replace("predict?m=", "");
-            var tournament = $(".eventm:eq(0)", value).text().trim();
+            var tournament = $(".matchheader div:eq(1)", value).text().trim();
             var teamA = $(".teamtext:eq(0) b", value).text().trim();
             var teamB = $(".teamtext:eq(1) b", value).text().trim();
             var matchWhenTextNode = $(".matchheader .whenm:eq(0)", value)
@@ -354,6 +354,8 @@ function checkNewMatches(ajaxResponse, appID) {
 
     var matchesToNotificate = {};
     chrome.storage.local.get('matches' + appID, function(result) {
+        var newMatchStorageObject = result[storageName];
+
         if($.isEmptyObject(result)) {
             // Init
             console.log("empty object");
@@ -361,14 +363,20 @@ function checkNewMatches(ajaxResponse, appID) {
         else {
             $.each(activeMatches, function(index, value) {
                 if (typeof result[storageName][index] == 'undefined') {
-                    console.log("Match #" + index + " is new, adding to notify list..");
+                    console.log("Match #" + index + " is new, adding to notify list and saving in local storage.");
                     matchesToNotificate[index] = value;
+                    newMatchStorageObject[index] = value;
                 }
             });
         }
 
-        /* Store new fresh bullshit */
-        var tempObj = {}; tempObj[storageName] = activeMatches;
+        console.log("Old match storage object: ", result[storageName]);
+        console.log("New match storage object: ", newMatchStorageObject);
+
+        var tempObj = {};
+        tempObj[storageName] = newMatchStorageObject;
+
+        // Setting newly discovered matches in the storage
         chrome.storage.local.set(tempObj);
 
         var countNotify = Object.keys(matchesToNotificate).length;
@@ -386,7 +394,7 @@ function checkNewMatches(ajaxResponse, appID) {
                 var msg = (value.teamA.length > 0) ? (value.teamA + " vs. " + value.teamB + " @ " + value.tournament + "\nMatch begins " + value.when) : (value.tournament + "\nMatch begins " + value.when);
                 createNotification(
                     "A new " + (appID == 730 ? "CS:GO" : "DOTA2") + " match has been added!",
-                    value.teamA + " vs. " + value.teamB + " @ " + value.tournament + "\nMatch begins " + value.when,
+                    msg,
                     "match",
                     {title: "Open match page"},
                     baseURLs[appID] + "match?m=" + value.matchID
