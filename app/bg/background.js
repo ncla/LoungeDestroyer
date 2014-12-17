@@ -148,10 +148,8 @@ chrome.extension.onMessage.addListener(function (request, sender, sendResponse) 
 
     	chrome.storage.local.get("themes", function(result){
 	    	themes = result.themes || {};
-	    	if (newCurTheme) {
-	    		if (themes.hasOwnProperty(newCurTheme)) {
-	    			themeCSS = themes[newCurTheme].cachedCSS || "";
-	    		}
+	    	if (newCurTheme && themes.hasOwnProperty(newCurTheme)) {
+	    		themeCSS = themes[newCurTheme].cachedCSS || "";
 	    	} else {
 	    		themeCSS = "";
 	    	}
