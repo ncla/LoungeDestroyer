@@ -38,6 +38,12 @@ function restore_options() {
             document.querySelector(".cur-theme").value = Settings.currentTheme || "-none";
         }
     });
+    $("#refetchmarketcrap").click(function() {
+        chrome.runtime.sendMessage({refetchMarketPriceList: true});
+    });
+    $("#refetchcurrencies").click(function() {
+        chrome.runtime.sendMessage({refetchCurrencyConversionRates: true});
+    });
 }
 
 document.addEventListener('DOMContentLoaded', restore_options);

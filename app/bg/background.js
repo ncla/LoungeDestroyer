@@ -155,6 +155,12 @@ chrome.extension.onMessage.addListener(function (request, sender, sendResponse) 
 	    	}
 	    });
     }
+    if(request.hasOwnProperty("refetchMarketPriceList")) {
+        updateMarketPriceList();
+    }
+    if(request.hasOwnProperty("refetchCurrencyConversionRates")) {
+        updateCurrencyConversion();
+    }
 });
 
 var icons = {"-1": "icons/icon_unknown.png", "0": "icons/icon_offline.png", "1": "icons/icon_online.png"};
@@ -354,6 +360,8 @@ function checkNewMatches(ajaxResponse, appID) {
 
     var matchesToNotificate = {};
     chrome.storage.local.get('matches' + appID, function(result) {
+        console.log("Old match storage object: ", JSON.stringify(result[storageName]).length);
+
         var newMatchStorageObject = result[storageName];
 
         if($.isEmptyObject(result)) {
@@ -370,8 +378,7 @@ function checkNewMatches(ajaxResponse, appID) {
             });
         }
 
-        console.log("Old match storage object: ", result[storageName]);
-        console.log("New match storage object: ", newMatchStorageObject);
+        console.log("New match storage object: ", JSON.stringify(newMatchStorageObject).length);
 
         var tempObj = {};
         tempObj[storageName] = newMatchStorageObject;
@@ -518,7 +525,7 @@ function updateMarketPriceList() {
         console.log(new Date() + " -- Item price list has been updated!");
     };
     oReq.onerror = function() {
-        chrome.storage.local.set({"marketPriceList": {}});
+        console.log("Error getting response for item price list API");
     };
     oReq.open("get", "http://api.ncla.me/itemlist.php", true);
     oReq.send();
