@@ -37,6 +37,10 @@ function restore_options() {
             console.log("Found curTheme! Setting to ",Settings.currentTheme);
             document.querySelector(".cur-theme").value = Settings.currentTheme || "-none";
         }
+
+        if (document.querySelectorAll("#themes-carousel .carousel-inner > div").length < 2) {
+            $("#themes-carousel .carousel-control").hide();
+        }
     });
 }
 
@@ -242,6 +246,10 @@ function theme_create_element(name, obj, active) {
         item.classList.add("active");
 
         select_theme(name);
+    }
+
+    if (document.querySelectorAll("#themes-carousel .carousel-inner > div").length > 1) {
+        $("#themes-carousel .carousel-control").show();
     }
 }
 
@@ -490,6 +498,10 @@ document.querySelector(".theme-modal-confirm-delete .confirm").addEventListener(
     delete themes[theme];
     chrome.storage.local.set({themes: themes});
     chrome.runtime.sendMessage({setCurrentTheme: true});
+
+    if (document.querySelectorAll("#themes-carousel .carousel-inner > div").length < 2) {
+        $("#themes-carousel .carousel-control").hide();
+    }
 });
 
 /**
