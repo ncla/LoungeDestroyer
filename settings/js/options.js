@@ -291,7 +291,7 @@ function create_theme(name, json, css, bg, callback, remoteUrl, icon, active) {
 
         $.ajax({
             type: "GET",
-            url: css,
+            url: css+"?cachebreak="+Date.now(),
             success: function(data, status) {
                 var css = data;
                 chrome.runtime.getBackgroundPage(function(bg){
@@ -373,7 +373,7 @@ function select_theme(name) {
 document.querySelector("#add-theme-remote button[type='submit']").addEventListener("click", function(ev){
     ev.preventDefault();
 
-    var url = document.getElementById("add-theme-url").value;
+    var url = document.getElementById("add-theme-url").value+"?cachebreak="+Date.now();
     if (!url) {
         alert("Missing the following information: url");
         return;
