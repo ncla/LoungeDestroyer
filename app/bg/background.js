@@ -15,6 +15,18 @@ LoungeUser.loadUserSettings(function() {
     			themeCSS = themes[name].cachedCSS || "";
     		}
     	}
+
+    	// if we don't have any themes
+    	if (!Object.keys(themes).length) {
+    		// add bundled themes
+    		themes = {
+    			cleanlounge: {
+	    			url: "http://api.ncla.me/themes/CleanLounge/data.json",
+	    			remote: true
+	    		}
+    		};
+    		chrome.storage.local.set({themes: themes}, function(){updateThemes()});
+    	}
     });
 });
 
