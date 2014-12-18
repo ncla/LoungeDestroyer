@@ -1,39 +1,4 @@
 var appID = (window.location.hostname == "dota2lounge.com" ? "570" : "730");
-/*
-    Based on Steam market API
- */
-var currencyData = {
-    1: {
-        "name": "USDUSD",
-        "htmlSymbol": "&#36;",
-        symbolBeforeValue: true
-    },
-    2: {
-        "name": "USDGBP",
-        "htmlSymbol": "&#163;",
-        symbolBeforeValue: true
-    },
-    3: {
-        "name": "USDEUR",
-        "htmlSymbol": "&#8364;",
-        symbolBeforeValue: false
-    },
-    5: {
-        "name": "USDRUB",
-        "htmlSymbol": "p&#1091;&#1073;.",
-        symbolBeforeValue: false
-    },
-    20: {
-        "name": "USDCAD",
-        "htmlSymbol": "CDN&#36;",
-        symbolBeforeValue: true
-    },
-    21: {
-        "name": "USDAUD",
-        "htmlSymbol": "A&#36;",
-        symbolBeforeValue: true
-    }
-};
 
 var storageMarketItems,
     currencies = {},

@@ -532,6 +532,11 @@ function updateMarketPriceList() {
 }
 
 function updateCurrencyConversion() {
+    var currencyList = [];
+    $.each(currencyData, function(i, v) {
+        currencyList.push('"USD'+v["naming"]+'"');
+    });
+    currencyList = currencyList.join();
     var oReq = new XMLHttpRequest();
     oReq.onload = function() {
         var parsed = JSON.parse(this.responseText);
@@ -548,7 +553,8 @@ function updateCurrencyConversion() {
     	setTimeout(updateCurrencyConversion, 30000);
     	chrome.storage.local.set({"currencyConversionRates": currencyFallback});
     };
-    oReq.open("get", "http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20yahoo.finance.xchange%20where%20pair%20in%20(%22USDUSD%22%2C%20%22USDGBP%22%2C%20%22USDEUR%22%2C%20%22USDRUB%22%2C%20%22USDCAD%22%2C%20%22USDAUD%22)&format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&callback=", true);
+
+    oReq.open("get", "http://query.yahooapis.com/v1/public/yql?q=select * from yahoo.finance.xchange where pair in (" + currencyList + ")&format=json&env=store://datatables.org/alltableswithkeys&callback=", true);
     oReq.send();
 }
 function checkForExpiredItems(appID) {

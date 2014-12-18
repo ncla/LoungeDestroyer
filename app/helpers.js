@@ -163,3 +163,26 @@ function setWindowVariables(variables) {
 
     $("#tmpScript").remove();
 }
+// Based on Steam available currencies
+var currencyData = {
+    1: { naming: "USD", decimal: '.', id: 1, symbol: "$", symbolBefore: true },
+    2: { naming: "GBP", decimal: '.', id: 2, symbol: "£", symbolBefore: true },
+    3: { naming: "EUR", decimal: ',', id: 3, symbol: "€", symbolBefore: false },
+    5: { naming: "RUB", decimal: ',', id: 5, symbol: "pуб.", symbolBefore: false },
+    7: { naming: "BRL", decimal: ',', id: 7, symbol: "R$", symbolBefore: true },
+    8: { naming: "JPY", decimal: '.', id: 8, symbol: "¥", symbolBefore: true },
+    9: { naming: "NOK", decimal: ',', id: 9, symbol: "kr", symbolBefore: false },
+    10: { naming: "IDR", decimal: '.', id: 10, symbol: "Rp", symbolBefore: true },
+    11: { naming: "MYR", decimal: '.', id: 11, symbol: "RM", symbolBefore: true },
+    12: { naming: "PHP", decimal: '.', id: 12, symbol: "P", symbolBefore: true },
+    13: { naming: "SGD", decimal: '.', id: 13, symbol: "S$", symbolBefore: true },
+    14: { naming: "THB", decimal: '.', id: 14, symbol: "฿", symbolBefore: true },
+    15: { naming: "VND", decimal: '.', id: 15, symbol: "₫", symbolBefore: false },
+    16: { naming: "KRW", decimal: '.', id: 16, symbol: "₩", symbolBefore: true },
+    17: { naming: "TRY", decimal: ',', id: 17, symbol: "TL", symbolBefore: false },
+    18: { naming: "UAH", decimal: ',', id: 18, symbol: "₴", symbolBefore: false },
+    19: { naming: "MXN", decimal: '.', id: 19, symbol: "Mex$", symbolBefore: true },
+    20: { naming: "CAD", decimal: '.', id: 20, symbol: "CDN$", symbolBefore: true },
+    21: { naming: "AUD", decimal: '.', id: 21, symbol: "A$", symbolBefore: true },
+    22: { naming: "NZD", decimal: '.', id: 22, symbol: "NZ$", symbolBefore: true }
+};

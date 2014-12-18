@@ -14,6 +14,9 @@ var Settings = defaultUser.defaultSettings;
 function restore_options() {
     var manifesto = chrome.runtime.getManifest();
     document.getElementById("version").innerHTML = manifesto.version;
+    $.each(currencyData, function(i, v) {
+        $("#marketCurrency").append('<option value="' + i + '">' + v["naming"] + '</option>');
+    });
     chrome.storage.local.get("userSettings", function(result) {
         var storageSettings = JSON.parse(result.userSettings);
 

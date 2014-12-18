@@ -43,10 +43,10 @@ Item.prototype.getMarketPrice = function() {
         if(storageMarketItems.hasOwnProperty(appID)) {
             if(storageMarketItems[appID].hasOwnProperty(this.itemName)) {
                 var currData = currencyData[LoungeUser.userSettings["marketCurrency"]];
-                var conversionRate = currencies[currData["name"]];
+                var conversionRate = currencies[("USD" + currData["naming"])];
                 var convertedPrice = (storageMarketItems[appID][this.itemName]["value"] * conversionRate).toFixed(2);
                 if (!isNaN(convertedPrice)) {
-	                var priceHtml = (currData["symbolBeforeValue"] === true ? currData["htmlSymbol"] + " " + convertedPrice : convertedPrice + " " + currData["htmlSymbol"]);
+	                var priceHtml = (currData["symbolBefore"] === true ? currData["symbol"] + " " + convertedPrice : convertedPrice + " " + currData["symbol"]);
 	                return this.insertMarketValue(priceHtml);
 	            }
             }
