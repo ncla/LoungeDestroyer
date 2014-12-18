@@ -674,7 +674,7 @@ chrome.alarms.onAlarm.addListener(function(alarm) {
     	updateThemes();
     }
     if (alarm.name == "autoBump") {
-    	if (LoungeUser.userSettings.autoBump == "1")
+    	if (["1","730","570"].indexOf(LoungeUser.userSettings.autoBump) !== -1)
     		autoBumpTrades();
     }
 });
