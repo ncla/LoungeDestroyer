@@ -40,6 +40,10 @@ function restore_options() {
             console.log("Found curTheme! Setting to ",Settings.currentTheme);
             document.querySelector(".cur-theme").value = Settings.currentTheme || "-none";
         }
+
+        if (document.querySelectorAll("#themes-carousel .carousel-inner > div").length < 2) {
+            $("#themes-carousel .carousel-control").hide();
+        }
     });
     $("#refetchmarketcrap").click(function() {
         chrome.runtime.sendMessage({refetchMarketPriceList: true});
@@ -252,6 +256,10 @@ function theme_create_element(name, obj, active) {
 
         select_theme(name);
     }
+
+    if (document.querySelectorAll("#themes-carousel .carousel-inner > div").length > 1) {
+        $("#themes-carousel .carousel-control").show();
+    }
 }
 
 
@@ -292,7 +300,7 @@ function create_theme(name, json, css, bg, callback, remoteUrl, icon, active) {
 
         $.ajax({
             type: "GET",
-            url: css,
+            url: css+"?cachebreak="+Date.now(),
             success: function(data, status) {
                 var css = data;
                 chrome.runtime.getBackgroundPage(function(bg){
@@ -374,7 +382,7 @@ function select_theme(name) {
 document.querySelector("#add-theme-remote button[type='submit']").addEventListener("click", function(ev){
     ev.preventDefault();
 
-    var url = document.getElementById("add-theme-url").value;
+    var url = document.getElementById("add-theme-url").value+"?cachebreak="+Date.now();
     if (!url) {
         alert("Missing the following information: url");
         return;
@@ -499,6 +507,10 @@ document.querySelector(".theme-modal-confirm-delete .confirm").addEventListener(
     delete themes[theme];
     chrome.storage.local.set({themes: themes});
     chrome.runtime.sendMessage({setCurrentTheme: true});
+
+    if (document.querySelectorAll("#themes-carousel .carousel-inner > div").length < 2) {
+        $("#themes-carousel .carousel-control").hide();
+    }
 });
 
 /**

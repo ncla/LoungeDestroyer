@@ -15,6 +15,18 @@ LoungeUser.loadUserSettings(function() {
     			themeCSS = themes[name].cachedCSS || "";
     		}
     	}
+
+    	// if we don't have any themes
+    	if (!Object.keys(themes).length) {
+    		// add bundled themes
+    		themes = {
+    			cleanlounge: {
+	    			url: "http://api.ncla.me/themes/CleanLounge/data.json",
+	    			remote: true
+	    		}
+    		};
+    		chrome.storage.local.set({themes: themes}, function(){updateThemes()});
+    	}
     });
 });
 
@@ -675,7 +687,7 @@ function updateThemes() {
 			if (themes[theme].remote) {
 				console.log("Updating theme "+theme);
 				// get JSON
-				var url = themes[theme].url;
+				var url = themes[theme].url+"?cachebreak="+Date.now();
 				if (!url)
 					continue;
 
@@ -721,7 +733,7 @@ function updateThemes() {
 					}
 
 					// cache CSS so we can inject instantly
-					get(themes[theme].css, function(){
+					get(themes[theme].css+"?cachebreak="+Date.now(), function(){
 						if (!this.status) {
 							console.error("["+theme+"] Failed to retrieve CSS");
 							return;
