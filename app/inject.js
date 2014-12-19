@@ -518,6 +518,14 @@ $(document).on("mouseover", ".matchmain", function() {
                 }
                 $(matchElement).addClass("extraMatchInfo");
                 $(matchElement).removeClass("loading");
+
+                // trim the unneeded spaces
+                var redInfo = matchHeaderBlock[0].querySelector("span[style*='#D12121']");
+                if (redInfo) {
+                    if (!redInfo.textContent.trim().length) {
+                        matchHeaderBlock[0].removeChild(redInfo);
+                    }
+                }
             },
             error: function() {
                 $(matchElement).removeClass("loading");
