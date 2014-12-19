@@ -298,6 +298,8 @@ function create_theme(name, json, css, bg, callback, remoteUrl, icon, active) {
         theme.remote = true;
         theme.url = remoteUrl;
 
+        console.log("URL:",theme.url);
+
         $.ajax({
             type: "GET",
             url: css+"?cachebreak="+Date.now(),
@@ -382,7 +384,7 @@ function select_theme(name) {
 document.querySelector("#add-theme-remote button[type='submit']").addEventListener("click", function(ev){
     ev.preventDefault();
 
-    var url = document.getElementById("add-theme-url").value+"?cachebreak="+Date.now();
+    var url = document.getElementById("add-theme-url").value;
     if (!url) {
         alert("Missing the following information: url");
         return;
