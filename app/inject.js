@@ -212,7 +212,7 @@ function init() {
             // convert time to local time
             var timeElm = document.querySelector("main > .box:first-child > div:first-child > div:first-child .half:nth-child(3)");
             if (timeElm) {
-                timeElm.textContent = convertTimeToLocal(timeElm.textContent);
+                timeElm.textContent = convertTimeToLocal(timeElm.textContent, true);
             }
             $("a.tab:contains('Returns')").after('<a class="tab" id="ld_cache" onclick="returns = false;">Cached inventory</div>');
             $("section.box .tab").width("33%").click(function() {
@@ -535,7 +535,7 @@ $(document).on("mouseover", ".matchmain", function() {
 });
 
 // expects string in format "00:00 CE(S)T"
-function convertTimeToLocal(timeStr) {
+function convertTimeToLocal(timeStr, showTz) {
     // [0]=timeStr, [1]=hours, [2]=minutes, [3]=CE(S)T
     var splitTime = /([0-9]{1,2}):([0-9]{1,2}) ([A-Za-z]*)/.exec(timeStr);
 
@@ -543,10 +543,10 @@ function convertTimeToLocal(timeStr) {
     if (splitTime[1] < 0)
         splitTime[1]+=24;
 
-    return ("0"+splitTime[1]).slice(-2)+":"+splitTime[2]+" GMT"+
+    return ("0"+splitTime[1]).slice(-2)+":"+splitTime[2]+(showTz ? " GMT"+
                 (tz>1 ? "-"+(tz-1) :
                 tz<1 ? "+"+(tz-1)*-1 :
-                "");
+                "") : "");
 }
 
 // auto-magically add market prices to newly added items, currently only for trade list
