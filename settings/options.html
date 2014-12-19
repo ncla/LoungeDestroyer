@@ -312,6 +312,7 @@
     </div>
 </div>
 
+<!-- Delete theme modal -->
 <div class="modal fade theme-modal-confirm-delete in" tabindex="-1" role="dialog" aria-hidden="false">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -326,6 +327,26 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Nevermind</button>
                 <button type="button" class="btn btn-danger confirm">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Change theme CSS modal -->
+<div class="modal fade theme-modal-edit-css in" tabindex="-1" role="dialog" aria-hidden="false">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                Change theme CSS
+                <button type="button" class="close" data-dismiss="modal"><span>&times;</span><span class="sr-only">Close</span></button>
+            </div>
+            <div class="modal-body">
+                <p>Edit the CSS of <b class="theme-css-owner"></b></p>
+                <textarea class="form-control theme-css-textarea" autocomplete="off" placeholder="Insert CSS here"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Nevermind</button>
+                <button type="button" class="btn btn-success confirm">Save</button>
             </div>
         </div>
     </div>
