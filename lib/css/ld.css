@@ -120,10 +120,13 @@ code {
 .options-toggle:checked ~ .theme-option {
     display: block;
 }
-.theme-remove {
+.theme-btns-container {
     position: absolute;
     left: 100px;
     bottom: 50px;
+}
+.theme-btns-container .btn {
+    margin-right: 10px;
 }
 
 @-webkit-keyframes highlight {

@@ -169,10 +169,6 @@ function theme_create_element(name, obj, active) {
                 optionsHTML += obj.options[k].description+"</label>";
                 optionsHTML += "</div>";
             }
-
-            if (obj.custom) {
-                optionsHTML += "<button class='btn btn-danger theme-remove' data-toggle='modal' data-target='.theme-modal-confirm-delete'>Delete theme</button>";
-            }
         }
         if (obj.changelog) {
             item.innerHTML += "<a target='_blank' href='"+obj.changelog+"' class='theme-changelog glyphicon glyphicon-list'></a>";
@@ -214,7 +210,10 @@ function theme_create_element(name, obj, active) {
         item.appendChild(tmpElm);
 
         if (obj.custom) {
-            tmpElm.innerHTML += "<button class='btn btn-danger theme-remove' data-toggle='modal' data-target='.theme-modal-confirm-delete'>Delete theme</button>";
+            tmpElm.innerHTML += "<div class='theme-btns-container'>"+
+                                "<button class='btn btn-danger theme-remove' data-toggle='modal' data-target='.theme-modal-confirm-delete'>Delete theme</button>" +
+                                ((!obj.remote) ? "<button class='btn btn-primary theme-edit-css' data-toggle='modal' data-target='.theme-modal-edit-css'>Edit theme CSS</button>" : "") +
+                                "</div>";
         }
 
         // on option change, save
@@ -230,6 +229,11 @@ function theme_create_element(name, obj, active) {
         });
         $(tmpElm).find(".theme-remove").on("click", function(){
             document.querySelector(".theme-modal-confirm-delete .confirm").setAttribute("data-theme", name);
+        });
+        $(tmpElm).find(".theme-edit-css").on("click", function(){
+            document.querySelector(".theme-modal-edit-css .theme-css-owner").textContent = themes[name].title;
+            document.querySelector(".theme-modal-edit-css .theme-css-textarea").value = themes[name].cachedCSS || "";
+            document.querySelector(".theme-modal-edit-css .confirm").setAttribute("data-theme", name);
         });
     }
 
@@ -513,6 +517,38 @@ document.querySelector(".theme-modal-confirm-delete .confirm").addEventListener(
     if (document.querySelectorAll("#themes-carousel .carousel-inner > div").length < 2) {
         $("#themes-carousel .carousel-control").hide();
     }
+});
+
+/**
+ * Hook edit CSS confirm button
+ */
+document.querySelector(".theme-modal-edit-css .confirm").addEventListener("click", function(){
+    var theme = this.getAttribute("data-theme");
+    if (!theme || !themes.hasOwnProperty(theme)) {
+        console.error("Can't edit CSS of a theme that doesn't exist");
+        return;
+    }
+
+    var css = document.querySelector(".theme-modal-edit-css .theme-css-textarea").value;
+    if (!css) {
+        alert("Can't set theme CSS to be empty");
+        return;
+    }
+
+    chrome.runtime.getBackgroundPage(function(bg){
+        var newCSS = bg.importantifyCSS(css);
+        if (newCSS) {
+            themes[theme].cachedCSS = newCSS;
+            chrome.storage.local.set({themes: themes}, function(x){
+                chrome.runtime.sendMessage({setCurrentTheme: theme});
+                $(".theme-modal-edit-css").modal("hide");
+            });
+        } else {
+            alert("Failed to parse theme CSS!");
+            console.error("Failed to parse CSS: ",{received: css, minimized: newCSS});
+            return;
+        }
+    });
 });
 
 /**
