@@ -309,7 +309,7 @@ function create_theme(name, json, css, bg, callback, remoteUrl, icon, active) {
                         theme.cachedCSS = newCSS;
                         themes[name] = theme;
                         theme_create_element(name, theme, active);
-                        chrome.storage.local.set({themes: themes}, function(){
+                        chrome.storage.local.set({themes: themes}, function(x){
                             callback(true);
                         });
                     } else {
@@ -426,11 +426,11 @@ document.querySelector("#add-theme-remote button[type='submit']").addEventListen
         create_theme(json.name, json, json.css, json.bg, function(val){
             if (val !== true)
                 error_proxy.apply({}, arguments);
-            else
+            else {
                 select_theme(json.name);
+                chrome.runtime.sendMessage({updateThemes: true});
+            }
         }, url, json.icon, true);
-
-        chrome.runtime.sendMessage({updateThemes: true});
     });
 });
 

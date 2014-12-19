@@ -18,6 +18,7 @@ LoungeUser.loadUserSettings(function() {
 
     	// if we don't have any themes
     	if (!Object.keys(themes).length) {
+    		console.log("Resetting to bundled themes!");
     		// add bundled themes
     		themes = {
     			cleanlounge: {
