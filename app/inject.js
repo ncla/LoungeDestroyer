@@ -5,7 +5,8 @@ var storageMarketItems,
     themes = {},
     streamPlaying = false,
     inventory = false,
-    streamHTML = null;
+    streamHTML = null,
+    tz = (new Date()).getTimezoneOffset() / 60 + 1; // timezone difference from CET
 
 var container = document.createElement("div");
 
@@ -207,6 +208,11 @@ function init() {
                     var txt = btn.textContent.toUpperCase();
                     btn.textContent = "FUCKING "+txt;
                 }
+            }
+            // convert time to local time
+            var timeElm = document.querySelector("main > .box:first-child > div:first-child > div:first-child .half:nth-child(3)");
+            if (timeElm) {
+                timeElm.textContent = convertTimeToLocal(timeElm.textContent);
             }
             $("a.tab:contains('Returns')").after('<a class="tab" id="ld_cache" onclick="returns = false;">Cached inventory</div>');
             $("section.box .tab").width("33%").click(function() {
@@ -502,10 +508,10 @@ $(document).on("mouseover", ".matchmain", function() {
                 doc.body.innerHTML = data;
                 var bestOfType = $(doc).find(".box-shiny-alt:eq(0) .half:eq(1)").text().trim(),
                     exactTime = $(doc).find(".box-shiny-alt:eq(0) .half:eq(2)").text().trim(),
-                    splitTime = /([0-9]{1,2}):([0-9]{1,2}) ([A-Za-z]*)/.exec(exactTime),
                     matchHeaderBlock = $(".matchheader .whenm:eq(0)", matchElement);
+
                 if(exactTime) {
-                    $(matchHeaderBlock).append('<span class="matchExactTime"> <span class="seperator">|</span> ' + exactTime + '</span>');
+                    $(matchHeaderBlock).append('<span class="matchExactTime"> <span class="seperator">|</span> ' + convertTimeToLocal(exactTime) + '</span>');
                 }
                 if(bestOfType) {
                     $(matchHeaderBlock).append(' <span class="seperator">|</span> <span class="bestoftype">' + bestOfType + '</span>');
@@ -519,6 +525,21 @@ $(document).on("mouseover", ".matchmain", function() {
         })
     }
 });
+
+// expects string in format "00:00 CE(S)T"
+function convertTimeToLocal(timeStr) {
+    // [0]=timeStr, [1]=hours, [2]=minutes, [3]=CE(S)T
+    var splitTime = /([0-9]{1,2}):([0-9]{1,2}) ([A-Za-z]*)/.exec(timeStr);
+
+    splitTime[1] = parseInt(splitTime[1])-tz;
+    if (splitTime[1] < 0)
+        splitTime[1]+=24;
+
+    return ("0"+splitTime[1]).slice(-2)+":"+splitTime[2]+" GMT"+
+                (tz>1 ? "-"+(tz-1) :
+                tz<1 ? "+"+(tz-1)*-1 :
+                "");
+}
 
 // auto-magically add market prices to newly added items, currently only for trade list
 var itemObs = new MutationObserver(function(records){
