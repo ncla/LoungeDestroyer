@@ -17,6 +17,9 @@ function restore_options() {
     $.each(currencyData, function(i, v) {
         $("#marketCurrency").append('<option value="' + i + '">' + v["naming"] + '</option>');
     });
+    $.each(moment.tz.names(), function(i, v) {
+        $("#timezone").append('<option value="' + v + '">' + v + '</option>');
+    });
     chrome.storage.local.get("userSettings", function(result) {
         var storageSettings = JSON.parse(result.userSettings);
 
@@ -25,7 +28,7 @@ function restore_options() {
         });
         $.each(Settings, function(index, value) {
             if (value)
-                $(".ld-settings #" + index + " option[value=" + value + "]").prop('selected', true);
+                $(".ld-settings #" + index + " option[value='" + value + "']").prop('selected', true);
         });
 
         var curTheme = document.querySelector(".item[data-theme-name='"+Settings.currentTheme+"']");

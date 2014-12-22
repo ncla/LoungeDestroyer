@@ -214,7 +214,10 @@ function init() {
             // convert time to local time
             var timeElm = document.querySelector("main > .box:first-child > div:first-child > div:first-child .half:nth-child(3)");
             if (timeElm) {
-                timeElm.textContent = convertTimeToLocal(timeElm.textContent, true);
+                var newTime = convertLoungeTime(timeElm.textContent, true);
+                if(newTime) {
+                    timeElm.textContent = timeElm.textContent + (newTime ? ", " + newTime : newTime);
+                }
             }
             $("a.tab:contains('Returns')").after('<a class="tab" id="ld_cache" onclick="returns = false;">Cached inventory</div>');
             $("section.box .tab").width("33%").click(function() {
@@ -500,89 +503,49 @@ $(document).on("mouseover", ".oitm", function() {
 $(document).on("mouseover", ".matchmain", function() {
     if(LoungeUser.userSettings.showExtraMatchInfo != "0" && !$(this).hasClass("extraMatchInfo") && !$(this).hasClass("loading")) {
         $(this).addClass("loading");
+
         var matchURL = $("a[href]:eq(0)", this).attr("href"),
             matchElement = this,
             matchID = matchURL.replace("match?m=","");
 
-        if (matchInfoCache.hasOwnProperty(matchID) && Date.now() - matchInfoCache[matchID].time < 1800000) {
-            // dry, cuz fuck if I care
-            var bestOfType = matchInfoCache[matchID].bestOfType,
-                exactTime = matchInfoCache[matchID].exactTime,
-                matchHeaderBlock = $(".matchheader .whenm:eq(0)", matchElement);
+        $.ajax({
+            url: matchURL,
+            type: "GET",
+            success: function(data){
+                var doc = document.implementation.createHTMLDocument("");
+                doc.body.innerHTML = data;
+                var bestOfType = $(doc).find(".box-shiny-alt:eq(0) .half:eq(1)").text().trim(),
+                    exactTime = $(doc).find(".box-shiny-alt:eq(0) .half:eq(2)").text().trim(),
+                    matchHeaderBlock = $(".matchheader .whenm:eq(0)", matchElement);
 
-            if(exactTime) {
-                $(matchHeaderBlock).append('<span class="matchExactTime"> <span class="seperator">|</span> ' + convertTimeToLocal(exactTime) + '</span>');
-            }
-            if(bestOfType) {
-                $(matchHeaderBlock).append(' <span class="seperator">|</span> <span class="bestoftype">' + bestOfType + '</span>');
-            }
-            $(matchElement).addClass("extraMatchInfo");
-            $(matchElement).removeClass("loading");
-
-            // trim the unneeded spaces
-            var redInfo = matchHeaderBlock[0].querySelector("span[style*='#D12121']");
-            if (redInfo) {
-                if (!redInfo.textContent.trim().length) {
-                    matchHeaderBlock[0].removeChild(redInfo);
+                if(exactTime) {
+                    var convertedTime = convertLoungeTime(exactTime);
+                    if(convertedTime) {
+                        exactTime = convertedTime;
+                    }
+                    $(matchHeaderBlock).append('<span class="matchExactTime"> <span class="seperator">|</span> ' + exactTime + '</span>');
                 }
-            }
-        } else {
-            $.ajax({
-                url: matchURL,
-                type: "GET",
-                success: function(data){
-                    var doc = document.implementation.createHTMLDocument("");
-                    doc.body.innerHTML = data;
-                    var bestOfType = $(doc).find(".box-shiny-alt:eq(0) .half:eq(1)").text().trim(),
-                        exactTime = $(doc).find(".box-shiny-alt:eq(0) .half:eq(2)").text().trim(),
-                        matchHeaderBlock = $(".matchheader .whenm:eq(0)", matchElement);
-
-                    if(exactTime) {
-                        $(matchHeaderBlock).append('<span class="matchExactTime"> <span class="seperator">|</span> ' + convertTimeToLocal(exactTime) + '</span>');
-                    }
-                    if(bestOfType) {
-                        $(matchHeaderBlock).append(' <span class="seperator">|</span> <span class="bestoftype">' + bestOfType + '</span>');
-                    }
-                    $(matchElement).addClass("extraMatchInfo");
-                    $(matchElement).removeClass("loading");
-
-                    // trim the unneeded spaces
-                    var redInfo = matchHeaderBlock[0].querySelector("span[style*='#D12121']");
-                    if (redInfo) {
-                        if (!redInfo.textContent.trim().length) {
-                            matchHeaderBlock[0].removeChild(redInfo);
-                        }
-                    }
-
-                    matchInfoCache[matchID] = {
-                        time: Date.now(),
-                        bestOfType: bestOfType,
-                        exactTime: exactTime
-                    };
-                    chrome.storage.local.set({matchInfoCache: matchInfoCache});
-                },
-                error: function() {
-                    $(matchElement).removeClass("loading");
+                if(bestOfType) {
+                    $(matchHeaderBlock).append(' <span class="seperator">|</span> <span class="bestoftype">' + bestOfType + '</span>');
                 }
-            });
-        }
+                $(matchElement).addClass("extraMatchInfo");
+                $(matchElement).removeClass("loading");
+
+                // trim the unneeded spaces
+                var redInfo = matchHeaderBlock[0].querySelector("span[style*='#D12121']");
+                if (redInfo) {
+                    if (!redInfo.textContent.trim().length) {
+                        matchHeaderBlock[0].removeChild(redInfo);
+                    }
+                }
+            },
+            error: function() {
+                $(matchElement).removeClass("loading");
+            }
+        });
+
     }
 });
-
-// expects string in format "00:00 CE(S)T"
-function convertTimeToLocal(timeStr, showTz) {
-    // [0]=timeStr, [1]=hours, [2]=minutes, [3]=CE(S)T
-    var splitTime = /([0-9]{1,2}):([0-9]{1,2}) ([A-Za-z]*)/.exec(timeStr);
-
-    splitTime[1] = parseInt(splitTime[1])-tz;
-    if (splitTime[1] < 0)
-        splitTime[1]+=24;
-
-    return ("0"+splitTime[1]).slice(-2)+":"+splitTime[2]+(showTz ? " GMT"+
-                (tz>1 ? "-"+(tz-1) :
-                tz<1 ? "+"+(tz-1)*-1 :
-                "") : "");
-}
 
 // auto-magically add market prices to newly added items, currently only for trade list
 var itemObs = new MutationObserver(function(records){
@@ -609,3 +572,18 @@ var itemObs = new MutationObserver(function(records){
         }
     }
 });
+
+function convertLoungeTime(loungeTimeString) {
+    if(LoungeUser.userSettings.changeTimeToLocal != "0") {
+        // I am no timezone expert, but I assume moment.js treats CET/CEST automatically
+        var trimmedTime = loungeTimeString.replace("CET", "").replace("CEST", "").trim();
+        // Intl.DateTimeFormat().resolved.timeZone, might be derpy in other browsers
+        var timezoneName = (LoungeUser.userSettings.timezone == "auto" ? Intl.DateTimeFormat().resolved.timeZone : LoungeUser.userSettings.timezone);
+        if(moment.tz.zone(timezoneName)) {
+            var format = (LoungeUser.userSettings.americanosTime == "0" ? "HH:mm" : "h:mm A");
+            format = (LoungeUser.userSettings.displayTzAbbr == "0" ? format : format + " z");
+            return moment.tz(trimmedTime, "HH:mm", "CET").tz(timezoneName).format(format);
+        }
+    }
+    return false;
+}
