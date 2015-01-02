@@ -373,8 +373,6 @@ function checkNewMatches(ajaxResponse, appID) {
 
     var matchesToNotificate = {};
     chrome.storage.local.get('matches' + appID, function(result) {
-        console.log("Old match storage object: ", JSON.stringify(result[storageName]).length);
-
         var newMatchStorageObject = result[storageName];
 
         if($.isEmptyObject(result)) {
@@ -390,8 +388,6 @@ function checkNewMatches(ajaxResponse, appID) {
                 }
             });
         }
-
-        console.log("New match storage object: ", JSON.stringify(newMatchStorageObject).length);
 
         var tempObj = {};
         tempObj[storageName] = newMatchStorageObject;
