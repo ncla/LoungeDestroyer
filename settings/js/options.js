@@ -28,7 +28,7 @@ function restore_options() {
         });
         $.each(Settings, function(index, value) {
             if (value)
-                $(".ld-settings #" + index + " option[value='" + value + "']").prop('selected', true);
+                $(".ld-settings #" + index).val(value);
         });
 
         var curTheme = document.querySelector(".item[data-theme-name='"+Settings.currentTheme+"']");
