@@ -643,14 +643,17 @@ var alarms = {
     autoBump: 10,
 }
 chrome.alarms.getAll(function(a){ // make sure we don't create alarms that already exist
-    var existingAlarms = [];
+    var existingAlarms = {};
     $.each(a,function(ind,alarm){ // loop through existing alarms
         if (alarm.name)
-            existingAlarms.push(alarm.name);
+            existingAlarms[alarm.name] = alarm.periodInMinutes;
     });
 
+    console.log("Existing alarms:",existingAlarms);
+
     $.each(alarms,function(name,time){ // loop through alarms we want
-        if (existingAlarms.indexOf(name) === -1) {
+        if (!existingAlarms.hasOwnProperty(name) || existingAlarms[name] !== time) {
+            console.log("Creating alarm",name,"(",time,")");
             chrome.alarms.create(name, {
                 periodInMinutes: time
             });
