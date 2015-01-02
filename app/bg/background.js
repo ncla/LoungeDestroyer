@@ -725,6 +725,11 @@ function updateThemes() {
 			                return;
 			            }
 
+                        if (themes[theme].version == json.version) {
+                            console.log("Version hasn't changed, no need to update");
+                            return;
+                        }
+
 			            console.log("Everything looks good");
 
 			            // merge new JSON into old, keeping options
