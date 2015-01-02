@@ -634,21 +634,33 @@ function autoBumpTrades() {
 	}
 }
 
-chrome.alarms.create('itemListUpdate', {
-    periodInMinutes: 60
+// create alarms
+var alarms = {
+    itemListUpdate: 60, // once an hour
+    currencyUpdate: 10080, // once a week
+    expiredReturnsChecking: 360, // once every 6 hours'
+    remoteThemesUpdate: 1440, // once a day
+    autoBump: 10,
+}
+chrome.alarms.getAll(function(a){ // make sure we don't create alarms that already exist
+    var existingAlarms = {};
+    $.each(a,function(ind,alarm){ // loop through existing alarms
+        if (alarm.name)
+            existingAlarms[alarm.name] = alarm.periodInMinutes;
+    });
+
+    console.log("Existing alarms:",existingAlarms);
+
+    $.each(alarms,function(name,time){ // loop through alarms we want
+        if (!existingAlarms.hasOwnProperty(name) || existingAlarms[name] !== time) {
+            console.log("Creating alarm",name,"(",time,")");
+            chrome.alarms.create(name, {
+                periodInMinutes: time
+            });
+        }
+    });
 });
-chrome.alarms.create('currencyUpdate', {
-    periodInMinutes: 10080 // once a week
-});
-chrome.alarms.create('expiredReturnsChecking', {
-    periodInMinutes: 360
-});
-chrome.alarms.create('remoteThemesUpdate', {
-	periodInMinutes: 1440 // once a day
-});
-chrome.alarms.create('autoBump', {
-	periodInMinutes: 10
-});
+
 chrome.alarms.onAlarm.addListener(function(alarm) {
     if(alarm.name == "itemListUpdate") {
         console.log("Checking if user has visited CS:GO Lounge recently..");
@@ -712,6 +724,11 @@ function updateThemes() {
 			                console.error(err);
 			                return;
 			            }
+
+                        if (themes[theme].version == json.version) {
+                            console.log("Version hasn't changed, no need to update");
+                            return;
+                        }
 
 			            console.log("Everything looks good");
 

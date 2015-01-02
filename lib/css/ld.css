@@ -1,3 +1,5 @@
+@import url(http://fonts.googleapis.com/css?family=Ubuntu:700);
+
 /* Sticky footer styles
 -------------------------------------------------- */
 html {
@@ -21,6 +23,10 @@ body {
 /* Custom page CSS
 -------------------------------------------------- */
 /* Not required for template or sticky footer method. */
+
+.blurred {
+    -webkit-filter: blur(5px);
+}
 
 body > .container {
     padding: 60px 15px 0;
@@ -69,6 +75,7 @@ code {
 .carousel-inner .item.current > .theme-container > .highlight {
     box-shadow: inset 0 0 0 10px #5cb85c;
 }
+
 .theme-option {
     position: absolute;
     top: 0;
@@ -89,35 +96,48 @@ code {
     margin: 0 5px 0 0;
     vertical-align: middle;
 }
-.options-toggle, .theme-changelog {
-    z-index: 999;
+.theme-overlay-container {
     position: absolute;
-    right: 10px;
-    top: 10px;
+    top: 15px;
+    right: 15px;
 
-    padding: 5px !important;
-    margin: 0 !important;
+    border: 2px solid #fff;
+    padding: 6px 8px;
+    border-radius: 99px;
+    background: rgba(0,0,0,.7);
+}
+.theme-overlay-button {
+    background: none;
+    border: none;
+    font-family: "Ubuntu", sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 14px;
+
+    z-index: 999;
+    position: relative;
+
+    padding: 0px 6px;
+    margin: 0;
 
     -webkit-appearance: none;
     appearance: none;
     outline: none !important;
     color: #fff;
-    font-size: 16px;
+    text-decoration: none;
     text-shadow: 1px 1px #000;
     cursor: pointer;
 }
-.options-toggle + .theme-changelog {
-    right: 32px;
-    top: 11px;
+.theme-overlay-button:nth-child(n+2) {
+    border-left: 1px solid #fff;
 }
-.theme-changelog:hover, .options-toggle:hover {
+.theme-overlay-button:active {
+}
+.theme-overlay-button:hover {
     color: #ccc !important;
     text-decoration: none !important;
 }
-.options-toggle:checked ~ .theme-container > * {
-    -webkit-filter: blur(5px);
-}
-.options-toggle:checked ~ .theme-option {
+.theme-container.blurred + .theme-option {
     display: block;
 }
 .theme-btns-container {

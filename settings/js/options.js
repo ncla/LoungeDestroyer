@@ -28,7 +28,7 @@ function restore_options() {
         });
         $.each(Settings, function(index, value) {
             if (value)
-                $(".ld-settings #" + index + " option[value='" + value + "']").prop('selected', true);
+                $(".ld-settings #" + index).val(value);
         });
 
         var curTheme = document.querySelector(".item[data-theme-name='"+Settings.currentTheme+"']");
@@ -161,21 +161,22 @@ function theme_create_element(name, obj, active) {
     // avoid HTML injection
     obj = escape_obj(obj);
     
-    var optionsHTML = "<h2 class='text-primary'>Options <small>"+obj.title+(obj.remote && obj.url ? " - <a href='"+obj.url+"' class='text-info'>"+obj.url+"</a>" : "")+"</small></h2>";
+    // create the options/changelog buttons
     if (obj.options || obj.custom || obj.changelog) {
-        if (obj.options || obj.custom) {
-            item.innerHTML += "<input id='"+name+"-options-toggle' type='checkbox' class='options-toggle glyphicon glyphicon-cog'>";
-            for (var k in obj.options) {
-                optionsHTML += "<div>";
-                optionsHTML += "<label for='"+name+"-"+k+"'>";
-                optionsHTML += "<input "+(obj.options[k].checked ? "checked ":"")+"type='checkbox' id='"+name+"-"+k+"' data-theme='"+name+"' data-option='"+k+"'>";
-                optionsHTML += obj.options[k].description+"</label>";
-                optionsHTML += "</div>";
-            }
-        }
+        var tmpHTML = "";
+        tmpHTML += "<div class='theme-overlay-container'>";
         if (obj.changelog) {
-            item.innerHTML += "<a target='_blank' href='"+obj.changelog+"' class='theme-changelog glyphicon glyphicon-list'></a>";
+            tmpHTML += "<a target='_blank' href='"+obj.changelog+"' class='theme-changelog theme-overlay-button'>Changelog</a>";
         }
+        if (obj.options || obj.custom) {
+            tmpHTML += "<button id='"+name+"-options-toggle' class='options-toggle theme-overlay-button'>Settings</button>";
+        }
+        tmpHTML += "</div>";
+        item.innerHTML += tmpHTML;
+
+        $(".options-toggle",item).click(function(){
+            a.classList.toggle("blurred");
+        });
     }
     
     // dirty dirty
@@ -206,7 +207,20 @@ function theme_create_element(name, obj, active) {
 
     item.appendChild(a);
 
+    // create the settings popover
     if (obj.options || obj.custom) {
+        var optionsHTML = "<h2 class='text-primary'>Options <small>"+obj.title+(obj.remote && obj.url ? " - <a href='"+obj.url+"' class='text-info'>"+obj.url+"</a>" : "")+"</small></h2>";
+        
+        if (obj.options) {
+            for (var k in obj.options) {
+                optionsHTML += "<div>";
+                optionsHTML += "<label for='"+name+"-"+k+"'>";
+                optionsHTML += "<input "+(obj.options[k].checked ? "checked ":"")+"type='checkbox' id='"+name+"-"+k+"' data-theme='"+name+"' data-option='"+k+"'>";
+                optionsHTML += obj.options[k].description+"</label>";
+                optionsHTML += "</div>";
+            }
+        }
+
         var tmpElm = document.createElement("div");
         tmpElm.className = "theme-option";
         tmpElm.innerHTML = optionsHTML;
