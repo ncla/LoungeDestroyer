@@ -7,16 +7,18 @@ var storageMarketItems,
     streamPlaying = false,
     inventory = false,
     streamHTML = null,
-    tz = (new Date()).getTimezoneOffset() / 60 + 1; // timezone difference from CET
+    tz = (new Date()).getTimezoneOffset() / 60 + 1, // timezone difference from CET
+    lastAccept = 0;
 
 var container = document.createElement("div");
 
 var LoungeUser = new User();
-chrome.storage.local.get(['marketPriceList', 'currencyConversionRates', 'themes', 'matchInfoCache'], function(result) {
+chrome.storage.local.get(['marketPriceList', 'currencyConversionRates', 'themes', 'matchInfoCache', 'lastAutoAccept'], function(result) {
     storageMarketItems = result.marketPriceList || {};
     currencies = result.currencyConversionRates || {};
     matchInfoCache = result.matchInfoCache || {};
     themes = result.themes || {};
+    lastAccept = result.lastAutoAccept || 0;
     LoungeUser.loadUserSettings(function() {
         console.log("User settings have been loaded in content script!");
         init();
@@ -155,8 +157,8 @@ function init() {
                     btn.textContent = "FUCKING REQUEST RETURNS";
             }
 
-            // inject primitive auto-freeze
             if (["2","1"].indexOf(LoungeUser.userSettings.enableAuto) !== -1) {
+                // inject primitive auto-freeze
                 var btn = document.getElementById("freezebutton");
                 if (btn) {
                     console.log("Replacing postToFreezeReturn");
@@ -173,6 +175,19 @@ function init() {
                             $(this).html("Are you sure").on("click", newFreezeReturn);
                         }
                     });
+                }
+
+                // return items if we've enabled auto-accept
+                if (LoungeUser.userSettings.enableAuto === "1") {
+                    // and if we have frozen items
+                    if (document.querySelector("#freeze .item") && !document.getElementById("queue")) {
+                        // and if we've just accepted an earlier offer
+                        if (Date.now() - lastAccept < 60000) {
+                            chrome.storage.local.set({lastAutoAccept: 0});
+                            console.log("Returning items");
+                            newFreezeReturn();
+                        }
+                    }
                 }
             }
 

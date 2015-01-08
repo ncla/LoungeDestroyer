@@ -65,6 +65,9 @@ chrome.storage.local.get("queue", function(data){
 function acceptOffer(){
 	document.querySelector(".destroyer.info").className = "destroyer info hidden";
 
+	// ask returns page to keep returning
+	chrome.storage.local.set({lastAutoAccept: Date.now()});
+
 	// if trade is suspicious, accept it anyway
 	var obs = new MutationObserver(function(records){
 		for (var i = 0; i < records.length; ++i) {
