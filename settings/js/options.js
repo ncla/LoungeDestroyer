@@ -49,11 +49,29 @@ function restore_options() {
         }
     });
     $("#refetchmarketcrap").click(function() {
-        chrome.runtime.sendMessage({refetchMarketPriceList: true});
+        var that = this;
+        that.disabled = true;
+        chrome.runtime.sendMessage({refetchMarketPriceList: true},
+            function(){
+                that.disabled = false;
+            });
     });
     $("#refetchcurrencies").click(function() {
-        chrome.runtime.sendMessage({refetchCurrencyConversionRates: true});
+        var that = this;
+        that.disabled = true;
+        chrome.runtime.sendMessage({refetchCurrencyConversionRates: true},
+            function(){
+                that.disabled = false;
+            });
     });
+    $("#updatethemes").click(function() {
+        var that = this;
+        that.disabled = true;
+        chrome.runtime.sendMessage({updateThemes: true},
+            function(){
+                that.disabled = false;
+            });
+    })
 }
 
 document.addEventListener('DOMContentLoaded', restore_options);

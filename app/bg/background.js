@@ -149,7 +149,9 @@ chrome.extension.onMessage.addListener(function (request, sender, sendResponse) 
     }
 
     if(request.hasOwnProperty("updateThemes")) {
-    	updateThemes();
+    	updateThemes(sendResponse);
+    	if (sendResponse)
+    		return true;
     }
 
     if(request.hasOwnProperty("setCurrentTheme")) {
@@ -169,10 +171,14 @@ chrome.extension.onMessage.addListener(function (request, sender, sendResponse) 
 	    });
     }
     if(request.hasOwnProperty("refetchMarketPriceList")) {
-        updateMarketPriceList();
+        updateMarketPriceList(sendResponse);
+        if (sendResponse)
+        	return true;
     }
     if(request.hasOwnProperty("refetchCurrencyConversionRates")) {
-        updateCurrencyConversion();
+        updateCurrencyConversion(sendResponse);
+        if (sendResponse)
+        	return true;
     }
 });
 
@@ -526,12 +532,16 @@ setInterval(function() {
     }
 }, 20000);
 
-function updateMarketPriceList() {
+function updateMarketPriceList(callback) {
     var oReq = new XMLHttpRequest();
     oReq.onload = function() {
         console.log(JSON.parse(this.responseText));
         chrome.storage.local.set({"marketPriceList": JSON.parse(this.responseText)});
         console.log(new Date() + " -- Item price list has been updated!");
+        if (callback) {
+        	console.log("Callback:",callback);
+        	callback();
+        }
     };
     oReq.onerror = function() {
         console.log("Error getting response for item price list API");
@@ -540,7 +550,7 @@ function updateMarketPriceList() {
     oReq.send();
 }
 
-function updateCurrencyConversion() {
+function updateCurrencyConversion(callback) {
     var currencyList = [];
     $.each(currencyData, function(i, v) {
         currencyList.push('"USD'+v["naming"]+'"');
@@ -557,6 +567,10 @@ function updateCurrencyConversion() {
         console.log("Currency conversion rates:");
         console.log(conversionList);
         chrome.storage.local.set({"currencyConversionRates": conversionList});
+        if (callback) {
+        	console.log("Callback:",callback);
+        	callback();
+        }
     };
     oReq.onerror = function() {
     	setTimeout(updateCurrencyConversion, 30000);
@@ -688,7 +702,7 @@ chrome.alarms.onAlarm.addListener(function(alarm) {
     }
 });
 
-function updateThemes() {
+function updateThemes(callback) {
 	console.log("Updating themes!");
 	chrome.storage.local.get("themes", function(result){
 		var themes = result.themes;
@@ -764,6 +778,8 @@ function updateThemes() {
 				});
 			}
 		}
+		if (callback)
+			setTimeout(callback, 750); // fake a delay so users don't get worried, yo
 	});
 }
 
