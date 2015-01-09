@@ -43,7 +43,8 @@ User.prototype.defaultSettings =
     changeTimeToLocal: "1",
     timezone: "auto",
     americanosTime: "0",
-    displayTzAbbr: "1"
+    displayTzAbbr: "1",
+    convertLoungePrices: "1"
 };
 
 User.prototype.loadUserSettings = function(callback) {
