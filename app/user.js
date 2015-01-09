@@ -63,16 +63,14 @@ User.prototype.loadUserSettings = function(callback) {
         else {
             var storageUserSettings = JSON.parse(result.userSettings);
 
-            $.each(storageUserSettings, function(index, value) {
-                self.userSettings[index] = value;
-            });
+            $.extend(self.userSettings, storageUserSettings);
 
-            $.each(self.defaultSettings, function(index, value) {
+            /*$.each(self.defaultSettings, function(index, value) {
                 if (typeof storageUserSettings[index] == 'undefined') {
                     console.log("New user setting missing in local storage, setting it now");
                     self.saveSetting(index, value);
                 }
-            });
+            });*/
         }
         /* Start the scripterino */
         callback();

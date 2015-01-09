@@ -16,19 +16,20 @@ var Item = function(item) {
     this.item = item;
     this.itemName = $(".smallimg", this.item).attr("alt");
 
-    // convert lounge price n shit
+    // convert lounge price
     if  (LoungeUser.userSettings["convertLoungePrices"] == "1") {
-        if (!item.hasClass("loungeConverted")) {
-            item.addClass("loungeConverted");
-            
-            var loungeValue = parseFloat($(".value", this.item).text().match(/[0-9.]+/));
+        var valElm = $(".value", this.item);
+        if (valElm.length) {
+            if (!item.hasClass("loungeConverted")) {
+                item.addClass("loungeConverted");
+                
+                var loungeValue = parseFloat(valElm.text().match(/[0-9.]+/));
 
-            // convert lounge's price
-            if (!isNaN(loungeValue) && LoungeUser.userSettings["convertLoungePrices"] == "1") {
-                console.log("Converting price!");
-                $(".value", this.item).text(convertPrice(loungeValue, true));
+                // convert lounge's price
+                if (!isNaN(loungeValue)) {9
+                    $(".value", this.item).text(convertPrice(loungeValue, true));
+                } 
             }
-            
         }
     }
 };
@@ -172,6 +173,9 @@ function convertPrice(usd, toString) {
     var currData = currencyData[LoungeUser.userSettings["marketCurrency"]],
         conversionRate = currencies[("USD" + currData["naming"])],
         convertedPrice = (usd * conversionRate).toFixed(2);
+
+    if (isNaN(convertedPrice))
+        return NaN;
 
     if (!toString)
         return convertedPrice;
