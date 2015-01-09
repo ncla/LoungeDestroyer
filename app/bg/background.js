@@ -587,7 +587,7 @@ function checkForExpiredItems(appID) {
     get(urlStart + "mybets", function() {
         var doc = document.implementation.createHTMLDocument("");
         doc.body.innerHTML = this.responseText;
-        var items = $(doc).find('.item');
+        var items = $(doc).find('.item.Warning');
         if(items.length) {
             createNotification("Items expiring soon", "There are "+items.length+" items on " + (appID == 730 ? "CS:GO Lounge" : "DOTA2 Lounge") + " about to expire.\nRequest them back if you don't want to lose them." , "regular", null, false);
         }
