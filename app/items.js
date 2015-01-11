@@ -5,9 +5,33 @@ var nonMarketItems = ["Dota Items", "Any Offers", "Any Knife", "Knife", "Gift", 
 var uniqueItemsFetched = 0;
 
 var Item = function(item) {
+    // why the fuck is Item called with either .oitm or .item as item?
+    // and why is it either a jQuery object (on hover) or an element (on pageload)?
+    if (!(item instanceof jQuery))
+        item = $(item);
+    if (!item.hasClass("item"))
+        item = $(".item", item);
+
     var self = this;
     this.item = item;
     this.itemName = $(".smallimg", this.item).attr("alt");
+
+    // convert lounge price
+    if  (LoungeUser.userSettings["convertLoungePrices"] == "1") {
+        var valElm = $(".value", this.item);
+        if (valElm.length) {
+            if (!item.hasClass("loungeConverted")) {
+                item.addClass("loungeConverted");
+                
+                var loungeValue = parseFloat(valElm.text().match(/[0-9.]+/));
+
+                // convert lounge's price
+                if (!isNaN(loungeValue)) {9
+                    $(".value", this.item).text(convertPrice(loungeValue, true));
+                } 
+            }
+        }
+    }
 };
 
 Item.prototype.insertMarketValue = function(lowestPrice) {
@@ -42,13 +66,8 @@ Item.prototype.getMarketPrice = function() {
     if(LoungeUser.userSettings["useCachedPriceList"] == "1") {
         if(storageMarketItems.hasOwnProperty(appID)) {
             if(storageMarketItems[appID].hasOwnProperty(this.itemName)) {
-                var currData = currencyData[LoungeUser.userSettings["marketCurrency"]];
-                var conversionRate = currencies[("USD" + currData["naming"])];
-                var convertedPrice = (storageMarketItems[appID][this.itemName]["value"] * conversionRate).toFixed(2);
-                if (!isNaN(convertedPrice)) {
-	                var priceHtml = (currData["symbolBefore"] === true ? currData["symbol"] + " " + convertedPrice : convertedPrice + " " + currData["symbol"]);
-	                return this.insertMarketValue(priceHtml);
-	            }
+                var priceHtml = convertPrice(storageMarketItems[appID][this.itemName]["value"], true);
+                return this.insertMarketValue(priceHtml);
             }
         }
     }
@@ -127,7 +146,7 @@ Item.prototype.generateSteamStoreURL = function() {
 
 /**
  * Get market prices for an element list in a performance friendly way
- * @param {Element} elmList - list of jQuery element objects
+ * @param {Array} elmList - list of jQuery element objects
  */
 function getMarketPricesForElementList(elmList) {
     if(!elmList) {
@@ -148,4 +167,19 @@ function getMarketPricesForElementList(elmList) {
         itemForScience.myFriends = cachedItemList[index];
         itemForScience.getMarketPrice();
     }
+}
+
+function convertPrice(usd, toString) {
+    var currData = currencyData[LoungeUser.userSettings["marketCurrency"]],
+        conversionRate = currencies[("USD" + currData["naming"])],
+        convertedPrice = (usd * conversionRate).toFixed(2);
+
+    if (isNaN(convertedPrice))
+        return NaN;
+
+    if (!toString)
+        return convertedPrice;
+
+    var outp = currData["symbolBefore"] ? currData["symbol"]+" "+convertedPrice : convertedPrice+" "+currData["symbol"];
+    return outp;
 }
