@@ -7,13 +7,14 @@ var storageMarketItems,
     streamPlaying = false,
     inventory = false,
     streamHTML = null,
-    tz = (new Date()).getTimezoneOffset() / 60 + 1, // timezone difference from CET
-    lastAccept = 0;
+    lastAccept = 0,
+    blacklistedItemList = {};
 
 var container = document.createElement("div");
 
 var LoungeUser = new User();
-chrome.storage.local.get(['marketPriceList', 'currencyConversionRates', 'themes', 'matchInfoCache', 'lastAutoAccept'], function(result) {
+chrome.storage.local.get(['marketPriceList', 'currencyConversionRates', 'themes', 'matchInfoCache', 'lastAutoAccept', 'blacklistedItemList'], function(result) {
+    blacklistedItemList = result.blacklistedItemList || {};
     storageMarketItems = result.marketPriceList || {};
     currencies = result.currencyConversionRates || {};
     matchInfoCache = result.matchInfoCache || {};

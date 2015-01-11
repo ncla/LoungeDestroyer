@@ -171,6 +171,13 @@
                             <option value="0">Disabled</option>
                         </select>
                     </div>
+                    <div class="col-md-6 ld-setting">
+                        <label class="control-label">Black-list items that do not have a market listing <a href="#" data-toggle="tooltip" data-original-title="When a request is made to Steam market API for an item and there are no listings for this item, extension can black-list this item to reduce amount of requests made for non-marketable/non-existing items">(?)</a>:</label>
+                        <select id="blacklistNonExistingItems" class="form-control">
+                            <option value="1">Enabled</option>
+                            <option value="0">Disabled</option>
+                        </select>
+                    </div>
                 </div>
 
                 <h3 class="page-header">Notifying</h3>

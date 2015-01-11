@@ -1,37 +1,13 @@
-var marketedItems = [];
-var loadingItems = [];
-var nonMarketItems = ["Dota Items", "Any Offers", "Any Knife", "Knife", "Gift", "TF2 Items", "Real Money", "Offers", "Any Common", "Any Uncommon", "Any Rare", "Any Mythical", "Any Legendary",
+var marketedItems = [],
+    loadingItems = [],
+    nonMarketItems = ["Dota Items", "Any Offers", "Any Knife", "Knife", "Gift", "TF2 Items", "Real Money", "Offers", "Any Common", "Any Uncommon", "Any Rare", "Any Mythical", "Any Legendary",
     "Any Ancient", "Any Immortal", "Real Money", "+ More", "Any Set", "Any Key", "Undefined / Not Tradeable", "Card", "Background", "Icon", "Gift", "DLC"];
-var uniqueItemsFetched = 0;
 
 var Item = function(item) {
-    // why the fuck is Item called with either .oitm or .item as item?
-    // and why is it either a jQuery object (on hover) or an element (on pageload)?
-    if (!(item instanceof jQuery))
-        item = $(item);
-    if (!item.hasClass("item"))
-        item = $(".item", item);
-
     var self = this;
     this.item = item;
     this.itemName = $(".smallimg", this.item).attr("alt");
-
-    // convert lounge price
-    if  (LoungeUser.userSettings["convertLoungePrices"] == "1") {
-        var valElm = $(".value", this.item);
-        if (valElm.length) {
-            if (!item.hasClass("loungeConverted")) {
-                item.addClass("loungeConverted");
-                
-                var loungeValue = parseFloat(valElm.text().match(/[0-9.]+/));
-
-                // convert lounge's price
-                if (!isNaN(loungeValue)) {9
-                    $(".value", this.item).text(convertPrice(loungeValue, true));
-                } 
-            }
-        }
-    }
+    this.convertLoungeValue();
 };
 
 Item.prototype.insertMarketValue = function(lowestPrice) {
@@ -71,6 +47,10 @@ Item.prototype.getMarketPrice = function() {
             }
         }
     }
+    if(blacklistedItemList.hasOwnProperty(this.itemName)) {
+        console.log("Item " + self.itemName.trim() + " is blacklisted, not fetching market price");
+        return false;
+    }
 
     if(marketedItems.hasOwnProperty(this.itemName)) {
         // Not sure if I am genius for returning something and calling a function at the same time
@@ -107,8 +87,11 @@ Item.prototype.fetchSteamMarketPrice = function() {
                 $(self.item).find('.rarity').html('Not Found');
             }
         },
-        error: function() {
-            console.log("Error getting response for item " + self.itemName);
+        error: function(jqXHR) {
+            if(LoungeUser.userSettings.blacklistNonExistingItems == "1" && jqXHR.status == 500) {
+                console.log("Error getting response for item " + self.itemName);
+                self.blacklistItem();
+            }
         }
     }).done(function() {
             delete loadingItems[self.itemName];
@@ -143,7 +126,27 @@ Item.prototype.generateSteamStoreURL = function() {
 
     return "http://store.steampowered.com/search/?term=" + encodeURI(this.itemName);
 };
+Item.prototype.convertLoungeValue = function() {
+    if (LoungeUser.userSettings["convertLoungePrices"] == "1") {
+        var valElm = $(".value", this.item);
+        if (valElm.length) {
+            if (!$(this.item).hasClass("loungeConverted")) {
+                $(this.item).addClass("loungeConverted");
 
+                var loungeValue = parseFloat(valElm.text().match(/[0-9.]+/));
+
+                // convert lounge's price
+                if (!isNaN(loungeValue)) {
+                    $(".value", this.item).text(convertPrice(loungeValue, true));
+                }
+            }
+        }
+    }
+};
+Item.prototype.blacklistItem = function() {
+    blacklistedItemList[this.itemName] = null;
+    chrome.storage.local.set({'blacklistedItemList': blacklistedItemList});
+};
 /**
  * Get market prices for an element list in a performance friendly way
  * @param {Array} elmList - list of jQuery element objects

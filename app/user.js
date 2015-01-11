@@ -44,7 +44,8 @@ User.prototype.defaultSettings =
     timezone: "auto",
     americanosTime: "0",
     displayTzAbbr: "1",
-    convertLoungePrices: "1"
+    convertLoungePrices: "1",
+    blacklistNonExistingItems: "0"
 };
 
 User.prototype.loadUserSettings = function(callback) {
