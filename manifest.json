@@ -72,6 +72,18 @@
         	"css": [
         		"app/steam/steam.css"
         	]
+        },
+        {
+            "matches": [
+                "*://steamcommunity.com/market/listings/730/*"
+            ],
+            "js": [
+                "lib/js/jquery-2.1.1.min.js",
+                "app/helpers.js",
+                "app/user.js",
+                "app/items.js",
+                "app/pricecheck.js"
+            ]
         }
     ]
 }

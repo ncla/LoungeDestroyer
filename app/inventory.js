@@ -60,7 +60,7 @@ Inventory.prototype.loadInventory = function() {
     @param onlyForBackpack true or false, either load market prices for the backpack or the whole page
  */
 Inventory.prototype.getMarketPrices = function() {
-    getMarketPricesForElementList($("#backpack .item"));
+    getMarketPricesForElementList($("#backpack .oitm"));
 };
 
 /*

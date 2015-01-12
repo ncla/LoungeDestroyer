@@ -582,7 +582,7 @@ var itemObs = new MutationObserver(function(records){
             }
             if(hasTradeNodes) {
                 if (LoungeUser.userSettings["itemMarketPricesv2"] == "2") {
-                    getMarketPricesForElementList($(records[i].addedNodes).find(".item"));
+                    getMarketPricesForElementList($(records[i].addedNodes).find(".oitm"));
                 }
             }
         }

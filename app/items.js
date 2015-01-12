@@ -153,7 +153,7 @@ Item.prototype.blacklistItem = function() {
  */
 function getMarketPricesForElementList(elmList) {
     if(!elmList) {
-        elmList = $("body .item");
+        elmList = $("body .oitm");
     }
     var cachedItemList = [];
 
