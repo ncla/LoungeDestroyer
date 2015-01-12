@@ -373,6 +373,11 @@ function init() {
                 }
             });
         }
+
+        // remove social buttons
+        if(LoungeUser.userSettings.removeSocial == "1") {
+            $(".share-buttons").remove();
+        }
     });
 }
 /*

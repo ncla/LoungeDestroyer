@@ -45,7 +45,8 @@ User.prototype.defaultSettings =
     americanosTime: "0",
     displayTzAbbr: "1",
     convertLoungePrices: "1",
-    blacklistNonExistingItems: "0"
+    blacklistNonExistingItems: "0",
+    removeSocial: "1"
 };
 
 User.prototype.loadUserSettings = function(callback) {
