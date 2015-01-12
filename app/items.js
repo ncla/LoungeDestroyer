@@ -103,28 +103,28 @@ Item.prototype.generateMarketURL = function() {
         throw new TypeError("'this' must be instance of Item");
     }
 
-    return 'http://steamcommunity.com/market/listings/' + appID + '/' + this.itemName;
+    return window.location.protocol + '//steamcommunity.com/market/listings/' + appID + '/' + this.itemName;
 };
 Item.prototype.generateMarketSearchURL = function() {
     if (!(this instanceof Item)) {
         throw new TypeError("'this' must be instance of Item");
     }
 
-    return 'http://steamcommunity.com/market/search?q=' + this.itemName;
+    return window.location.protocol + '://steamcommunity.com/market/search?q=' + this.itemName;
 };
 Item.prototype.generateMarketApiURL = function() {
     if (!(this instanceof Item)) {
         throw new TypeError("'this' must be instance of Item");
     }
 
-    return "http://steamcommunity.com/market/priceoverview/?country=US&currency=" + LoungeUser.userSettings["marketCurrency"] + "&appid=" + appID + "&market_hash_name=" + encodeURI(this.itemName);
+    return window.location.protocol + "//steamcommunity.com/market/priceoverview/?country=US&currency=" + LoungeUser.userSettings["marketCurrency"] + "&appid=" + appID + "&market_hash_name=" + encodeURI(this.itemName);
 };
 Item.prototype.generateSteamStoreURL = function() {
     if (!(this instanceof Item)) {
         throw new TypeError("'this' must be instance of Item");
     }
 
-    return "http://store.steampowered.com/search/?term=" + encodeURI(this.itemName);
+    return window.location.protocol + "//store.steampowered.com/search/?term=" + encodeURI(this.itemName);
 };
 Item.prototype.convertLoungeValue = function() {
     if (LoungeUser.userSettings["convertLoungePrices"] == "1") {
