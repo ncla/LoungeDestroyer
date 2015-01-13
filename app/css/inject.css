@@ -451,7 +451,7 @@ http://codepen.io/larrygeams/pen/nhgze
 }
 
 /* Item groups */
-.ld-item-group-wrapper, .ld-item-group {
+.ld-item-group-wrapper, .ld-item-group, .ld-item-groups-main-wrapper {
     float: left;
     width: 100%;
 }

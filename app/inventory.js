@@ -234,6 +234,7 @@ Inventory.prototype.group = function() {
 
     this.groupElms["default"] = defaultGroup;
     defaultGroup.className = "ld-item-group";
+    mainWrapper.className = "ld-item-groups-main-wrapper";
     bp.append(defaultGroup);
     bp.append(mainWrapper);
 
@@ -271,7 +272,7 @@ Inventory.prototype.group = function() {
     bp.append(addGroupWrapper);
 
     addGroupWrapper.find("a.ld-add-item-group-btn").click(function(){
-        var title = addGroupWrapper.querySelector(".ld-add-item-group-name").value,
+        var title = addGroupWrapper.find(".ld-add-item-group-name").val(),
             name = "item-group-",
             i = 0;
 
@@ -291,7 +292,7 @@ Inventory.prototype.group = function() {
             title: title
         };
         self.groups[name] = group;
-        mainWrapper.appendChild(createGroupElm(name));
+        mainWrapper.appendChild(self.createGroupElm(name));
         self.makeItemsSortable();
         self.saveGroups();
     });
@@ -302,8 +303,7 @@ Inventory.prototype.group = function() {
     $(mainWrapper).sortable({
         scroll: false,
         handle: ".ld-item-group-header",
-        axis: "y",
-        containment: "parent"
+        axis: "y"
     }).on("sortupdate", function(e,jqElm){
         var name = jqElm.item[0].getAttribute("data-group-name"),
             ind = jqElm.item.index(),
