@@ -461,3 +461,10 @@ http://codepen.io/larrygeams/pen/nhgze
 .ld-add-item-group-wrapper {
     float: right;
 }
+.ld-add-item-group-btn {
+    margin: .2em !important;
+    padding: .9em 5px !important;
+}
+.ld-item-group-header {
+    margin-top: 10px;
+}
