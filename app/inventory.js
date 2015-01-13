@@ -212,7 +212,6 @@ Inventory.prototype.addElementsToBackpack = function(elements) {
     Groupify inventory
  */
 Inventory.prototype.group = function() {
-    console.log("Grouping: ",this.grouped,this.inventoryIsLoading);
     if (this.grouped || this.inventoryIsLoading) {
         return;
     }
@@ -238,8 +237,6 @@ Inventory.prototype.group = function() {
     bp.append(defaultGroup);
     bp.append(mainWrapper);
 
-    console.log("Sorted: ",this.sortedGroups);
-
     // setup itemToGroup/groupElms variables and create group elements
     $.each(this.groups,function(groupName, group){
         $(group.items).each(function(i, name){
@@ -254,7 +251,6 @@ Inventory.prototype.group = function() {
         return a.priority - b.priority || 0;
     });
 
-    console.log(this.sortedGroups);
     // add groups to DOM
     $.each(this.sortedGroups, function(ind, groupObj) {
         if (groupObj.elm) {
@@ -403,7 +399,6 @@ Inventory.prototype.saveGroups = function(){
     Create group element - group must have data in LoungeUser.userSettings.itemGroups
  */
 Inventory.prototype.createGroupElm = function(groupName) {
-    console.log("Creating group for ",groupName);
     var group = this.groups[groupName],
         wrapper = document.createElement("div"),
         elm = document.createElement("div"),
