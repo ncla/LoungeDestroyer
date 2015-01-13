@@ -47,7 +47,8 @@ User.prototype.defaultSettings =
     convertLoungePrices: "1",
     blacklistNonExistingItems: "0",
     removeSocial: "1",
-    groupInventory: "1"
+    groupInventory: "1",
+    itemGroups: {}
 };
 
 User.prototype.loadUserSettings = function(callback) {
