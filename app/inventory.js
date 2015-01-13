@@ -255,11 +255,12 @@ function addInventoryStatistics() {
 /*
     Group items into sortable areas
  */
+var backpackObserver = null; // used to move items into groups
 function groupInventory() {
     if (LoungeUser.userSettings.groupInventory !== "1") {
         return;
     }
-    
+
     var bp = document.getElementById("backpack"),
         groups = LoungeUser.userSettings.itemGroups,
         itemToGroup = {},
@@ -268,8 +269,13 @@ function groupInventory() {
         mainWrapper = document.createElement("div"),
         sortedGroups = [];
 
-    if (!bp)
+    if (!bp) {
         return;
+    }
+
+    if (backpackObserver) {
+        backpackObserver.disconnect();
+    }
 
     defaultGroup.className = "ld-item-group";
     bp.appendChild(defaultGroup);
@@ -325,6 +331,11 @@ function groupInventory() {
             name = "item-group-",
             i = 0;
 
+        if (!title) {
+            alert("Group has to have a name");
+            return;
+        }
+
         while (groups.hasOwnProperty(name+i)) {
             ++i;
         }
@@ -354,6 +365,7 @@ function groupInventory() {
             if (!name) {
                 return;
             }
+
             // if we moved it from an existing group (and not default)
             if (groupName) {
                 groups[groupName].items.splice(groups[groupName].items.indexOf(name),1);
@@ -363,6 +375,9 @@ function groupInventory() {
                 if (groups[thisGroupName].items.indexOf(name) === -1) {
                     groups[thisGroupName].items.push(name);
                 }
+                itemToGroup[name] = thisGroupName;
+            } else {
+                delete itemToGroup[name];
             }
 
             LoungeUser.saveSetting("itemGroups", groups);
@@ -397,32 +412,30 @@ function groupInventory() {
         saveGroups();
     });
 
+
     // catch items being added back to backpack
-    var bpObserver = new MutationObserver(function(records){
+    backpackObserver = new MutationObserver(function(records){
         for (var i = 0, j = records.length; i < j; ++i) {
             if (records[i].addedNodes && records[i].addedNodes.length) {
                 var added = records[i].addedNodes;
                 for (var k = 0, l = added.length; k < l; ++k) {
+                    // stop self from messing shit up
+                    if (added[k].id === "loading") {
+                        backpackObserver.disconnect();
+                        return;
+                    }
+
                     // if an item has been added to backpack, place it in its group
                     if (added[k].classList && added[k].classList.contains("oitm")) {
-                        var name = added[k].querySelector(".name > b");
-                        if (!name) {
-                            return;
-                        }
-                        name = name.textContent;
-                        var group = itemToGroup[name];
-                        if (group) {
-                            groupElms[group].appendChild(added[k]);
-                        } else {
-                            defaultGroup.appendChild(added[k]);
-                        }
+                        moveItems();
+                        return;
                     }
                 }
             }
         }
     });
-    bpObserver.observe(bp, {childList: true});
-
+    backpackObserver.observe(bp, {childList: true});
+    
     // change priorities in groups to match the order of sortedGroups, then save
     function saveGroups() {
         $.each(sortedGroups, function(ind,obj){
@@ -465,7 +478,6 @@ function groupInventory() {
 
             // remove from sortedGroups
             $.each(sortedGroups, function(ind, obj){
-                console.log(obj);
                 if (obj.name === groupName) {
                     sortedGroups.splice(ind, 1);
                 }
