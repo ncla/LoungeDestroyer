@@ -46,6 +46,7 @@
             ],
             "js": [
                 "lib/js/jquery-2.1.1.min.js",
+                "lib/js/jquery-ui-1.11.2.min.js",
                 "lib/js/moment.min.js",
                 "lib/js/moment-timezone-with-data.min.js",
                 "app/helpers.js",

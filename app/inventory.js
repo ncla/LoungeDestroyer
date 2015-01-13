@@ -145,6 +145,7 @@ Inventory.prototype.onInventoryLoaded = function(url) {
                 this.cacheInventory("bettingInventory" + appID + "_" + readCookie("id"), $("#backpack").html());
             }
             addInventoryStatistics();
+            groupInventory();
         }
         if(LoungeUser.userSettings["itemMarketPricesv2"] == "2") {
             this.getMarketPrices(true);
@@ -248,5 +249,241 @@ function addInventoryStatistics() {
         $.each(itemValues, function(i, v) {
             $("#rarityValues").append('<div class="rarityContainer"><div><span class="' + i + '">' + capitaliseFirstLetter(i) + '</span>: ' + v + '</div></div>');
         });
+    }
+}
+
+/*
+    Group items into sortable areas
+ */
+function groupInventory() {
+    if (LoungeUser.userSettings.groupInventory !== "1") {
+        return;
+    }
+    
+    var bp = document.getElementById("backpack"),
+        groups = LoungeUser.userSettings.itemGroups,
+        itemToGroup = {},
+        groupElms = {},
+        defaultGroup = document.createElement("div"),
+        mainWrapper = document.createElement("div"),
+        sortedGroups = [];
+
+    if (!bp)
+        return;
+
+    defaultGroup.className = "ld-item-group";
+    bp.appendChild(defaultGroup);
+    bp.appendChild(mainWrapper);
+
+    // setup itemToGroup/groupElms variables
+    $.each(groups,function(groupName, group){
+        $(group.items).each(function(i, name){
+            itemToGroup[name] = groupName;
+        });
+
+        createGroupElm(groupName);
+    });
+
+    // sort groups in order of priority
+    sortedGroups.sort(function(a,b){
+        return a.priority - b.priority || 0;
+    });
+
+    // add groups to DOM
+    $.each(sortedGroups, function(ind, groupObj) {
+        if (groupObj.elm) {
+            mainWrapper.appendChild(groupObj.elm);
+        }
+    });
+
+    // move items to item groups
+    function moveItems() {
+        $(".oitm",bp).each(function(ind, elm){
+            var name = elm.querySelector(".name > b");
+            if (!name) {
+                return;
+            }
+            name = name.textContent;
+            var group = itemToGroup[name];
+            if (group) {
+                groupElms[group].appendChild(elm);
+            } else {
+                defaultGroup.appendChild(elm);
+            }
+        });
+    }
+    moveItems();
+
+    // create user interface for groups
+    var addGroupWrapper = document.createElement("div");
+    addGroupWrapper.className = "ld-add-item-group-wrapper";
+    addGroupWrapper.innerHTML = "<input class='ld-add-item-group-name selectbox' type='text' placeholder='Group name'><a class='button ld-add-item-group-btn'>Add item group</a>";
+    bp.appendChild(addGroupWrapper);
+
+    addGroupWrapper.querySelector("a.ld-add-item-group-btn").addEventListener("click", function(){
+        var title = addGroupWrapper.querySelector(".ld-add-item-group-name").value,
+            name = "item-group-",
+            i = 0;
+
+        while (groups.hasOwnProperty(name+i)) {
+            ++i;
+        }
+        name += i;
+
+        var group = {
+            items: [],
+            priority: 99,
+            title: title
+        };
+        groups[name] = group;
+        mainWrapper.appendChild(createGroupElm(name));
+        makeItemsSortable();
+        saveGroups();
+    });
+
+    // make items sortable
+    function makeItemsSortable(){
+        $(".ld-item-group").sortable({
+            connectWith: ".ld-item-group",
+            scroll: false
+        }).on("sortreceive", function(e,jqElm){
+            var name = $(".name > b", jqElm.item).text(),
+                groupName = jqElm.sender[0].getAttribute("data-group-name"),
+                thisGroupName = this.getAttribute("data-group-name");
+
+            if (!name) {
+                return;
+            }
+            // if we moved it from an existing group (and not default)
+            if (groupName) {
+                groups[groupName].items.splice(groups[groupName].items.indexOf(name),1);
+            }
+            // if we moved it to an existing group (and not default)
+            if (thisGroupName) {
+                if (groups[thisGroupName].items.indexOf(name) === -1) {
+                    groups[thisGroupName].items.push(name);
+                }
+            }
+
+            LoungeUser.saveSetting("itemGroups", groups);
+        });
+    }
+    makeItemsSortable();
+
+    // make groups sortable
+    $(mainWrapper).sortable({
+        scroll: false,
+        handle: ".ld-item-group-header"
+    }).on("sortupdate", function(e,jqElm){
+        var name = jqElm.item[0].getAttribute("data-group-name"),
+            ind = jqElm.item.index(),
+            elm = jqElm.item[0],
+            prevInd;
+
+        // get the previous index
+        $.each(sortedGroups, function(ind,obj){
+            if (name === obj.name) {
+                prevInd = ind;
+            }
+        });
+
+        if (!name || prevInd==undefined) {
+            return;
+        }
+
+        // move group in sortedGroups to its new index
+        sortedGroups.splice(ind,0,sortedGroups.splice(prevInd,1)[0]);
+        
+        saveGroups();
+    });
+
+    // catch items being added back to backpack
+    var bpObserver = new MutationObserver(function(records){
+        for (var i = 0, j = records.length; i < j; ++i) {
+            if (records[i].addedNodes && records[i].addedNodes.length) {
+                var added = records[i].addedNodes;
+                for (var k = 0, l = added.length; k < l; ++k) {
+                    // if an item has been added to backpack, place it in its group
+                    if (added[k].classList && added[k].classList.contains("oitm")) {
+                        var name = added[k].querySelector(".name > b");
+                        if (!name) {
+                            return;
+                        }
+                        name = name.textContent;
+                        var group = itemToGroup[name];
+                        if (group) {
+                            groupElms[group].appendChild(added[k]);
+                        } else {
+                            defaultGroup.appendChild(added[k]);
+                        }
+                    }
+                }
+            }
+        }
+    });
+    bpObserver.observe(bp, {childList: true});
+
+    // change priorities in groups to match the order of sortedGroups, then save
+    function saveGroups() {
+        $.each(sortedGroups, function(ind,obj){
+            var name = obj.name;
+            if (!name || !groups[name]) {
+                return;
+            }
+
+            groups[name].priority = ind;
+        });
+
+        LoungeUser.saveSetting("itemGroups", groups);
+    }
+
+    // create group element and add it to sortedGroups
+    function createGroupElm(groupName) {
+        var group = groups[groupName],
+            wrapper = document.createElement("div"),
+            elm = document.createElement("div"),
+            header = document.createElement("div");
+
+        wrapper.className = "ld-item-group-wrapper";
+        wrapper.setAttribute("data-group-name",groupName);
+        elm.className = "ld-item-group";
+        elm.setAttribute("data-group-name",groupName);
+        header.className = "bpheader ld-item-group-header";
+        header.innerHTML = "<div style='float: left;color: #999;'>"+group.title+"</div><a class='ld-item-group-delete' style='float: right'>x</a>";
+        groupElms[groupName] = elm;
+        sortedGroups.push({name: groupName, priority: group.priority, elm: wrapper});
+        wrapper.appendChild(header);
+        wrapper.appendChild(elm);
+
+        header.querySelector(".ld-item-group-delete").addEventListener("click", function(){
+            var groupElm = this.parentNode.parentNode,
+                groupName = groupElm.getAttribute("data-group-name");
+
+            if (!groupName || !groups.hasOwnProperty(groupName)) {
+                return;
+            }
+
+            // remove from sortedGroups
+            $.each(sortedGroups, function(ind, obj){
+                console.log(obj);
+                if (obj.name === groupName) {
+                    sortedGroups.splice(ind, 1);
+                }
+            });
+
+            // move items to default
+            $.each(groups[groupName].items, function(ind,name){
+                delete itemToGroup[name];
+            });
+
+            // remove from groups
+            delete groups[groupName];
+
+            moveItems();
+            groupElm.parentNode.removeChild(groupElm);
+            saveGroups();
+        });
+
+        return wrapper;
     }
 }

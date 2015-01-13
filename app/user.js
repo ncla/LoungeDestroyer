@@ -46,7 +46,8 @@ User.prototype.defaultSettings =
     displayTzAbbr: "1",
     convertLoungePrices: "1",
     blacklistNonExistingItems: "0",
-    removeSocial: "1"
+    removeSocial: "1",
+    groupInventory: "1"
 };
 
 User.prototype.loadUserSettings = function(callback) {

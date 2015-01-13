@@ -449,3 +449,15 @@ http://codepen.io/larrygeams/pen/nhgze
     text-decoration: underline;
     cursor: pointer;
 }
+
+/* Item groups */
+.ld-item-group-wrapper, .ld-item-group {
+    float: left;
+    width: 100%;
+}
+.ld-item-group {
+    min-height: 5px;
+}
+.ld-add-item-group-wrapper {
+    float: right;
+}

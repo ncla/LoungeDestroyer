@@ -246,6 +246,7 @@ function init() {
                     document.getElementById("backpack").innerHTML = bpHTML;
                     this.bettingInventoryType = "inventory";
                     addInventoryStatistics();
+                    groupInventory();
                     inventory.getMarketPrices(true);
                 });
             });
