@@ -212,7 +212,7 @@ Inventory.prototype.addElementsToBackpack = function(elements) {
     Groupify inventory
  */
 Inventory.prototype.group = function() {
-    if (this.grouped || this.inventoryIsLoading) {
+    if (this.grouped || this.inventoryIsLoading || LoungeUser.userSettings.groupInventory !== "1") {
         return;
     }
 
