@@ -6,7 +6,6 @@ var storageMarketItems,
     matchInfoCache = {},
     streamPlaying = false,
     inventory = false,
-    streamHTML = null,
     lastAccept = 0,
     blacklistedItemList = {};
 
@@ -211,15 +210,6 @@ function init() {
             }
         }
         if(document.URL.indexOf("/match?m=") != -1 || document.URL.indexOf("/predict") != -1) {
-            if(LoungeUser.userSettings["removeStream"] == "1") {
-                var $streamElement = $("#mainstream");
-                streamHTML = $streamElement.html();
-                $streamElement.children().remove();
-                $streamElement.html('<div id="ld-streamRemovedWrapper">Stream has been removed from page by LoungeDestroyer. <a id="ld-restoreStream">Show stream</a></div>');
-                $("#ld-restoreStream", $streamElement).click(function() {
-                    $streamElement.html(streamHTML);
-                });
-            }
             if (LoungeUser.userSettings.renameButtons === "1") {
                 var btn = document.getElementById("placebut");
                 if (btn) {
@@ -235,34 +225,22 @@ function init() {
                     timeElm.textContent = timeElm.textContent + (newTime ? ", " + newTime : newTime);
                 }
             }
-            $("a.tab:contains('Returns')").after('<a class="tab" id="ld_cache" onclick="returns = false;">Cached inventory</div>');
-            $("section.box .tab").width("33%").click(function() {
-                inventory.stopLoadingInventory();
-            });
-            $("#ld_cache").click(function() {
-                $(".left").html("");
-                document.getElementById("backpack").innerHTML = '<div id="LDloading" class="spin-1"></div>';
-                inventory.getCachedInventory("bettingInventory" + appID + "_" + readCookie("id"), function(bpHTML) {
-                    document.getElementById("backpack").innerHTML = bpHTML;
-                    this.bettingInventoryType = "inventory";
-                    addInventoryStatistics();
-                    inventory.group();
-                    inventory.getMarketPrices(true);
+            var $returnsTab = $("a.tab:contains('Returns')");
+            if($returnsTab.length) {
+                $returnsTab.after('<a class="tab" id="ld_cache" onclick="returns = false;">Cached inventory</div>');
+                $("section.box .tab").width("33%").click(function() {
+                    inventory.stopLoadingInventory();
                 });
-            });
-            if(appID == "730" && LoungeUser.userSettings["easterEgg1"] == "1") {
-                /*
-                    HYPE TRAIN, HYPE TRAIN
-                 */
-                if($(".team[style*='cdn.csgolounge.com/img/teams/LC.jpg']").length) {
-                    var secondBox = $("section.box:eq(1)");
-                    $(secondBox).prepend("<div class='embed-container' style='margin-bottom:10px;'><iframe src='http://www.youtube.com/embed/B3vkL1nxQDI' frameborder='0' allowfullscreen></iframe></div>");
-                    $(secondBox).prepend("<div id='easteregg-ld'>Let's ride the hype train. Video appended by LoungeDestroyer. <span id='no-easteregg1'>Don't show anymore</span></div>");
-                    $("#no-easteregg1").click(function() {
-                        $("#easteregg-ld, .embed-container").remove();
-                        LoungeUser.saveSetting("easterEgg1", "0");
+                $("#ld_cache").click(function() {
+                    $(".left").html("");
+                    document.getElementById("backpack").innerHTML = '<div id="LDloading" class="spin-1"></div>';
+                    inventory.getCachedInventory("bettingInventory" + appID + "_" + readCookie("id"), function(bpHTML) {
+                        document.getElementById("backpack").innerHTML = bpHTML;
+                        this.bettingInventoryType = "inventory";
+                        addInventoryStatistics();
+                        inventory.getMarketPrices(true);
                     });
-                }
+                });
             }
         }
         if(document.URL.indexOf("/addtrade") != -1) {
@@ -373,11 +351,6 @@ function init() {
                     $(v).trigger('mouseenter');
                 }
             });
-        }
-
-        // remove social buttons
-        if(LoungeUser.userSettings.removeSocial == "1") {
-            $(".share-buttons").remove();
         }
     });
 }

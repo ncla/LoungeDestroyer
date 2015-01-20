@@ -21,7 +21,6 @@ User.prototype.defaultSettings =
     marketCurrency: "1",
     itemMarketPricesv2: "1",
     redirect: "1",
-    removeStream: "0",
     delayBotsOff: "30000",
     delayBotsOn: "5000",
     delayRelogError: "15000",
@@ -39,14 +38,12 @@ User.prototype.defaultSettings =
     showExtraMatchInfo: "2",
     autoBump: "0",
     acceptDelay: 30,
-    easterEgg1: "1",
     changeTimeToLocal: "1",
     timezone: "auto",
     americanosTime: "0",
     displayTzAbbr: "1",
     convertLoungePrices: "1",
     blacklistNonExistingItems: "0",
-    removeSocial: "1",
     groupInventory: "1",
     itemGroups: {}
 };
