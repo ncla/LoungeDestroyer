@@ -52,7 +52,7 @@ function handleQueue(data, game) {
         if (LoungeUser.userSettings.notifyTradeOffer == "1") {
             chrome.tabs.query({
                 active: true,
-                url: "*://"+(["csgo","dota"])[game]+"lounge.com/*",
+                url: "*://"+(["csgo","dota2"])[game]+"lounge.com/*",
                 lastFocusedWindow: true
             }, function(tabs){
                 if (!tabs.length) {
@@ -215,12 +215,32 @@ bet.autoLoop = function(game) {
         // repeat request
         console.log("Performing request:");
         console.log({url: bet.betData[g].url, data: bet.betData[g].data});
-        $.ajax({
-            url: bet.betData[g].url,
-            timeout: 10000,
-            type: bet.type[g] === "autoBet" ? "POST" : "GET",
-            data: bet.type[g] === "autoBet" ? bet.betData[g].data : "",
-            success: (function(g){return function(data) {
+
+        // establish data to be sent to tab later
+        var tabMsg = {
+                url: bet.betData[g].url,
+                timeout: 10000,
+                type: bet.type[g] === "autoBet" ? "POST" : "GET",
+                data: bet.type[g] === "autoBet" ? bet.betData[g].data : "",
+            },
+            tabCallback = (function(g){return function(data) {
+                if (data==="error"){
+                    var err = "Error while autoing. Retrying";
+                    bet.lastBetTime[g] = Date.now();
+                    console.log(err);
+
+                    var msg = {};
+                    msg[bet.type[g]] = {
+                        time: bet.lastBetTime[g],
+                        error: err
+                    };
+
+                    sendMessageToContentScript(msg, -1-g);
+                    clearTimeout(bet.loopTimer);
+                    bet.loopTimer = setTimeout(bet.autoLoop, bet.autoDelay);
+
+                    return;
+                }
                 // Lounge returns nothing if success
                 if (data) {
                     console.log("Received error from auto ("+(["CS:GO", "Dota 2"])[g]+"):");
@@ -228,6 +248,13 @@ bet.autoLoop = function(game) {
                     bet.lastError[g] = data;
                     bet.lastBetTime[g] = Date.now();
                     bet.numTries[g]++;
+
+                    var extraDelay = 0;
+                    if (data.indexOf("Try again in few seconds.") !== -1) {
+                        console.log("Waiting a few seconds to avoid blocking");
+                        data += "\r\nDelayed auto by 5 seconds to avoid block.";
+                        extraDelay = 5000;
+                    }
 
                     var msg = {};
                     msg[bet.type[g]] = {
@@ -241,7 +268,7 @@ bet.autoLoop = function(game) {
                     }
 
                     clearTimeout(bet.loopTimer);
-                    bet.loopTimer = setTimeout(bet.autoLoop, bet.autoDelay); // recall
+                    bet.loopTimer = setTimeout(bet.autoLoop, bet.autoDelay+extraDelay); // recall
                 } else {
                     // happy times
                     console.log("Bet was succesfully placed ("+(["CS:GO", "Dota 2"])[g]+")");
@@ -249,24 +276,27 @@ bet.autoLoop = function(game) {
                     // tell tabs of our great success
                     var msg = {};
                     msg[bet.type[g]] = true;
-                    sendMessageToContentScript(msg, -1-g);
+                    //sendMessageToContentScript(msg, -1-g);
                 }
-            }})(g),
-            error: (function(g){return function(xhr) {
-                var err = "Error (#"+xhr.status+") while autoing. Retrying";
-                bet.lastBetTime[g] = Date.now();
-                console.log(err);
+            }})(g);
 
-                var msg = {};
-                msg[bet.type[g]] = {
-                    time: bet.lastBetTime[g],
-                    error: err
-                };
+        // due to Lounge checking Origin HTTP header, we gotta ask a tab to do it for us
+        chrome.tabs.query({
+            url: "*://"+(["csgo","dota2"])[g]+"lounge.com/*",
+        }, function(tabs){
+            if (!tabs.length) {
+                chrome.tabs.create({
+                    url: "http://"+(["csgo","dota2"])[g]+"lounge.com/",
+                    active: false
+                }, function(tab){
+                    chrome.tabs.sendMessage(tab.id, {ajax: tabMsg}, tabCallback);
+                });
+            }
+            
+            var scriptTab = tabs[0];
+            chrome.tabs.sendMessage(scriptTab.id, {ajax: tabMsg}, tabCallback);
 
-                sendMessageToContentScript(msg, -1-g);
-                clearTimeout(bet.loopTimer);
-                bet.loopTimer = setTimeout(bet.autoLoop, bet.autoDelay);
-            }})(g)
+            console.log("Sending message ",tabMsg,tabCallback);
         });
     }
     if (game===0 || game===1)

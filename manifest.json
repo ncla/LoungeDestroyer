@@ -1,5 +1,6 @@
 {
     "name": "LoungeDestroyer",
+    "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtHtbhIljIThkj2Ohgo0Z8SadkH9QGxwxftthZYhsHV3twsaSPrpOjeKZw07bpM01sH83CVdRNcF4nTScxBOolXaB/BrmX4qiDVPBJHk+7+U0v+jPXKd1a+3WhuO6RkG42+3iITcoZJw0g14DiZs02z0aSpQSlBMy0J2NGmV/EYXRAezLneCi0MYbBxgYzLuY0SLG6z13VMnf5TvPgjIHeoVLE8/fuMvE0gmQzNMtWCPB9GHUxhdWq34G1NyQavV9ZvIlo4iXkATlBsMdJu5E6brzUm1WRVQ9ox+lrNGNZ7FBed65zcpKTlvwNJwklr42SAwW4G4l/nIsnxnBWTZu+wIDAQAB",
     "version": "0.8.0.4",
     "manifest_version": 2,
     "description": "Improves the experience of CS:GO Lounge and DOTA2 Lounge",

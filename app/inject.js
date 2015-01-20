@@ -46,6 +46,16 @@ function init() {
                 LoungeUser.userSettings[name] = msg.changeSetting[name];
             }
         }
+        if(msg.hasOwnProperty("ajax")) {
+            console.log("Got ajax: "+msg.ajax);
+            // peform ajax
+            var settings = msg.ajax;
+            settings.success = function(data){console.log("======");console.log("Data: "+data);sendResponse(data)};
+            settings.error = function(){console.log("Error :(");sendResponse("error")};
+            $.ajax(settings);
+
+            return true;
+        }
     });
 
     // do theme-related stuff
