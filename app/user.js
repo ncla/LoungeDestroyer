@@ -66,6 +66,8 @@ User.prototype.loadUserSettings = function(callback) {
 
             $.extend(self.userSettings, storageUserSettings);
 
+            // restrict options
+            self.userSettings.autoDelay = Math.max(2, self.userSettings.autoDelay);
             /*$.each(self.defaultSettings, function(index, value) {
                 if (typeof storageUserSettings[index] == 'undefined') {
                     console.log("New user setting missing in local storage, setting it now");
