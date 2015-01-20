@@ -283,21 +283,23 @@ bet.autoLoop = function(game) {
         // due to Lounge checking Origin HTTP header, we gotta ask a tab to do it for us
         chrome.tabs.query({
             url: "*://"+(["csgo","dota2"])[g]+"lounge.com/*",
-        }, function(tabs){
+        }, (function(g){return function(tabs){
             if (!tabs.length) {
                 chrome.tabs.create({
                     url: "http://"+(["csgo","dota2"])[g]+"lounge.com/",
                     active: false
                 }, function(tab){
-                    chrome.tabs.sendMessage(tab.id, {ajax: tabMsg}, tabCallback);
+                    console.log(tab);
+                    setTimeout((function(id,msg,callback){return function(){
+                        chrome.tabs.sendMessage(id, {ajax: msg}, callback);
+                    }})(tab.id,tabMsg,tabCallback), 1000);
                 });
+                return;
             }
             
             var scriptTab = tabs[0];
             chrome.tabs.sendMessage(scriptTab.id, {ajax: tabMsg}, tabCallback);
-
-            console.log("Sending message ",tabMsg,tabCallback);
-        });
+        }})(g));
     }
     if (game===0 || game===1)
         return success[game];

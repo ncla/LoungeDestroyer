@@ -49,8 +49,8 @@ function init() {
         if(msg.hasOwnProperty("ajax")) {
             // peform ajax
             var settings = msg.ajax;
-            settings.success = function(data){console.log("======");console.log("Data: "+data);sendResponse(data)};
-            settings.error = function(){console.log("Error :(");sendResponse("error")};
+            settings.success = function(data){sendResponse(data)};
+            settings.error = function(){sendResponse("error")};
             $.ajax(settings);
 
             return true;
