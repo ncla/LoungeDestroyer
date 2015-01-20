@@ -16,6 +16,7 @@ Item.prototype.insertMarketValue = function(lowestPrice) {
         for (var index in self.myFriends) {
             var $myLittleItem = $(self.myFriends[index]["item"]);
             $myLittleItem.addClass('marketPriced');
+            $(".item",$myLittleItem).addClass("marketPriced");
             $myLittleItem.find(".rarity").html(lowestPrice);
         }
     }
