@@ -246,6 +246,7 @@ function init() {
                     document.getElementById("backpack").innerHTML = bpHTML;
                     this.bettingInventoryType = "inventory";
                     addInventoryStatistics();
+                    inventory.group();
                     inventory.getMarketPrices(true);
                 });
             });
@@ -372,6 +373,11 @@ function init() {
                     $(v).trigger('mouseenter');
                 }
             });
+        }
+
+        // remove social buttons
+        if(LoungeUser.userSettings.removeSocial == "1") {
+            $(".share-buttons").remove();
         }
     });
 }
