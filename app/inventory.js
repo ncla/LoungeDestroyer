@@ -502,7 +502,11 @@ Inventory.prototype.removeBackpackElements = function() {
 function addInventoryStatistics() {
     var total = 0,
         itemValues = {},
-        betSizes = {};
+        betSizes = {},
+        itemQualities = {
+            730: ['exotic', 'remarkable', 'contraband', 'high', 'base', 'covert', 'classified', 'restricted', 'industrial', 'mil-spec', 'consumer', 'base'],
+            570: ['arcana', 'immortal', 'legendary', 'mythical', 'rare', 'uncommon', 'common', 'base']
+        };
     $("#backpack .item").each(function () {
         var rarity = $(this).children("div.rarity")[0].classList[1],
             e = $(this).children("div.value")[0].innerHTML;
@@ -515,11 +519,14 @@ function addInventoryStatistics() {
         }
         total += itemPrice;
     });
-    for (var key in itemValues) {
-        if (itemValues.hasOwnProperty(key)) {
-            itemValues[key] = itemValues[key].toFixed(2);
+    var itemValuesTemp = {};
+    $.each(itemQualities[appID], function(i, v) {
+        if(itemValues.hasOwnProperty(v)) {
+            itemValuesTemp[v] = itemValues[v]
         }
-    }
+    });
+    var itemValues = itemValuesTemp;
+
     betSizes.small = (.05 * total).toFixed(2);
     betSizes.medium = (.1 * total).toFixed(2);
     betSizes.large = (.2 * total).toFixed(2);
@@ -534,7 +541,7 @@ function addInventoryStatistics() {
             '</div>' +
             '</div>');
         $.each(itemValues, function(i, v) {
-            $("#rarityValues").append('<div class="rarityContainer"><div><span class="' + i + '">' + capitaliseFirstLetter(i) + '</span>: ' + v + '</div></div>');
+            $("#rarityValues").append('<div class="rarityContainer"><div><span class="' + i + '">' + capitaliseFirstLetter(i) + '</span>: ' + v.toFixed(2) + '</div></div>');
         });
     }
 }
