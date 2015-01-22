@@ -1,13 +1,26 @@
 var marketedItems = [],
     loadingItems = [],
     nonMarketItems = ["Dota Items", "Any Offers", "Any Knife", "Knife", "Gift", "TF2 Items", "Real Money", "Offers", "Any Common", "Any Uncommon", "Any Rare", "Any Mythical", "Any Legendary",
-    "Any Ancient", "Any Immortal", "Real Money", "+ More", "Any Set", "Any Key", "Undefined / Not Tradeable", "Card", "Background", "Icon", "Gift", "DLC"];
+    "Any Ancient", "Any Immortal", "Real Money", "+ More", "Any Set", "Any Key", "Undefined / Not Tradeable", "Card", "Background", "Icon", "Gift", "DLC"],
+    csgoSkinQualities = {'Factory New': 'FN', 'Minimal Wear': 'MW', 'Well-Worn': 'WW', 'Battle-Scarred': 'BS', 'Field-Tested': 'FT'};
 
 var Item = function(item) {
     var self = this;
-    this.item = item;
-    this.itemName = $(".smallimg", this.item).attr("alt");
-    this.convertLoungeValue();
+    // This allows us to use the object functions as static functions without constructing the object
+    if(item !== undefined) {
+        this.item = item;
+        this.itemName = $(".smallimg", this.item).attr("alt");
+        if(appID == "730") {
+            $.each(csgoSkinQualities, function(i, v) {
+                if(self.itemName.indexOf(i) != -1) {
+                    self.weaponQuality = i;
+                    self.weaponQualityAbbrevation = v;
+                    return false;
+                }
+            });
+        }
+        this.convertLoungeValue();
+    }
 };
 
 Item.prototype.insertMarketValue = function(lowestPrice) {
@@ -19,19 +32,27 @@ Item.prototype.insertMarketValue = function(lowestPrice) {
             var $myLittleItem = $(self.myFriends[index]["item"]);
             $myLittleItem.addClass('marketPriced');
             $myLittleItem.find(".rarity").html(lowestPrice);
+            self.myFriends[index].displayWeaponQuality();
         }
     }
     else {
-        $(".item").each(function() {
-            var $theItem = $(this);
-            if(!$theItem.hasClass('marketPriced')) {
-                if ($theItem.find("img.smallimg").attr("alt") == self.itemName) {
-                    $theItem.find(".rarity").html(lowestPrice);
-                    $theItem.addClass('marketPriced');
-                }
+        $(".oitm:not(.marketPriced)").each(function() {
+            if ($(this).find("img.smallimg").attr("alt") == self.itemName) {
+                var $theItem = $(this);
+                var itemObj = new Item($theItem);
+                $theItem.find(".rarity").html(lowestPrice);
+                $theItem.addClass('marketPriced');
+                itemObj.displayWeaponQuality();
             }
         });
     }
+};
+
+Item.prototype.displayWeaponQuality = function() {
+    if(appID != "730" || LoungeUser.userSettings.displayCsgoWeaponQuality != "1" || typeof this.weaponQuality == 'undefined') {
+        return false;
+    }
+    $(".rarity", this.item).append('<span class="weaponWear"> | ' + this.weaponQualityAbbrevation + '</span>')
 };
 
 Item.prototype.getMarketPrice = function() {
@@ -152,6 +173,23 @@ Item.prototype.convertLoungeValue = function() {
 Item.prototype.blacklistItem = function() {
     blacklistedItemList[this.itemName] = null;
     chrome.storage.local.set({'blacklistedItemList': blacklistedItemList});
+};
+Item.prototype.appendHoverElements = function() {
+    var self = this;
+    if(!$(self.item).hasClass("ld-appended")) {
+        if(nonMarketItems.indexOf(self.itemName) == -1) {
+            if($("a:contains('Market')", self.item).length) {
+                $("a:contains('Market')", self.item).html("Market Listings");
+            } else {
+                $(".name", self.item).append('<br/><a href="' + self.generateMarketURL() + '" target="_blank">Market Listings</a>');
+            }
+
+            $(".name", self.item).append('<br/><a href="' + self.generateMarketSearchURL() + '" target="_blank">Market Search</a>' +
+                '<br/><br/><small><a class="refreshPriceMarket">Show Steam market price</a></small>');
+        }
+
+        $(self.item).addClass("ld-appended");
+    }
 };
 /**
  * Get market prices for an element list in a performance friendly way

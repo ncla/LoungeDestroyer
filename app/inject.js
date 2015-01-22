@@ -485,33 +485,22 @@ function newFreezeReturn(tries){
     Mouseover action for items
  */
 $(document).on("mouseover", ".oitm", function() {
-    var LoungeItem = new Item($(this));
+    // We do not have to do any of the stuff below anymore
+    if($(this).hasClass("ld-appended")) {
+        return false;
+    }
+    var LoungeItem = new Item(this);
+    LoungeItem.appendHoverElements();
     var settingMarketPrices = LoungeUser.userSettings["itemMarketPricesv2"];
     if(settingMarketPrices == "1" || settingMarketPrices == "2") {
         LoungeItem.getMarketPrice();
     }
-    if(!$(this).hasClass("ld-appended")) {
-        if(nonMarketItems.indexOf(LoungeItem.itemName) == -1) {
-            if($("a:contains('Market')", this).length) {
-                $("a:contains('Market')", this).html("Market Listings");
-            } else {
-                $(".name", this).append('<br/><a href="' + LoungeItem.generateMarketURL() + '" target="_blank">Market Listings</a>');
-            }
-
-            $(".name", this).append('<br/><a href="' + LoungeItem.generateMarketSearchURL() + '" target="_blank">Market Search</a>' +
-                '<br/><br/><small><a class="refreshPriceMarket">Show Steam market price</a></small>');
-        }
-
-        $(this).addClass("ld-appended");
-
-        $("a", this).click(function(e) {
-            e.stopPropagation();
-            if($(this).hasClass("refreshPriceMarket")) {
-                LoungeItem.unloadMarketPrice();
-                LoungeItem.fetchSteamMarketPrice();
-            }
-        });
-    }
+});
+$(document).on("click", "a.refreshPriceMarket", function(e) {
+    e.stopPropagation();
+    var LoungeItem = new Item($(this).parents(".oitm"));
+    LoungeItem.unloadMarketPrice();
+    LoungeItem.fetchSteamMarketPrice();
 });
 $(document).on("mouseover", ".matchmain", function() {
     if(LoungeUser.userSettings.showExtraMatchInfo != "0" && !$(this).hasClass("extraMatchInfo") && !$(this).hasClass("loading")) {
