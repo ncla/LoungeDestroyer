@@ -237,7 +237,7 @@ function init() {
             var $returnsTab = $("a.tab:contains('Returns')");
             if($returnsTab.length) {
                 $returnsTab.after('<a class="tab" id="ld_cache" onclick="returns = false;">Cached inventory</div>');
-                $("section.box .tab:not(#stream)").width("33%").click(function() {
+                $("section.box div[style='width: 96%;margin: 0 2%;border-radius: 5px;overflow: hidden;'] .tab").width("33%").click(function() {
                     inventory.stopLoadingInventory();
                 });
                 $("#ld_cache").click(function() {
