@@ -45,6 +45,9 @@ function init() {
                 LoungeUser.userSettings[name] = msg.changeSetting[name];
             }
         }
+        if(msg.hasOwnProperty("serialize")) {
+            sendResponse($(msg.serialize).serialize());
+        }
     });
 
     // do theme-related stuff
