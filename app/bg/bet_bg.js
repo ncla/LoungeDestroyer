@@ -216,31 +216,12 @@ bet.autoLoop = function(game) {
         console.log("Performing request:");
         console.log({url: bet.betData[g].url, data: bet.betData[g].data});
 
-        // establish data to be sent to tab later
-        var tabMsg = {
-                url: bet.betData[g].url,
-                timeout: 10000,
-                type: bet.type[g] === "autoBet" ? "POST" : "GET",
-                data: bet.type[g] === "autoBet" ? bet.betData[g].data : "",
-            },
-            tabCallback = (function(g){return function(data) {
-                if (data==="error"){
-                    var err = "Error while autoing. Retrying";
-                    bet.lastBetTime[g] = Date.now();
-                    console.log(err);
-
-                    var msg = {};
-                    msg[bet.type[g]] = {
-                        time: bet.lastBetTime[g],
-                        error: err
-                    };
-
-                    sendMessageToContentScript(msg, -1-g);
-                    clearTimeout(bet.loopTimer);
-                    bet.loopTimer = setTimeout(bet.autoLoop, bet.autoDelay);
-
-                    return;
-                }
+        $.ajax({
+            url: bet.betData[g].url,
+            timeout: 10000,
+            type: bet.type[g] === "autoBet" ? "POST" : "GET",
+            data: bet.type[g] === "autoBet" ? bet.betData[g].data : "",
+            success: (function(g){return function(data) {
                 // Lounge returns nothing if success
                 if (data) {
                     console.log("Received error from auto ("+(["CS:GO", "Dota 2"])[g]+"):");
@@ -278,28 +259,27 @@ bet.autoLoop = function(game) {
                     msg[bet.type[g]] = true;
                     //sendMessageToContentScript(msg, -1-g);
                 }
-            }})(g);
+            }})(g),
+            error: (function(g){return function(xhr) {
+                var err = "Error (#"+xhr.status+") while autoing. Retrying";
+                bet.lastBetTime[g] = Date.now();
+                console.log(err);
 
-        // due to Lounge checking Origin HTTP header, we gotta ask a tab to do it for us
-        chrome.tabs.query({
-            url: "*://"+(["csgo","dota2"])[g]+"lounge.com/*",
-        }, (function(g){return function(tabs){
-            if (!tabs.length) {
-                chrome.tabs.create({
-                    url: "http://"+(["csgo","dota2"])[g]+"lounge.com/",
-                    active: false
-                }, function(tab){
-                    console.log(tab);
-                    setTimeout((function(id,msg,callback){return function(){
-                        chrome.tabs.sendMessage(id, {ajax: msg}, callback);
-                    }})(tab.id,tabMsg,tabCallback), 1000);
-                });
-                return;
+                var msg = {};
+                msg[bet.type[g]] = {
+                    time: bet.lastBetTime[g],
+                    error: err
+                };
+
+                sendMessageToContentScript(msg, -1-g);
+                clearTimeout(bet.loopTimer);
+                bet.loopTimer = setTimeout(bet.autoLoop, bet.autoDelay);
+            }})(g),
+            headers: {
+                "X-Requested-With": "XMLHttpRequest",
+                "Data-Referer": bet.baseUrls[g]+"match?m="+bet.matchNum[g]
             }
-            
-            var scriptTab = tabs[0];
-            chrome.tabs.sendMessage(scriptTab.id, {ajax: tabMsg}, tabCallback);
-        }})(g));
+        });
     }
     if (game===0 || game===1)
         return success[game];
@@ -459,16 +439,33 @@ chrome.webRequest.onBeforeRequest.addListener(
     ["requestBody","blocking"]
 );
 
-// checks if response is failed, and if so, start auto-retrying
-chrome.webRequest.onCompleted.addListener(
+// remove any evidence of us being here
+chrome.webRequest.onBeforeSendHeaders.addListener(
     function (details) {
-        /*console.log("Received data:");
-        console.log(details);*/
+        var headers = details.requestHeaders,
+            baseUrlRegexp = /^https?:\/\/[\da-zA-Z\.-]+\.[a-z]{2,6}/,
+            baseUrl = details.url.match(baseUrlRegexp),
+            referer;
+
+        // replace the "Origin" header with the URL being requested
+        for (var i = 0; i < headers.length; ++i) {
+            if (headers[i].name === "Origin") {
+                headers[i].value = headers[i].value.replace("chrome-extension://"+chrome.runtime.id,baseUrl);
+            }
+            if (headers[i].name === "Data-Referer") {
+                referer = headers[i].value;
+                headers.splice(i,1);
+                headers.push({name: "Referer", value: referer});
+            }
+        }
+
+        return {requestHeaders: headers};
     },
     {
-        urls: ["*://csgolounge.com/*", "*://dota2lounge.com/*"],
+        urls: ["<all_urls>"],
         types: ["xmlhttprequest"]
-    }
+    },
+    ["blocking", "requestHeaders"]
 );
 
 // example return data:
