@@ -45,15 +45,6 @@ function init() {
                 LoungeUser.userSettings[name] = msg.changeSetting[name];
             }
         }
-        if(msg.hasOwnProperty("ajax")) {
-            // peform ajax
-            var settings = msg.ajax;
-            settings.success = function(data){sendResponse(data)};
-            settings.error = function(){sendResponse("error")};
-            $.ajax(settings);
-
-            return true;
-        }
     });
 
     // do theme-related stuff
@@ -406,7 +397,8 @@ $(document).ready(function() {
                 $("#preview").attr("data-index", "-1");
             }
             if (ev.srcElement.id !== "modalPreview"
-                && !$("#modalPreview").find(ev.srcElement).length) {
+                && !$("#modalPreview").find(ev.srcElement).length
+                && document.getElementById("modalPreview").style.opacity!=="0") {
                 $("#modalPreview").fadeOut();
             }
         }
