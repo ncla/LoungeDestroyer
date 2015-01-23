@@ -16,12 +16,13 @@ function enableAuto(worth, match, tries, error) {
 		            ordinalEnding === "3" ? "rd":
 		            "th";
 
+	var isBetStatusTypeValid = false;
 	var typeSpansTextContent = "";
 	var worthContainerClass = "worth-container";
 	var destroyerInfoButtonText = "Disable auto-";
 
 	if (betStatus.type === "autoBet") {
-
+		isBetStatusTypeValid = true;
 		var worth = worth === -1 ? "key(s)" :
 		                      "$"+(worth || 0).toFixed(2);
 		typeSpansTextContent = "betting";
@@ -31,17 +32,19 @@ function enableAuto(worth, match, tries, error) {
 	    document.querySelector(".destroyer.auto-info .match-link").href = "match?m="+match;
 
 	} else if (betStatus.type === "autoReturn") {
+		isBetStatusTypeValid = true;
 		typeSpansTextContent = "returning";
 		worthContainerClass += " hidden";
 		destroyerInfoButtonText += "return";
 	}
 
-	document.querySelector(".destroyer.auto-info .worth-container").className = worthContainerClass;
-	document.querySelector(".destroyer.auto-info button").textContent = destroyerInfoButtonText;
-
-	var typeSpans = document.querySelectorAll(".destroyer.auto-info .type");
-	for (var i = 0; i < typeSpans.length; ++i) {
-		typeSpans[i].textContent = typeSpansTextContent;
+	if(isBetStatusTypeValid){
+		document.querySelector(".destroyer.auto-info .worth-container").className = worthContainerClass;
+		document.querySelector(".destroyer.auto-info button").textContent = destroyerInfoButtonText;
+		var typeSpans = document.querySelectorAll(".destroyer.auto-info .type");
+		for (var i = 0; i < typeSpans.length; ++i) {
+			typeSpans[i].textContent = typeSpansTextContent;
+		}
 	}
 
 	// update info-box in top-right
