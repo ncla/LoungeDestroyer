@@ -217,13 +217,17 @@ bet.autoLoop = function(game) {
         console.log({url: bet.betData[g].url, data: bet.betData[g].data});
 
         // establish data to be sent to tab later
-        var tabMsg = {
+        var recallTimeout,
+            tabMsg = {
                 url: bet.betData[g].url,
                 timeout: 10000,
                 type: bet.type[g] === "autoBet" ? "POST" : "GET",
                 data: bet.type[g] === "autoBet" ? bet.betData[g].data : "",
             },
             tabCallback = (function(g){return function(data) {
+                if (recallTimeout) {
+                    clearTimeout(recallTimeout);
+                }
                 if (data==="error"){
                     var err = "Error while autoing. Retrying";
                     bet.lastBetTime[g] = Date.now();
@@ -283,13 +287,12 @@ bet.autoLoop = function(game) {
         // due to Lounge checking Origin HTTP header, we gotta ask a tab to do it for us
         chrome.tabs.query({
             url: "*://"+(["csgo","dota2"])[g]+"lounge.com/*",
-        }, (function(g){return function(tabs){
+        }, (function(g){return function sendMsg(tabs){
             if (!tabs.length) {
                 chrome.tabs.create({
                     url: "http://"+(["csgo","dota2"])[g]+"lounge.com/",
                     active: false
                 }, function(tab){
-                    console.log(tab);
                     setTimeout((function(id,msg,callback){return function(){
                         chrome.tabs.sendMessage(id, {ajax: msg}, callback);
                     }})(tab.id,tabMsg,tabCallback), 1000);
@@ -299,6 +302,9 @@ bet.autoLoop = function(game) {
             
             var scriptTab = tabs[0];
             chrome.tabs.sendMessage(scriptTab.id, {ajax: tabMsg}, tabCallback);
+            recallTimeout = setTimeout((function(sendMsg,tabs){return function(){
+                sendMsg(tabs);
+            }})(sendMsg,tabs),5000);
         }})(g));
     }
     if (game===0 || game===1)
