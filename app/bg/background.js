@@ -323,7 +323,7 @@ function createNotification(title, message, messageType, buttons, buttonUrl) {
     http://jsperf.com/xmlhttprequest-vs-jquery-ajax/3
  */
 
-setInterval(function() {
+/*setInterval(function() {
     if(LoungeUser.userSettings.notifyBots == "1") {
         var oReq = new XMLHttpRequest();
         oReq.onload = function() {
@@ -350,7 +350,7 @@ setInterval(function() {
         oReq.open("get", "http://csgolounge.com/status", true);
         oReq.send();
     }
-}, 5000);
+}, 5000);*/
 
 function checkNewMatches(ajaxResponse, appID) {
     var activeMatches = {};
