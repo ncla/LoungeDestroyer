@@ -45,7 +45,8 @@ User.prototype.defaultSettings =
     convertLoungePrices: "1",
     blacklistNonExistingItems: "0",
     groupInventory: "1",
-    itemGroups: {}
+    itemGroups: {},
+    displayCsgoWeaponQuality: "1"
 };
 
 User.prototype.loadUserSettings = function(callback) {
@@ -68,12 +69,6 @@ User.prototype.loadUserSettings = function(callback) {
 
             // restrict options
             self.userSettings.autoDelay = Math.max(2, self.userSettings.autoDelay);
-            /*$.each(self.defaultSettings, function(index, value) {
-                if (typeof storageUserSettings[index] == 'undefined') {
-                    console.log("New user setting missing in local storage, setting it now");
-                    self.saveSetting(index, value);
-                }
-            });*/
         }
         /* Start the scripterino */
         callback();
