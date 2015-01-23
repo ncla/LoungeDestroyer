@@ -1,36 +1,58 @@
 var marketedItems = [],
     loadingItems = [],
     nonMarketItems = ["Dota Items", "Any Offers", "Any Knife", "Knife", "Gift", "TF2 Items", "Real Money", "Offers", "Any Common", "Any Uncommon", "Any Rare", "Any Mythical", "Any Legendary",
-    "Any Ancient", "Any Immortal", "Real Money", "+ More", "Any Set", "Any Key", "Undefined / Not Tradeable", "Card", "Background", "Icon", "Gift", "DLC"];
+    "Any Ancient", "Any Immortal", "Real Money", "+ More", "Any Set", "Any Key", "Undefined / Not Tradeable", "Card", "Background", "Icon", "Gift", "DLC"],
+    csgoSkinQualities = {'Factory New': 'FN', 'Minimal Wear': 'MW', 'Well-Worn': 'WW', 'Battle-Scarred': 'BS', 'Field-Tested': 'FT'};
 
 var Item = function(item) {
     var self = this;
-    this.item = item;
-    this.itemName = $(".smallimg", this.item).attr("alt");
-    this.convertLoungeValue();
+    // This allows us to use the object functions as static functions without constructing the object
+    if(item !== undefined) {
+        this.item = item;
+        this.itemName = $(".smallimg", this.item).attr("alt");
+        if(appID == "730") {
+            $.each(csgoSkinQualities, function(i, v) {
+                if(self.itemName.indexOf(i) != -1) {
+                    self.weaponQuality = i;
+                    self.weaponQualityAbbrevation = v;
+                    return false;
+                }
+            });
+        }
+        this.convertLoungeValue();
+    }
 };
 
 Item.prototype.insertMarketValue = function(lowestPrice) {
 	var self = this;
+    // This is set by getMarketPricesForElementList function in order to avoid performance issues
+    // when creating requetsts for market prices on Steam
     if(this.myFriends) {
         for (var index in self.myFriends) {
             var $myLittleItem = $(self.myFriends[index]["item"]);
             $myLittleItem.addClass('marketPriced');
-            $(".item",$myLittleItem).addClass("marketPriced");
             $myLittleItem.find(".rarity").html(lowestPrice);
+            self.myFriends[index].displayWeaponQuality();
         }
     }
     else {
-        $(".item").each(function() {
-            var $theItem = $(this);
-            if(!$theItem.hasClass('marketPriced')) {
-                if ($theItem.find("img.smallimg").attr("alt") == self.itemName) {
-                    $theItem.find(".rarity").html(lowestPrice);
-                    $theItem.addClass('marketPriced');
-                }
+        $(".oitm:not(.marketPriced)").each(function() {
+            if ($(this).find("img.smallimg").attr("alt") == self.itemName) {
+                var $theItem = $(this);
+                var itemObj = new Item($theItem);
+                $theItem.find(".rarity").html(lowestPrice);
+                $theItem.addClass('marketPriced');
+                itemObj.displayWeaponQuality();
             }
         });
     }
+};
+
+Item.prototype.displayWeaponQuality = function() {
+    if(appID != "730" || LoungeUser.userSettings.displayCsgoWeaponQuality != "1" || typeof this.weaponQuality == 'undefined') {
+        return false;
+    }
+    $(".rarity", this.item).append('<span class="weaponWear"> | ' + this.weaponQualityAbbrevation + '</span>')
 };
 
 Item.prototype.getMarketPrice = function() {
@@ -40,6 +62,7 @@ Item.prototype.getMarketPrice = function() {
 
     var self = this;
 
+    // Check if we can append a cached item price
     if(LoungeUser.userSettings["useCachedPriceList"] == "1") {
         if(storageMarketItems.hasOwnProperty(appID)) {
             if(storageMarketItems[appID].hasOwnProperty(this.itemName)) {
@@ -48,11 +71,14 @@ Item.prototype.getMarketPrice = function() {
             }
         }
     }
+
+    // Check if we even have to fetch a price
     if(blacklistedItemList.hasOwnProperty(this.itemName)) {
         console.log("Item " + self.itemName.trim() + " is blacklisted, not fetching market price");
         return false;
     }
 
+    // Check if the itemName has not been already marketed before
     if(marketedItems.hasOwnProperty(this.itemName)) {
         // Not sure if I am genius for returning something and calling a function at the same time
         return this.insertMarketValue(marketedItems[this.itemName]);
@@ -64,7 +90,7 @@ Item.prototype.getMarketPrice = function() {
 };
 Item.prototype.unloadMarketPrice = function() {
     var self = this;
-    $(".item.marketPriced").each(function(i, v) {
+    $(".oitm.marketPriced").each(function(i, v) {
         $theItem = $(v);
         if($theItem.hasClass('marketPriced') && $theItem.find("img.smallimg").attr("alt") == self.itemName) {
             $theItem.find(".rarity").html("Fetching...");
@@ -136,7 +162,7 @@ Item.prototype.convertLoungeValue = function() {
 
                 var loungeValue = parseFloat(valElm.text().match(/[0-9.]+/));
 
-                // convert lounge's price
+                // If the the value is parsable as a number, convert the lounge's price
                 if (!isNaN(loungeValue)) {
                     $(".value", this.item).text(convertPrice(loungeValue, true));
                 }
@@ -148,9 +174,26 @@ Item.prototype.blacklistItem = function() {
     blacklistedItemList[this.itemName] = null;
     chrome.storage.local.set({'blacklistedItemList': blacklistedItemList});
 };
+Item.prototype.appendHoverElements = function() {
+    var self = this;
+    if(!$(self.item).hasClass("ld-appended")) {
+        if(nonMarketItems.indexOf(self.itemName) == -1) {
+            if($("a:contains('Market')", self.item).length) {
+                $("a:contains('Market')", self.item).html("Market Listings");
+            } else {
+                $(".name", self.item).append('<br/><a href="' + self.generateMarketURL() + '" target="_blank">Market Listings</a>');
+            }
+
+            $(".name", self.item).append('<br/><a href="' + self.generateMarketSearchURL() + '" target="_blank">Market Search</a>' +
+                '<br/><br/><small><a class="refreshPriceMarket">Show Steam market price</a></small>');
+        }
+
+        $(self.item).addClass("ld-appended");
+    }
+};
 /**
  * Get market prices for an element list in a performance friendly way
- * @param {Array} elmList - list of jQuery element objects
+ * @param {Array} elmList - list of jQuery element objects (optional)
  */
 function getMarketPricesForElementList(elmList) {
     if(!elmList) {
@@ -158,6 +201,7 @@ function getMarketPricesForElementList(elmList) {
     }
     var cachedItemList = [];
 
+    // Loop through all the items and push them in an array if we found duplicates
     for (var i = 0, j = elmList.length; i < j; ++i) {
         var item = new Item(elmList[i]);
         if (!cachedItemList.hasOwnProperty(item.itemName)) {
@@ -165,7 +209,7 @@ function getMarketPricesForElementList(elmList) {
         }
         cachedItemList[item.itemName].push(item);
     }
-
+    // Then we fetch market prices only for unique, non-duplicate items
     for (var index in cachedItemList) {
         var itemForScience = cachedItemList[index][0];
         itemForScience.myFriends = cachedItemList[index];
@@ -173,6 +217,11 @@ function getMarketPricesForElementList(elmList) {
     }
 }
 
+/**
+ * Converts Lounge value (assuming it is USD by default) to users currency
+ * @param {float} usd - Value in USD
+ * @param {boolean} toString - true if you want the function to return the value in string
+ */
 function convertPrice(usd, toString) {
     var currData = currencyData[LoungeUser.userSettings["marketCurrency"]],
         conversionRate = currencies[("USD" + currData["naming"])],

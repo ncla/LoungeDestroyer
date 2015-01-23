@@ -1,8 +1,10 @@
+var backpackAjaxURLs = ['tradeBackpack', 'betBackpack'];
+
 var Inventory = function() {
-    this.inventoryIsLoading = false; // LD loading it, not site loading it
-    this.backpackAjaxURL = null;
+    this.inventoryIsLoading = false; // Extension loading the inventory, not the site
+    this.backpackAjaxURL = null; // newest inventory AJAX request URL
     var self = this;
-    this.lastElementInBackpack = null; // only used for trade pages
+    this.lastElementInBackpack = null; // this property is only used on individual trade pages
 
     // item groups related
     this.grouped = false;
@@ -11,9 +13,7 @@ var Inventory = function() {
     this.groupElms = {},
     this.sortedGroups = [];
 
-    /*
-        Construct for backpack
-     */
+    // Determining where the backpack is
     if(document.URL.indexOf("/match?m=") != -1 || document.URL.indexOf("/predict") != -1 || document.URL.indexOf("/search") != -1 || document.URL.indexOf("/addtrade") != -1) {
         this.backpackElement = $("#backpack");
     } else if(document.URL.indexOf("/trade?t=") != -1) {
@@ -28,12 +28,37 @@ var Inventory = function() {
  */
 Inventory.prototype.loadInventory = function() {
     var self = this;
+
+    // We get rid of the .php extension, the AJAX requests work anyway without it
+    self.backpackAjaxURL = self.backpackAjaxURL.replace('.php', '');
+
+    // This will be default URL if none of the conditions below are met
     var theURL = self.backpackAjaxURL;
 
+    // There are two APIs for inventory loading, we want to switch back and forth between two of them
+    // By adding and remove Api at the end of AJAX request URL
+    if(self.backpackAjaxURL.indexOf('Api') != -1) {
+        theURL = self.backpackAjaxURL.replace('Api', '');
+    } else {
+        // Loop through all the Lounge requests that support 'Api' at the end of request
+        $.each(backpackAjaxURLs, function(i, v) {
+            if(self.backpackAjaxURL.indexOf(v) != -1) {
+                theURL = self.backpackAjaxURL + 'Api';
+                return false;
+            }
+        });
+    }
+    console.log("Loading inventory with URL " , theURL);
+
+    self.backpackAjaxURL = theURL;
+
+    // Send AJAX request, necessary to be set as a property because user may need to abort the request
     this.ajaxRequest = $.ajax({
         url: theURL,
         success: function(data) {
+            // All inventory requests usually throw this string if the backpack loading was successful, or return nothing at all
             if($(data).text().indexOf("Can't get items.") == -1 && data.length != 0) {
+                // Backpack behavior is a bit different on individual trade pages
                 if(document.URL.indexOf("/trade?t=") != -1) {
                     self.removeBackpackElements();
                     self.addElementsToBackpack(data);
@@ -49,11 +74,13 @@ Inventory.prototype.loadInventory = function() {
                 self.inventoryIsLoading = false;
             }
             else {
+                // Show the received error to the user and continue loading the inventory
                 document.getElementById("LDerr").innerHTML = $(data).text();
                 self.loadInventory();
             }
         },
         error: function (xhr, text_status, error_thrown) {
+            // If the request error status is not 'abort', continue loading inventory
             if (text_status != "abort") {
                 setTimeout(function() {
                     self.loadInventory();
@@ -146,10 +173,11 @@ Inventory.prototype.onInventoryLoaded = function(url) {
         this.addInventoryLoadButton(this.backpackElement);
     } else {
         console.log("Assuming the backpack has loaded!");
+        this.determineBackpackType();
         $("#loading", this.backpackElement).hide();
         if(document.URL.indexOf("/match?m=") != -1) {
-            // At the moment caching only betting inventories
-            if($(".bpheader", self.backpackElement).text().indexOf("CS:GO Inventory") != -1 || $(".bpheader .title", self.backpackElement).text().indexOf("Armory") != -1) {
+            // We only need to cache the betting inventories
+            if(this.bettingInventoryType == "inventory") {
                 this.cacheInventory("bettingInventory" + appID + "_" + readCookie("id"), $("#backpack").html());
             }
             addInventoryStatistics();
@@ -158,7 +186,6 @@ Inventory.prototype.onInventoryLoaded = function(url) {
         if(LoungeUser.userSettings["itemMarketPricesv2"] == "2") {
             this.getMarketPrices(true);
         }
-        this.determineBackpackType();
     }
 };
 Inventory.prototype.determineBackpackType = function() {
@@ -201,6 +228,7 @@ Inventory.prototype.addInventoryLoadButton = function(element) {
     Adds elements to backpack element
  */
 Inventory.prototype.addElementsToBackpack = function(elements) {
+    // Again special care for individual tradep ages
     if(document.URL.indexOf("/trade?t=") != -1) {
         $(this.backpackElement).append(elements);
     } else {
@@ -502,12 +530,19 @@ Inventory.prototype.removeBackpackElements = function() {
 function addInventoryStatistics() {
     var total = 0,
         itemValues = {},
-        betSizes = {};
+        betSizes = {},
+        itemQualities = {
+            730: ['exotic', 'remarkable', 'contraband', 'high', 'base', 'covert', 'classified', 'restricted', 'industrial', 'mil-spec', 'consumer', 'base'],
+            570: ['arcana', 'immortal', 'legendary', 'mythical', 'rare', 'uncommon', 'common', 'base']
+        };
+
     $("#backpack .item").each(function () {
+        // Lounge provides item rarities in the classnames
         var rarity = $(this).children("div.rarity")[0].classList[1],
             e = $(this).children("div.value")[0].innerHTML;
         var itemPrice = parseFloat(e.replace("$ ", ""));
         rarity = (rarity === undefined ? "base" : rarity.toLowerCase());
+        // If there is already a rarity index set, if not just add up the numbers for that rarity
         if(itemValues.hasOwnProperty(rarity)) {
             itemValues[rarity] = itemValues[rarity] + itemPrice;
         } else {
@@ -515,26 +550,28 @@ function addInventoryStatistics() {
         }
         total += itemPrice;
     });
-    for (var key in itemValues) {
-        if (itemValues.hasOwnProperty(key)) {
-            itemValues[key] = itemValues[key].toFixed(2);
+
+    var itemValuesTemp = {};
+    // Derp solution for sorting by highest rarities
+    $.each(itemQualities[appID], function(i, v) {
+        if(itemValues.hasOwnProperty(v)) {
+            itemValuesTemp[v] = itemValues[v]
         }
-    }
-    betSizes.small = (.05 * total).toFixed(2);
-    betSizes.medium = (.1 * total).toFixed(2);
-    betSizes.large = (.2 * total).toFixed(2);
+    });
+    var itemValues = itemValuesTemp;
+
     if(total > 0) {
         $("#backpack").prepend('<div class="inventoryStatisticsBox">' +
             '<div id="totalInvValue">Your items are worth: <span>' + total.toFixed(2) + '</span></div>' +
             '<div id="rarityValuesWrapper"><div id="rarityValues"></div></div>' +
             '<div id="betSizeValues">' +
-            '<span>Small bet: ' + betSizes.small + '</span>' +
-            '<span>Medium bet: ' + betSizes.medium + '</span>' +
-            '<span>Large bet: ' + betSizes.large + '</span>' +
+            '<span>Small bet: ' + (.05 * total).toFixed(2) + '</span>' +
+            '<span>Medium bet: ' + (.1 * total).toFixed(2) + '</span>' +
+            '<span>Large bet: ' + (.2 * total).toFixed(2) + '</span>' +
             '</div>' +
             '</div>');
         $.each(itemValues, function(i, v) {
-            $("#rarityValues").append('<div class="rarityContainer"><div><span class="' + i + '">' + capitaliseFirstLetter(i) + '</span>: ' + v + '</div></div>');
+            $("#rarityValues").append('<div class="rarityContainer"><div><span class="' + i + '">' + capitaliseFirstLetter(i) + '</span>: ' + v.toFixed(2) + '</div></div>');
         });
     }
 }
