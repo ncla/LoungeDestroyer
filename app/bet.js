@@ -94,6 +94,7 @@ chrome.runtime.onMessage.addListener(function(request,sender,sendResponse){
 		betStatus.enabled = false;
         $(document).ready(function() {
             document.querySelector(".destroyer.auto-info").className = "destroyer auto-info hidden";
+            $("#placebut").show();
         });
 		return;
 	}

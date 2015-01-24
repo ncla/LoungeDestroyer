@@ -46,6 +46,7 @@ function init() {
             }
         }
         if(msg.hasOwnProperty("serialize")) {
+            console.log("Serializing: ",msg);
             sendResponse($(msg.serialize).serialize());
         }
     });
@@ -391,7 +392,7 @@ $(document).ready(function() {
     });
     document.body.appendChild(container);
 
-    document.body.addEventListener("click",function(ev) {
+    document.addEventListener("click",function(ev) {
         if (ev.srcElement) {
             if (ev.srcElement.id !== "preview"
                 && !$("#preview").find(ev.srcElement).length) {
@@ -402,7 +403,7 @@ $(document).ready(function() {
             if (ev.srcElement.id !== "modalPreview"
                 && !$("#modalPreview").find(ev.srcElement).length
                 && document.getElementById("modalPreview").style.opacity!=="0") {
-                $("#modalPreview").fadeOut();
+                $("#modalPreview").fadeOut("fast");
             }
         }
     });
