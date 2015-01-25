@@ -41,11 +41,11 @@ Trade.prototype.addTradeDescription = function() {
         if(self.tradeDescription.length > 240) {
             self.getExtendedTradeDescription(
                 function(tradeDescriptionExtended) {
-                    $(".trade-description p", self.tradeElement).html(textToUrl(tradeDescriptionExtended));
+                    $(".trade-description p", self.tradeElement).text(textToUrl(tradeDescriptionExtended));
                 }
             );
         } else {
-            $(".trade-description p", self.tradeElement).html(
+            $(".trade-description p", self.tradeElement).text(
                 textToUrl($(".trade-description p", self.tradeElement).text())
             );
         }
