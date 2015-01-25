@@ -45,7 +45,7 @@ User.prototype.defaultSettings =
     convertLoungePrices: "1",
     blacklistNonExistingItems: "0",
     groupInventory: "1",
-    itemGroups: {},
+    itemGroups: {730: {}, 570: {}},
     displayCsgoWeaponQuality: "1"
 };
 

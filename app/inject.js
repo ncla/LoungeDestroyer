@@ -402,6 +402,7 @@ $(document).ready(function() {
             }
             if (ev.srcElement.id !== "modalPreview"
                 && !$("#modalPreview").find(ev.srcElement).length
+                && document.getElementById("modalPreview")
                 && document.getElementById("modalPreview").style.opacity!=="0") {
                 $("#modalPreview").fadeOut("fast");
             }

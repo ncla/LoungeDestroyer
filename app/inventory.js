@@ -8,7 +8,7 @@ var Inventory = function() {
 
     // item groups related
     this.grouped = false;
-    this.groups = LoungeUser.userSettings.itemGroups || {};
+    this.groups = LoungeUser.userSettings.itemGroups[appID] || {};
     this.itemToGroup = {},
     this.groupElms = {},
     this.sortedGroups = [];
@@ -245,7 +245,7 @@ Inventory.prototype.group = function() {
     }
 
     this.grouped = true;
-    this.groups = LoungeUser.userSettings.itemGroups;
+    this.groups = LoungeUser.userSettings.itemGroups[appID];
     this.itemToGroup = {},
     this.groupElms = {},
     this.sortedGroups = [];
@@ -410,7 +410,8 @@ Inventory.prototype.saveGroups = function(){
         return;
     }
 
-    var self = this;
+    var self = this,
+        fullGroups = LoungeUser.userSettings.itemGroups;
 
     $.each(this.sortedGroups, function(ind,obj){
         var name = obj.name;
@@ -421,7 +422,11 @@ Inventory.prototype.saveGroups = function(){
         self.groups[name].priority = ind;
     });
 
-    LoungeUser.saveSetting("itemGroups", this.groups);
+    fullGroups[appID] = this.groups;
+
+    console.log("Saving groups: ",fullGroups);
+
+    LoungeUser.saveSetting("itemGroups", fullGroups);
 };
 /*
     Create group element - group must have data in LoungeUser.userSettings.itemGroups
@@ -487,7 +492,8 @@ Inventory.prototype.makeItemsSortable = function(){
     var self = this;
     $(".ld-item-group").sortable({
         connectWith: ".ld-item-group",
-        scroll: false
+        scroll: false,
+        distance: 10
     }).on("sortreceive", function(e,jqElm){
         var name = $(".name > b", jqElm.item).text(),
             groupName = jqElm.sender[0].getAttribute("data-group-name"),
@@ -511,7 +517,10 @@ Inventory.prototype.makeItemsSortable = function(){
             delete self.itemToGroup[name];
         }
 
-        LoungeUser.saveSetting("itemGroups", self.groups);
+        var fullGroups = LoungeUser.userSettings.itemGroups;
+        fullGroups[appID] = self.groups;
+
+        LoungeUser.saveSetting("itemGroups", fullGroups);
     });
 };
 /*
