@@ -257,7 +257,7 @@ chrome.webRequest.onHeadersReceived.addListener(
             var errHtml = "<h1>LoungeDestroyer</h1><p>LoungeDestroyer is redirecting you away from wait.html redirect page to the page you intended to visit. " +
                 "You can disable this feature in extension settings.</p>";
             chrome.tabs.executeScript(details.tabId, {code: "document.body.innerHTML += '"+errHtml+"'"});
-            chrome.tabs.executeScript(details.tabId, {code: "setTimeout(function() { window.location = '"+originalURL+"';}, 1000);"});
+            chrome.tabs.executeScript(details.tabId, {code: "setTimeout(function() { window.location = '"+originalURL+"';}, 10000);"});
             blockingResponse.responseHeaders = newHeaders;
         }
         return blockingResponse;
