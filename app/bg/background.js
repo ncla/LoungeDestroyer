@@ -257,7 +257,7 @@ chrome.webRequest.onHeadersReceived.addListener(
             var errHtml = "<h1>LoungeDestroyer</h1><p>LoungeDestroyer is redirecting you away from wait.html redirect page to the page you intended to visit. " +
                 "You can disable this feature in extension settings.</p>";
             chrome.tabs.executeScript(details.tabId, {code: "document.body.innerHTML += '"+errHtml+"'"});
-            chrome.tabs.executeScript(details.tabId, {code: "setTimeout(function() { window.location = '"+originalURL+"';}, 1000);"});
+            chrome.tabs.executeScript(details.tabId, {code: "setTimeout(function() { window.location = '"+originalURL+"';}, 10000);"});
             blockingResponse.responseHeaders = newHeaders;
         }
         return blockingResponse;
@@ -323,7 +323,7 @@ function createNotification(title, message, messageType, buttons, buttonUrl) {
     http://jsperf.com/xmlhttprequest-vs-jquery-ajax/3
  */
 
-setInterval(function() {
+/*setInterval(function() {
     if(LoungeUser.userSettings.notifyBots == "1") {
         var oReq = new XMLHttpRequest();
         oReq.onload = function() {
@@ -350,7 +350,7 @@ setInterval(function() {
         oReq.open("get", "http://csgolounge.com/status", true);
         oReq.send();
     }
-}, 5000);
+}, 5000);*/
 
 function checkNewMatches(ajaxResponse, appID) {
     var activeMatches = {};
