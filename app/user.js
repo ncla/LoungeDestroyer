@@ -45,7 +45,7 @@ User.prototype.defaultSettings =
     convertLoungePrices: "1",
     blacklistNonExistingItems: "0",
     groupInventory: "1",
-    itemGroups: {},
+    itemGroups: {730: {}, 570: {}},
     displayCsgoWeaponQuality: "1"
 };
 
@@ -87,11 +87,15 @@ User.prototype.saveSetting = function(settingName, settingValue) {
     */
     var theSetting = {};
     theSetting[settingName] = settingValue; // just pass this to sendMessage
-    chrome.runtime.sendMessage({changeSetting: theSetting}); // sending it to background.js
-    chrome.tabs.query({}, function(tabs) {
-        for (var i=0; i<tabs.length; ++i) {
-            chrome.tabs.sendMessage(tabs[i].id, {changeSetting: theSetting}); // sending it to content scripts
-        }
-    });
+    // if currently in background script
+    if (chrome.extension.getBackgroundPage && chrome.extension.getBackgroundPage() === window) {
+        chrome.tabs.query({}, function(tabs) {
+            for (var i=0; i<tabs.length; ++i) {
+                chrome.tabs.sendMessage(tabs[i].id, {changeSetting: theSetting}); // sending it to content scripts
+            }
+        });
+    } else {
+        chrome.runtime.sendMessage({changeSetting: theSetting}); // sending it to background.js
+    }
     console.log("Saving user setting [" + settingName +"] to " +settingValue);
 };
