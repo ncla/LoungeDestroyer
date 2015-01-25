@@ -39,7 +39,8 @@
             </div>
             <p>Settings are automatically saved once you have selected an option.</p>
 
-            <h3 class="page-header">CS:GO Lounge / Dota2 Lounge</h3>
+            <h3 class="page-header">Items</h3>
+
             <div class="ld-settings">
                 <div class="row">
                     <div class="col-md-6 ld-setting">
@@ -74,83 +75,6 @@
                         </select>
                     </div>
                     <div class="col-md-6 ld-setting">
-                        <label class="control-label">Redirect from item draft page <a href="#" data-toggle="tooltip" data-original-title="CS:GO Lounge does an annoying redirect to item drafting page, which can be stopped by extension. This may cause some lag issues as this will keep redirecting to intended page instead of item drafting page.">(?)</a>:</label>
-                        <select id="redirect" class="form-control">
-                            <option value="1">Enabled</option>
-                            <option value="0">Disabled</option>
-                        </select>
-                    </div>
-                    <div class="col-md-6 ld-setting">
-                        <label class="control-label">Show trade descriptions:</label>
-                        <select id="showDescriptions" class="form-control">
-                            <option value="1">Enabled</option>
-                            <option value="0">Disabled</option>
-                        </select>
-                    </div>
-                    <div class="col-md-6 ld-setting">
-                        <label class="control-label">Enable auto-betting/-returning/-accept:</label>
-                        <select id="enableAuto" class="form-control">
-                            <option value="3">Auto-accept only</option>
-                            <option value="2">Auto-betting/-returning only</option>
-                            <option value="1">Enabled</option>
-                            <option value="0">Disabled</option>
-                        </select>
-                    </div>
-                    <div class="col-md-6 ld-setting">
-                        <label class="control-label">Add preview buttons to trades:</label>
-                        <select id="addTradePreviews" class="form-control">
-                            <option value="1">Enabled</option>
-                            <option value="0">Disabled</option>
-                        </select>
-                    </div>
-                    <div class="col-md-6 ld-setting">
-                        <label class="control-label">Show match type and exact time:</label>
-                        <select id="showExtraMatchInfo" class="form-control">
-                            <option value="2">Load automatically for upcoming matches + on hover</option>
-                            <option value="1">Trigger only when mouse is over the match</option>
-                            <option value="0">Disabled</option>
-                        </select>
-                    </div>
-                    <div class="col-md-6 ld-setting">
-                        <label class="control-label">Automatically change match time to local time:</label>
-                        <select id="changeTimeToLocal" class="form-control">
-                            <option value="1">Enable</option>
-                            <option value="0">Disabled</option>
-                        </select>
-                    </div>
-                    <div class="col-md-6 ld-setting">
-                        <label class="control-label">Time zone:</label>
-                        <select id="timezone" class="form-control">
-                            <option value="auto">Detect automatically</option>
-                            <!--
-                                Options are generated dynamically from option.js with moment.js lib
-                            -->
-                        </select>
-                    </div>
-                    <div class="col-md-6 ld-setting">
-                        <label class="control-label">12/24 hour clock:</label>
-                        <select id="americanosTime" class="form-control">
-                            <option value="1">12 hour clock</option>
-                            <option value="0">24 hour clock</option>
-                        </select>
-                    </div>
-                    <div class="col-md-6 ld-setting">
-                        <label class="control-label">Display time zone abbreviation:</label>
-                        <select id="displayTzAbbr" class="form-control">
-                            <option value="1">Enabled</option>
-                            <option value="0">Disabled</option>
-                        </select>
-                    </div>
-                    <div class="col-md-6 ld-setting">
-                        <label class="control-label">Attempt to auto-bump trades every 10 minutes:</label>
-                        <select id="autoBump" class="form-control">
-                            <option value="570">Dota 2 Lounge trades only</option>
-                            <option value="730">CS:GO Lounge trades only</option>
-                            <option value="1">Enabled</option>
-                            <option value="0">Disabled</option>
-                        </select>
-                    </div>
-                    <div class="col-md-6 ld-setting">
                         <label class="control-label">Black-list items that do not have a market listing <a href="#" data-toggle="tooltip" data-original-title="When a request is made to Steam market API for an item and there are no listings for this item, extension can black-list this item to reduce amount of requests made for non-marketable/non-existing items">(?)</a>:</label>
                         <select id="blacklistNonExistingItems" class="form-control">
                             <option value="1">Enabled</option>
@@ -173,7 +97,8 @@
                     </div>
                 </div>
 
-                <h3 class="page-header">Notifying</h3>
+                <h3 class="page-header">Notifications</h3>
+
                 <div class="row">
                     <div class="col-md-6 ld-setting">
                         <label class="control-label">Notify when bots go online:</label>
@@ -217,6 +142,94 @@
                         </select>
                     </div>
                 </div>
+
+                <h3 class="page-header">Time and date</h3>
+                <div class="row">
+                    <div class="col-md-6 ld-setting">
+                    <label class="control-label">Automatically change match time to local time:</label>
+                    <select id="changeTimeToLocal" class="form-control">
+                        <option value="1">Enable</option>
+                        <option value="0">Disabled</option>
+                    </select>
+                </div>
+                    <div class="col-md-6 ld-setting">
+                        <label class="control-label">Time zone:</label>
+                        <select id="timezone" class="form-control">
+                            <option value="auto">Detect automatically</option>
+                            <!--
+                                Options are generated dynamically from option.js with moment.js lib
+                            -->
+                        </select>
+                    </div>
+                    <div class="col-md-6 ld-setting">
+                        <label class="control-label">12/24 hour clock:</label>
+                        <select id="americanosTime" class="form-control">
+                            <option value="1">12 hour clock</option>
+                            <option value="0">24 hour clock</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 ld-setting">
+                        <label class="control-label">Display time zone abbreviation:</label>
+                        <select id="displayTzAbbr" class="form-control">
+                            <option value="1">Enabled</option>
+                            <option value="0">Disabled</option>
+                        </select>
+                    </div>
+                </div>
+
+
+                <h3 class="page-header">Features</h3>
+
+                <div class="row">
+                    <div class="col-md-6 ld-setting">
+                        <label class="control-label">Redirect from item draft page <a href="#" data-toggle="tooltip" data-original-title="CS:GO Lounge does an annoying redirect to item drafting page, which can be stopped by extension. This may cause some lag issues as this will keep redirecting to intended page instead of item drafting page.">(?)</a>:</label>
+                        <select id="redirect" class="form-control">
+                            <option value="1">Enabled</option>
+                            <option value="0">Disabled</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 ld-setting">
+                        <label class="control-label">Show trade descriptions:</label>
+                        <select id="showDescriptions" class="form-control">
+                            <option value="1">Enabled</option>
+                            <option value="0">Disabled</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 ld-setting">
+                        <label class="control-label">Enable auto-betting/-returning/-accept:</label>
+                        <select id="enableAuto" class="form-control">
+                            <option value="3">Auto-accept only</option>
+                            <option value="2">Auto-betting/-returning only</option>
+                            <option value="1">Enabled</option>
+                            <option value="0">Disabled</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 ld-setting">
+                        <label class="control-label">Add preview buttons to trades:</label>
+                        <select id="addTradePreviews" class="form-control">
+                            <option value="1">Enabled</option>
+                            <option value="0">Disabled</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 ld-setting">
+                        <label class="control-label">Show match type and exact time:</label>
+                        <select id="showExtraMatchInfo" class="form-control">
+                            <option value="2">Load automatically for upcoming matches + on hover</option>
+                            <option value="1">Trigger only when mouse is over the match</option>
+                            <option value="0">Disabled</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 ld-setting">
+                        <label class="control-label">Attempt to auto-bump trades every 10 minutes:</label>
+                        <select id="autoBump" class="form-control">
+                            <option value="570">Dota 2 Lounge trades only</option>
+                            <option value="730">CS:GO Lounge trades only</option>
+                            <option value="1">Enabled</option>
+                            <option value="0">Disabled</option>
+                        </select>
+                    </div>
+                </div>
+
 
                 <h3 class="page-header">Misc</h3>
                 <div class="row">
@@ -345,7 +358,7 @@
 
 <div class="footer">
     <div class="container">
-        <p class="text-muted">Developed with hate by NCLA and <a href="https://github.com/ncla/LoungeDestroyer/graphs/contributors">contributors on GitHub</a></p>
+        <p class="text-muted">Created by <a href="https://github.com/ncla">NCLA</a>, co-developed by <a href="https://github.com/birjolaxew">birjolaxew</a> and <a href="https://github.com/ncla/LoungeDestroyer/graphs/contributors"> the rare occasional contributors on GitHub</a></p>
     </div>
 </div>
 
