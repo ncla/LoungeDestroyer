@@ -232,9 +232,12 @@ bet.autoLoop = function(game) {
                     var extraDelay = 0;
                     if (data.indexOf("Try again in few seconds.") !== -1) {
                         console.log("Waiting a few seconds to avoid blocking");
-                        data += "\r\nDelayed auto by 5 seconds to avoid block.";
-                        extraDelay = 5000;
+                        data += "\r\nDelayed auto by 2 seconds to avoid block.";
+                        extraDelay = 2000;
                     }
+
+                    // randomize our delay, so it gets harder for Lounge to detect us
+                    extraDelay += Math.random() * 600 - 300;
 
                     var msg = {};
                     msg[bet.type[g]] = {
