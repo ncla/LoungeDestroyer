@@ -176,7 +176,7 @@ function init() {
                     // inject own
                     btn.addEventListener("click", function(){
                         if (this.textContent !== "Are you sure") {
-                            $(this).html("Are you sure").on("click", newFreezeReturn);
+                            $(this).text("Are you sure").on("click", newFreezeReturn);
                         }
                     });
                 }
@@ -236,7 +236,7 @@ function init() {
                     inventory.stopLoadingInventory();
                 });
                 $("#ld_cache").click(function() {
-                    $(".left").html("");
+                    $(".left").text("");
                     document.getElementById("backpack").innerHTML = '<div id="LDloading" class="spin-1"></div>';
                     inventory.getCachedInventory("bettingInventory" + appID + "_" + readCookie("id"), function(bpHTML) {
                         document.getElementById("backpack").innerHTML = bpHTML;
