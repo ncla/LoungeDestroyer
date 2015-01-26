@@ -837,4 +837,5 @@ chrome.runtime.onInstalled.addListener(function(details) {
     }
     updateCurrencyConversion();
     updateMarketPriceList();
+    updateThemes();
 });
