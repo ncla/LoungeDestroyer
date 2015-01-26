@@ -36,17 +36,17 @@ Trade.prototype.addTradeDescription = function() {
     var self = this;
     self.getTradeDescriptionFromHTML();
     if(self.tradeDescription.length > 0) {
-        $(self.tradeElement).find(".tradecnt").after('<div class="trade-description"><p>' + $.trim(self.tradeDescription) + (self.tradeDescription.length > 240 ? "..." : "") + '</p></div>');
+        $(self.tradeElement).find(".tradecnt").after('<div class="trade-description"><p>' + removeTags($.trim(self.tradeDescription)) + (self.tradeDescription.length > 240 ? "..." : "") + '</p></div>');
         var tradeDescription = $(".trade-description", self.tradeElement);
         if(self.tradeDescription.length > 240) {
             self.getExtendedTradeDescription(
                 function(tradeDescriptionExtended) {
-                    $(".trade-description p", self.tradeElement).html(textToUrl(tradeDescriptionExtended));
+                    $(".trade-description p", self.tradeElement).html(textToUrl(removeTags(tradeDescriptionExtended)));
                 }
             );
         } else {
             $(".trade-description p", self.tradeElement).html(
-                textToUrl($(".trade-description p", self.tradeElement).text())
+                textToUrl(removeTags($(".trade-description p", self.tradeElement).text()))
             );
         }
     }

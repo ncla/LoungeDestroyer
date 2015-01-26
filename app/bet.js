@@ -5,7 +5,7 @@ var betStatus = {
 	rebetDelay: 5000
 };
 
-function enableAuto(worth, match, tries, error) {
+function enableAuto(match, tries, error) {
 	betStatus.enabled = true;
 
 	var ordinalEnding = ((tries||0)+"").slice(-1);
@@ -23,11 +23,8 @@ function enableAuto(worth, match, tries, error) {
 
 	if (betStatus.type === "autoBet") {
 		isBetStatusTypeValid = true;
-		var worth = worth === -1 ? "key(s)" :
-		                      "$"+(worth || 0).toFixed(2);
 		typeSpansTextContent = "betting";
 		destroyerInfoButtonText += "bet";
-   		//document.querySelector(".destroyer.auto-info .worth").textContent = worth;
 	    document.querySelector(".destroyer.auto-info .match-link").textContent = match;
 	    document.querySelector(".destroyer.auto-info .match-link").href = "match?m="+match;
 
@@ -80,7 +77,7 @@ chrome.runtime.sendMessage({get: "autoBet"}, function(data){
 	betStatus.type = data.type;
 
 	$(document).ready(function(){
-	    enableAuto(data.worth, data.matchId, data.numTries, data.error);
+	    enableAuto(data.matchId, data.numTries, data.error);
 	});
 });
 
@@ -97,6 +94,7 @@ chrome.runtime.onMessage.addListener(function(request,sender,sendResponse){
 		betStatus.enabled = false;
         $(document).ready(function() {
             document.querySelector(".destroyer.auto-info").className = "destroyer auto-info hidden";
+            $("#placebut").show();
         });
 		return;
 	}
@@ -126,7 +124,7 @@ chrome.runtime.onMessage.addListener(function(request,sender,sendResponse){
 			betStatus.time = data.time;
 			betStatus.rebetDelay = data.rebetDelay;
             $(document).ready(function(){
-                enableAuto(data.worth, data.matchId, data.numTries, data.error);
+                enableAuto(data.matchId, data.numTries, data.error);
             });
 			return;
 		}

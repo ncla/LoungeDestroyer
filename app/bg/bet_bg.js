@@ -27,7 +27,6 @@ chrome.extension.onMessage.addListener(function (request, sender, sendResponse) 
             sendResponse({enabled: bet.autoBetting[game],
                           type: bet.type[game],
                           time: bet.lastBetTime[game],
-                          worth: bet.betData[game].worth,
                           rebetDelay: bet.autoDelay,
                           error: bet.lastError[game],
                           matchId: bet.matchNum[game],
@@ -86,8 +85,7 @@ function handleQueue(data, game) {
  * Uses arrays for keeping track of csgo/dota2lounge, format: [csgo, dota2]
  *
  * Sends messages to content scripts with updates. Possible messages are:
- * {autoBet: {worth: <worth>, // when autobet starts
- *            time: <start-time>},
+ * {autoBet: {time: <start-time>, // when autobet starts
  *            rebetDelay: <re-bet delay>}
  * {autoBet: false} // when autobet stops
  * {autoBet: { // when autobet ticks (error is received from Lounge)
@@ -131,7 +129,7 @@ bet.enableAuto = function(url, data, csgo) {
     bet.lastBetTime[g] = Date.now();
     bet.numTries[g] = 0;
 
-    if (bet.type[g] === "autoBet") {
+    /*if (bet.type[g] === "autoBet") {
         // extract data
         var hash = data.tlss[0],
             worthArr = data.worth,
@@ -153,12 +151,14 @@ bet.enableAuto = function(url, data, csgo) {
             data: data,
             worth: worth
         };
-    };
-    if (bet.type[g] === "autoFreeze") {
-        bet.betData[g] = data;
-    }
+    };*/
+    bet.betData[g] = {serialized: data,
+                        url: url};
+    /*if (bet.type[g] === "autoFreeze") {
+        bet.betData[g] = {serialized: data};
+    }*/
 
-    bet.betData[g].url = url;
+    //bet.betData[g].url = url;
 
     bet.autoBetting[g] = bet.autoLoop(g);
     console.log("Enabling for "+g+": "+bet.autoBetting[g]);
@@ -166,7 +166,6 @@ bet.enableAuto = function(url, data, csgo) {
         // send event to all lounge tabs
         var msg = {};
         msg[bet.type[g]] = {
-            worth: bet.betData[g].worth, 
             time: bet.lastBetTime[g], 
             rebetDelay: bet.autoDelay,
             error: bet.lastError[g],
@@ -194,12 +193,12 @@ bet.autoLoop = function(game) {
         console.log(bet.betData);
 
         if (bet.type[g] === "autoBet") {
-            if (!bet.betData[g] || !bet.betData[g].data) { // if not betting
+            if (!bet.betData[g] || !bet.betData[g].serialized) { // if not betting
                 // mostly failsafe for next if statement
                 success[g] = false;
                 continue;
             }
-            if (!bet.betData[g].data.on) { // if not a betting request
+            if (bet.betData[g].serialized.indexOf("&on=")===-1) { // if not a betting request
                 console.log("Not a betting request");
                 success[g] = false;
                 continue;
@@ -214,37 +213,14 @@ bet.autoLoop = function(game) {
 
         // repeat request
         console.log("Performing request:");
-        console.log({url: bet.betData[g].url, data: bet.betData[g].data});
+        console.log({url: bet.betData[g].url, data: bet.betData[g].serialized});
 
-        // establish data to be sent to tab later
-        var recallTimeout,
-            tabMsg = {
-                url: bet.betData[g].url,
-                timeout: 10000,
-                type: bet.type[g] === "autoBet" ? "POST" : "GET",
-                data: bet.type[g] === "autoBet" ? bet.betData[g].data : "",
-            },
-            tabCallback = (function(g){return function(data) {
-                if (recallTimeout) {
-                    clearTimeout(recallTimeout);
-                }
-                if (data==="error"){
-                    var err = "Error while autoing. Retrying";
-                    bet.lastBetTime[g] = Date.now();
-                    console.log(err);
-
-                    var msg = {};
-                    msg[bet.type[g]] = {
-                        time: bet.lastBetTime[g],
-                        error: err
-                    };
-
-                    sendMessageToContentScript(msg, -1-g);
-                    clearTimeout(bet.loopTimer);
-                    bet.loopTimer = setTimeout(bet.autoLoop, bet.autoDelay);
-
-                    return;
-                }
+        $.ajax({
+            url: bet.betData[g].url,
+            timeout: 10000,
+            type: bet.type[g] === "autoBet" ? "POST" : "GET",
+            data: bet.type[g] === "autoBet" ? bet.betData[g].serialized : "",
+            success: (function(g){return function(data) {
                 // Lounge returns nothing if success
                 if (data) {
                     console.log("Received error from auto ("+(["CS:GO", "Dota 2"])[g]+"):");
@@ -256,9 +232,12 @@ bet.autoLoop = function(game) {
                     var extraDelay = 0;
                     if (data.indexOf("Try again in few seconds.") !== -1) {
                         console.log("Waiting a few seconds to avoid blocking");
-                        data += "\r\nDelayed auto by 5 seconds to avoid block.";
-                        extraDelay = 5000;
+                        data += "\r\nDelayed auto by 2 seconds to avoid block.";
+                        extraDelay = 2000;
                     }
+
+                    // randomize our delay, so it gets harder for Lounge to detect us
+                    extraDelay += Math.random() * 600 - 300;
 
                     var msg = {};
                     msg[bet.type[g]] = {
@@ -267,9 +246,9 @@ bet.autoLoop = function(game) {
                         numTries: bet.numTries[g]
                     }
                     sendMessageToContentScript(msg,-1-g);
-                    if (data.indexOf("You have to relog in order to place a bet.") !== -1) {
+                    /*if (data.indexOf("You have to relog in order to place a bet.") !== -1) {
                         bet.renewHash(0, g);
-                    }
+                    }*/
 
                     clearTimeout(bet.loopTimer);
                     bet.loopTimer = setTimeout(bet.autoLoop, bet.autoDelay+extraDelay); // recall
@@ -282,37 +261,34 @@ bet.autoLoop = function(game) {
                     msg[bet.type[g]] = true;
                     //sendMessageToContentScript(msg, -1-g);
                 }
-            }})(g);
+            }})(g),
+            error: (function(g){return function(xhr) {
+                var err = "Error (#"+xhr.status+") while autoing. Retrying";
+                bet.lastBetTime[g] = Date.now();
+                console.log(err);
 
-        // due to Lounge checking Origin HTTP header, we gotta ask a tab to do it for us
-        chrome.tabs.query({
-            url: "*://"+(["csgo","dota2"])[g]+"lounge.com/*",
-        }, (function(g){return function sendMsg(tabs){
-            if (!tabs.length) {
-                chrome.tabs.create({
-                    url: "http://"+(["csgo","dota2"])[g]+"lounge.com/",
-                    active: false
-                }, function(tab){
-                    setTimeout((function(id,msg,callback){return function(){
-                        chrome.tabs.sendMessage(id, {ajax: msg}, callback);
-                    }})(tab.id,tabMsg,tabCallback), 1000);
-                });
-                return;
+                var msg = {};
+                msg[bet.type[g]] = {
+                    time: bet.lastBetTime[g],
+                    error: err
+                };
+
+                sendMessageToContentScript(msg, -1-g);
+                clearTimeout(bet.loopTimer);
+                bet.loopTimer = setTimeout(bet.autoLoop, bet.autoDelay);
+            }})(g),
+            headers: {
+                "X-Requested-With": "XMLHttpRequest",
+                "Data-Referer": bet.baseUrls[g]+"match?m="+bet.matchNum[g]
             }
-            
-            var scriptTab = tabs[0];
-            chrome.tabs.sendMessage(scriptTab.id, {ajax: tabMsg}, tabCallback);
-            recallTimeout = setTimeout((function(sendMsg,tabs){return function(){
-                sendMsg(tabs);
-            }})(sendMsg,tabs),5000);
-        }})(g));
+        });
     }
     if (game===0 || game===1)
         return success[game];
 
     return true;
 };
-bet.renewHash = function(numTries, game) {
+/*bet.renewHash = function(numTries, game) {
     console.log("Renewing hash");
     var numTries = numTries || 0;
 
@@ -365,7 +341,7 @@ bet.renewHash = function(numTries, game) {
             bet.disableAuto(false, game);
         }
     });
-};
+};*/
 
 // NEW SHIT
 var requestData = {
@@ -400,22 +376,23 @@ chrome.webRequest.onBeforeRequest.addListener(
         }
 
         // because jQuery appends [] to all array keys, and Chrome makes everything an array
-        for (var k in data) {
+        /*for (var k in data) {
             if (k.slice(-2) !== "[]" && data[k] instanceof Array) {
                 data[k] = data[k][0];
             }
-        }
+        }*/
 
         newCallback = (function(url, data){return function(response){
             bet.type[game] = this.type || bet.disableAuto(true, game);
             bet.matchNum[game] = this.match ? data.match : "";
 
+            console.log("Reached newCallback: ",url,data);
+
             if (!response) {
                 bet.disableAuto(true, game);
                 return;
             }
-
-            bet.enableAuto(url, data || "", !game);
+            bet.enableAuto(url, this.data || "", !game);
         }})(details.url, data);
 
         // if it's a return request
@@ -441,19 +418,30 @@ chrome.webRequest.onBeforeRequest.addListener(
 
         // if it's a bet request
         if (data.on !== undefined && data["lquality[]"] !== undefined)  {
-            $.ajax({
-                url: details.url, 
-                type: "POST",
-                data: data,
-                success: newCallback.bind({
-                    type: "autoBet",
-                    match: true
-                }),
-                error: requestListener.bind(this, details)
-            });
+            // ask for serialized data from tab
+            chrome.tabs.sendMessage(details.tabId, {serialize: "#betpoll"},
+                (function(details,data,game,that){return function(d){
+                    var serializedData = d+"&match="+data.match[0]+"&tlss="+data.tlss[0];
+                    $.ajax({
+                        url: details.url, 
+                        type: "POST",
+                        data: serializedData,
+                        timeout: 10000,
+                        success: newCallback.bind({
+                            type: "autoBet",
+                            match: true,
+                            data: serializedData
+                        }),
+                        error: requestListener.bind(that, details),
+                        headers: {
+                            "X-Requested-With": "XMLHttpRequest",
+                            "Data-Referer": bet.baseUrls[game]+"match?m="+data.match[0]
+                        }
+                    });
 
-            console.log("Intercepting bet request:");
-            console.log(details);
+                    console.log("Intercepting bet request:");
+                    console.log(details,data,d);
+                }})(details,data,game,this));
 
             return {cancel: true};
         }
@@ -465,16 +453,33 @@ chrome.webRequest.onBeforeRequest.addListener(
     ["requestBody","blocking"]
 );
 
-// checks if response is failed, and if so, start auto-retrying
-chrome.webRequest.onCompleted.addListener(
+// remove any evidence of us being here
+chrome.webRequest.onBeforeSendHeaders.addListener(
     function (details) {
-        /*console.log("Received data:");
-        console.log(details);*/
+        var headers = details.requestHeaders,
+            baseUrlRegexp = /^https?:\/\/[\da-zA-Z\.-]+\.[a-z]{2,6}/,
+            baseUrl = details.url.match(baseUrlRegexp),
+            referer;
+
+        // replace the "Origin" header with the URL being requested
+        for (var i = 0; i < headers.length; ++i) {
+            if (headers[i].name === "Origin") {
+                headers[i].value = headers[i].value.replace("chrome-extension://"+chrome.runtime.id,baseUrl);
+            }
+            if (headers[i].name === "Data-Referer") {
+                referer = headers[i].value;
+                headers.splice(i,1);
+                headers.push({name: "Referer", value: referer});
+            }
+        }
+
+        return {requestHeaders: headers};
     },
     {
-        urls: ["*://csgolounge.com/*", "*://dota2lounge.com/*"],
+        urls: ["<all_urls>"],
         types: ["xmlhttprequest"]
-    }
+    },
+    ["blocking", "requestHeaders"]
 );
 
 // example return data:

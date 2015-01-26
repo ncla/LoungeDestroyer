@@ -50,6 +50,12 @@ function capitaliseFirstLetter(string)
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
+function removeTags(text) {
+    var doc = document.implementation.createHTMLDocument("");
+    doc.body.innerHTML = text;
+    return doc.body.textContent;
+}
+
 /**
  * Perform a POST request to a url
  * @param {string} url - The URL to request to

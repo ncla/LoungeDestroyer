@@ -45,14 +45,9 @@ function init() {
                 LoungeUser.userSettings[name] = msg.changeSetting[name];
             }
         }
-        if(msg.hasOwnProperty("ajax")) {
-            // peform ajax
-            var settings = msg.ajax;
-            settings.success = function(data){sendResponse(data)};
-            settings.error = function(){sendResponse("error")};
-            $.ajax(settings);
-
-            return true;
+        if(msg.hasOwnProperty("serialize")) {
+            console.log("Serializing: ",msg);
+            sendResponse($(msg.serialize).serialize());
         }
     });
 
@@ -181,7 +176,7 @@ function init() {
                     // inject own
                     btn.addEventListener("click", function(){
                         if (this.textContent !== "Are you sure") {
-                            $(this).html("Are you sure").on("click", newFreezeReturn);
+                            $(this).text("Are you sure").on("click", newFreezeReturn);
                         }
                     });
                 }
@@ -241,7 +236,7 @@ function init() {
                     inventory.stopLoadingInventory();
                 });
                 $("#ld_cache").click(function() {
-                    $(".left").html("");
+                    $(".left").text("");
                     document.getElementById("backpack").innerHTML = '<div id="LDloading" class="spin-1"></div>';
                     inventory.getCachedInventory("bettingInventory" + appID + "_" + readCookie("id"), function(bpHTML) {
                         document.getElementById("backpack").innerHTML = bpHTML;
@@ -397,7 +392,7 @@ $(document).ready(function() {
     });
     document.body.appendChild(container);
 
-    document.body.addEventListener("click",function(ev) {
+    document.addEventListener("click",function(ev) {
         if (ev.srcElement) {
             if (ev.srcElement.id !== "preview"
                 && !$("#preview").find(ev.srcElement).length) {
@@ -406,8 +401,10 @@ $(document).ready(function() {
                 $("#preview").attr("data-index", "-1");
             }
             if (ev.srcElement.id !== "modalPreview"
-                && !$("#modalPreview").find(ev.srcElement).length) {
-                $("#modalPreview").fadeOut();
+                && !$("#modalPreview").find(ev.srcElement).length
+                && document.getElementById("modalPreview")
+                && document.getElementById("modalPreview").style.opacity!=="0") {
+                $("#modalPreview").fadeOut("fast");
             }
         }
     });
@@ -433,6 +430,7 @@ function newFreezeReturn(tries){
             success: function(data) {
                 if (data) { // this should never happen
                     console.error("Whoops, this shouldn't happen: ",data);
+                    alert(data);
                 } else {
                     console.error("This shouldn't happen.");
                 }
@@ -449,10 +447,11 @@ function newFreezeReturn(tries){
                         ordinalEnding === "3" ? "rd":
                         "th";
         document.querySelector(".destroyer.auto-info .num-tries").textContent = (tries||0)+ordinalEnding;
-        var toHide = document.querySelectorAll(".destroyer.auto-info > *:not(:first-child)");
+        var toHide = document.querySelectorAll(".destroyer.auto-info > *:not(:first-child):not(.error-text)");
         for (var i = 0, j = toHide.length; i < j; ++i) {
-            if (toHide[i].classList)
+            if (toHide[i].classList) {
                 toHide[i].classList.add("hidden");
+            }
         }
 
         var typeSpans = document.querySelectorAll(".destroyer.auto-info .type");
@@ -468,6 +467,7 @@ function newFreezeReturn(tries){
             success: function(data) {
                 if (data) {
                     console.error(data);
+                    document.querySelector(".destroyer.auto-info .error-text").textContent = data;
                     setTimeout(function(){
                         console.log("Retrying freeze for the ",tries,". time - ",data);
                         newFreezeReturn(tries+1);
