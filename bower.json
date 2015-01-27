@@ -1,0 +1,11 @@
+{
+  "name": "LoungeDestroyerWebsite",
+  "version": "1.0.0",
+  "ignore": [
+    ".jshintrc",
+    "**/*.txt"
+  ],
+  "dependencies": {
+    "foundation": "git@github.com:zurb/bower-foundation.git"
+  }
+}
