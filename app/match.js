@@ -92,7 +92,6 @@ Match.prototype.cacheMatchExtraInfo = function() {
     if(!this.matchID || !this.matchFormat || !this.exactTime || !this.game) {
         return false;
     }
-    console.log("caching shit");
     matchInfoCachev2[this.game][this.matchID] = {
         time: Date.now(),
         matchFormat: this.matchFormat,
