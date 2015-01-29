@@ -111,7 +111,7 @@ function loadExtraMatchInfo(targetElement) {
     if(!Matchik.loading && !Matchik.extraInfoAdded) {
         Matchik.parseMatchElement(targetElement);
 
-        if (matchInfoCachev2[appID].hasOwnProperty(Matchik.matchID) && Date.now() - matchInfoCachev2[appID][Matchik.matchID].time < (1 * 60 * 1000)) {
+        if (matchInfoCachev2[appID].hasOwnProperty(Matchik.matchID) && Date.now() - matchInfoCachev2[appID][Matchik.matchID].time < (5 * 60 * 1000)) {
             // Loop through every cache property and set them within the Match object
             $.each(matchInfoCachev2[appID][Matchik.matchID], function(i, v) {
                 Matchik[i] = v;
