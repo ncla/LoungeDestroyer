@@ -12,7 +12,6 @@
     "background": {
         "scripts": [
             "lib/js/jquery-2.1.1.min.js",
-            "lib/js/jquery-ajax-clientside-cache.js",
             "lib/js/css-lib.js",
             "app/errorObserver.js",
             "app/helpers.js",
@@ -52,7 +51,6 @@
                 "lib/js/jquery-ui-1.11.2.min.js",
                 "lib/js/moment.min.js",
                 "lib/js/moment-timezone-with-data.min.js",
-                "lib/js/jquery-ajax-clientside-cache.js",
                 "app/errorObserver.js",
                 "app/helpers.js",
                 "app/user.js",
@@ -86,7 +84,6 @@
             ],
             "js": [
                 "lib/js/jquery-2.1.1.min.js",
-                "lib/js/jquery-ajax-clientside-cache.js",
                 "app/errorObserver.js",
                 "app/helpers.js",
                 "app/user.js",

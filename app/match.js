@@ -6,7 +6,7 @@ var Match = function() {};
  */
 Match.prototype.fetchMatchPage = function(callback, game) {
     if(!game) {
-        game = appID || "730";
+        this.game = appID || "730";
     }
     var self = this;
     $.ajax({
@@ -86,6 +86,22 @@ Match.prototype.appendExtraMatchInfo = function(targetElement) {
     this.extraInfoAdded = true;
 };
 /**
+ * Caches the extra match info properties (exactTime, exactTimeConverted, matchFormat)
+ */
+Match.prototype.cacheMatchExtraInfo = function() {
+    if(!this.matchID || !this.matchFormat || !this.exactTime || !this.game) {
+        return false;
+    }
+    console.log("caching shit");
+    matchInfoCachev2[this.game][this.matchID] = {
+        time: Date.now(),
+        matchFormat: this.matchFormat,
+        exactTime: this.exactTime
+    };
+    chrome.storage.local.set({matchInfoCachev2: matchInfoCachev2});
+    return true;
+};
+/**
  * Loads extra match info for .matchmain element and appends it
  * @param targetElement .matchmain element on site
  */
@@ -95,12 +111,21 @@ function loadExtraMatchInfo(targetElement) {
     if(!Matchik.loading && !Matchik.extraInfoAdded) {
         Matchik.parseMatchElement(targetElement);
 
-        Matchik.loading = true;
-
-        Matchik.fetchMatchPage(function(document) {
-            Matchik.parseMatchPage(document);
+        if (matchInfoCachev2[appID].hasOwnProperty(Matchik.matchID) && Date.now() - matchInfoCachev2[appID][Matchik.matchID].time < (1 * 60 * 1000)) {
+            // Loop through every cache property and set them within the Match object
+            $.each(matchInfoCachev2[appID][Matchik.matchID], function(i, v) {
+                Matchik[i] = v;
+            });
             Matchik.appendExtraMatchInfo(targetElement);
-            Matchik.loading = false;
-        })
+        } else {
+            Matchik.loading = true;
+            Matchik.fetchMatchPage(function(document) {
+                Matchik.parseMatchPage(document);
+                Matchik.cacheMatchExtraInfo();
+                Matchik.appendExtraMatchInfo(targetElement);
+                Matchik.loading = false;
+            })
+        }
+
     }
 }

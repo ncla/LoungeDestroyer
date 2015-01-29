@@ -3,7 +3,7 @@ var appID = (window.location.hostname == "dota2lounge.com" ? "570" : "730");
 var storageMarketItems,
     currencies = {},
     themes = {},
-    matchInfoCache = {},
+    matchInfoCachev2 = {},
     streamPlaying = false,
     inventory = false,
     lastAccept = 0,
@@ -12,14 +12,13 @@ var storageMarketItems,
 var container = document.createElement("div");
 
 var LoungeUser = new User();
-chrome.storage.local.get(['marketPriceList', 'currencyConversionRates', 'themes', 'matchInfoCache', 'lastAutoAccept', 'blacklistedItemList', 'ajaxCache'], function(result) {
+chrome.storage.local.get(['marketPriceList', 'currencyConversionRates', 'themes', 'matchInfoCachev2', 'lastAutoAccept', 'blacklistedItemList', 'ajaxCache'], function(result) {
     blacklistedItemList = result.blacklistedItemList || {};
     storageMarketItems = result.marketPriceList || {};
     currencies = result.currencyConversionRates || {};
-    matchInfoCache = result.matchInfoCache || {};
+    matchInfoCachev2 = result.matchInfoCachev2 || {"730": {}, "530": {}};
     themes = result.themes || {};
     lastAccept = result.lastAutoAccept || 0;
-    ajaxCache = result.ajaxCache || {};
     LoungeUser.loadUserSettings(function() {
         console.log("User settings have been loaded in content script!");
         init();
