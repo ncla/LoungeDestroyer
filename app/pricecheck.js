@@ -1,13 +1,15 @@
-var itemName = document.title.split("Listings for ")[1];
+var itemName = $("div.market_listing_nav:eq(0) a:last-child").text().trim() || false;
 
 var LoungeUser = new User();
-chrome.storage.local.get(['currencyConversionRates'], function(result) {
+chrome.storage.local.get(['currencyConversionRates', 'ajaxCache'], function(result) {
     currencies = result.currencyConversionRates || {};
+    ajaxCache = result.ajaxCache || {};
     LoungeUser.loadUserSettings(function() {
-        console.log("User settings have been loaded in content script!");
-        $("#largeiteminfo_item_actions").append('<span class="btn_small btn_grey_white_innerfade" id="csglpricecheck">' +
-            '<span>Check CSGOLounge.com item value</span>' +
-            '</span>');
+        if(itemName) {
+            $("#largeiteminfo_item_actions").append('<span class="btn_small btn_grey_white_innerfade" id="csglpricecheck">' +
+                '<span>Check CSGOLounge.com item betting value</span>' +
+                '</span>');
+        }
 
         $("#csglpricecheck").click(function() {
             var itemFound = false;
