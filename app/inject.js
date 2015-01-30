@@ -16,7 +16,7 @@ chrome.storage.local.get(['marketPriceList', 'currencyConversionRates', 'themes'
     blacklistedItemList = result.blacklistedItemList || {};
     storageMarketItems = result.marketPriceList || {};
     currencies = result.currencyConversionRates || {};
-    matchInfoCachev2 = result.matchInfoCachev2 || {"730": {}, "530": {}};
+    matchInfoCachev2 = result.matchInfoCachev2 || {"730": {}, "570": {}};
     themes = result.themes || {};
     lastAccept = result.lastAutoAccept || 0;
     LoungeUser.loadUserSettings(function() {

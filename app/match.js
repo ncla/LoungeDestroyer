@@ -2,7 +2,7 @@ var Match = function() {};
 /**
  * Creates a request to a match page, property matchID has be set before hand on the Match object
  * @param callback Success callback, returns with document object received from the request
- * @param game "730" or "530"
+ * @param game "730" or "570"
  */
 Match.prototype.fetchMatchPage = function(callback, game) {
     if(!game) {
@@ -109,7 +109,6 @@ function loadExtraMatchInfo(targetElement) {
     var Matchik = targetElement.matchObj;
     if(!Matchik.loading && !Matchik.extraInfoAdded) {
         Matchik.parseMatchElement(targetElement);
-
         if (matchInfoCachev2[appID].hasOwnProperty(Matchik.matchID) && Date.now() - matchInfoCachev2[appID][Matchik.matchID].time < (5 * 60 * 1000)) {
             // Loop through every cache property and set them within the Match object
             $.each(matchInfoCachev2[appID][Matchik.matchID], function(i, v) {
