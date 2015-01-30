@@ -137,7 +137,7 @@ Item.prototype.generateMarketSearchURL = function() {
         throw new TypeError("'this' must be instance of Item");
     }
 
-    return window.location.protocol + '://steamcommunity.com/market/search?q=' + this.itemName;
+    return window.location.protocol + '//steamcommunity.com/market/search?q=' + this.itemName;
 };
 Item.prototype.generateMarketApiURL = function() {
     if (!(this instanceof Item)) {

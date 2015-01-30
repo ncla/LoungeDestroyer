@@ -3,7 +3,7 @@ var appID = (window.location.hostname == "dota2lounge.com" ? "570" : "730");
 var storageMarketItems,
     currencies = {},
     themes = {},
-    matchInfoCache = {},
+    matchInfoCachev2 = {},
     streamPlaying = false,
     inventory = false,
     lastAccept = 0,
@@ -12,11 +12,11 @@ var storageMarketItems,
 var container = document.createElement("div");
 
 var LoungeUser = new User();
-chrome.storage.local.get(['marketPriceList', 'currencyConversionRates', 'themes', 'matchInfoCache', 'lastAutoAccept', 'blacklistedItemList'], function(result) {
+chrome.storage.local.get(['marketPriceList', 'currencyConversionRates', 'themes', 'matchInfoCachev2', 'lastAutoAccept', 'blacklistedItemList', 'ajaxCache'], function(result) {
     blacklistedItemList = result.blacklistedItemList || {};
     storageMarketItems = result.marketPriceList || {};
     currencies = result.currencyConversionRates || {};
-    matchInfoCache = result.matchInfoCache || {};
+    matchInfoCachev2 = result.matchInfoCachev2 || {"730": {}, "530": {}};
     themes = result.themes || {};
     lastAccept = result.lastAutoAccept || 0;
     LoungeUser.loadUserSettings(function() {
@@ -350,9 +350,7 @@ function init() {
         if(LoungeUser.userSettings.showExtraMatchInfo == "2") {
             $(".matchmain").each(function(i, v) {
                 if(!$(v).find(".notavailable").length) {
-                    // Instead of repeating myself with the same code I have in .mouseover part or moving logic to somewhere else,
-                    // I just trigger the hover event
-                    $(v).trigger('mouseenter');
+                    loadExtraMatchInfo(v);
                 }
             });
         }
@@ -503,49 +501,8 @@ $(document).on("click", "a.refreshPriceMarket", function(e) {
     LoungeItem.fetchSteamMarketPrice();
 });
 $(document).on("mouseover", ".matchmain", function() {
-    if(LoungeUser.userSettings.showExtraMatchInfo != "0" && !$(this).hasClass("extraMatchInfo") && !$(this).hasClass("loading")) {
-        $(this).addClass("loading");
-
-        var matchURL = $("a[href]:eq(0)", this).attr("href"),
-            matchElement = this,
-            matchID = matchURL.replace("match?m=","");
-
-        $.ajax({
-            url: matchURL,
-            type: "GET",
-            success: function(data){
-                var doc = document.implementation.createHTMLDocument("");
-                doc.body.innerHTML = data;
-                var bestOfType = $(doc).find(".box-shiny-alt:eq(0) .half:eq(1)").text().trim(),
-                    exactTime = $(doc).find(".box-shiny-alt:eq(0) .half:eq(2)").text().trim(),
-                    matchHeaderBlock = $(".matchheader .whenm:eq(0)", matchElement);
-
-                if(exactTime) {
-                    var convertedTime = convertLoungeTime(exactTime);
-                    if(convertedTime) {
-                        exactTime = convertedTime;
-                    }
-                    $(matchHeaderBlock).append('<span class="matchExactTime"> <span class="seperator">|</span> ' + exactTime + '</span>');
-                }
-                if(bestOfType) {
-                    $(matchHeaderBlock).append(' <span class="seperator">|</span> <span class="bestoftype">' + bestOfType + '</span>');
-                }
-                $(matchElement).addClass("extraMatchInfo");
-                $(matchElement).removeClass("loading");
-
-                // trim the unneeded spaces
-                var redInfo = matchHeaderBlock[0].querySelector("span[style*='#D12121']");
-                if (redInfo) {
-                    if (!redInfo.textContent.trim().length) {
-                        matchHeaderBlock[0].removeChild(redInfo);
-                    }
-                }
-            },
-            error: function() {
-                $(matchElement).removeClass("loading");
-            }
-        });
-
+    if(LoungeUser.userSettings.showExtraMatchInfo != "0") {
+        loadExtraMatchInfo(this);
     }
 });
 
