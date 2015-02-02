@@ -2,23 +2,23 @@ var marketedItems = [],
     loadingItems = [],
     nonMarketItems = ["Dota Items", "Any Offers", "Any Knife", "Knife", "Gift", "TF2 Items", "Real Money", "Offers", "Any Common", "Any Uncommon", "Any Rare", "Any Mythical", "Any Legendary",
     "Any Ancient", "Any Immortal", "Real Money", "+ More", "Any Set", "Any Key", "Undefined / Not Tradeable", "Card", "Background", "Icon", "Gift", "DLC"],
-    csgoSkinQualities = {'Factory New': 'FN', 'Minimal Wear': 'MW', 'Well-Worn': 'WW', 'Battle-Scarred': 'BS', 'Field-Tested': 'FT'};
+    skinQualities = {'Factory New': 'FN', 'Minimal Wear': 'MW', 'Well-Worn': 'WW', 'Battle-Scarred': 'BS', 'Field-Tested': 'FT',
+                     'Common': 'C', 'Uncommon': 'UC', 'Rare': 'R', 'Mythical': 'M', 'Legendary': 'L', 'Ancient': 'AN', 'Immortal': 'I', 'Arcana': 'AR'};
 
 var Item = function(item) {
     var self = this;
     // This allows us to use the object functions as static functions without constructing the object
     if(item !== undefined) {
         this.item = item;
-        this.itemName = $(".smallimg", this.item).attr("alt");
-        if(appID == "730") {
-            $.each(csgoSkinQualities, function(i, v) {
-                if(self.itemName.indexOf(i) != -1) {
-                    self.weaponQuality = i;
-                    self.weaponQualityAbbrevation = v;
-                    return false;
-                }
-            });
-        }
+        this.itemName = $(".smallimg", this.item).attr("alt").trim();
+        var quality = $(".rarity", this.item).text().trim();
+        $.each(skinQualities, function(i, v) {
+            if(quality.indexOf(i) != -1) {
+                self.weaponQuality = i;
+                self.weaponQualityAbbrevation = v;
+                return false;
+            }
+        });
         this.convertLoungeValue();
     }
 };
@@ -37,7 +37,7 @@ Item.prototype.insertMarketValue = function(lowestPrice) {
     }
     else {
         $(".oitm:not(.marketPriced)").each(function() {
-            if ($(this).find("img.smallimg").attr("alt") == self.itemName) {
+            if ($(this).find("img.smallimg").attr("alt").trim() == self.itemName) {
                 var $theItem = $(this);
                 var itemObj = new Item($theItem);
                 $theItem.find(".rarity").html(lowestPrice);
@@ -49,7 +49,7 @@ Item.prototype.insertMarketValue = function(lowestPrice) {
 };
 
 Item.prototype.displayWeaponQuality = function() {
-    if(appID != "730" || LoungeUser.userSettings.displayCsgoWeaponQuality != "1" || typeof this.weaponQuality == 'undefined') {
+    if(LoungeUser.userSettings.displayCsgoWeaponQuality != "1" || typeof this.weaponQuality == 'undefined') {
         return false;
     }
     $(".rarity", this.item).append('<span class="weaponWear"> | ' + this.weaponQualityAbbrevation + '</span>')
@@ -92,7 +92,7 @@ Item.prototype.unloadMarketPrice = function() {
     var self = this;
     $(".oitm.marketPriced").each(function(i, v) {
         $theItem = $(v);
-        if($theItem.hasClass('marketPriced') && $theItem.find("img.smallimg").attr("alt") == self.itemName) {
+        if($theItem.hasClass('marketPriced') && $theItem.find("img.smallimg").attr("alt").trim() == self.itemName) {
             $theItem.find(".rarity").html("Fetching...");
             $theItem.removeClass('marketPriced');
         }

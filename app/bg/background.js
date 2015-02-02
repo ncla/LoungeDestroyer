@@ -384,16 +384,16 @@ function checkNewMatches(ajaxResponse, appID) {
         if($.isEmptyObject(result)) {
             // Init
             console.log("empty object");
+            newMatchStorageObject = {};
         }
-        else {
-            $.each(activeMatches, function(index, value) {
-                if (typeof result[storageName][index] == 'undefined') {
-                    console.log("Match #" + index + " is new, adding to notify list and saving in local storage.");
-                    matchesToNotificate[index] = value;
-                    newMatchStorageObject[index] = value;
-                }
-            });
-        }
+        
+        $.each(activeMatches, function(index, value) {
+            if (typeof newMatchStorageObject[index] == 'undefined') {
+                console.log("Match #" + index + " is new, adding to notify list and saving in local storage.");
+                matchesToNotificate[index] = value;
+                newMatchStorageObject[index] = value;
+            }
+        });
 
         var tempObj = {};
         tempObj[storageName] = newMatchStorageObject;
