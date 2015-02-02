@@ -7,10 +7,6 @@ var Inventory = function() {
     this.lastElementInBackpack = null; // this property is only used on individual trade pages
 
     // item groups related
-    this.grouped = false;
-    this.itemToGroup = {},
-    this.groupElms = {},
-    this.sortedGroups = [];
 
     // Determining where the backpack is
     if(document.URL.indexOf("/match?m=") != -1 || document.URL.indexOf("/predict") != -1 || document.URL.indexOf("/search") != -1 || document.URL.indexOf("/addtrade") != -1) {
@@ -242,7 +238,6 @@ Inventory.prototype.group = function() {
     if (this.grouped || this.inventoryIsLoading || LoungeUser.userSettings.groupInventory !== "1") {
         return;
     }
-
     this.grouped = true;
     this.groups = LoungeUser.userSettings.itemGroups[appID];
     this.itemToGroup = {},

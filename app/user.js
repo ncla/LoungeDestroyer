@@ -3,6 +3,7 @@ var User = function() {
 
     /* User settings */
     this.userSettings = this.defaultSettings;
+    this.userSettingsLoaded = false;
 };
 
 /* Default settings */
@@ -61,6 +62,7 @@ User.prototype.loadUserSettings = function(callback) {
             self.userSettings.autoDelay = Math.max(2, self.userSettings.autoDelay);
         }
         /* Start the scripterino */
+        self.userSettingsLoaded = true;
         callback();
     });
 };

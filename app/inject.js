@@ -1,6 +1,8 @@
 console.log("LoungeDestroyer content script has started..", +new Date());
 var appID = (window.location.hostname == "dota2lounge.com" ? "570" : "730");
 
+var LoungeUser = new User();
+
 var storageMarketItems,
     currencies = {},
     themes = {},
@@ -13,7 +15,6 @@ var storageMarketItems,
 
 var container = document.createElement("div");
 
-var LoungeUser = new User();
 chrome.storage.local.get(['marketPriceList', 'currencyConversionRates', 'themes', 'matchInfoCachev2', 'lastAutoAccept', 'blacklistedItemList', 'ajaxCache'], function(result) {
     blacklistedItemList = result.blacklistedItemList || {};
     storageMarketItems = result.marketPriceList || {};
@@ -33,8 +34,7 @@ chrome.runtime.sendMessage({injectCSSTheme: true});
 chrome.extension.onMessage.addListener(function(msg, sender, sendResponse) {
     if(msg.inventory) {
         console.log('Backpack AJAX request detected from background script with URL ', msg.inventory, +new Date());
-        console.log(LoungeUser);
-        if(LoungeUser.hasOwnProperty("userSettings")) {
+        if(LoungeUser.userSettingsLoaded) {
             inventory.onInventoryLoaded(msg.inventory);
         } else {
             earlyBackpackLoad = msg.inventory;
@@ -59,7 +59,7 @@ function init() {
      When bot status changes (detected by background.js), a message gets send from background script to content script (here).
      TODO: Pass bot status through listener.
      */
-    if(earlyBackpackLoad ) {
+    if(earlyBackpackLoad) {
         inventory.onInventoryLoaded(earlyBackpackLoad);
     }
     // do theme-related stuff
