@@ -8,7 +8,6 @@ var Inventory = function() {
 
     // item groups related
     this.grouped = false;
-    this.groups = LoungeUser.userSettings.itemGroups[appID] || {};
     this.itemToGroup = {},
     this.groupElms = {},
     this.sortedGroups = [];

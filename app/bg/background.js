@@ -273,6 +273,7 @@ var lastBackpackAjaxURL = null;
 chrome.webRequest.onCompleted.addListener(
     function(details) {
         lastBackpackAjaxURL = details.url;
+        console.log('Backpack AJAX request detected with URL ', details.url, +new Date());
         var message = {inventory: details.url};
         sendMessageToContentScript(message, details.tabId);
     },

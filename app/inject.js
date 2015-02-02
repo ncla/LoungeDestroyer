@@ -1,3 +1,4 @@
+console.log("LoungeDestroyer content script has started..", +new Date());
 var appID = (window.location.hostname == "dota2lounge.com" ? "570" : "730");
 
 var storageMarketItems,
@@ -5,9 +6,10 @@ var storageMarketItems,
     themes = {},
     matchInfoCachev2 = {},
     streamPlaying = false,
-    inventory = false,
+    inventory = new Inventory(),
     lastAccept = 0,
-    blacklistedItemList = {};
+    blacklistedItemList = {},
+    earlyBackpackLoad = false;
 
 var container = document.createElement("div");
 
@@ -20,13 +22,35 @@ chrome.storage.local.get(['marketPriceList', 'currencyConversionRates', 'themes'
     themes = result.themes || {};
     lastAccept = result.lastAutoAccept || 0;
     LoungeUser.loadUserSettings(function() {
-        console.log("User settings have been loaded in content script!");
+        console.log("User settings have been loaded in content script!", +new Date());
         init();
     });
 });
 
 // Inject theme as quickly as possible
 chrome.runtime.sendMessage({injectCSSTheme: true});
+
+chrome.extension.onMessage.addListener(function(msg, sender, sendResponse) {
+    if(msg.inventory) {
+        console.log('Backpack AJAX request detected from background script with URL ', msg.inventory, +new Date());
+        console.log(LoungeUser);
+        if(LoungeUser.hasOwnProperty("userSettings")) {
+            inventory.onInventoryLoaded(msg.inventory);
+        } else {
+            earlyBackpackLoad = msg.inventory;
+        }
+    }
+    if(msg.hasOwnProperty("changeSetting")) {
+        for(var name in msg.changeSetting) {
+            LoungeUser.userSettings[name] = msg.changeSetting[name];
+        }
+    }
+    if(msg.hasOwnProperty("serialize")) {
+        console.log("Serializing: ",msg);
+        sendResponse($(msg.serialize).serialize());
+    }
+});
+
 /*
  Wrap the init code here, because for this to function properly, we need user settings to be loaded first
  */
@@ -35,22 +59,9 @@ function init() {
      When bot status changes (detected by background.js), a message gets send from background script to content script (here).
      TODO: Pass bot status through listener.
      */
-    inventory = new Inventory();
-    chrome.extension.onMessage.addListener(function(msg, sender, sendResponse) {
-        if(msg.inventory) {
-            inventory.onInventoryLoaded(msg.inventory);
-        }
-        if(msg.hasOwnProperty("changeSetting")) {
-            for(var name in msg.changeSetting) {
-                LoungeUser.userSettings[name] = msg.changeSetting[name];
-            }
-        }
-        if(msg.hasOwnProperty("serialize")) {
-            console.log("Serializing: ",msg);
-            sendResponse($(msg.serialize).serialize());
-        }
-    });
-
+    if(earlyBackpackLoad ) {
+        inventory.onInventoryLoaded(earlyBackpackLoad);
+    }
     // do theme-related stuff
     if (LoungeUser.userSettings.currentTheme) {
         var name = LoungeUser.userSettings.currentTheme;
