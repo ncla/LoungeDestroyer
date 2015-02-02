@@ -10,7 +10,7 @@ var Item = function(item) {
     // This allows us to use the object functions as static functions without constructing the object
     if(item !== undefined) {
         this.item = item;
-        this.itemName = $(".smallimg", this.item).attr("alt");
+        this.itemName = $(".smallimg", this.item).attr("alt").trim();
         var quality = $(".rarity", this.item).text().trim();
         $.each(skinQualities, function(i, v) {
             if(quality.indexOf(i) != -1) {
@@ -37,7 +37,7 @@ Item.prototype.insertMarketValue = function(lowestPrice) {
     }
     else {
         $(".oitm:not(.marketPriced)").each(function() {
-            if ($(this).find("img.smallimg").attr("alt") == self.itemName) {
+            if ($(this).find("img.smallimg").attr("alt").trim() == self.itemName) {
                 var $theItem = $(this);
                 var itemObj = new Item($theItem);
                 $theItem.find(".rarity").html(lowestPrice);
@@ -92,7 +92,7 @@ Item.prototype.unloadMarketPrice = function() {
     var self = this;
     $(".oitm.marketPriced").each(function(i, v) {
         $theItem = $(v);
-        if($theItem.hasClass('marketPriced') && $theItem.find("img.smallimg").attr("alt") == self.itemName) {
+        if($theItem.hasClass('marketPriced') && $theItem.find("img.smallimg").attr("alt").trim() == self.itemName) {
             $theItem.find(".rarity").html("Fetching...");
             $theItem.removeClass('marketPriced');
         }
