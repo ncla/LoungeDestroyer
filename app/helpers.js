@@ -188,7 +188,7 @@ var currencyData = {
     17: { naming: "TRY", decimal: ',', id: 17, symbol: "TL", symbolBefore: false },
     18: { naming: "UAH", decimal: ',', id: 18, symbol: "₴", symbolBefore: false },
     19: { naming: "MXN", decimal: '.', id: 19, symbol: "Mex$", symbolBefore: true },
-    20: { naming: "CAD", decimal: '.', id: 20, symbol: "CDN$", symbolBefore: true },
+    20: { naming: "CAD", decimal: '.', id: 20, symbol: "C$", symbolBefore: true },
     21: { naming: "AUD", decimal: '.', id: 21, symbol: "A$", symbolBefore: true },
     22: { naming: "NZD", decimal: '.', id: 22, symbol: "NZ$", symbolBefore: true }
 };
