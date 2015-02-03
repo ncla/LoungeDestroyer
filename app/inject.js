@@ -32,6 +32,8 @@ chrome.storage.local.get(['marketPriceList', 'currencyConversionRates', 'themes'
 chrome.runtime.sendMessage({injectCSSTheme: true});
 
 chrome.extension.onMessage.addListener(function(msg, sender, sendResponse) {
+    var args = {}; // if non-empty, calls sendResponse with arguments at end
+
     if(msg.inventory) {
         console.log('Backpack AJAX request detected from background script with URL ', msg.inventory, +new Date());
         if(LoungeUser.userSettingsLoaded) {
@@ -47,7 +49,14 @@ chrome.extension.onMessage.addListener(function(msg, sender, sendResponse) {
     }
     if(msg.hasOwnProperty("serialize")) {
         console.log("Serializing: ",msg);
-        sendResponse($(msg.serialize).serialize());
+        args["serialize"] = $(msg.serialize).serialize();
+    }
+    if(msg.hasOwnProperty("cookies")) {
+        args["cookies"] = document.cookie;
+    }
+
+    if (!$.isEmptyObject(args)) {
+        sendResponse(args);
     }
 });
 
