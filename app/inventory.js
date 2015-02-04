@@ -5,10 +5,9 @@ var Inventory = function() {
     this.backpackAjaxURL = null; // newest inventory AJAX request URL
     var self = this;
     this.lastElementInBackpack = null; // this property is only used on individual trade pages
+};
 
-    // item groups related
-
-    // Determining where the backpack is
+Inventory.prototype.determineBackpackElement = function() {
     if(document.URL.indexOf("/match?m=") != -1 || document.URL.indexOf("/predict") != -1 || document.URL.indexOf("/search") != -1 || document.URL.indexOf("/addtrade") != -1) {
         this.backpackElement = $("#backpack");
     } else if(document.URL.indexOf("/trade?t=") != -1) {
@@ -17,7 +16,9 @@ var Inventory = function() {
     } else {
         this.backpackElement = false;
     }
+    return this.backpackElement
 };
+
 /*
     Goes into a loop and stops when the response is acceptable
  */
@@ -90,7 +91,7 @@ Inventory.prototype.loadInventory = function() {
     @param onlyForBackpack true or false, either load market prices for the backpack or the whole page
  */
 Inventory.prototype.getMarketPrices = function() {
-    getMarketPricesForElementList($("#backpack .oitm"));
+    getMarketPricesForElementList($("#backpack .oitm:not(.marketPriced)"));
 };
 
 /*
@@ -138,6 +139,8 @@ Inventory.prototype.stopLoadingInventory = function() {
     @param url AJAX request URL, necessary for loading inventory through this extension
  */
 Inventory.prototype.onInventoryLoaded = function(url) {
+    // Determining where the backpack is
+    this.determineBackpackElement();
     if(!this.backpackElement || this.inventoryIsLoading) {
         return false;
     }

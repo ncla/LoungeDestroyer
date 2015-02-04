@@ -311,7 +311,7 @@ function createNotification(title, message, messageType, buttons, buttonUrl) {
     }
     chrome.notifications.create(notificationID + "_" + messageType, {
         type: "basic",
-        iconUrl: "../../icons/icon_normal2.png",
+        iconUrl: "../../icons/128x128.png",
         title: title,
         message: message,
         buttons: tempButtons

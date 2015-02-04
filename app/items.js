@@ -52,6 +52,7 @@ Item.prototype.displayWeaponQuality = function() {
     if(LoungeUser.userSettings.displayCsgoWeaponQuality != "1" || typeof this.weaponQuality == 'undefined') {
         return false;
     }
+
     $(".rarity", this.item).append('<span class="weaponWear"> | ' + this.weaponQualityAbbrevation + '</span>')
 };
 
@@ -197,7 +198,7 @@ Item.prototype.appendHoverElements = function() {
  */
 function getMarketPricesForElementList(elmList) {
     if(!elmList) {
-        elmList = $("body .oitm");
+        elmList = $("body .oitm:not(.marketPriced)");
     }
     var cachedItemList = [];
 
