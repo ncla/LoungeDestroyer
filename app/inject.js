@@ -171,9 +171,6 @@ function init() {
             flash.setAttribute("wmode", "transparent");
         })();
 
-        if(LoungeUser.userSettings["itemMarketPricesv2"] == "2") {
-            getMarketPricesForElementList();
-        }
         if(document.URL.indexOf("/mybets") != -1) {
             if (LoungeUser.userSettings.renameButtons === "1") {
                 var btn = document.getElementById("freezebutton");
@@ -373,6 +370,9 @@ function init() {
                     loadExtraMatchInfo(v);
                 }
             });
+        }
+        if(LoungeUser.userSettings["itemMarketPricesv2"] == "2") {
+            getMarketPricesForElementList();
         }
     });
 }
