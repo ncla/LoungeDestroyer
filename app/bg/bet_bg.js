@@ -419,9 +419,12 @@ chrome.webRequest.onBeforeRequest.addListener(
         // if it's a bet request
         if (data.on !== undefined && data["lquality[]"] !== undefined)  {
             // ask for serialized data from tab
-            chrome.tabs.sendMessage(details.tabId, {serialize: "#betpoll"},
+            chrome.tabs.sendMessage(details.tabId, {serialize: "#betpoll", cookies: true},
                 (function(details,data,game,that){return function(d){
-                    var serializedData = d+"&match="+data.match[0]+"&tlss="+data.tlss[0];
+                    var serialized = d["serialize"],
+                        serializedData = serialized+"&match="+data.match[0]+"&tlss="+data.tlss[0],
+                        cookies = d["cookies"];
+
                     $.ajax({
                         url: details.url, 
                         type: "POST",
@@ -435,7 +438,8 @@ chrome.webRequest.onBeforeRequest.addListener(
                         error: requestListener.bind(that, details),
                         headers: {
                             "X-Requested-With": "XMLHttpRequest",
-                            "Data-Referer": bet.baseUrls[game]+"match?m="+data.match[0]
+                            "Data-Referer": bet.baseUrls[game]+"match?m="+data.match[0],
+                            "Data-Cookie": cookies
                         }
                     });
 
@@ -466,10 +470,10 @@ chrome.webRequest.onBeforeSendHeaders.addListener(
             if (headers[i].name === "Origin") {
                 headers[i].value = headers[i].value.replace("chrome-extension://"+chrome.runtime.id,baseUrl);
             }
-            if (headers[i].name === "Data-Referer") {
-                referer = headers[i].value;
+            if (headers[i].name.indexOf("Data-") === 0) {
+                headers.push({name: headers[i].name.replace("Data-",""), 
+                              value: headers[i].value});
                 headers.splice(i,1);
-                headers.push({name: "Referer", value: referer});
             }
         }
 
