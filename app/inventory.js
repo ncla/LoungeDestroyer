@@ -3,10 +3,11 @@ var backpackAjaxURLs = ['tradeBackpack', 'betBackpack'];
 var Inventory = function() {
     this.inventoryIsLoading = false; // Extension loading the inventory, not the site
     this.backpackAjaxURL = null; // newest inventory AJAX request URL
-    var self = this;
     this.lastElementInBackpack = null; // this property is only used on individual trade pages
 };
-
+/**
+ * Determining where the backpack element is located in DOM
+ */
 Inventory.prototype.determineBackpackElement = function() {
     if(document.URL.indexOf("/match?m=") != -1 || document.URL.indexOf("/predict") != -1 || document.URL.indexOf("/search") != -1 || document.URL.indexOf("/addtrade") != -1) {
         this.backpackElement = $("#backpack");
@@ -31,19 +32,23 @@ Inventory.prototype.loadInventory = function() {
     // This will be default URL if none of the conditions below are met
     var theURL = self.backpackAjaxURL;
 
-    // There are two APIs for inventory loading, we want to switch back and forth between two of them
-    // By adding and remove Api at the end of AJAX request URL
-    if(self.backpackAjaxURL.indexOf('Api') != -1) {
-        theURL = self.backpackAjaxURL.replace('Api', '');
-    } else {
-        // Loop through all the Lounge requests that support 'Api' at the end of request
-        $.each(backpackAjaxURLs, function(i, v) {
-            if(self.backpackAjaxURL.indexOf(v) != -1) {
-                theURL = self.backpackAjaxURL + 'Api';
-                return false;
-            }
-        });
+    // Don't bother with force refresh requests
+    if(self.backpackAjaxURL.indexOf('?refresh=1') == -1) {
+        // There are two APIs for inventory loading, we want to switch back and forth between two of them
+        // By adding and remove Api at the end of AJAX request URL
+        if(self.backpackAjaxURL.indexOf('Api') != -1) {
+            theURL = self.backpackAjaxURL.replace('Api', '');
+        } else {
+            // Loop through all the Lounge requests that support 'Api' at the end of request
+            $.each(backpackAjaxURLs, function(i, v) {
+                if(self.backpackAjaxURL.indexOf(v) != -1) {
+                    theURL = self.backpackAjaxURL + 'Api';
+                    return false;
+                }
+            });
+        }
     }
+
     console.log("Loading inventory with URL " , theURL);
 
     self.backpackAjaxURL = theURL;
@@ -72,7 +77,9 @@ Inventory.prototype.loadInventory = function() {
             else {
                 // Show the received error to the user and continue loading the inventory
                 document.getElementById("LDerr").innerHTML = $(data).text();
-                self.loadInventory();
+                setTimeout(function() {
+                    self.loadInventory();
+                }, 1000);
             }
         },
         error: function (xhr, text_status, error_thrown) {
