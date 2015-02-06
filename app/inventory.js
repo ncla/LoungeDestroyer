@@ -185,8 +185,16 @@ Inventory.prototype.onInventoryLoaded = function(url) {
             if(this.bettingInventoryType == "inventory") {
                 this.cacheInventory("bettingInventory" + appID + "_" + readCookie("id"), $("#backpack").html());
             }
-            addInventoryStatistics();
             this.group();
+            var statsSetting = LoungeUser.userSettings.inventoryStatisticsGroup;
+            if(statsSetting != "0") {
+                if(LoungeUser.userSettings.groupInventory == "1" && statsSetting == "2") {
+                    console.log("first inventory only");
+                    addInventoryStatistics($(".ld-item-group:eq(0)"), $("#backpack"));
+                } else {
+                    addInventoryStatistics();
+                }
+            }
         }
         if(LoungeUser.userSettings["itemMarketPricesv2"] == "2") {
             this.getMarketPrices(true);
@@ -540,7 +548,11 @@ Inventory.prototype.removeBackpackElements = function() {
 /*
  Originally created by /u/ekim43, code cleaned up by us
  */
-function addInventoryStatistics() {
+function addInventoryStatistics(targetItems, targetBackpack) {
+    if(!targetItems) {
+        targetItems = targetBackpack = $("#backpack");
+    }
+    console.log(targetItems, targetBackpack);
     var total = 0,
         itemValues = {},
         betSizes = {},
@@ -549,7 +561,7 @@ function addInventoryStatistics() {
             570: ['arcana', 'immortal', 'legendary', 'mythical', 'rare', 'uncommon', 'common', 'base']
         };
 
-    $("#backpack .item").each(function () {
+    $(".item", targetItems).each(function () {
         // Lounge provides item rarities in the classnames
         var rarity = $(this).children("div.rarity")[0].classList[1],
             e = $(this).children("div.value")[0].innerHTML;
@@ -574,13 +586,13 @@ function addInventoryStatistics() {
     var itemValues = itemValuesTemp;
 
     if(total > 0) {
-        $("#backpack").prepend('<div class="inventoryStatisticsBox">' +
+        $(targetBackpack).prepend('<div class="inventoryStatisticsBox">' +
             '<div id="totalInvValue">Your items are worth: <span>' + total.toFixed(2) + '</span></div>' +
             '<div id="rarityValuesWrapper"><div id="rarityValues"></div></div>' +
             '<div id="betSizeValues">' +
-            '<span>Small bet: ' + (.05 * total).toFixed(2) + '</span>' +
-            '<span>Medium bet: ' + (.1 * total).toFixed(2) + '</span>' +
-            '<span>Large bet: ' + (.2 * total).toFixed(2) + '</span>' +
+            '<span>Small bet: ' + ((LoungeUser.userSettings.smallBetPercentage / 100) * total).toFixed(2) + '</span>' +
+            '<span>Medium bet: ' + ((LoungeUser.userSettings.mediumBetPercentage / 100) * total).toFixed(2) + '</span>' +
+            '<span>Large bet: ' + ((LoungeUser.userSettings.largeBetPercentage / 100) * total).toFixed(2) + '</span>' +
             '</div>' +
             '</div>');
         $.each(itemValues, function(i, v) {

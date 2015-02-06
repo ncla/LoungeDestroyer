@@ -71,12 +71,59 @@ function restore_options() {
             function(){
                 that.disabled = false;
             });
-    })
+    });
+    $("#reportlog").click(function() {
+        $("#reportlog-textarea").show();
+
+        var wantedStorageItems = ["currencyConversionRates", "lastAutoAccept", "matchInfoCache", "matches", "queue", "themes", "appErrors"];
+
+        chrome.storage.local.get(null, function(result) {
+            $.each(result, function(i, v) {
+                $.each(wantedStorageItems, function(wantedStorageIndex, wantedStorageName) {
+                    if(i.indexOf(wantedStorageName) != -1) {
+                        var val = $textarea.val();
+                        val = val + i + "\n\n" + JSON.stringify(result[i]) + "\n\n";
+                        $textarea.val(val);
+                    }
+                });
+            });
+
+            console.log(result);
+        });
+        $.ajax({
+            url: 'http://api.ncla.me/itemlist.php',
+            type: 'GET',
+            success: function(data, textStatus, jqXHR) {
+                addTextToReportLog(this.url + "\n" + jqXHR.status + "\n\n");
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                addTextToReportLog(this.url + "\n" + JSON.stringify(jqXHR) + "\n\n");
+            }
+        })
+        $.ajax({
+            url: 'http://query.yahooapis.com/v1/public/yql?q=show%20tables&format=json',
+            type: 'GET',
+            success: function(data, textStatus, jqXHR) {
+                addTextToReportLog(this.url + "\n" + jqXHR.status + "\n\n");
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                addTextToReportLog(this.url + "\n" + JSON.stringify(jqXHR) + "\n\n");
+            }
+        })
+    });
+}
+
+$textarea = $("#reportlog-textarea textarea");
+
+function addTextToReportLog(text) {
+    var val = $textarea.val();
+    val = val + text;
+    $textarea.val(val);
 }
 
 document.addEventListener('DOMContentLoaded', restore_options);
 
-$(".ld-settings select").on('change', function() {
+$(".ld-settings select, .ld-settings input").on('change', function() {
     defaultUser.saveSetting(this.id, this.value);
 });
 

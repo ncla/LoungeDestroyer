@@ -37,7 +37,11 @@ User.prototype.defaultSettings =
     blacklistNonExistingItems: "0",
     groupInventory: "1",
     itemGroups: {730: {}, 570: {}},
-    displayCsgoWeaponQuality: "1"
+    displayCsgoWeaponQuality: "1",
+    inventoryStatisticsGroup: "1",
+    smallBetPercentage: "5",
+    mediumBetPercentage: "10",
+    largeBetPercentage: "20"
 };
 
 User.prototype.loadUserSettings = function(callback) {
