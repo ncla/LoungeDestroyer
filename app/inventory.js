@@ -545,7 +545,7 @@ function addInventoryStatistics() {
         itemValues = {},
         betSizes = {},
         itemQualities = {
-            730: ['exotic', 'remarkable', 'contraband', 'high', 'base', 'covert', 'classified', 'restricted', 'industrial', 'mil-spec', 'consumer', 'base'],
+            730: ['exotic', 'remarkable', 'contraband', 'high', 'covert', 'classified', 'restricted', 'industrial', 'mil-spec', 'consumer', 'base'],
             570: ['arcana', 'immortal', 'legendary', 'mythical', 'rare', 'uncommon', 'common', 'base']
         };
 
