@@ -248,11 +248,12 @@ Inventory.prototype.group = function() {
     if (this.grouped || this.inventoryIsLoading || LoungeUser.userSettings.groupInventory !== "1") {
         return;
     }
+
     this.grouped = true;
     this.groups = LoungeUser.userSettings.itemGroups[appID];
-    this.itemToGroup = {},
-    this.groupElms = {},
-    this.sortedGroups = [];
+    this.itemToGroup = {}, // {"name": ["group-1","group-2"], ...}
+    this.groupElms = {}, // {"group-1": <elm>, ...}
+    this.sortedGroups = []; // ["group-1", "group-2", ...]
 
     var bp = $(this.backpackElement.selector),
         defaultGroup = document.createElement("div"),
@@ -272,7 +273,11 @@ Inventory.prototype.group = function() {
     // setup itemToGroup/groupElms variables and create group elements
     $.each(this.groups,function(groupName, group){
         $(group.items).each(function(i, name){
-            self.itemToGroup[name] = groupName;
+            if (!self.itemToGroup.hasOwnProperty(name)) {
+                self.itemToGroup[name] = [];
+            }
+
+            self.itemToGroup[name].push(groupName);
         });
 
         self.createGroupElm(groupName);
@@ -396,14 +401,37 @@ Inventory.prototype.sortItems = function(){
     var self = this;
 
     $(this.backpackElement.selector+" .oitm").each(function(ind, elm){
+        // move to default first, for testing for empty room later
+        self.groupElms["default"].appendChild(elm);
+
         var name = elm.querySelector(".name > b");
+
         if (!name) {
             return;
         }
         name = name.textContent;
-        var group = self.itemToGroup[name] || "default";
-        
-        self.groupElms[group].appendChild(elm);
+
+        // loop through groups that contain this item
+        for (var i in self.itemToGroup[name]) {
+            var group = self.itemToGroup[name][i];
+            // check if said group has empty space for this
+            if (self.groupElms[group]) {
+                var numInGroup = $(".name > b:contains('"+name+"')", self.groupElms[group]).length,
+                    numInArr = 0,
+                    ind = -1;
+
+                // count number of times the group is in itemToGroup[name]
+                while ((ind = self.itemToGroup[name].indexOf(group, ind+1)) !== -1) {
+                    ++numInArr;
+                }
+
+                // if there's an empty space in the group
+                if (numInGroup < numInArr) {
+                    self.groupElms[group].appendChild(elm);
+                    break;
+                }
+            }
+        }
     });
 };
 /*
@@ -472,7 +500,11 @@ Inventory.prototype.createGroupElm = function(groupName) {
 
         // move items to default
         $.each(self.groups[groupName].items, function(ind,name){
-            delete self.itemToGroup[name];
+            var i = self.itemToGroup[name].indexOf(groupName);
+            if (i !== -1) {
+                self.itemToGroup[name].splice(i, 1);
+            }
+            //delete self.itemToGroup[name];
         });
 
         // remove from groups
@@ -510,15 +542,19 @@ Inventory.prototype.makeItemsSortable = function(){
         // if we moved it from an existing group (and not default)
         if (groupName) {
             self.groups[groupName].items.splice(self.groups[groupName].items.indexOf(name),1);
+            var ind = self.itemToGroup[name].indexOf(groupName);
+            if (ind !== -1) {
+                self.itemToGroup[name].splice(ind, 1);
+            }
         }
         // if we moved it to an existing group (and not default)
         if (thisGroupName) {
-            if (self.groups[thisGroupName].items.indexOf(name) === -1) {
-                self.groups[thisGroupName].items.push(name);
+            self.groups[thisGroupName].items.push(name);
+            if (self.itemToGroup[name]) {
+                self.itemToGroup[name].push(thisGroupName);
+            } else {
+                self.itemToGroup[name] = [thisGroupName];
             }
-            self.itemToGroup[name] = thisGroupName;
-        } else {
-            delete self.itemToGroup[name];
         }
 
         var fullGroups = LoungeUser.userSettings.itemGroups;
