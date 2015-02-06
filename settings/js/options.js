@@ -124,6 +124,13 @@ function addTextToReportLog(text) {
 document.addEventListener('DOMContentLoaded', restore_options);
 
 $(".ld-settings select, .ld-settings input").on('change', function() {
+    // make sure number inputs are limited to their min/max settings
+    if (this.type === "number" && (this.hasOwnProperty("min") || this.hasOwnProperty("max"))) {
+        var min = this.min!==undefined ? this.min : Infinity,
+            max = this.max!==undefined ? this.max : -Infinity;
+
+        this.value = Math.min(Math.max(this.value, min), max);
+    }
     defaultUser.saveSetting(this.id, this.value);
 });
 
