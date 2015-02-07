@@ -257,10 +257,12 @@ function init() {
                     document.getElementById("backpack").innerHTML = '<div id="LDloading" class="spin-1"></div>';
                     inventory.getCachedInventory("bettingInventory" + appID + "_" + readCookie("id"), function(bpHTML) {
                         document.getElementById("backpack").innerHTML = bpHTML;
-                        this.bettingInventoryType = "inventory";
+                        inventory.onInventoryLoaded("", true);
+                        /*this.bettingInventoryType = "inventory";
                         addInventoryStatistics();
                         inventory.group();
-                        inventory.getMarketPrices(true);
+                        inventory.getMarketPrices(true);*/
+
                     });
                 });
             }

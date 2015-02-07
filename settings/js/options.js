@@ -31,6 +31,41 @@ function restore_options() {
                 $(".ld-settings #" + index).val(value);
         });
 
+        // populate group <select> for inventory statistics
+        $.each(Settings.itemGroups, function(gameId, groups){
+            var optgroup = document.querySelector("optgroup[group='"+gameId+"']");
+            if (optgroup) {
+                // first generate for ungrouped, to make sure it's at the top
+                optgroup.appendChild(generateOpt("default", "Ungrouped"));
+
+                $.each(groups, function(groupName, group){
+                    optgroup.appendChild(generateOpt(groupName, group.title));
+                });
+            }
+
+            // temporary function for less DRYness
+            function generateOpt(groupName, groupTitle) {
+                var opt = document.createElement("option");
+                opt.value = groupName;
+                opt.textContent = groupTitle;
+                if (Settings.inventoryStatisticsGroup[gameId].indexOf(groupName)!==-1) {
+                    opt.setAttribute("selected", "true");
+                }
+                return opt;
+            }
+        });
+
+        // set 'selected' on Disabled/Enabled for inventory statistics
+        if (Settings.inventoryStatisticsGroup["570"].indexOf("0")!==-1){
+            document.querySelector("#inventoryStatisticsGroup option[value='0']")
+                .setAttribute("selected", "true");
+        }
+        if (Settings.inventoryStatisticsGroup["570"].indexOf("1")!==-1){
+            document.querySelector("#inventoryStatisticsGroup option[value='1']")
+                .setAttribute("selected", "true");
+        }
+
+        // populate themes
         var curTheme = document.querySelector(".item[data-theme-name='"+Settings.currentTheme+"']");
         if (curTheme) {
             var act;
@@ -131,6 +166,54 @@ $(".ld-settings select, .ld-settings input").on('change', function() {
 
         this.value = Math.min(Math.max(this.value, min), max);
     }
+
+    // handles <select multiple>'s.
+    // Also adds support for the "solo" keyword, making an option selectable only by itself
+    // resulting setting is in format:
+    //   {optgroup-1: [val-1, ...], optgroup-2: [val-2, ...]}
+    if (this.type === "select-multiple") {
+        var opts = this.selectedOptions,
+            groupElms = this.querySelectorAll("optgroup"),
+            groups = [],
+            outp = {};
+
+        // turn groups into an array of names
+        for (var i = 0, j = groupElms.length; i < j; ++i) {
+            groups[i] = groupElms[i].getAttribute("group");
+            outp[groups[i]] = [];
+        }
+
+        for (var i = 0, j = opts.length; i < j; ++i) {
+            var val = opts[i].value,
+                solo = opts[i].hasAttribute("solo"),
+                inGroup = opts[i].parentNode.tagName === "OPTGROUP",
+                group = opts[i].parentNode.getAttribute("group");
+
+            // if a "solo" option is selected, save that alone and exit
+            if (solo) {
+                this.value = val;
+                outp = {};
+                for (var i = 0; i < groups.length; ++i) {
+                    outp[groups[i]] = [val];
+                }
+                break;
+            }
+
+            // otherwise, add option to its group (or all groups, if it doesn't have one)
+            if (inGroup) {
+                outp[group].push(val);
+            } else {
+                for (var k = 0; k < groups.length; ++k) {
+                    outp[groups[k]].push(val);
+                }
+            }
+        }
+
+        defaultUser.saveSetting(this.id, outp);
+        return;
+    }
+
+    // save setting
     defaultUser.saveSetting(this.id, this.value);
 });
 

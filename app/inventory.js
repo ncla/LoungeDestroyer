@@ -145,53 +145,100 @@ Inventory.prototype.stopLoadingInventory = function() {
     Gets called every time the inventory has loaded (except sometimes manually fired on match page)
     @param url AJAX request URL, necessary for loading inventory through this extension
  */
-Inventory.prototype.onInventoryLoaded = function(url) {
+Inventory.prototype.onInventoryLoaded = function(url, fromCache) {
     // Determining where the backpack is
-    this.determineBackpackElement();
-    if(!this.backpackElement || this.inventoryIsLoading) {
-        return false;
-    }
     console.log("onInventoryLoaded has been fired");
-    this.backpackAjaxURL = url;
+    if (!fromCache) {
+        this.determineBackpackElement();
+        if(!this.backpackElement || this.inventoryIsLoading) {
+            return false;
+        }
+        this.backpackAjaxURL = url;
 
-    var whereToLookAt = $("#backpack");
-    /*
-        Special care for trade page backpacks, since backpack is appended and not replaced on trade page,
-        we have to wrap all elements and then check against that
-     */
-    if(document.URL.indexOf("/trade?t=") != -1) {
-        whereToLookAt = $(this.lastElementInBackpack).nextAll();
-        var testFake = $("<div/>");
-        $(whereToLookAt).each(function(i, v) {
-            var theClone = $(v).clone();
-            $(testFake).append(theClone);
-        });
+        var whereToLookAt = $("#backpack");
+        /*
+            Special care for trade page backpacks, since backpack is appended and not replaced on trade page,
+            we have to wrap all elements and then check against that
+         */
+        if(document.URL.indexOf("/trade?t=") != -1) {
+            whereToLookAt = $(this.lastElementInBackpack).nextAll();
+            var testFake = $("<div/>");
+            $(whereToLookAt).each(function(i, v) {
+                var theClone = $(v).clone();
+                $(testFake).append(theClone);
+            });
 
-        whereToLookAt = testFake;
+            whereToLookAt = testFake;
+        }
+    } else {
+        this.bettingInventoryType = "inventory";
     }
 
-    if($(whereToLookAt).text().indexOf("Can't get items.") != -1) {
+    if($(whereToLookAt).text().indexOf("Can't get items.") !== -1 && !fromCache) {
         console.log("Failure to get items!");
         this.addInventoryLoadButton(this.backpackElement);
-    } else if($(whereToLookAt).text().trim().length == 0) {
+    } else if($(whereToLookAt).text().trim().length === 0 && !fromCache) {
         console.log("Empty response!");
         this.addInventoryLoadButton(this.backpackElement);
     } else {
         console.log("Assuming the backpack has loaded!");
         this.determineBackpackType();
         $("#loading", this.backpackElement).hide();
-        if(document.URL.indexOf("/match?m=") != -1) {
+        if(document.URL.indexOf("/match?m=") !== -1 || fromCache) {
             // We only need to cache the betting inventories
             if(this.bettingInventoryType == "inventory") {
                 this.cacheInventory("bettingInventory" + appID + "_" + readCookie("id"), $("#backpack").html());
             }
             this.group();
-            var statsSetting = LoungeUser.userSettings.inventoryStatisticsGroup;
-            if(statsSetting != "0") {
-                if(LoungeUser.userSettings.groupInventory == "1" && statsSetting == "2") {
-                    console.log("first inventory only");
-                    addInventoryStatistics($(".ld-item-group:eq(0)"), $("#backpack"));
+
+            // limit the inventory statistics to the groups the user has chosen
+            var statsSetting = LoungeUser.userSettings.inventoryStatisticsGroup[appID];
+            if(statsSetting.indexOf("0") === -1) {
+                if(LoungeUser.userSettings.groupInventory == "1" && statsSetting.indexOf("1") === -1) {
+                    var groups = [],
+                        bp = $("#backpack");
+
+                    for (var i = 0; i < statsSetting.length; ++i) {
+                        var elm = document.querySelector(".ld-item-group[data-group-name='"+statsSetting[i]+"']");
+                        if (elm) {
+                            groups.push(elm);
+                        } else {
+                            console.error("Could not find a group with id ",statsSetting[i]);
+                        }
+                    }
+
+                    // if one or more groups are found, add stats for them
+                    if (groups.length > 0) {
+                        console.log("Adding statistics for ",groups);
+                        var names = [],
+                            items;
+
+                        // merge all item groups into jQuery object, and store titles in names
+                        for (var i = 0, j = groups.length; i < j; ++i) {
+                            var groupTitle = statsSetting[i],
+                                itemGroups = LoungeUser.userSettings.itemGroups[appID];
+
+                            if (itemGroups.hasOwnProperty(statsSetting[i])) {
+                                names.push(itemGroups[statsSetting[i]].title);
+                            } else if (groupTitle === "default") {
+                                names.push("Default")
+                            }
+
+                            if (!items) {
+                                items = $(groups[i]);
+                            } else {
+                                items.add(groups[i]);
+                            }
+                        }
+
+                        addInventoryStatistics(items, bp, names.join("+"));
+                    // otherwise, add stats for everything
+                    } else {
+                        console.log("Adding all statistics");
+                        addInventoryStatistics();
+                    }
                 } else {
+                    console.log("Adding statistics to everything #2");
                     addInventoryStatistics();
                 }
             }
@@ -274,6 +321,7 @@ Inventory.prototype.group = function() {
 
     this.groupElms["default"] = defaultGroup;
     defaultGroup.className = "ld-item-group";
+    defaultGroup.setAttribute("data-group-name", "default");
     mainWrapper.className = "ld-item-groups-main-wrapper";
     bp.append(defaultGroup);
     bp.append(mainWrapper);
@@ -588,11 +636,14 @@ Inventory.prototype.removeBackpackElements = function() {
 /*
  Originally created by /u/ekim43, code cleaned up by us
  */
-function addInventoryStatistics(targetItems, targetBackpack) {
+function addInventoryStatistics(targetItems, targetBackpack, groupName) {
     if(!targetItems) {
         targetItems = targetBackpack = $("#backpack");
     }
-    console.log(targetItems, targetBackpack);
+    if (groupName && groupName.length > 18) {
+        groupName = groupName.substr(0,15)+"..."
+    }
+
     var total = 0,
         itemValues = {},
         betSizes = {},
@@ -623,11 +674,12 @@ function addInventoryStatistics(targetItems, targetBackpack) {
             itemValuesTemp[v] = itemValues[v]
         }
     });
-    var itemValues = itemValuesTemp;
+    var itemValues = itemValuesTemp,
+        groupString = groupName ? "in <span class='stats-group-names'>"+groupName+"</span> " : "";
 
     if(total > 0) {
         $(targetBackpack).prepend('<div class="inventoryStatisticsBox">' +
-            '<div id="totalInvValue">Your items are worth: <span>' + total.toFixed(2) + '</span></div>' +
+            '<div id="totalInvValue">Your items '+groupString+'are worth: <span>' + total.toFixed(2) + '</span></div>' +
             '<div id="rarityValuesWrapper"><div id="rarityValues"></div></div>' +
             '<div id="betSizeValues">' +
             '<span>Small bet: ' + ((LoungeUser.userSettings.smallBetPercentage / 100) * total).toFixed(2) + '</span>' +

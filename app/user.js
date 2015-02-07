@@ -93,5 +93,5 @@ User.prototype.saveSetting = function(settingName, settingValue) {
     } else {
         chrome.runtime.sendMessage({changeSetting: theSetting}); // sending it to background.js
     }
-    console.log("Saving user setting [" + settingName +"] to " +settingValue);
+    console.log("Saving user setting [" + settingName +"] to ",settingValue);
 };
