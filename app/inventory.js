@@ -145,46 +145,42 @@ Inventory.prototype.stopLoadingInventory = function() {
     Gets called every time the inventory has loaded (except sometimes manually fired on match page)
     @param url AJAX request URL, necessary for loading inventory through this extension
  */
-Inventory.prototype.onInventoryLoaded = function(url, fromCache) {
+Inventory.prototype.onInventoryLoaded = function(url) {
     // Determining where the backpack is
+    this.determineBackpackElement();
+    if(!this.backpackElement || this.inventoryIsLoading) {
+        return false;
+    }
     console.log("onInventoryLoaded has been fired");
-    if (!fromCache) {
-        this.determineBackpackElement();
-        if(!this.backpackElement || this.inventoryIsLoading) {
-            return false;
-        }
-        this.backpackAjaxURL = url;
+    this.backpackAjaxURL = url;
 
-        var whereToLookAt = $("#backpack");
-        /*
-            Special care for trade page backpacks, since backpack is appended and not replaced on trade page,
-            we have to wrap all elements and then check against that
-         */
-        if(document.URL.indexOf("/trade?t=") != -1) {
-            whereToLookAt = $(this.lastElementInBackpack).nextAll();
-            var testFake = $("<div/>");
-            $(whereToLookAt).each(function(i, v) {
-                var theClone = $(v).clone();
-                $(testFake).append(theClone);
-            });
+    var whereToLookAt = $("#backpack");
+    /*
+        Special care for trade page backpacks, since backpack is appended and not replaced on trade page,
+        we have to wrap all elements and then check against that
+     */
+    if(document.URL.indexOf("/trade?t=") != -1) {
+        whereToLookAt = $(this.lastElementInBackpack).nextAll();
+        var testFake = $("<div/>");
+        $(whereToLookAt).each(function(i, v) {
+            var theClone = $(v).clone();
+            $(testFake).append(theClone);
+        });
 
-            whereToLookAt = testFake;
-        }
-    } else {
-        this.bettingInventoryType = "inventory";
+        whereToLookAt = testFake;
     }
 
-    if($(whereToLookAt).text().indexOf("Can't get items.") !== -1 && !fromCache) {
+    if($(whereToLookAt).text().indexOf("Can't get items.") !== -1) {
         console.log("Failure to get items!");
         this.addInventoryLoadButton(this.backpackElement);
-    } else if($(whereToLookAt).text().trim().length === 0 && !fromCache) {
+    } else if($(whereToLookAt).text().trim().length === 0) {
         console.log("Empty response!");
         this.addInventoryLoadButton(this.backpackElement);
     } else {
         console.log("Assuming the backpack has loaded!");
         this.determineBackpackType();
         $("#loading", this.backpackElement).hide();
-        if(document.URL.indexOf("/match?m=") !== -1 || fromCache) {
+        if(document.URL.indexOf("/match?m=") !== -1) {
             // We only need to cache the betting inventories
             if(this.bettingInventoryType == "inventory") {
                 this.cacheInventory("bettingInventory" + appID + "_" + readCookie("id"), $("#backpack").html());
@@ -644,6 +640,8 @@ function addInventoryStatistics(targetItems, targetBackpack, groupName) {
         groupName = groupName.substr(0,15)+"..."
     }
 
+    console.log("Adding stats "+groupName, targetBackpack);
+
     var total = 0,
         itemValues = {},
         betSizes = {},
@@ -677,6 +675,7 @@ function addInventoryStatistics(targetItems, targetBackpack, groupName) {
     var itemValues = itemValuesTemp,
         groupString = groupName ? "in <span class='stats-group-names'>"+groupName+"</span> " : "";
 
+    console.log("Total: ",total,$(".item",targetItems));
     if(total > 0) {
         $(targetBackpack).prepend('<div class="inventoryStatisticsBox">' +
             '<div id="totalInvValue">Your items '+groupString+'are worth: <span>' + total.toFixed(2) + '</span></div>' +
@@ -690,5 +689,8 @@ function addInventoryStatistics(targetItems, targetBackpack, groupName) {
         $.each(itemValues, function(i, v) {
             $("#rarityValues").append('<div class="rarityContainer"><div><span class="' + i + '">' + capitaliseFirstLetter(i) + '</span>: ' + v.toFixed(2) + '</div></div>');
         });
+    } else {
+        $(targetBackpack).prepend('<div class="inventoryStatisticsBox">'+
+            '<div id="totalInvValue">No items '+groupString+'to add statistics for.</div></div>');
     }
 }

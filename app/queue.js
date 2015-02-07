@@ -31,7 +31,7 @@ $(document).ready(function(){
 				}
 
 				// time left
-				if (elm.id === "timebet") {
+				if (["timeret","timebet"].indexOf(elm.id)!==-1) {
 					var time = parseInt(elm.textContent);
 
 					time = time ? Date.now() + time*1000 : 0;

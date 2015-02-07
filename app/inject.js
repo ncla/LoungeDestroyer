@@ -257,7 +257,7 @@ function init() {
                     document.getElementById("backpack").innerHTML = '<div id="LDloading" class="spin-1"></div>';
                     inventory.getCachedInventory("bettingInventory" + appID + "_" + readCookie("id"), function(bpHTML) {
                         document.getElementById("backpack").innerHTML = bpHTML;
-                        inventory.onInventoryLoaded("", true);
+                        inventory.onInventoryLoaded("");
                         /*this.bettingInventoryType = "inventory";
                         addInventoryStatistics();
                         inventory.group();
