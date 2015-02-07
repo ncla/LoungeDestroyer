@@ -30,20 +30,22 @@ $(document).ready(function(){
 					continue;
 				}
 
-				// other than protection code, we're only interested in links
+				// time left
+				if (elm.id === "timebet") {
+					var time = parseInt(elm.textContent);
+
+					time = time ? Date.now() + time*1000 : 0;
+
+					queue.time = time;
+				}
+
+				// other than protection code/time, we're only interested in links
 				if (elm.nodeName !== "A")
 					continue;
 
 				// link to offer
 				if (elm.className === "button") {
-					var placedTime = parseInt(localStorage.whenret) > parseInt(localStorage.whenbet) ?
-					                 parseInt(localStorage.whenret) :
-					                 parseInt(localStorage.whenbet);
-
 					queue.offer = elm.href || false;
-					queue.time = placedTime ?
-					             placedTime + 420000 :
-					             0;
 				}
 			}
 		}
