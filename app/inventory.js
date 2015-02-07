@@ -640,8 +640,6 @@ function addInventoryStatistics(targetItems, targetBackpack, groupName) {
         groupName = groupName.substr(0,15)+"..."
     }
 
-    console.log("Adding stats "+groupName, targetBackpack);
-
     var total = 0,
         itemValues = {},
         betSizes = {},
@@ -675,7 +673,6 @@ function addInventoryStatistics(targetItems, targetBackpack, groupName) {
     var itemValues = itemValuesTemp,
         groupString = groupName ? "in <span class='stats-group-names'>"+groupName+"</span> " : "";
 
-    console.log("Total: ",total,$(".item",targetItems));
     if(total > 0) {
         $(targetBackpack).prepend('<div class="inventoryStatisticsBox">' +
             '<div id="totalInvValue">Your items '+groupString+'are worth: <span>' + total.toFixed(2) + '</span></div>' +
