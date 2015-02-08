@@ -110,6 +110,10 @@ function restore_options() {
                 that.disabled = false;
             });
     });
+    $("#restoreDefaults").click(function() {
+        defaultUser.restoreDefaults();
+        document.location.reload();
+    });
     $("#reportlog").click(function() {
         $("#reportlog-textarea").show();
 
