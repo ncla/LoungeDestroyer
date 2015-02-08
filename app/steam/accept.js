@@ -5,20 +5,27 @@ chrome.storage.local.get("queue", function(data){
     // load previously saved accept delay
     chrome.runtime.sendMessage({"getSetting": ["acceptDelay", "enableAuto"]}, function(resp){
     	console.log("Settings: ",resp);
-    	if (["2","0"].indexOf(resp.enableAuto) !== -1)
+    	if (["2","0"].indexOf(resp.enableAuto) !== -1) {
     		return;
+    	}
 
     	data = data.queue;
 
-		if (!data)
+		if (!data) {
+			console.log("No queue object");
 			return;
+		}
 		var code = /Protection code: ([0-9A-Z]{4})/.exec(document.querySelector(".quote").textContent)[1],
 		    urlRegex = /https?:\/\/(.*)/;
 		
-		if (!code || code !== data.protectionCode)
+		if (!code || code !== data.protectionCode) {
+			console.log("Protection code does not match: ",code,"!==",data.protectionCode);
 			return;
-		if (!document.URL || urlRegex.exec(document.URL)[1] !== urlRegex.exec(data.offer)[1])
+		}
+		if (!document.URL || urlRegex.exec(document.URL)[1] !== urlRegex.exec(data.offer)[1]) {
+			console.log("URL does not match: ",urlRegex.exec(document.URL)[1],"!==",urlRegex.exec(data.offer)[1]);
 			return;
+		}
 
 		console.log("Enabling");
 		autoAccepting = true;
@@ -41,16 +48,21 @@ chrome.storage.local.get("queue", function(data){
 
     	container.querySelector("#accept-time").valueAsNumber = resp.acceptDelay || 30;
 
-	    var acceptTime = Math.min(data.time, Date.now()+(resp.acceptDelay || 30)*1000);
-	    if (!data.time || acceptTime-Date.now() < 10000) // won't accept offers with <10 sec left
+	    var now = Date.now(),
+	        acceptTime = Math.min(data.time, now+(resp.acceptDelay || 30)*1000);
+	    
+	    if (!data.time || acceptTime-now < 10000) { // won't accept offers with <10 sec left
+			console.log("Too little time left: ",(acceptTime-Date.now())/1000);
 			return;
+		}
 
 	    timer = setTimeout(acceptOffer, acceptTime-Date.now());
 
 	    // update timer
 	    (function timerLoop(){
-	    	if (!autoAccepting)
+	    	if (!autoAccepting) {
 	    		return;
+	    	}
 
 	        var span = container.querySelector(".destroyer.info .time-left");
 	        span.textContent = ((acceptTime - Date.now())/1000).toFixed(2) + "s";
@@ -72,14 +84,16 @@ function acceptOffer(){
 	var obs = new MutationObserver(function(records){
 		for (var i = 0; i < records.length; ++i) {
 			var record = records[i];
-			if (!record.type === "childList" || !record.addedNodes)
+			if (!record.type === "childList" || !record.addedNodes) {
 				continue;
+			}
 
 			// loop through every added node
 			for (var j = 0, k = record.addedNodes.length; j < k; ++j) {
 				var elm = record.addedNodes[j];
-				if (elm.className !== "newmodal")
-					return;
+				if (elm.className !== "newmodal") {
+					continue;
+				}
 
 				elm.querySelector(".btn_green_white_innerfade").click();
 				document.getElementById("trade_confirmbtn").click()

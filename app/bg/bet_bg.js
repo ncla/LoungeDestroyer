@@ -4,8 +4,9 @@
  *   autoReturn - for autoReturn
  */
 chrome.extension.onMessage.addListener(function (request, sender, sendResponse) {
-    if (!sender.url)
+    if (!sender.url) {
         return;
+    }
 
     var game = sender.url.indexOf("http://csgolounge.com/") === 0 ? 0 :
                sender.url.indexOf("http://dota2lounge.com/") === 0 ? 1 :
@@ -68,8 +69,9 @@ function handleQueue(data, game) {
 
         if (["0","2"].indexOf(LoungeUser.userSettings.enableAuto) === -1) {
             chrome.tabs.query({url: data.offer}, function(tabs){
-                if (tabs.length !== 0)
+                if (tabs.length !== 0) {
                     return;
+                }
 
                 chrome.tabs.create({url: data.offer});
             });
@@ -283,8 +285,9 @@ bet.autoLoop = function(game) {
             }
         });
     }
-    if (game===0 || game===1)
+    if (game===0 || game===1) {
         return success[game];
+    }
 
     return true;
 };
@@ -354,8 +357,9 @@ var pathRegexp = new RegExp("https?://.*?/(.*)");
 // overwrite betting/return requests for autoing
 chrome.webRequest.onBeforeRequest.addListener(
     function requestListener(details) {
-        if (["0","3"].indexOf(LoungeUser.userSettings.enableAuto) !== -1)
+        if (["0","3"].indexOf(LoungeUser.userSettings.enableAuto) !== -1) {
             return;
+        }
 
         var data,
             newCallback,
@@ -363,14 +367,17 @@ chrome.webRequest.onBeforeRequest.addListener(
                    details.url.indexOf("http://dota2lounge.com/") === 0 ? 1 :
                    -1;
 
-        if (bet.autoBetting[game] || game === -1)
+        if (bet.autoBetting[game] || game === -1) {
             return;
-        if (details.tabId === -1)
+        }
+        if (details.tabId === -1) {
             return;
+        }
 
         if (details.method === "POST") {
-            if (!details.requestBody || !details.requestBody.formData)
+            if (!details.requestBody || !details.requestBody.formData) {
                 return;
+            }
 
             data = details.requestBody.formData;
         }
@@ -397,8 +404,9 @@ chrome.webRequest.onBeforeRequest.addListener(
 
         // if it's a return request
         if (details.method === "GET") { // gawd damnit csgl, why did you have to make returning a two-step process
-            if (pathRegexp.exec(details.url)[1] !== "ajax/postToReturn.php")
+            if (pathRegexp.exec(details.url)[1] !== "ajax/postToReturn.php") {
                 return;
+            }
             
             $.ajax({
                 url: details.url, 

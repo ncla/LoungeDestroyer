@@ -111,8 +111,9 @@ function init() {
             if (theme.options) {
                 var classes = " ";
                 for (var k in theme.options) {
-                    if (theme.options[k].checked)
+                    if (theme.options[k].checked) {
                         classes += k+" ";
+                    }
                 }
                 $(document).ready(function(){
                     document.body.className += classes;
@@ -144,8 +145,9 @@ function init() {
 
             if (!flash) { // it's a hitbox stream
                 flash = document.querySelector("#mainstream iframe:first-child");
-                if (!flash)
+                if (!flash) {
                     return;
+                }
 
                 flash.contentWindow.document.addEventListener("click", function(){
                     streamPlaying = true
@@ -154,13 +156,15 @@ function init() {
                 return
             }
 
-            if (!container)
+            if (!container) {
                 return;
+            }
 
             flash = flash.document || flash;
 
-            if (!flash)
+            if (!flash) {
                 return;
+            }
 
             // onclick/onmousedown doesn't fire on flash objects
             container.addEventListener("mousedown", function(){
@@ -174,8 +178,9 @@ function init() {
         if(document.URL.indexOf("/mybets") != -1) {
             if (LoungeUser.userSettings.renameButtons === "1") {
                 var btn = document.getElementById("freezebutton");
-                if (btn)
+                if (btn) {
                     btn.textContent = "FUCKING REQUEST RETURNS";
+                }
             }
 
             if (["2","1"].indexOf(LoungeUser.userSettings.enableAuto) !== -1) {
@@ -276,15 +281,18 @@ function init() {
         // add custom 'Preview' buttons to trades that don't have it
         // first create preview element if it doesn't exist
         (function(){
-            if (LoungeUser.userSettings.addTradePreviews === "0")
+            if (LoungeUser.userSettings.addTradePreviews === "0") {
                 return;
-            if (!document.getElementById("logout"))
+            }
+            if (!document.getElementById("logout")) {
                 return;
+            }
 
             var previewElm = document.getElementById("preview");
             
-            if (previewElm)
+            if (previewElm) {
                 return;
+            }
 
             if (document.querySelector(".tradepoll")) {
                 previewElm = document.createElement("section");
@@ -305,8 +313,9 @@ function init() {
                     btn.innerHTML = "Preview";
                     btn.style.float = "none";
 
-                    if (!header)
+                    if (!header) {
                         return;
+                    }
                     if (!span) {
                         // if buttons already exist in header, don't place within span
                         if (elm.querySelector(".tradeheader > a.button")) {
@@ -322,10 +331,11 @@ function init() {
 
                     var tradeId = elm.querySelector("a[href^=\"trade?\"]"),
                         self = this instanceof $ ? this : $(this);
-                    if (tradeId)
+                    if (tradeId) {
                         tradeId = tradeId.getAttribute("href").replace("trade?t=","");
-                    else
+                    } else {
                         return;
+                    }
 
                     // magic happens here
                     btn.addEventListener("click", function(){
@@ -433,8 +443,9 @@ $(document).ready(function() {
 
 // postToFreezeReturn overwrite
 function newFreezeReturn(tries){
-    if (typeof tries !== "number")
+    if (typeof tries !== "number") {
         tries = 1;
+    }
 
     var toreturn = retrieveWindowVariables("toreturn")["toreturn"];
     if (toreturn === "true") {
