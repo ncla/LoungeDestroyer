@@ -40,9 +40,11 @@ chrome.storage.local.get("queue", function(data){
 	        container.className = "destroyer info hidden";
 	    });
 
-	    container.querySelector("#accept-time").addEventListener("input", function(){
+	    container.querySelector("#accept-time").addEventListener("blur", function(){
 			if (this.valueAsNumber) {
-	            chrome.runtime.sendMessage({"saveSetting": {acceptDelay: this.valueAsNumber}});
+				var val = Math.max(this.valueAsNumber, 10);
+				this.valueAsNumber = val;
+	            chrome.runtime.sendMessage({"saveSetting": {acceptDelay: val}});
 	        }
 	    });
 
@@ -51,7 +53,7 @@ chrome.storage.local.get("queue", function(data){
 	    var now = Date.now(),
 	        acceptTime = Math.min(data.time, now+(resp.acceptDelay || 30)*1000);
 	    
-	    if (!data.time || acceptTime-now < 10000) { // won't accept offers with <10 sec left
+	    if (!data.time || acceptTime-now < Math.min(resp.acceptDelay||30, 10)*1000) { // won't accept offers with <10 sec left
 			console.log("Too little time left: ",(acceptTime-Date.now())/1000);
 			return;
 		}

@@ -406,13 +406,6 @@ $(document).ready(function() {
     container.querySelector("button").addEventListener("click", function(){
         chrome.runtime.sendMessage({type: "autoBet", autoBet: false});
     });
-    container.querySelector("input").addEventListener("input", function(){
-        var newVal = Math.max(2, this.valueAsNumber);
-        if (newVal) {
-            chrome.runtime.sendMessage({"set": {bet: {autoDelay: newVal * 1000}},
-                "saveSetting": {autoDelay: newVal}});
-        }
-    });
     container.querySelector("input").addEventListener("blur", function(){
         var newVal = Math.max(2, this.valueAsNumber);
         if (newVal) {
