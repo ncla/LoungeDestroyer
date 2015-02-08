@@ -233,32 +233,36 @@
                 <h3 class="page-header">Betting inventory statistics</h3>
                 <div class="row">
                     <div class="col-md-4 ld-setting">
-                        <label for="largeBetPercentage">Small bet</label>
+                        <label for="smallBetPercentage" class="control-label">Small bet:</label>
                         <div class="input-group">
                             <input type="number" min="1" max="100" class="form-control" id="smallBetPercentage">
                             <div class="input-group-addon">%</div>
                         </div>
                     </div>
                     <div class="col-md-4 ld-setting">
-                        <label for="largeBetPercentage">Medium bet</label>
+                        <label for="mediumBetPercentage" class="control-label">Medium bet:</label>
                         <div class="input-group">
                             <input type="number" min="1" max="100" class="form-control" id="mediumBetPercentage">
                             <div class="input-group-addon">%</div>
                         </div>
                     </div>
                     <div class="col-md-4 ld-setting">
-                        <label for="largeBetPercentage">Large bet</label>
+                        <label for="largeBetPercentage" class="control-label">Large bet:</label>
                         <div class="input-group">
                             <input type="number" min="1" max="100" class="form-control" id="largeBetPercentage">
                             <div class="input-group-addon">%</div>
                         </div>
                     </div>
                     <div class="col-md-12 ld-setting">
-                        <label class="control-label">Calculate inventory statistics on betting inventories:</label>
-                        <select id="inventoryStatisticsGroup" class="form-control">
-                            <option value="2">Calculate for items only in main inventory group</option>
-                            <option value="1">Calculate for all items in inventory</option>
-                            <option value="0">Disabled</option>
+                        <label class="control-label">Calculate inventory statistics for betting groups:</label>
+                        <select id="inventoryStatisticsGroup" multiple class="form-control" size="6">
+                            <option value="1" solo>Calculate for all items in inventory</option>
+                            <option value="0" solo>Disabled</option>
+                            <option disabled></option>
+                            <optgroup label="Groups (CS:GO)" id="inventoryStatisticsGroup-730" group="730">
+                            </optgroup>
+                            <optgroup label="Groups (Dota2)" id="inventoryStatisticsGroup-570" group="570">
+                            </optgroup>
                         </select>
                     </div>
                 </div>

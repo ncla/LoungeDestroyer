@@ -38,7 +38,7 @@ User.prototype.defaultSettings =
     groupInventory: "1",
     itemGroups: {730: {}, 570: {}},
     displayCsgoWeaponQuality: "1",
-    inventoryStatisticsGroup: "1",
+    inventoryStatisticsGroup: {730: ["1"], 570: ["1"]},
     smallBetPercentage: "5",
     mediumBetPercentage: "10",
     largeBetPercentage: "20"
@@ -93,5 +93,15 @@ User.prototype.saveSetting = function(settingName, settingValue) {
     } else {
         chrome.runtime.sendMessage({changeSetting: theSetting}); // sending it to background.js
     }
-    console.log("Saving user setting [" + settingName +"] to " +settingValue);
+    console.log("Saving user setting [" + settingName +"] to ",settingValue);
 };
+
+User.prototype.restoreDefaults = function() {
+    if (!(this instanceof User)) {
+        throw new TypeError("'this' must be instance of User");
+    }
+
+    for (var k in User.prototype.defaultSettings) {
+        this.saveSetting(k, User.prototype.defaultSettings[k]);
+    }
+}

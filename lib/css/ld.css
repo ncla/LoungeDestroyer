@@ -168,3 +168,17 @@ code {
 #settings, #themes, #about {
     margin-bottom: 20px;
 }
+
+option[solo]::after {
+    content: "Only selectable alone";
+    float: right;
+    color: #666;
+    text-decoration: underline;
+}
+option[solo]:checked::after {
+    color: #eee;
+}
+optgroup > option {
+    padding-left: 10px;
+    white-space: normal;
+}
