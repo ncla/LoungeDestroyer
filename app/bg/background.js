@@ -81,8 +81,9 @@ chrome.extension.onMessage.addListener(function (request, sender, sendResponse) 
     // Inject theme CSS (in bg for speed purposes)
     if(request.hasOwnProperty("injectCSSTheme")) {
     	(function loop(id, tries){
-    		if (tries > 200)
+    		if (tries > 200) {
     			return;
+            }
 
 			chrome.tabs.insertCSS(id, {code: themeCSS, runAt: "document_start"}, function(x){
 				// retry if it's called before tab exists (dah fuck chrome?)
@@ -98,8 +99,9 @@ chrome.extension.onMessage.addListener(function (request, sender, sendResponse) 
     // Open new tab if none exists
     if(request.hasOwnProperty("tab")) {
         chrome.tabs.query({url: request.tab}, function(tabs){
-            if (tabs.length !== 0)
+            if (tabs.length !== 0) {
                 return;
+            }
 
             chrome.tabs.create({url: request.tab});
         });
@@ -150,14 +152,16 @@ chrome.extension.onMessage.addListener(function (request, sender, sendResponse) 
 
     if(request.hasOwnProperty("updateThemes")) {
     	updateThemes(sendResponse);
-    	if (sendResponse)
+    	if (sendResponse) {
     		return true;
+        }
     }
 
     if(request.hasOwnProperty("setCurrentTheme")) {
     	var newCurTheme = request.setCurrentTheme;
-    	if (typeof newCurTheme !== "string")
+    	if (typeof newCurTheme !== "string") {
     		newCurTheme = LoungeUser.userSettings.currentTheme;
+        }
 
     	console.log("Setting current theme to ",newCurTheme);
 
@@ -172,13 +176,15 @@ chrome.extension.onMessage.addListener(function (request, sender, sendResponse) 
     }
     if(request.hasOwnProperty("refetchMarketPriceList")) {
         updateMarketPriceList(sendResponse);
-        if (sendResponse)
+        if (sendResponse) {
         	return true;
+        }
     }
     if(request.hasOwnProperty("refetchCurrencyConversionRates")) {
         updateCurrencyConversion(sendResponse);
-        if (sendResponse)
+        if (sendResponse) {
         	return true;
+        }
     }
 });
 
@@ -596,8 +602,9 @@ function checkForExpiredItems(appID) {
 }
 function autoBumpTrades() {
 	for (var appID in baseURLs) {
-		if (LoungeUser.userSettings.autoBump != appID && LoungeUser.userSettings.autoBump != "1")
+		if (LoungeUser.userSettings.autoBump != appID && LoungeUser.userSettings.autoBump != "1") {
 			continue;
+        }
 
 		var url = baseURLs[appID];
 		(function(url, appID){return function self(){
@@ -610,16 +617,18 @@ function autoBumpTrades() {
 
 					var bumpBtns = $(".buttonright[onclick*='bumpTrade']", doc);
 
-					if (!bumpBtns.length)
+					if (!bumpBtns.length) {
 						return;
+                    }
 
 					bumpBtns.each(function(){
 						var onclick = this.getAttribute("onclick"),
 						    params = /bumpTrade\('([0-9]+)'(?:,'([0-9a-zA-Z]+))?/.exec(onclick);
 
 						// params[1] = trade, params[2] = code
-						if (!params[1])
+						if (!params[1]) {
 							return;
+                        }
 
 						var data = "trade="+params[1]+(params[2] ? "&code="+params[2] : "");
 
@@ -656,8 +665,11 @@ var alarms = {
 chrome.alarms.getAll(function(a){ // make sure we don't create alarms that already exist
     var existingAlarms = {};
     $.each(a,function(ind,alarm){ // loop through existing alarms
-        if (alarm.name)
+    	var minToRecall = (alarm.scheduledTime-Date.now())/(1000*60);
+    	// if it has a name, and time to recall isn't more than periodInMinutes
+        if (alarm.name && alarm.periodInMinutes >= minToRecall) {
             existingAlarms[alarm.name] = alarm.periodInMinutes;
+        }
     });
 
     console.log("Existing alarms:",existingAlarms);
@@ -666,13 +678,14 @@ chrome.alarms.getAll(function(a){ // make sure we don't create alarms that alrea
         if (!existingAlarms.hasOwnProperty(name) || existingAlarms[name] !== time) {
             console.log("Creating alarm",name,"(",time,")");
             chrome.alarms.create(name, {
+            	delayInMinutes: time,
                 periodInMinutes: time
             });
         }
     });
 });
 
-chrome.alarms.onAlarm.addListener(function(alarm) {
+chrome.alarms.onAlarm.addListener(function (alarm) {
     if(alarm.name == "itemListUpdate") {
         console.log("Checking if user has visited CS:GO Lounge recently..");
         var msSinceLastVisit = (new Date().getTime() - lastTimeUserVisited);
@@ -698,8 +711,9 @@ chrome.alarms.onAlarm.addListener(function(alarm) {
     	updateThemes();
     }
     if (alarm.name == "autoBump") {
-    	if (["1","730","570"].indexOf(LoungeUser.userSettings.autoBump) !== -1)
+    	if (["1","730","570"].indexOf(LoungeUser.userSettings.autoBump) !== -1) {
     		autoBumpTrades();
+        }
     }
 });
 
@@ -712,8 +726,9 @@ function updateThemes(callback) {
 				console.log("Updating theme "+theme);
 				// get JSON
 				var url = themes[theme].url+"?cachebreak="+Date.now();
-				if (!url)
+				if (!url) {
 					continue;
+                }
 
 				get(url, function(){
 					try {
@@ -724,8 +739,9 @@ function updateThemes(callback) {
 
 			            for (var i = 0; i < required.length; ++i) {
 			                if (!json[required[i]]) {
-			                    if (!err)
+			                    if (!err) {
 			                        err = "The following information is missing from the JSON: ";
+                                }
 
 			                    err += required[i] + " ";
 			                }
@@ -769,8 +785,9 @@ function updateThemes(callback) {
 						}
 						var css = importantifyCSS(this.responseText);
 						if (css) {
-							if (theme === LoungeUser.userSettings.currentTheme)
+							if (theme === LoungeUser.userSettings.currentTheme) {
 								themeCSS = css;
+                            }
 
 				    		themes[theme].cachedCSS = css;
 				    		chrome.storage.local.set({themes: themes});
@@ -779,8 +796,9 @@ function updateThemes(callback) {
 				});
 			}
 		}
-		if (callback)
+		if (callback) {
 			setTimeout(callback, 750); // fake a delay so users don't get worried, yo
+        }
 	});
 }
 
@@ -794,12 +812,14 @@ function importantifyCSS(css){
     			var rule = rules[i],
     			    decls = rule.declarations;
 
-    			if (!decls)
+    			if (!decls) {
     				continue;
+                }
 
     			for (var l = 0; l < decls.length; ++l) {
-    				if (!decls[l].value)
+    				if (!decls[l].value) {
     					continue;
+                    }
 
     				decls[l].value = decls[l].value.replace("!important","").trim() + " !important";
     			}

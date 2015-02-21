@@ -52,8 +52,9 @@ function enableAuto(match, tries, error) {
 
     // update timer
     (function timerLoop(){
-        if (!betStatus.enabled)
+        if (!betStatus.enabled) {
             return;
+        }
         if (!betStatus.betTime) {
         	setTimeout(timerLoop, 250);
         	return;
@@ -68,8 +69,9 @@ function enableAuto(match, tries, error) {
 
 // load data if auto-betting
 chrome.runtime.sendMessage({get: "autoBet"}, function(data){
-	if (!data.enabled)
+	if (!data.enabled) {
 		return;
+	}
 
 	betStatus.betTime = data.time;
 	betStatus.rebetDelay = data.rebetDelay;

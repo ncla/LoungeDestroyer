@@ -84,8 +84,9 @@ function post(url, data, callback, headers) {
 
     // set headers
     for (var h in headers) {
-        if (headers.hasOwnProperty(h))
+        if (headers.hasOwnProperty(h)) {
             xhr.setRequestHeader(h, headers[h]);
+        }
     }
 
     // save lastRequest for later re-sending
@@ -125,8 +126,9 @@ function isDevMode() {
 
 // http://stackoverflow.com/a/24344154/645768
 function retrieveWindowVariables(variables) {
-    if (typeof variables === "string")
+    if (typeof variables === "string") {
         variables = [variables];
+    }
 
     var ret = {},
         scriptContent = "";
@@ -156,8 +158,9 @@ function retrieveWindowVariables(variables) {
 function setWindowVariables(variables) {
     var scriptContent = "";
     for (var k in variables) {
-        if (typeof variables[k] === "string")
+        if (typeof variables[k] === "string") {
             variables[k] = "'"+variables[k]+"'";
+        }
 
         scriptContent += k + " = "+variables[k];
     }

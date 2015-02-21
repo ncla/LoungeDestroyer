@@ -9,8 +9,9 @@ var queue = {
 // init
 $(document).ready(function(){
 	var queueElm = document.getElementById("queue");
-	if (!queueElm)
+	if (!queueElm) {
 		return;
+	}
 
 	queue.queued = true;
 
@@ -18,8 +19,9 @@ $(document).ready(function(){
 	var obs = new MutationObserver(function(records){
 		for (var i = 0; i < records.length; ++i) {
 			var record = records[i];
-			if (!record.type === "childList" || !record.addedNodes)
+			if (!record.type === "childList" || !record.addedNodes) {
 				continue;
+			}
 			
 			// loop through every added node
 			for (var j = 0, k = record.addedNodes.length; j < k; ++j) {
@@ -40,8 +42,9 @@ $(document).ready(function(){
 				}
 
 				// other than protection code/time, we're only interested in links
-				if (elm.nodeName !== "A")
+				if (elm.nodeName !== "A") {
 					continue;
+				}
 
 				// link to offer
 				if (elm.className === "button") {
@@ -52,10 +55,12 @@ $(document).ready(function(){
 
 		// save queue data to storage
 		chrome.storage.local.set({queue: queue}, function(){
-			if (queue.tabOpened)
+			if (queue.tabOpened) {
 				return;
-			if (!queue.offer)
+			}
+			if (!queue.offer) {
 				return;
+			}
 
 			queue.tabOpened = true;
 			

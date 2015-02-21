@@ -27,8 +27,9 @@ function restore_options() {
             Settings[index] = value;
         });
         $.each(Settings, function(index, value) {
-            if (value)
+            if (value) {
                 $(".ld-settings #" + index).val(value);
+            }
         });
 
         // populate group <select> for inventory statistics
@@ -69,10 +70,12 @@ function restore_options() {
         var curTheme = document.querySelector(".item[data-theme-name='"+Settings.currentTheme+"']");
         if (curTheme) {
             var act;
-            if (act = document.querySelector("#themes-carousel .item.active"))
+            if (act = document.querySelector("#themes-carousel .item.active")) {
                 act.classList.remove("active");
-            if (act = document.querySelector("#themes-carousel .item.current"))
+            }
+            if (act = document.querySelector("#themes-carousel .item.current")) {
                 act.classList.remove("current");
+            }
 
             curTheme.classList.add("current", "active");
             console.log("Found curTheme! Setting to ",Settings.currentTheme);
@@ -106,6 +109,10 @@ function restore_options() {
             function(){
                 that.disabled = false;
             });
+    });
+    $("#restoreDefaults").click(function() {
+        defaultUser.restoreDefaults();
+        document.location.reload();
     });
     $("#reportlog").click(function() {
         $("#reportlog-textarea").show();
@@ -251,10 +258,12 @@ function theme_data_handler(){
         obj = this.obj,
         name = this.themeName;
 
-    if (!json.bg)
+    if (!json.bg) {
         json.bg = obj.bg;
-    if (!json.icon)
+    }
+    if (!json.icon) {
         json.icon = obj.icon;
+    }
     
     // overwrite settings with saved settings
     if (json.options) {
@@ -271,8 +280,9 @@ function theme_data_handler(){
     if (Object.keys(json).length > 2) {
         console.log("Removing keys from ",obj, " based on ",json);
         for (var k in obj) {
-            if (!json.hasOwnProperty(k))
+            if (!json.hasOwnProperty(k)) {
                 delete obj[k];
+            }
         }
     }
 
@@ -308,8 +318,9 @@ function theme_create_element(name, obj, active) {
 
     if (active) {
         var act;
-        if (act = document.querySelector("#themes-carousel .item.active"))
+        if (act = document.querySelector("#themes-carousel .item.active")) {
             act.classList.remove("active");
+        }
         item.classList.add("active");
     }
 
@@ -356,8 +367,9 @@ function theme_create_element(name, obj, active) {
         };
 
         var caption = a.querySelector(".carousel-caption");
-        if (caption)
+        if (caption) {
             caption.insertBefore(iconImg, caption.firstChild);
+        }
     }
 
     item.appendChild(a);
@@ -393,8 +405,9 @@ function theme_create_element(name, obj, active) {
             var theme = this.getAttribute("data-theme"),
                 option = this.getAttribute("data-option");
 
-            if (!theme || !option)
+            if (!theme || !option) {
                 return;
+            }
 
             themes[theme].options[option].checked = this.checked;
             chrome.storage.local.set({themes: themes});
@@ -425,8 +438,9 @@ function theme_create_element(name, obj, active) {
 
     if (name === Settings.currentTheme) {
         var act = document.querySelector("#themes-carousel .item.active");
-        if (act)
+        if (act) {
             act.classList.remove("active");
+        }
 
         item.classList.add("active");
 
@@ -451,8 +465,9 @@ function theme_create_element(name, obj, active) {
  * @param Boolean active - whether slide should be active
  */
 function create_theme(name, json, css, bg, callback, remoteUrl, icon, active) {
-    if (!callback)
+    if (!callback) {
         callback = error_proxy;
+    }
 
     if (!name || !json || !css || (!bg && !json.bg)) {
         console.error("Necesarry information not provided for create_theme on ",name);
@@ -466,8 +481,9 @@ function create_theme(name, json, css, bg, callback, remoteUrl, icon, active) {
     theme.author = json.author || "Unknown";
     theme.version = json.version || "0.0.1";
     theme.description = json.description || "Custom theme";
-    if (json.options)
+    if (json.options) {
         theme.options = json.options;
+    }
     theme.bg = bg || json.bg;
 
     if (remoteUrl) {
@@ -532,12 +548,14 @@ function select_theme(name) {
         active = document.querySelector("#themes-carousel .item.active"),
         ownElm = document.querySelector("#themes-carousel .item[data-theme-name='"+name+"']");
     
-    if (current)
+    if (current) {
         current.classList.remove("current");
+    }
 
     if (name && ownElm) {
-        if (active)
+        if (active) {
             active.classList.remove("active");
+        }
 
         ownElm.classList.add("current");
         ownElm.classList.add("active");
@@ -632,8 +650,9 @@ document.querySelector("#add-theme-local button[type='submit']").addEventListene
 
     for (var i = 0; i < vals.length; ++i) {
         if (!vals[i]) {
-            if (!err)
+            if (!err) {
                 err = "We're missing the following information: ";
+            }
 
             err += names[i] + " ";
         }
@@ -653,10 +672,11 @@ document.querySelector("#add-theme-local button[type='submit']").addEventListene
         version: version,
         author: author
     }, css, bg, function(val){
-        if (val !== true)
+        if (val !== true) {
             error_proxy.apply({}, arguments);
-        else 
+        } else { 
             select_theme(name);
+        }
     }, false, undefined, true);
 });
 
@@ -746,10 +766,12 @@ function error_proxy(err) {
  */
 function escape_obj(obj) {
     for (var k in obj) {
-        if (!obj.hasOwnProperty(k))
+        if (!obj.hasOwnProperty(k)) {
             continue;
-        if(["cachedCSS"].indexOf(k) !== -1)
+        }
+        if(["cachedCSS"].indexOf(k) !== -1) {
             continue;
+        }
 
         var val = obj[k];
         if (typeof val === "string") {
