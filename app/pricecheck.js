@@ -4,21 +4,13 @@ var itemName = false;
 // to the body element with attribute 'data-itemname-ld'
 function scriptInject () {
     try {
-        for(var prop in g_rgAssets) {
-            var appIDprop = g_rgAssets[prop];
-            break;
-        }
-        for(var inventory in appIDprop) {
-            var inventoryProp = appIDprop[inventory];
-            break;
-        }
-        for(var asset in inventoryProp) {
-            var firstAsset = inventoryProp[asset];
-            if(firstAsset.hasOwnProperty('market_hash_name')) {
-                var marketHashName = firstAsset['market_hash_name'];
-                document.body.setAttribute('data-itemname-ld', marketHashName);
-            }
-            break;
+        var prop = g_rgAssets[Object.keys(g_rgAssets)[0]],
+            inventoryProp = prop[Object.keys(prop)[0]],
+            assetProp = inventoryProp[Object.keys(inventoryProp)[0]];
+
+        if (assetProp.hasOwnProperty('market_hash_name')) {
+            var marketHashName = assetProp['market_hash_name'];
+            document.body.setAttribute('data-itemname-ld', marketHashName);
         }
     } catch(e) {}
 }
