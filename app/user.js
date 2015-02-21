@@ -44,6 +44,9 @@ User.prototype.defaultSettings =
     largeBetPercentage: "20"
 };
 
+// defaultSettings get modified when changing settings?
+User.prototype.defaults = $.extend({}, User.prototype.defaultSettings);
+
 User.prototype.loadUserSettings = function(callback) {
 	if (!(this instanceof User)) {
 		throw new TypeError("'this' must be instance of User");
@@ -64,6 +67,7 @@ User.prototype.loadUserSettings = function(callback) {
 
             // restrict options
             self.userSettings.autoDelay = Math.max(2, self.userSettings.autoDelay);
+            self.userSettings.acceptDelay = Math.max(10, self.userSettings.acceptDelay);
         }
         /* Start the scripterino */
         self.userSettingsLoaded = true;
@@ -101,7 +105,7 @@ User.prototype.restoreDefaults = function() {
         throw new TypeError("'this' must be instance of User");
     }
 
-    for (var k in User.prototype.defaultSettings) {
-        this.saveSetting(k, User.prototype.defaultSettings[k]);
+    for (var k in User.prototype.defaults) {
+        this.saveSetting(k, User.prototype.defaults[k]);
     }
 }
