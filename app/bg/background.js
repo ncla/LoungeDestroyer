@@ -665,7 +665,9 @@ var alarms = {
 chrome.alarms.getAll(function(a){ // make sure we don't create alarms that already exist
     var existingAlarms = {};
     $.each(a,function(ind,alarm){ // loop through existing alarms
-        if (alarm.name) {
+    	var minToRecall = (alarm.scheduledTime-Date.now())/(1000*60);
+    	// if it has a name, and time to recall isn't more than periodInMinutes
+        if (alarm.name && alarm.periodInMinutes >= minToRecall) {
             existingAlarms[alarm.name] = alarm.periodInMinutes;
         }
     });
@@ -676,13 +678,14 @@ chrome.alarms.getAll(function(a){ // make sure we don't create alarms that alrea
         if (!existingAlarms.hasOwnProperty(name) || existingAlarms[name] !== time) {
             console.log("Creating alarm",name,"(",time,")");
             chrome.alarms.create(name, {
+            	delayInMinutes: time,
                 periodInMinutes: time
             });
         }
     });
 });
 
-chrome.alarms.onAlarm.addListener(function(alarm) {
+chrome.alarms.onAlarm.addListener(function (alarm) {
     if(alarm.name == "itemListUpdate") {
         console.log("Checking if user has visited CS:GO Lounge recently..");
         var msSinceLastVisit = (new Date().getTime() - lastTimeUserVisited);

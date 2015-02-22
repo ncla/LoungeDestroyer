@@ -592,7 +592,7 @@ Inventory.prototype.makeItemsSortable = function(){
         }
 
         // if we moved it from an existing group (and not default)
-        if (groupName) {
+        if (groupName !== "default") {
             var ind = self.itemToGroup[name].indexOf(groupName),
                 indGroup = self.groups[groupName].items.indexOf(name);
 
