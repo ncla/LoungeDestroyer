@@ -185,6 +185,7 @@ Inventory.prototype.onInventoryLoaded = function(url) {
             if(this.bettingInventoryType == "inventory") {
                 this.cacheInventory("bettingInventory" + appID + "_" + readCookie("id"), $("#backpack").html());
             }
+            this.grouped = false;
             this.group();
 
             // limit the inventory statistics to the groups the user has chosen
@@ -420,6 +421,9 @@ Inventory.prototype.group = function() {
             if (records[i].removedNodes && records[i].removedNodes.length > 1) {
                 var removed = records[i].removedNodes;
                 for (var k = 0, l = removed.length; k < l; ++k) {
+                    if (!removed[k] || !removed[k].classList) {
+                        continue;
+                    }
                     if (removed[k].classList.contains("full") || removed[k].id === "trash") {
                         self.grouped = false;
                         bpObserver.disconnect();
@@ -428,6 +432,7 @@ Inventory.prototype.group = function() {
                     }
                 }
             }
+            // move added item to the group it belongs to
             if (records[i].addedNodes && records[i].addedNodes.length) {
                 var added = records[i].addedNodes;
                 for (var k = 0, l = added.length; k < l; ++k) {
