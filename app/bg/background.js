@@ -98,12 +98,16 @@ chrome.extension.onMessage.addListener(function (request, sender, sendResponse) 
 
     // Open new tab if none exists
     if(request.hasOwnProperty("tab")) {
+        console.log()
         chrome.tabs.query({url: request.tab}, function(tabs){
             if (tabs.length !== 0) {
                 return;
             }
 
-            chrome.tabs.create({url: request.tab});
+            chrome.tabs.create({
+                url: request.tab,
+                windowId: sender.windowId
+            });
         });
     }
 
