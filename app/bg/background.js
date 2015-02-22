@@ -667,7 +667,7 @@ chrome.alarms.getAll(function(a){ // make sure we don't create alarms that alrea
     $.each(a,function(ind,alarm){ // loop through existing alarms
     	var minToRecall = (alarm.scheduledTime-Date.now())/(1000*60);
     	// if it has a name, and time to recall isn't more than periodInMinutes
-        if (alarm.name && alarm.periodInMinutes >= minToRecall) {
+        if (alarm.name && alarm.periodInMinutes >= Math.abs(minToRecall)) {
             existingAlarms[alarm.name] = alarm.periodInMinutes;
         }
     });
