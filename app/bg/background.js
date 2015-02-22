@@ -727,7 +727,7 @@ function updateThemes(callback) {
 					continue;
                 }
 
-				get(url, function(){
+				get(url, (function(theme){return function(){
 					try {
 						var data = this.responseText,
 			                json = JSON.parse(data),
@@ -790,7 +790,7 @@ function updateThemes(callback) {
 				    		chrome.storage.local.set({themes: themes});
 					    }
 					});
-				});
+				}})(theme));
 			}
 		}
 		if (callback) {
