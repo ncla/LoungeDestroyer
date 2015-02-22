@@ -223,7 +223,7 @@ Inventory.prototype.onInventoryLoaded = function(url) {
                             if (!items) {
                                 items = $(groups[i]);
                             } else {
-                                items.add(groups[i]);
+                                items = items.add(groups[i]);
                             }
                         }
 
