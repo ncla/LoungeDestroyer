@@ -19,7 +19,7 @@ chrome.extension.onMessage.addListener(function (request, sender, sendResponse) 
 
     // Queue offer has been received
     if(request.hasOwnProperty("queue")) {
-        handleQueue(request.queue, game);
+        handleQueue(request.queue, game, sender);
     }
 
     // Get current state of auto-betting
@@ -47,7 +47,7 @@ var queue = {
 };
 
 // Handle queue update (offer received)
-function handleQueue(data, game) {
+function handleQueue(data, game, sender) {
     if (data.offer !== queue.lastOffer[game]) {
         if (LoungeUser.userSettings.notifyTradeOffer == "1") {
             chrome.tabs.query({
@@ -72,8 +72,10 @@ function handleQueue(data, game) {
                 if (tabs.length !== 0) {
                     return;
                 }
-
-                chrome.tabs.create({url: data.offer});
+                chrome.tabs.create({
+                    url: data.offer,
+                    windowId: sender.tab.windowId
+                });
             });
         }
 
@@ -113,7 +115,7 @@ var bet = { // not a class - don't instantiate
 
 // example data:
 // ldef_index%5B%5D=2682&lquality%5B%5D=0&id%5B%5D=711923886&worth=0.11&on=a&match=1522&tlss=2e7877e8d42fb969c5f6f517243c2d19
-bet.enableAuto = function(url, data, csgo) {
+bet.enableAuto = function(url, data, csgo, cookies) {
     console.log("Auto-betting");
     console.log(data);
     var g = csgo ? 0 : 1; // short for game
@@ -131,36 +133,9 @@ bet.enableAuto = function(url, data, csgo) {
     bet.lastBetTime[g] = Date.now();
     bet.numTries[g] = 0;
 
-    /*if (bet.type[g] === "autoBet") {
-        // extract data
-        var hash = data.tlss[0],
-            worthArr = data.worth,
-            worth = 0;
-
-        if (!worthArr) { // keys don't have worth, don't ask me why
-            worthArr = [];
-            worth = -1;
-        }
-
-        for (var i = 0, j = worthArr.length; i < j; i++) {
-            var parsed = parseFloat(worthArr[i]);
-            if (!isNaN(parsed))
-                worth += parsed;
-        }
-
-        bet.betData[g] = {
-            hash: hash,
-            data: data,
-            worth: worth
-        };
-    };*/
     bet.betData[g] = {serialized: data,
-                        url: url};
-    /*if (bet.type[g] === "autoFreeze") {
-        bet.betData[g] = {serialized: data};
-    }*/
-
-    //bet.betData[g].url = url;
+                        url: url,
+                        cookies: cookies};
 
     bet.autoBetting[g] = bet.autoLoop(g);
     console.log("Enabling for "+g+": "+bet.autoBetting[g]);
@@ -216,6 +191,14 @@ bet.autoLoop = function(game) {
         // repeat request
         console.log("Performing request:");
         console.log({url: bet.betData[g].url, data: bet.betData[g].serialized});
+
+        var headerObj = {
+            "X-Requested-With": "XMLHttpRequest",
+            "Data-Referer": bet.baseUrls[g]+"match?m="+bet.matchNum[g]
+        };
+        if (bet.betData[g].cookies) {
+            headerObj["Data-Cookie"] = bet.betData[g].cookies;
+        }
 
         $.ajax({
             url: bet.betData[g].url,
@@ -279,10 +262,7 @@ bet.autoLoop = function(game) {
                 clearTimeout(bet.loopTimer);
                 bet.loopTimer = setTimeout(bet.autoLoop, bet.autoDelay);
             }})(g),
-            headers: {
-                "X-Requested-With": "XMLHttpRequest",
-                "Data-Referer": bet.baseUrls[g]+"match?m="+bet.matchNum[g]
-            }
+            headers: headerObj
         });
     }
     if (game===0 || game===1) {
@@ -291,60 +271,6 @@ bet.autoLoop = function(game) {
 
     return true;
 };
-/*bet.renewHash = function(numTries, game) {
-    console.log("Renewing hash");
-    var numTries = numTries || 0;
-
-    // let's just assume match num works
-    $.ajax({
-        url: bet.baseUrls[game]+"match?m="+bet.matchNum,
-        type: "GET",
-        async: false,
-        success: function(data) {
-            // don't parse HTML, just extract from text
-            var startInd = data.indexOf('id="placebut'),
-                endInd = data.indexOf(">Place Bet<"),
-                elmText = data.substring(startInd, endInd),
-                hash = /[0-9]{4}['", ]*([0-9a-z]*)/.exec(elmText); // optionally replace second * with {32}
-
-            if (!hash) {
-                console.log("Failed to find hash");
-                bet.disableAuto(false, game);
-                return;
-            }
-
-            hash = hash[1];
-
-            if (startInd === -1) {
-                console.log("Failed to get button element, re-attempting in 5s");
-                setTimeout((function(g){
-                    return function(){
-                        bet.renewHash(false,g)
-                    }
-                })(game), 5000);
-            } else {
-                console.log("Elm text: "+elmText);
-                console.log("Found a hash: "+hash);
-                bet.betData[game].data.tlss = hash;
-            }
-        },
-        error: function() {
-            console.log("Error while renewing hash (#"+numTries+"), re-attempting in 5s");
-            numTries++;
-            if (numTries < 5) {
-                setTimeout((function(x,g){
-                    return function(){
-                        bet.renewHash(x,g)
-                    }
-                })(numTries,game), 5000);
-                return;
-            }
-
-            console.log("Retried too many times!");
-            bet.disableAuto(false, game);
-        }
-    });
-};*/
 
 // NEW SHIT
 var requestData = {
@@ -382,13 +308,6 @@ chrome.webRequest.onBeforeRequest.addListener(
             data = details.requestBody.formData;
         }
 
-        // because jQuery appends [] to all array keys, and Chrome makes everything an array
-        /*for (var k in data) {
-            if (k.slice(-2) !== "[]" && data[k] instanceof Array) {
-                data[k] = data[k][0];
-            }
-        }*/
-
         newCallback = (function(url, data){return function(response){
             bet.type[game] = this.type || bet.disableAuto(true, game);
             bet.matchNum[game] = this.match ? data.match : "";
@@ -399,7 +318,7 @@ chrome.webRequest.onBeforeRequest.addListener(
                 bet.disableAuto(true, game);
                 return;
             }
-            bet.enableAuto(url, this.data || "", !game);
+            bet.enableAuto(url, this.data || "", !game, this.cookies);
         }})(details.url, data);
 
         // if it's a return request
@@ -441,7 +360,8 @@ chrome.webRequest.onBeforeRequest.addListener(
                         success: newCallback.bind({
                             type: "autoBet",
                             match: true,
-                            data: serializedData
+                            data: serializedData,
+                            cookies: cookies
                         }),
                         error: requestListener.bind(that, details),
                         headers: {
