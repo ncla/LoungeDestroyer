@@ -98,7 +98,7 @@ chrome.extension.onMessage.addListener(function (request, sender, sendResponse) 
 
     // Open new tab if none exists
     if(request.hasOwnProperty("tab")) {
-        console.log()
+        console.log("Opening tab",request,sender);
         chrome.tabs.query({url: request.tab}, function(tabs){
             if (tabs.length !== 0) {
                 return;
@@ -106,7 +106,7 @@ chrome.extension.onMessage.addListener(function (request, sender, sendResponse) 
 
             chrome.tabs.create({
                 url: request.tab,
-                windowId: sender.windowId
+                windowId: sender.tab.windowId
             });
         });
     }
