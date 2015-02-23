@@ -175,6 +175,23 @@ function init() {
             flash.setAttribute("wmode", "transparent");
         })();
 
+        // reload page if draft page
+        if (LoungeUser.userSettings.redirect === "1") {
+            if (document.body.textContent.indexOf("Item draft is under progress") !== -1) {
+                var title = document.querySelector("main .full h2"),
+                    newElm = document.createElement("h2");
+
+                newElm.setAttribute("style", title.getAttribute("style"));
+                newElm.textContent = "LoungeDestroyer is reloading this page.";
+                title.parentNode.insertBefore(newElm, title);
+
+                // reload in 2-4 seconds
+                setTimeout(function(){
+                    window.location.reload(true);
+                }, (2+(Math.random()*2))*1000);
+            }
+        }
+
         if(document.URL.indexOf("/mybets") != -1) {
             if (LoungeUser.userSettings.renameButtons === "1") {
                 var btn = document.getElementById("freezebutton");
