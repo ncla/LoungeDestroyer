@@ -41,7 +41,8 @@ User.prototype.defaultSettings =
     inventoryStatisticsGroup: {730: ["1"], 570: ["1"]},
     smallBetPercentage: "5",
     mediumBetPercentage: "10",
-    largeBetPercentage: "20"
+    largeBetPercentage: "20",
+    showBettedIndicator: "0"
 };
 
 // defaultSettings get modified when changing settings?
