@@ -9,6 +9,7 @@ var storageMarketItems,
     matchInfoCachev2 = {},
     streamPlaying = false,
     inventory = new Inventory(),
+    inventorySearch = new Inventory(),
     lastAccept = 0,
     blacklistedItemList = {},
     earlyBackpackLoad = false;
@@ -37,7 +38,13 @@ chrome.extension.onMessage.addListener(function(msg, sender, sendResponse) {
     if(msg.inventory) {
         console.log('Backpack AJAX request detected from background script with URL ', msg.inventory, +new Date());
         if(LoungeUser.userSettingsLoaded) {
-            inventory.onInventoryLoaded(msg.inventory);
+            if(msg.inventory.indexOf('tradeCsRight') != -1 || msg.inventory.indexOf('tradeWhatRight') != -1) {
+                if(LoungeUser.userSettings["itemMarketPricesv2"] == "2") {
+                    getMarketPricesForElementList($("#itemlist .oitm:not(.marketPriced)"), true);
+                }
+            } else {
+                inventory.onInventoryLoaded(msg.inventory);
+            }
         } else {
             earlyBackpackLoad = msg.inventory;
         }

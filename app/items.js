@@ -56,9 +56,13 @@ Item.prototype.displayWeaponQuality = function() {
     $(".rarity", this.item).append('<span class="weaponWear"> | ' + this.weaponQualityAbbrevation + '</span>')
 };
 
-Item.prototype.getMarketPrice = function() {
+Item.prototype.getMarketPrice = function(cachedOnly) {
     if (!(this instanceof Item)) {
         throw new TypeError("'this' must be instance of Item");
+    }
+
+    if(!cachedOnly) {
+        cachedOnly = false;
     }
 
     var self = this;
@@ -83,6 +87,10 @@ Item.prototype.getMarketPrice = function() {
     if(marketedItems.hasOwnProperty(this.itemName)) {
         // Not sure if I am genius for returning something and calling a function at the same time
         return this.insertMarketValue(marketedItems[this.itemName]);
+    }
+
+    if(cachedOnly) {
+        return false;
     }
 
     if(nonMarketItems.indexOf(self.itemName) == -1 && nonMarketItems.indexOf($(".rarity", this.item).text()) == -1 && !loadingItems.hasOwnProperty(this.itemName)) {
@@ -196,9 +204,12 @@ Item.prototype.appendHoverElements = function() {
  * Get market prices for an element list in a performance friendly way
  * @param {Array} elmList - list of jQuery element objects (optional)
  */
-function getMarketPricesForElementList(elmList) {
+function getMarketPricesForElementList(elmList, cachedOnly) {
     if(!elmList) {
         elmList = $("body .oitm:not(.marketPriced)");
+    }
+    if(!cachedOnly) {
+        cachedOnly = false;
     }
     var cachedItemList = [];
 
@@ -214,7 +225,7 @@ function getMarketPricesForElementList(elmList) {
     for (var index in cachedItemList) {
         var itemForScience = cachedItemList[index][0];
         itemForScience.myFriends = cachedItemList[index];
-        itemForScience.getMarketPrice();
+        itemForScience.getMarketPrice(cachedOnly);
     }
 }
 

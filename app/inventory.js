@@ -14,6 +14,8 @@ Inventory.prototype.determineBackpackElement = function() {
     } else if(document.URL.indexOf("/trade?t=") != -1) {
         this.backpackElement = $("#offer");
         this.lastElementInBackpack = $(self.backpackElement).children().last();
+    } else if($("#backpack").length) {
+        this.backpackElement = $("#backpack");
     } else {
         this.backpackElement = false;
     }
