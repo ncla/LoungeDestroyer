@@ -242,7 +242,12 @@
                     </div>
                     <div class="col-md-6 ld-setting">
                         <label class="control-label">Custom .mp3 audio to be played when trade offer has been received:</label>
-                        <input id="customTradeOfferSound" class="form-control" placeholder="HTTP URL to your custom .mp3 audio">
+                        <div class="input-group">
+                            <input id="customTradeOfferSound" class="form-control" placeholder="HTTP URL to your custom .mp3 audio" type="url">
+                            <span class="input-group-btn">
+                                <button id="offer-audio-play-btn" class="btn btn-primary">&#9658;</button>
+                            </span>
+                        </div>
                     </div>
                 </div>
 

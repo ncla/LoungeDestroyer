@@ -153,6 +153,11 @@ function restore_options() {
             }
         })
     });
+    $("#offer-audio-play-btn").click(function(){
+        var url = this.parentNode.parentNode.querySelector("input[type='url']").value,
+            a = new Audio(url);
+        a.play();
+    });
 }
 
 $textarea = $("#reportlog-textarea textarea");
@@ -218,6 +223,37 @@ $(".ld-settings select, .ld-settings input").on('change', function() {
 
         defaultUser.saveSetting(this.id, outp);
         return;
+    }
+
+    // make sure URL inputs are actually valid URLs
+    if (this.type === "url") {
+        var urlRegxp = /^(http(?:s)?\:\/\/[a-zA-Z0-9\-]+(?:\.[a-zA-Z0-9\-]+)*\.[a-zA-Z]{2,6}(?:\/?|(?:\/[\w\-]+)*)(?:\/?|\/\w+\.[a-zA-Z]{2,4}(?:\?[\w]+\=[\w\-]+)?)?(?:\&[\w]+\=[\w\-]+)*(?:\.([a-zA-Z0-9]+))?)$/,
+            url = this.value,
+            parent = this.parentNode,
+            btn = parent.querySelector(".input-group-btn button");
+
+        // just save if URL is empty
+        if (url) {
+            // reset previous data
+            clearTimeout(this.stateTimer);
+            parent.classList.remove("has-success", "has-error");
+            if (btn) { btn.removeAttribute("disabled"); }
+
+            // if the URL seems valid
+            if (urlRegxp.test(url)) {
+                // display success, remove after 2.5 seconds
+                var that = this;
+                parent.classList.add("has-success");
+
+                this.stateTimer = setTimeout(function(){
+                    parent.classList.remove("has-success");
+                }, 2500);
+            } else {
+                parent.classList.add("has-error");
+                if (btn) { btn.setAttribute("disabled", "disabled"); }
+                return;
+            }
+        }
     }
 
     // save setting
