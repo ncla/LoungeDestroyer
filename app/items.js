@@ -22,7 +22,10 @@ var Item = function(item) {
         this.convertLoungeValue();
     }
 };
-
+/**
+ * Replaces text of .rarity element with the market price for every item that has the same item name
+ * @param lowestPrice
+ */
 Item.prototype.insertMarketValue = function(lowestPrice) {
 	var self = this;
     // This is set by getMarketPricesForElementList function in order to avoid performance issues
@@ -47,7 +50,9 @@ Item.prototype.insertMarketValue = function(lowestPrice) {
         });
     }
 };
-
+/**
+ * Appends item rarity next to market price while respecting user settings
+ */
 Item.prototype.displayWeaponQuality = function() {
     if(LoungeUser.userSettings.displayCsgoWeaponQuality != "1" || typeof this.weaponQuality == 'undefined') {
         return false;
@@ -55,10 +60,18 @@ Item.prototype.displayWeaponQuality = function() {
 
     $(".rarity", this.item).append('<span class="weaponWear"> | ' + this.weaponQualityAbbrevation + '</span>')
 };
-
-Item.prototype.getMarketPrice = function() {
+/**
+ * Gets market price for the item, it goes through our cached item list, blacklisted item list, already marketed items list,
+ * and then finally if price still hasn't been found, request it via Steam API
+ * @param cachedOnly If set to true, this method will only rely on cached information and will not request price from Steam API
+ */
+Item.prototype.getMarketPrice = function(cachedOnly) {
     if (!(this instanceof Item)) {
         throw new TypeError("'this' must be instance of Item");
+    }
+
+    if(!cachedOnly) {
+        cachedOnly = false;
     }
 
     var self = this;
@@ -81,24 +94,34 @@ Item.prototype.getMarketPrice = function() {
 
     // Check if the itemName has not been already marketed before
     if(marketedItems.hasOwnProperty(this.itemName)) {
+        console.log(this.itemName + " has been already marketed by the API, appending price now.");
         // Not sure if I am genius for returning something and calling a function at the same time
         return this.insertMarketValue(marketedItems[this.itemName]);
+    }
+
+    if(cachedOnly) {
+        return false;
     }
 
     if(nonMarketItems.indexOf(self.itemName) == -1 && nonMarketItems.indexOf($(".rarity", this.item).text()) == -1 && !loadingItems.hasOwnProperty(this.itemName)) {
         this.fetchSteamMarketPrice();
     }
 };
+/**
+ * Used by 'Show Steam market price' button in item pop-up
+ */
 Item.prototype.unloadMarketPrice = function() {
     var self = this;
     $(".oitm.marketPriced").each(function(i, v) {
         $theItem = $(v);
         if($theItem.hasClass('marketPriced') && $theItem.find("img.smallimg").attr("alt").trim() == self.itemName) {
-            $theItem.find(".rarity").html("Fetching...");
             $theItem.removeClass('marketPriced');
         }
     });
 };
+/**
+ *
+ */
 Item.prototype.fetchSteamMarketPrice = function() {
     var self = this;
     loadingItems[this.itemName] = true;
@@ -196,9 +219,12 @@ Item.prototype.appendHoverElements = function() {
  * Get market prices for an element list in a performance friendly way
  * @param {Array} elmList - list of jQuery element objects (optional)
  */
-function getMarketPricesForElementList(elmList) {
+function getMarketPricesForElementList(elmList, cachedOnly) {
     if(!elmList) {
         elmList = $("body .oitm:not(.marketPriced)");
+    }
+    if(!cachedOnly) {
+        cachedOnly = false;
     }
     var cachedItemList = [];
 
@@ -214,7 +240,7 @@ function getMarketPricesForElementList(elmList) {
     for (var index in cachedItemList) {
         var itemForScience = cachedItemList[index][0];
         itemForScience.myFriends = cachedItemList[index];
-        itemForScience.getMarketPrice();
+        itemForScience.getMarketPrice(cachedOnly);
     }
 }
 

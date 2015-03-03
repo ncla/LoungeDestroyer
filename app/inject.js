@@ -37,7 +37,13 @@ chrome.extension.onMessage.addListener(function(msg, sender, sendResponse) {
     if(msg.inventory) {
         console.log('Backpack AJAX request detected from background script with URL ', msg.inventory, +new Date());
         if(LoungeUser.userSettingsLoaded) {
-            inventory.onInventoryLoaded(msg.inventory);
+            if(msg.inventory.indexOf('tradeCsRight') != -1 || msg.inventory.indexOf('tradeWhatRight') != -1) {
+                if(LoungeUser.userSettings["itemMarketPricesv2"] == "2") {
+                    getMarketPricesForElementList($("#itemlist .oitm:not(.marketPriced)"), true);
+                }
+            } else {
+                inventory.onInventoryLoaded(msg.inventory);
+            }
         } else {
             earlyBackpackLoad = msg.inventory;
         }
@@ -280,11 +286,6 @@ function init() {
                     inventory.getCachedInventory("bettingInventory" + appID + "_" + readCookie("id"), function(bpHTML) {
                         document.getElementById("backpack").innerHTML = bpHTML;
                         inventory.onInventoryLoaded("");
-                        /*this.bettingInventoryType = "inventory";
-                        addInventoryStatistics();
-                        inventory.group();
-                        inventory.getMarketPrices(true);*/
-
                     });
                 });
             }
@@ -533,6 +534,7 @@ $(document).on("mouseover", ".oitm", function() {
     }
     var LoungeItem = new Item(this);
     LoungeItem.appendHoverElements();
+    // TODO: Stop pointlessly firing getMarketPrice without checking marketPriced class
     var settingMarketPrices = LoungeUser.userSettings["itemMarketPricesv2"];
     if(settingMarketPrices == "1" || settingMarketPrices == "2") {
         LoungeItem.getMarketPrice();
@@ -542,6 +544,7 @@ $(document).on("click", "a.refreshPriceMarket", function(e) {
     e.stopPropagation();
     var LoungeItem = new Item($(this).parents(".oitm"));
     LoungeItem.unloadMarketPrice();
+    $(LoungeItem.item).find(".rarity").html("");
     LoungeItem.fetchSteamMarketPrice();
 });
 $(document).on("mouseover", ".matchmain", function() {

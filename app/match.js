@@ -26,13 +26,10 @@ Match.prototype.fetchMatchPage = function(callback, game) {
  */
 Match.prototype.parseMatchElement = function(elm) {
     // Because the timeFromNow is not wrapped around an element and is a text node, we need to do this..
-    var timeFromNow = $(".matchheader > *:eq(0)", elm).contents()
-        .filter(function() {
-            return this.nodeType === 3;
-        });
-    this.timeFromNow = timeFromNow || "in near future..";
+    var timeFromNow = $(".matchheader > *:eq(0)", elm).contents();
+    this.timeFromNow = $(timeFromNow[0]).text() || "in near future.."; // This somehow works..
     this.tournamentName = $(".matchheader .eventm", elm).text().trim() || undefined;
-    this.matchULR = $("a[href]:first", elm)[0].href;
+    this.matchURL = $("a[href]:first", elm)[0].href; // Does not work if it's not run in page context
     this.matchID = $("a[href]:first", elm).attr("href").replace(/\D/g, '');
     this.teamA = $(".teamtext:eq(0) b", elm).text().trim() || $(".changeteam:eq(0)", elm).text().trim() || undefined;
     this.teamB = $(".teamtext:eq(1) b", elm).text().trim() || $(".changeteam:eq(1)", elm).text().trim() || undefined;

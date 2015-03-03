@@ -42,7 +42,9 @@ User.prototype.defaultSettings =
     smallBetPercentage: "5",
     mediumBetPercentage: "10",
     largeBetPercentage: "20",
-    showBettedIndicator: "0"
+    showBettedIndicator: "0",
+    beepSoundDisable: "0",
+    customTradeOfferSound: ""
 };
 
 // defaultSettings get modified when changing settings?

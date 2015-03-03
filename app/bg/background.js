@@ -288,9 +288,33 @@ chrome.webRequest.onCompleted.addListener(
         sendMessageToContentScript(message, details.tabId);
     },
     {
-        urls: ["http://*/ajax/betReturns*", "http://*/ajax/betBackpack*", "http://*/ajax/tradeBackpack*", "http://*/ajax/tradeGifts*", "http://*/ajax/backpack*"],
+        urls: ["*://*/ajax/betReturns*", "*://*/ajax/betBackpack*", "*://*/ajax/tradeBackpack*", "*://*/ajax/tradeGifts*", "*://*/ajax/backpack*", "*://*/ajax/showBackpackApi*", "*://*/ajax/tradeCsRight*", "*://*/ajax/tradeWhatRight*"],
         types: ["xmlhttprequest"]
     }
+);
+
+chrome.webRequest.onBeforeRequest.addListener(
+    function requestListener(details) {
+        if(["1", "2"].indexOf(LoungeUser.userSettings.beepSoundDisable) != -1 && details.url.indexOf('/audio/notif.mp3') != -1) {
+            console.log("Detected notif.mp3 sound request..");
+            if(LoungeUser.userSettings.beepSoundDisable == "2" && LoungeUser.userSettings.customTradeOfferSound.length > 0) {
+                console.log("Applying custom trade offer audio...");
+                return {
+                    redirectUrl: LoungeUser.userSettings.customTradeOfferSound
+                };
+            } else {
+                console.log("Disabling notif.mp3 sound..");
+                return {
+                    cancel: true
+                };
+            }
+        }
+    },
+    {
+        urls: ["*://csgolounge.com/audio/*", "*://dota2lounge.com/audio/*"],
+        types: ["other"]
+    },
+    ["blocking"]
 );
 
 var notificationID = 0;
@@ -368,20 +392,13 @@ function checkNewMatches(ajaxResponse, appID) {
 
     $(".matchmain", ajaxResponse).each(function(index, value) {
         if(!$(".match", value).hasClass("notaviable")) {
-            var matchID = $("a", value).attr("href").replace("match?m=", "").replace("predict?m=", "");
-            var tournament = $(".matchheader div:eq(1)", value).text().trim();
-            var teamA = $(".teamtext:eq(0) b", value).text().trim();
-            var teamB = $(".teamtext:eq(1) b", value).text().trim();
-            var matchWhenTextNode = $(".matchheader .whenm:eq(0)", value)
-                .contents()
-                .filter(function() {
-                    return this.nodeType === 3;
-                });
-            var when = $(matchWhenTextNode).text().trim() || " in near future..";
-            activeMatches[matchID] = {matchID: matchID, tournament: tournament, teamA: teamA, teamB: teamB, when: when };
+            var matchObj = new Match();
+            matchObj.parseMatchElement(value);
+            activeMatches[matchObj.matchID] = matchObj;
         }
     });
-    /* Don't bother if there are no matches */
+
+    // No need to do anything if there are no active matches
     if($.isEmptyObject(activeMatches)) {
         return false;
     }
@@ -389,20 +406,18 @@ function checkNewMatches(ajaxResponse, appID) {
     var storageName = "matches" + appID;
 
     var matchesToNotificate = {};
-    chrome.storage.local.get('matches' + appID, function(result) {
-        var newMatchStorageObject = result[storageName];
 
-        if($.isEmptyObject(result)) {
-            // Init
-            console.log("empty object");
-            newMatchStorageObject = {};
-        }
-        
+    chrome.storage.local.get(storageName, function(result) {
+        // If no storage, then it is empty object
+        var newMatchStorageObject = result[storageName] || {};
+        var newMatchesCount = 0;
+
+        // Loop through active matches and check if they are in storage
         $.each(activeMatches, function(index, value) {
             if (typeof newMatchStorageObject[index] == 'undefined') {
                 console.log("Match #" + index + " is new, adding to notify list and saving in local storage.");
-                matchesToNotificate[index] = value;
-                newMatchStorageObject[index] = value;
+                matchesToNotificate[index] = newMatchStorageObject[index] = value;
+                newMatchesCount++;
             }
         });
 
@@ -412,19 +427,10 @@ function checkNewMatches(ajaxResponse, appID) {
         // Setting newly discovered matches in the storage
         chrome.storage.local.set(tempObj);
 
-        var countNotify = Object.keys(matchesToNotificate).length;
-        if(countNotify >= 3) {
-            createNotification(
-                "New matches have been added for betting on " + (appID == 730 ? "CS:GO" : "DOTA2") + " Lounge",
-                "",
-                "regular",
-                null,
-                false
-            );
-        }
-        else {
+        // We do not want to overwhelm user with many new matches
+        if(newMatchesCount <= 3) {
             $.each(matchesToNotificate, function(index, value) {
-                var msg = (value.teamA.length > 0) ? (value.teamA + " vs. " + value.teamB + " @ " + value.tournament + "\nMatch begins " + value.when) : (value.tournament + "\nMatch begins " + value.when);
+                var msg = (value.teamA.length > 0) ? (value.teamA + " vs. " + value.teamB + " @ " + value.tournamentName + "\nMatch begins " + value.timeFromNow) : (value.tournamentName + "\nMatch begins " + value.timeFromNow);
                 createNotification(
                     "A new " + (appID == 730 ? "CS:GO" : "DOTA2") + " match has been added!",
                     msg,
