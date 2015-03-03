@@ -41,7 +41,9 @@ User.prototype.defaultSettings =
     inventoryStatisticsGroup: {730: ["1"], 570: ["1"]},
     smallBetPercentage: "5",
     mediumBetPercentage: "10",
-    largeBetPercentage: "20"
+    largeBetPercentage: "20",
+    beepSoundDisable: "0",
+    customTradeOfferSound: ""
 };
 
 // defaultSettings get modified when changing settings?

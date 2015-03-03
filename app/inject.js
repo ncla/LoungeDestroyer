@@ -9,7 +9,6 @@ var storageMarketItems,
     matchInfoCachev2 = {},
     streamPlaying = false,
     inventory = new Inventory(),
-    inventorySearch = new Inventory(),
     lastAccept = 0,
     blacklistedItemList = {},
     earlyBackpackLoad = false;
@@ -270,11 +269,6 @@ function init() {
                     inventory.getCachedInventory("bettingInventory" + appID + "_" + readCookie("id"), function(bpHTML) {
                         document.getElementById("backpack").innerHTML = bpHTML;
                         inventory.onInventoryLoaded("");
-                        /*this.bettingInventoryType = "inventory";
-                        addInventoryStatistics();
-                        inventory.group();
-                        inventory.getMarketPrices(true);*/
-
                     });
                 });
             }
@@ -523,6 +517,7 @@ $(document).on("mouseover", ".oitm", function() {
     }
     var LoungeItem = new Item(this);
     LoungeItem.appendHoverElements();
+    // TODO: Stop pointlessly firing getMarketPrice without checking marketPriced class
     var settingMarketPrices = LoungeUser.userSettings["itemMarketPricesv2"];
     if(settingMarketPrices == "1" || settingMarketPrices == "2") {
         LoungeItem.getMarketPrice();
@@ -532,6 +527,7 @@ $(document).on("click", "a.refreshPriceMarket", function(e) {
     e.stopPropagation();
     var LoungeItem = new Item($(this).parents(".oitm"));
     LoungeItem.unloadMarketPrice();
+    $(LoungeItem.item).find(".rarity").html("");
     LoungeItem.fetchSteamMarketPrice();
 });
 $(document).on("mouseover", ".matchmain", function() {
