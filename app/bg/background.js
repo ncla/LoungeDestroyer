@@ -295,10 +295,8 @@ chrome.webRequest.onCompleted.addListener(
 
 chrome.webRequest.onBeforeRequest.addListener(
     function requestListener(details) {
-        console.log(details); // main_frame
         if(["1", "2"].indexOf(LoungeUser.userSettings.beepSoundDisable) != -1 && details.url.indexOf('/audio/notif.mp3') != -1) {
             console.log("Detected notif.mp3 sound request..");
-            // http://soundjax.com/reddo/40725%5EDING1.mp3
             if(LoungeUser.userSettings.beepSoundDisable == "2" && LoungeUser.userSettings.customTradeOfferSound.length > 0) {
                 console.log("Applying custom trade offer audio...");
                 return {
