@@ -649,7 +649,6 @@ function addInventoryStatistics(targetItems, targetBackpack, groupName) {
 
     var total = 0,
         itemValues = {},
-        betSizes = {},
         itemQualities = {
             730: ['exotic', 'remarkable', 'contraband', 'high', 'covert', 'classified', 'restricted', 'industrial', 'mil-spec', 'consumer', 'base'],
             570: ['arcana', 'immortal', 'legendary', 'mythical', 'rare', 'uncommon', 'common', 'base']
@@ -657,17 +656,19 @@ function addInventoryStatistics(targetItems, targetBackpack, groupName) {
 
     $(".item", targetItems).each(function () {
         // Lounge provides item rarities in the classnames
-        var rarity = $(this).children("div.rarity")[0].classList[1],
-            e = $(this).children("div.value")[0].innerHTML;
-        var itemPrice = parseFloat(e.replace("$ ", ""));
-        rarity = (rarity === undefined ? "base" : rarity.toLowerCase());
-        // If there is already a rarity index set, if not just add up the numbers for that rarity
-        if(itemValues.hasOwnProperty(rarity)) {
-            itemValues[rarity] = itemValues[rarity] + itemPrice;
-        } else {
-            itemValues[rarity] = itemPrice;
+        var rarity = ($("div.rarity", this).attr("class").split(" ")[1] || "base").toLowerCase();
+        var itemValue = parseFloat($("div.value", this).text().replace("$ ", "")) || parseFloat($("input[name='worth']").val()) || undefined;
+
+        // Make sure we have both rarity and item value
+        if(rarity && itemValue) {
+            // If there is already a rarity index set, if not just add up the numbers for that rarity
+            if(itemValues.hasOwnProperty(rarity)) {
+                itemValues[rarity] = itemValues[rarity] + itemValue;
+            } else {
+                itemValues[rarity] = itemValue;
+            }
+            total += itemValue;
         }
-        total += itemPrice;
     });
 
     var itemValuesTemp = {};
