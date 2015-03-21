@@ -32,6 +32,11 @@ function restore_options() {
             }
         });
 
+        // display the keywords list
+        $("#hideTradesFilter,#markTradesFilter").each(function(){
+            parseAndDisplayKeywords.apply(this);
+        });
+
         // populate group <select> for inventory statistics
         $.each(Settings.itemGroups, function(gameId, groups){
             var optgroup = document.querySelector("optgroup[group='"+gameId+"']");
@@ -158,6 +163,42 @@ function restore_options() {
             a = new Audio(url);
         a.play();
     });
+    $("#hideTradesFilter, #markTradesFilter").on("change", function(){
+        var outp = parseAndDisplayKeywords.apply(this);
+
+        defaultUser.saveSetting(this.id+"Array", outp);
+    });
+
+    // handles extracting and displaying keywords. Should be used as event handler for input
+    function parseAndDisplayKeywords() {
+        var quoteRegexp = /(["'])((?:\\?.)*?)\1/g,
+            input = this.value,
+            keywords = [],
+            container = $(this).siblings("p").children(".keywordsContainer");
+
+        // get all text within quotes 
+        input = input.replace(quoteRegexp, function(m1,m2,m3){
+            if (m3.length && keywords.indexOf(m3) === -1) {
+                keywords.push(m3.trim().toLowerCase()); // push the content (sans quotes) to keywords
+            }
+            return ""; // remove from string
+        });
+        // get all words (separated by whitespace)
+        input.replace(/[^\s]+/g, function(m1){
+            if (m1.length && keywords.indexOf(m1) === -1) {
+                keywords.push(m1.trim().toLowerCase()); // push word to keywords
+            }
+            return "";
+        });
+
+        // display keywords to user
+        container.empty();
+        for (var i = 0; i < keywords.length; ++i) {
+            container.append($("<span class='keyword' />").text(keywords[i]));
+        }
+
+        return keywords;
+    }
 }
 
 $textarea = $("#reportlog-textarea textarea");
@@ -170,7 +211,7 @@ function addTextToReportLog(text) {
 
 document.addEventListener('DOMContentLoaded', restore_options);
 
-$(".ld-settings select, .ld-settings input").on('change', function() {
+$(".ld-setting select, .ld-setting input").on('change', function() {
     // make sure number inputs are limited to their min/max settings
     if (this.type === "number" && (this.hasOwnProperty("min") || this.hasOwnProperty("max"))) {
         var min = this.min!==undefined ? this.min : Infinity,

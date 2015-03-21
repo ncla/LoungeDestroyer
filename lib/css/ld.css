@@ -182,3 +182,12 @@ optgroup > option {
     padding-left: 10px;
     white-space: normal;
 }
+.keyword { 
+    display: inline-block;
+    padding: 0 4px;
+    margin: 0 4px 4px 0;
+
+    background: #999;
+    color: #fff;
+    border-radius: 3px;
+}

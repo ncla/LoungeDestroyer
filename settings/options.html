@@ -251,6 +251,30 @@
                     </div>
                 </div>
 
+                <h3 class="page-header">Trade filters</h3>
+                <div class="row">
+                    <div class="col-md-6 ld-setting">
+                        <label class="control-label">Hide trades that include:</label>
+                        <input type="text" id="hideTradesFilter" class="form-control" placeholder="Enter keywords">
+                        <p class="help-block">
+                            Any trades that include these keywords will be hidden. Keywords are separated by space, unless enclosed in quotes. Punctuation and leading/trailing whitespace is ignored when matching.
+                        </p>
+                        <p class="help-block">Currently matching: 
+                            <span class="keywordsContainer"></span>
+                        </p>
+                    </div>
+                    <div class="col-md-6 ld-setting">
+                        <label class="control-label">Mark trades that include:</label>
+                        <input type="text" id="markTradesFilter" class="form-control" placeholder="Enter keywords">
+                        <p class="help-block">
+                            Any trades that include these keywords will be visibly marked with a red line next to their description. Keywords are separated by space, unless enclosed in quotes. Punctuation and leading/trailing whitespace is ignored when matching.
+                        </p>
+                        <p class="help-block">Currently matching: 
+                            <span class="keywordsContainer"></span>
+                        </p>
+                    </div>
+                </div>
+
                 <h3 class="page-header">Betting inventory statistics</h3>
                 <div class="row">
                     <div class="col-md-4 ld-setting">

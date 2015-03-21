@@ -11,7 +11,9 @@ var storageMarketItems,
     inventory = new Inventory(),
     lastAccept = 0,
     blacklistedItemList = {},
-    earlyBackpackLoad = false;
+    earlyBackpackLoad = false,
+    tradeHideFilter,
+    tradeMarkFilter;
 
 var container = document.createElement("div");
 
@@ -128,6 +130,31 @@ function init() {
         }
     }
 
+    // create RegExp's from users trade filters
+    var tradeHideArr = LoungeUser.userSettings.hideTradesFilterArray || [],
+        tradeMarkArr = LoungeUser.userSettings.markTradesFilterArray || [];
+    // create string in format "m1|m2|m3|m4" for RegExp
+    var tradeHideStr = joinArrForRegexp(tradeHideArr),
+        tradeMarkStr = joinArrForRegexp(tradeMarkArr);
+    // create actual regexps
+    // match any keyword surrounded by:
+    // a word boundary, whitespace, the beginning/end of input, punctuation or itself
+    var filterTempl = "(?:^|¤)(#)\\1*(?=$|¤)".replace(/¤/g, "\\b|\\s|^|\\.|,|!|\\?|\\-|\\+|~");
+    tradeHideFilter = tradeHideStr ? new RegExp(filterTempl.replace(/#/g, tradeHideStr),"i") : undefined;
+    tradeMarkFilter = tradeMarkStr ? new RegExp(filterTempl.replace(/#/g, tradeMarkStr),"i") : undefined;
+    // very specific, but DRY n shit
+    // creates string in format "m1|m2|m3|m4" for use in RegExps
+    function joinArrForRegexp(arr){
+        return arr.reduce(function(prev, cur){
+            return prev
+                    // add "|" between strings
+                    +(prev?"|":"")
+                    // escape special characters \ ^ $ * + ? . ( ) | { } [ ]
+                    +cur.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+        }, "");
+    }
+
+    // the following requires DOM
     $(document).ready(function() {
         // add describing classes to body
         $("body").addClass("appID" + appID);
@@ -251,12 +278,10 @@ function init() {
             });
         }
         if($('a[href="/trades"]').length || document.URL.indexOf("/result?") != -1 || document.URL.indexOf("/trades") != -1) {
-            if (LoungeUser.userSettings.showDescriptions !== "0") {
-                $(".tradepoll").each(function(index, value) {
-                    var trade = new Trade(value);
-                    trade.addTradeDescription();
-                });
-            }
+            $(".tradepoll").each(function(index, value) {
+                var trade = new Trade(value);
+                trade.addTradeDescription();
+            });
         }
         if(document.URL.indexOf("/match?m=") != -1 || document.URL.indexOf("/predict") != -1) {
             if (LoungeUser.userSettings.renameButtons === "1") {
@@ -563,10 +588,8 @@ var itemObs = new MutationObserver(function(records){
                 if (elm.classList) {
                     if (elm.classList.contains("tradepoll")) {
                         hasTradeNodes = true;
-                        if (LoungeUser.userSettings.showDescriptions !== "0") {
-                            var trade = new Trade(elm);
-                            trade.addTradeDescription();
-                        }
+                        var trade = new Trade(elm);
+                        trade.addTradeDescription();
                     }
                 }
             }
