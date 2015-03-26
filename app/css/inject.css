@@ -48,7 +48,7 @@ div.trade-description {
 .trade-description .open-trade {
     right: 10px;
 }
-.tradepoll.ld-marked .trade-description p {
+.tradepoll.ld-marked .trade-description p, .tradepoll.ld-marked:hover .trade-description p {
     box-sizing: border-box;
     border-left: 3px solid red !important;
 }
