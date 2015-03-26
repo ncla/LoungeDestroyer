@@ -242,7 +242,36 @@
                     </div>
                     <div class="col-md-6 ld-setting">
                         <label class="control-label">Custom .mp3 audio to be played when trade offer has been received:</label>
-                        <input id="customTradeOfferSound" class="form-control" placeholder="HTTP URL to your custom .mp3 audio">
+                        <div class="input-group">
+                            <input id="customTradeOfferSound" class="form-control" placeholder="HTTP URL to your custom .mp3 audio" type="url">
+                            <span class="input-group-btn">
+                                <button id="offer-audio-play-btn" class="btn btn-primary">&#9658;</button>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 class="page-header">Trade filters</h3>
+                <div class="row">
+                    <div class="col-md-6 ld-setting">
+                        <label class="control-label">Hide trades that include:</label>
+                        <input type="text" id="hideTradesFilter" class="form-control" placeholder="Enter keywords">
+                        <p class="help-block">
+                            Any trades that include these keywords will be hidden. Keywords are separated by space, unless enclosed in quotes. Punctuation and leading/trailing whitespace is ignored when matching.
+                        </p>
+                        <p class="help-block">Currently matching: 
+                            <span class="keywordsContainer"></span>
+                        </p>
+                    </div>
+                    <div class="col-md-6 ld-setting">
+                        <label class="control-label">Mark trades that include:</label>
+                        <input type="text" id="markTradesFilter" class="form-control" placeholder="Enter keywords">
+                        <p class="help-block">
+                            Any trades that include these keywords will be visibly marked with a red line next to their description. Keywords are separated by space, unless enclosed in quotes. Punctuation and leading/trailing whitespace is ignored when matching.
+                        </p>
+                        <p class="help-block">Currently matching: 
+                            <span class="keywordsContainer"></span>
+                        </p>
                     </div>
                 </div>
 
@@ -308,6 +337,14 @@
                         <select id="renameButtons" class="form-control">
                             <option value="1">Enabled</option>
                             <option value="0">Disabled</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 ld-setting">
+                        <label class="control-label">Betted match indicator <a href="#" data-toggle="tooltip" data-original-title="Shows a small indicator on the front page besides matches you've already betted on.">(?)</a>:</label>
+                        <select id="showBettedIndicator" class="form-control">
+                        <option value="2">Show on matches bet on</option>
+                        <option value="1">Show on matches not bet on</option>
+                        <option value="0">Disabled</option>
                         </select>
                     </div>
                 </div>

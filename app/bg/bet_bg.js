@@ -175,7 +175,7 @@ bet.autoLoop = function(game) {
                 success[g] = false;
                 continue;
             }
-            if (bet.betData[g].serialized.indexOf("&on=")===-1) { // if not a betting request
+            if (bet.betData[g].serialized.indexOf("on=")===-1) { // if not a betting request
                 console.log("Not a betting request");
                 success[g] = false;
                 continue;
@@ -349,8 +349,17 @@ chrome.webRequest.onBeforeRequest.addListener(
             chrome.tabs.sendMessage(details.tabId, {serialize: "#betpoll", cookies: true},
                 (function(details,data,game,that){return function(d){
                     var serialized = d["serialize"],
-                        serializedData = serialized+"&match="+data.match[0]+"&tlss="+data.tlss[0],
                         cookies = d["cookies"];
+
+                    // replace bet data with serialized, keep everything else
+                    // "on=a&ldef_index%5B%5D=2974&lquality%5B%5D=0&id%5B%5D=1578647120&worth=0.18"
+                    var serializedData = serialized,
+                        blacklistedKeys = ["id[]", "ldef_index[]", "lquality[]", "on", "worth"];
+                    for (var k in data) {
+                        if (blacklistedKeys.indexOf(k) === -1) {
+                            serializedData += "&"+k+"="+data[k];
+                        }
+                    }
 
                     $.ajax({
                         url: details.url, 

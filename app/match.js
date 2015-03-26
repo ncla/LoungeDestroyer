@@ -44,6 +44,7 @@ Match.prototype.parseMatchPage = function(elm) {
     this.timeFromNow = $(".half:eq(0)", matchHeader).text().trim();
     this.matchFormat = $(".half:eq(1)", matchHeader).text().trim();
     this.exactTime = $(".half:eq(2)", matchHeader).text().trim();
+    this.userBetted = !!$(".box-shiny-alt .winsorloses", elm).length;
 };
 /**
  *
@@ -61,6 +62,10 @@ Match.prototype.generateMatchURL = function(appID) {
 Match.prototype.appendExtraMatchInfo = function(targetElement) {
     var matchHeaderBlock = $(".matchheader .whenm:eq(0)", targetElement);
 
+    // this.userBetted is never === "-"
+    if (this.userBetted !== undefined && this.userBetted === ["-", false, true][LoungeUser.userSettings.showBettedIndicator]) {
+    	$(matchHeaderBlock).prepend("<span class='bettedIndicator'>•</span> ");
+    }
     if(this.exactTime) {
         var convertedTime = convertLoungeTime(this.exactTime);
         if(convertedTime) {
@@ -92,7 +97,8 @@ Match.prototype.cacheMatchExtraInfo = function() {
     matchInfoCachev2[this.game][this.matchID] = {
         time: Date.now(),
         matchFormat: this.matchFormat,
-        exactTime: this.exactTime
+        exactTime: this.exactTime,
+        userBetted: this.userBetted
     };
     chrome.storage.local.set({matchInfoCachev2: matchInfoCachev2});
     return true;

@@ -11,7 +11,9 @@ var storageMarketItems,
     inventory = new Inventory(),
     lastAccept = 0,
     blacklistedItemList = {},
-    earlyBackpackLoad = false;
+    earlyBackpackLoad = false,
+    tradeHideFilter,
+    tradeMarkFilter;
 
 var container = document.createElement("div");
 
@@ -128,6 +130,13 @@ function init() {
         }
     }
 
+    // create RegExp's from users trade filters
+    var tradeHideArr = LoungeUser.userSettings.hideTradesFilterArray || [],
+        tradeMarkArr = LoungeUser.userSettings.markTradesFilterArray || [];
+    tradeHideFilter = createKeywordRegexp(tradeHideArr);
+    tradeMarkFilter = createKeywordRegexp(tradeMarkArr);
+
+    // the following requires DOM
     $(document).ready(function() {
         // add describing classes to body
         $("body").addClass("appID" + appID);
@@ -182,6 +191,23 @@ function init() {
         })();
 
         if(document.URL.indexOf("/mybets") != -1) {
+            // reload page if draft page
+            if (LoungeUser.userSettings.redirect === "1") {
+                if (document.body.textContent.indexOf("Item draft is under progress") !== -1) {
+                    var title = document.querySelector("main .full h2"),
+                        newElm = document.createElement("h2");
+
+                    newElm.setAttribute("style", title.getAttribute("style"));
+                    newElm.textContent = "LoungeDestroyer is reloading this page.";
+                    title.parentNode.insertBefore(newElm, title);
+
+                    // reload in 2-4 seconds
+                    setTimeout(function(){
+                        window.location.reload(true);
+                    }, (2+(Math.random()*2))*1000);
+                }
+            }
+
             if (LoungeUser.userSettings.renameButtons === "1") {
                 var btn = document.getElementById("freezebutton");
                 if (btn) {
@@ -234,12 +260,10 @@ function init() {
             });
         }
         if($('a[href="/trades"]').length || document.URL.indexOf("/result?") != -1 || document.URL.indexOf("/trades") != -1) {
-            if (LoungeUser.userSettings.showDescriptions !== "0") {
-                $(".tradepoll").each(function(index, value) {
-                    var trade = new Trade(value);
-                    trade.addTradeDescription();
-                });
-            }
+            $(".tradepoll").each(function(index, value) {
+                var trade = new Trade(value);
+                trade.addTradeDescription();
+            });
         }
         if(document.URL.indexOf("/match?m=") != -1 || document.URL.indexOf("/predict") != -1) {
             if (LoungeUser.userSettings.renameButtons === "1") {
@@ -546,10 +570,8 @@ var itemObs = new MutationObserver(function(records){
                 if (elm.classList) {
                     if (elm.classList.contains("tradepoll")) {
                         hasTradeNodes = true;
-                        if (LoungeUser.userSettings.showDescriptions !== "0") {
-                            var trade = new Trade(elm);
-                            trade.addTradeDescription();
-                        }
+                        var trade = new Trade(elm);
+                        trade.addTradeDescription();
                     }
                 }
             }
