@@ -133,26 +133,8 @@ function init() {
     // create RegExp's from users trade filters
     var tradeHideArr = LoungeUser.userSettings.hideTradesFilterArray || [],
         tradeMarkArr = LoungeUser.userSettings.markTradesFilterArray || [];
-    // create string in format "m1|m2|m3|m4" for RegExp
-    var tradeHideStr = joinArrForRegexp(tradeHideArr),
-        tradeMarkStr = joinArrForRegexp(tradeMarkArr);
-    // create actual regexps
-    // match any keyword surrounded by:
-    // a word boundary, whitespace, the beginning/end of input, punctuation or itself
-    var filterTempl = "(?:^|¤)(#)\\1*(?=$|¤)".replace(/¤/g, "\\b|\\s|^|\\.|,|!|\\?|\\-|\\+|~");
-    tradeHideFilter = tradeHideStr ? new RegExp(filterTempl.replace(/#/g, tradeHideStr),"i") : undefined;
-    tradeMarkFilter = tradeMarkStr ? new RegExp(filterTempl.replace(/#/g, tradeMarkStr),"i") : undefined;
-    // very specific, but DRY n shit
-    // creates string in format "m1|m2|m3|m4" for use in RegExps
-    function joinArrForRegexp(arr){
-        return arr.reduce(function(prev, cur){
-            return prev
-                    // add "|" between strings
-                    +(prev?"|":"")
-                    // escape special characters \ ^ $ * + ? . ( ) | { } [ ]
-                    +cur.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
-        }, "");
-    }
+    tradeHideFilter = createKeywordRegexp(tradeHideArr);
+    tradeMarkFilter = createKeywordRegexp(tradeMarkArr);
 
     // the following requires DOM
     $(document).ready(function() {
@@ -225,7 +207,7 @@ function init() {
                     }, (2+(Math.random()*2))*1000);
                 }
             }
-            
+
             if (LoungeUser.userSettings.renameButtons === "1") {
                 var btn = document.getElementById("freezebutton");
                 if (btn) {

@@ -38,13 +38,7 @@ Trade.prototype.testFilters = function() {
 // hide self
 // possibly expand later so that it replaces self with a new trade?
 Trade.prototype.hideSelf = function() {
-    console.log("Matched ",this,this.tradeElement);
-    var elm = this.tradeElement;
-    if (elm.parentNode) {
-        elm.parentNode.removeChild(elm);
-    } else {
-        elm.remove(); // not sure on the support of this one
-    }
+    this.tradeElement.setAttribute("style", "display: none !important;");
 }
 Trade.prototype.generateTradeURL = function() {
     return;
