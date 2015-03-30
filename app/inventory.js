@@ -683,16 +683,16 @@ function addInventoryStatistics(targetItems, targetBackpack, groupName) {
 
     if(total > 0) {
         $(targetBackpack).prepend('<div class="inventoryStatisticsBox">' +
-            '<div id="totalInvValue">Your items '+groupString+'are worth: <span>' + total.toFixed(2) + '</span></div>' +
+            '<div id="totalInvValue">Your items '+groupString+'are worth: <span>' + convertPrice(total, true) + '</span></div>' +
             '<div id="rarityValuesWrapper"><div id="rarityValues"></div></div>' +
             '<div id="betSizeValues">' +
-            '<span>Small bet: ' + ((LoungeUser.userSettings.smallBetPercentage / 100) * total).toFixed(2) + '</span>' +
-            '<span>Medium bet: ' + ((LoungeUser.userSettings.mediumBetPercentage / 100) * total).toFixed(2) + '</span>' +
-            '<span>Large bet: ' + ((LoungeUser.userSettings.largeBetPercentage / 100) * total).toFixed(2) + '</span>' +
+            '<span>Small bet: ' + convertPrice(((LoungeUser.userSettings.smallBetPercentage / 100) * total), true) + '</span>' +
+            '<span>Medium bet: ' + convertPrice(((LoungeUser.userSettings.mediumBetPercentage / 100) * total), true) + '</span>' +
+            '<span>Large bet: ' + convertPrice(((LoungeUser.userSettings.largeBetPercentage / 100) * total), true) + '</span>' +
             '</div>' +
             '</div>');
         $.each(itemValues, function(i, v) {
-            $("#rarityValues").append('<div class="rarityContainer"><div><span class="' + i + '">' + capitaliseFirstLetter(i) + '</span>: ' + v.toFixed(2) + '</div></div>');
+            $("#rarityValues").append('<div class="rarityContainer"><div><span class="' + i + '">' + capitaliseFirstLetter(i) + '</span>: ' + convertPrice(v, true) + '</div></div>');
         });
     } else {
         $(targetBackpack).prepend('<div class="inventoryStatisticsBox">'+
