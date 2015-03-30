@@ -53,7 +53,7 @@ Match.prototype.parseMatchPage = function(elm) {
  * @returns {string} Match URL
  */
 Match.prototype.generateMatchURL = function(appID) {
-    return "http://" + (appID == "570" ? "dota2lounge.com" : "csgolounge.com") + "/match?m=" + this.matchID;
+    return (window.location.protocol != "chrome-extension:" ? window.location.protocol : "http:") + "//" + (appID == "570" ? "dota2lounge.com" : "csgolounge.com") + "/match?m=" + this.matchID;
 };
 /**
  * Appends gathered extra match info (best of x, exact time) to targetElement
