@@ -29,7 +29,7 @@ var Item = function(item) {
 };
 /**
  * Replaces text of .rarity element with the market price for every item that has the same item name
- * @param lowestPrice
+ * @param lowestPrice string
  */
 Item.prototype.insertMarketValue = function(lowestPrice) {
     var _this = this;

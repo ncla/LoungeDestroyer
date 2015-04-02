@@ -1,7 +1,10 @@
 {
+  // https://github.com/airbnb/javascript/blob/master/README.md
   "preset": "airbnb",
-  "validateLineBreaks": "CRLF",
+  // Windows/Linux line-breaks differ, don't think we need to be that worried about it
+  "validateLineBreaks": null,
+  // Disabled because if there are keys in object with space in them, the warning will get triggered
   "disallowQuotedKeysInObjects": null,
-  "validateIndentation": 4,
-  "validateLineBreaks": null
+  // This is what we use in our project at the moment
+  "validateIndentation": 4
 }
