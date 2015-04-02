@@ -1,0 +1,7 @@
+{
+  "preset": "airbnb",
+  "validateLineBreaks": "CRLF",
+  "disallowQuotedKeysInObjects": null,
+  "validateIndentation": 4,
+  "validateLineBreaks": null
+}

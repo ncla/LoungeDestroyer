@@ -1,11 +1,7 @@
-var jshint = require('gulp-jshint');
-var gulp   = require('gulp');
-var watch  = require('gulp-watch');
+var gulp = require('gulp');
+var jscs = require('gulp-jscs');
 
-gulp.task('default', ['watch']);
-
-gulp.task('watch', function() {
-    watch("app/*.js")
-        .pipe(jshint())
-        .pipe(jshint.reporter('jshint-stylish'));
+gulp.task('default', function () {
+    return gulp.src('app/items.js')
+        .pipe(jscs());
 });
