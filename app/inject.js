@@ -13,7 +13,10 @@ var storageMarketItems,
     blacklistedItemList = {},
     earlyBackpackLoad = false,
     tradeHideFilter,
-    tradeMarkFilter;
+    tradeMarkFilter,
+    timezoneName = (LoungeUser.userSettings.timezone == "auto" ? Intl.DateTimeFormat().resolved.timeZone : LoungeUser.userSettings.timezone);
+
+console.log(tzdetect.matches()[0], Intl.DateTimeFormat().resolved.timeZone);
 
 var container = document.createElement("div");
 
@@ -314,7 +317,7 @@ function init() {
             }
 
             var previewElm = document.getElementById("preview");
-            
+
             if (previewElm) {
                 return;
             }
@@ -534,22 +537,21 @@ function newFreezeReturn(tries){
 /*
     Mouseover action for items
  */
-$(document).on("mouseover", ".oitm", function() {
+$(document).on("mouseenter", ".oitm", function(e) {
     // We do not have to do any of the stuff below anymore
-    if($(this).hasClass("ld-appended")) {
-        return false;
-    }
-    var LoungeItem = new Item(this);
+    e.stopPropagation();
+
+    var LoungeItem = itemObject($(this));
     LoungeItem.appendHoverElements();
-    // TODO: Stop pointlessly firing getMarketPrice without checking marketPriced class
+
     var settingMarketPrices = LoungeUser.userSettings["itemMarketPricesv2"];
-    if(settingMarketPrices == "1" || settingMarketPrices == "2") {
+    if (settingMarketPrices == "1" || settingMarketPrices == "2") {
         LoungeItem.getMarketPrice();
     }
 });
 $(document).on("click", "a.refreshPriceMarket", function(e) {
     e.stopPropagation();
-    var LoungeItem = new Item($(this).parents(".oitm"));
+    var LoungeItem = itemObject($(this).parents(".oitm"));
     LoungeItem.unloadMarketPrice();
     $(LoungeItem.item).find(".rarity").html("");
     LoungeItem.fetchSteamMarketPrice();
@@ -589,7 +591,7 @@ function convertLoungeTime(loungeTimeString) {
         // I am no timezone expert, but I assume moment.js treats CET/CEST automatically
         var trimmedTime = loungeTimeString.replace("CET", "").replace("CEST", "").trim();
         // Intl.DateTimeFormat().resolved.timeZone, might be derpy in other browsers
-        var timezoneName = (LoungeUser.userSettings.timezone == "auto" ? Intl.DateTimeFormat().resolved.timeZone : LoungeUser.userSettings.timezone);
+
         if(moment.tz.zone(timezoneName)) {
             var format = (LoungeUser.userSettings.americanosTime == "0" ? "HH:mm" : "h:mm A");
             format = (LoungeUser.userSettings.displayTzAbbr == "0" ? format : format + " z");

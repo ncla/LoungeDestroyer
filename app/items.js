@@ -13,6 +13,7 @@ var Item = function(item) {
 
     // This allows us to use the object functions as static functions without constructing the object
     if (item !== undefined) {
+
         this.item = item;
         this.itemName = $('.smallimg', this.item).attr('alt').trim();
         var quality = $('.rarity', this.item).text().trim();
@@ -29,51 +30,64 @@ var Item = function(item) {
 };
 /**
  * Replaces text of .rarity element with the market price for every item that has the same item name
- * @param lowestPrice string
+ * @param lowestPrice float Market price in USD
+ * @returns {Item}
  */
-Item.prototype.insertMarketValue = function(lowestPrice) {
+Item.prototype.insertMarketValue = function(marketValue) {
     var _this = this;
+
+    var marketValueHTML = convertPrice(marketValue, true);
 
     // This is set by getMarketPricesForElementList function in order to avoid performance issues
     // when creating requetsts for market prices on Steam
     if (this.myFriends) {
         for (var index in _this.myFriends) {
             var $myLittleItem = $(_this.myFriends[index].item);
-            $myLittleItem.addClass('marketPriced');
-            $myLittleItem.find('.rarity').html(lowestPrice);
-            _this.myFriends[index].displayWeaponQuality();
+            _this.myFriends[index].marketPriced = true;
+            _this.myFriends[index].marketValue = marketValue;
+            $myLittleItem.addClass('marketPriced').find('.rarity').html(marketValueHTML);
+            _this.myFriends[index].displayWeaponQuality().calculateMarketDifference().calculateMarketOverprice();
         }
     }
     else {
         $('.oitm:not(.marketPriced)').each(function() {
             if ($(this).find('img.smallimg').attr('alt').trim() === _this.itemName) {
-                var $theItem = $(this);
-                var itemObj = new Item($theItem);
-                $theItem.find('.rarity').html(lowestPrice);
-                $theItem.addClass('marketPriced');
-                itemObj.displayWeaponQuality();
+                var itemObj = itemObject(this);
+                $(itemObj.item).addClass('marketPriced').find('.rarity').html(marketValueHTML);
+                itemObj.marketPriced = true;
+                itemObj.marketValue = marketValue;
+                itemObj.displayWeaponQuality().calculateMarketDifference().calculateMarketOverprice();
             }
         });
     }
+
+    return this;
 };
 /**
  * Appends item rarity next to market price while respecting user settings
+ * @returns {Item}
  */
 Item.prototype.displayWeaponQuality = function() {
-    if (LoungeUser.userSettings.displayCsgoWeaponQuality !== '1' || typeof this.weaponQuality === 'undefined') {
-        return false;
+    if (LoungeUser.userSettings.displayCsgoWeaponQuality === '1' && typeof this.weaponQuality !== 'undefined') {
+        $('.rarity', this.item).append('<span class="weaponWear"> | ' + this.weaponQualityAbbrevation + '</span>');
     }
 
-    $('.rarity', this.item).append('<span class="weaponWear"> | ' + this.weaponQualityAbbrevation + '</span>');
+    return this;
 };
 /**
  * Gets market price for the item, it goes through our cached item list, blacklisted item list, already marketed items
  * list, and then finally if price still hasn't been found, request it via Steam API
  * @param cachedOnly If true, function will only rely on cached information and will not request prices from Steam API
+ * @returns {Item}
  */
 Item.prototype.getMarketPrice = function(cachedOnly) {
     if (!(this instanceof Item)) {
         throw new TypeError('\'this\' must be instance of Item');
+    }
+
+    if (this.marketPriced) {
+        console.log('Item ' + this.itemName + ' already marketed, not marketing it again');
+        return this;
     }
 
     if (!cachedOnly) {
@@ -86,8 +100,7 @@ Item.prototype.getMarketPrice = function(cachedOnly) {
     if (LoungeUser.userSettings.useCachedPriceList === '1') {
         if (storageMarketItems.hasOwnProperty(appID)) {
             if (storageMarketItems[appID].hasOwnProperty(this.itemName)) {
-                var priceHtml = convertPrice(storageMarketItems[appID][this.itemName].value, true);
-                return this.insertMarketValue(priceHtml);
+                return this.insertMarketValue(storageMarketItems[appID][this.itemName].value);
             }
         }
     }
@@ -95,7 +108,7 @@ Item.prototype.getMarketPrice = function(cachedOnly) {
     // Check if we even have to fetch a price
     if (blacklistedItemList.hasOwnProperty(this.itemName)) {
         console.log('Item ' + _this.itemName.trim() + ' is blacklisted, not fetching market price');
-        return false;
+        return this;
     }
 
     // Check if the itemName has not been already marketed before
@@ -107,16 +120,41 @@ Item.prototype.getMarketPrice = function(cachedOnly) {
     }
 
     if (cachedOnly) {
-        return false;
+        return this;
     }
 
     if (nonMarketItems.indexOf(_this.itemName) === -1 && nonMarketItems.indexOf($('.rarity', this.item).text()) === -1 &&
         !loadingItems.hasOwnProperty(this.itemName)) {
         this.fetchSteamMarketPrice();
+        return this;
     }
 };
 /**
+ * Calculates market difference, positive value if it's overpriced, negative if it's underpriced
+ * @returns {Item}
+ */
+Item.prototype.calculateMarketDifference = function() {
+    if (this.marketValue && this.loungeValue) {
+        this.marketDifference = parseFloat((this.loungeValue - this.marketValue).toFixed(2));
+    }
+
+    return this;
+};
+/**
+ * Calculates the overprice percentage of the item
+ * @returns {Item}
+ */
+Item.prototype.calculateMarketOverprice = function() {
+    if (this.marketValue && this.loungeValue) {
+        this.marketOverprice = Math.round(((this.loungeValue / this.marketValue) * 100));
+    }
+
+    return this;
+};
+
+/**
  * Used by 'Show Steam market price' button in item pop-up
+ * @returns {Item}
  */
 Item.prototype.unloadMarketPrice = function() {
     var _this = this;
@@ -125,10 +163,16 @@ Item.prototype.unloadMarketPrice = function() {
         if ($theItem.hasClass('marketPriced') && $theItem.find('img.smallimg').attr('alt').trim() === _this.itemName) {
             $theItem.removeClass('marketPriced');
         }
+
+        var itemObj = itemObject($theItem);
+        itemObj.marketPriced = false;
+        itemObj.marketValue = null;
     });
+
+    return this;
 };
 /**
- *
+ * Fetches Steam market price from unofficial Steam API in USD currency (converts if necessary)
  */
 Item.prototype.fetchSteamMarketPrice = function() {
     var _this = this;
@@ -139,12 +183,13 @@ Item.prototype.fetchSteamMarketPrice = function() {
         success: function(data) {
             if (data.success === true && data.hasOwnProperty('lowest_price')) {
                 // jscs: disable
-                var lowestPrice = data.lowest_price.replace('&#36;', '&#36; ');
+                var lowestPrice = parseFloat(data.lowest_price.replace('&#36;', '').match(/[0-9.]+/));
                 // jscs: enable
                 marketedItems[_this.itemName] = lowestPrice;
                 _this.insertMarketValue(lowestPrice);
             }
             else {
+                // TODO: Rewrite insertMarketValue method to handle no market price values
                 $(_this.item).find('.rarity').html('Not Found');
             }
         },
@@ -181,8 +226,8 @@ Item.prototype.generateMarketApiURL = function() {
         throw new TypeError('\'this\' must be instance of Item');
     }
 
-    return window.location.protocol + '//steamcommunity.com/market/priceoverview/?country=US&currency=' +
-        LoungeUser.userSettings.marketCurrency + '&appid=' + appID + '&market_hash_name=' + encodeURI(this.itemName);
+    return window.location.protocol + '//steamcommunity.com/market/priceoverview/?country=US&currency=1&appid=' +
+        appID + '&market_hash_name=' + encodeURI(this.itemName);
 };
 
 Item.prototype.generateSteamStoreURL = function() {
@@ -194,31 +239,36 @@ Item.prototype.generateSteamStoreURL = function() {
 };
 
 Item.prototype.convertLoungeValue = function() {
-    if (LoungeUser.userSettings.convertLoungePrices === '1') {
-        var valElm = $('.value', this.item);
-        if (valElm.length) {
-            if (!$(this.item).hasClass('loungeConverted')) {
-                $(this.item).addClass('loungeConverted');
+    if (LoungeUser.userSettings.convertLoungePrices === '1' && !this.loungeValueConverted) {
+        var $valElm = $('.value', this.item);
+        if ($valElm.length) {
+            var loungeValue = parseFloat($valElm.text().match(/[0-9.]+/));
 
-                var loungeValue = parseFloat(valElm.text().match(/[0-9.]+/));
-
-                // If the the value is parsable as a number, convert the lounge's price
-                if (!isNaN(loungeValue)) {
-                    $('.value', this.item).text(convertPrice(loungeValue, true));
-                }
+            // If the the value is parsable as a number, convert the lounge's price
+            if (!isNaN(loungeValue)) {
+                this.loungeValue = loungeValue;
+                $valElm.text(convertPrice(loungeValue, true));
+                this.loungeValueConverted = true;
             }
         }
     }
-};
 
+    return this;
+};
+/**
+ * Black-lists an item from ever creating requests to Steam API
+ * @returns {Item}
+ */
 Item.prototype.blacklistItem = function() {
     blacklistedItemList[this.itemName] = null;
     chrome.storage.local.set({'blacklistedItemList': blacklistedItemList});
+    return this;
 };
 
 Item.prototype.appendHoverElements = function() {
     var _this = this;
-    if (!$(_this.item).hasClass('ld-appended')) {
+    if (!_this.extraAppended) {
+        console.log('No extra elements appended to hover elm.');
         if (nonMarketItems.indexOf(_this.itemName) === -1) {
             if ($('a:contains("Market")', _this.item).length) {
                 $('a:contains("Market")', _this.item).html('Market Listings');
@@ -232,8 +282,10 @@ Item.prototype.appendHoverElements = function() {
             '<br/><br/><small><a class="refreshPriceMarket">Show Steam market price</a></small>');
         }
 
-        $(_this.item).addClass('ld-appended');
+        _this.extraAppended = true;
     }
+
+    return this;
 };
 
 /**
@@ -253,7 +305,7 @@ function getMarketPricesForElementList(elmList, cachedOnly) {
 
     // Loop through all the items and push them in an array if we found duplicates
     for (var i = 0, j = elmList.length; i < j; ++i) {
-        var item = new Item(elmList[i]);
+        var item = itemObject(elmList[i]);
         if (!cachedItemList.hasOwnProperty(item.itemName)) {
             cachedItemList[item.itemName] = [];
         }
@@ -288,4 +340,16 @@ function convertPrice(usd, toString) {
     } else {
         return convertedPrice + ' ' + currData.symbol;
     }
+}
+/**
+ * Gets Items object for an .oitm element, if the object is not appended, it will append a new one instead
+ * @param {object} domObj - .oitm element
+ */
+function itemObject(domObj) {
+    var $item = $(domObj);
+    if (!$item.data('item-data')) {
+        $item.data('item-data', new Item($item));
+    }
+
+    return $item.data('item-data');
 }
