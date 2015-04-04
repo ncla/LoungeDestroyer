@@ -14,9 +14,7 @@ var blacklistedItemList = {};
 var earlyBackpackLoad = false;
 var tradeHideFilter;
 var tradeMarkFilter;
-var timezoneName = (LoungeUser.userSettings.timezone == 'auto' ? Intl.DateTimeFormat().resolved.timeZone : LoungeUser.userSettings.timezone);
-
-console.log(tzdetect.matches()[0], Intl.DateTimeFormat().resolved.timeZone);
+var timezoneName = (LoungeUser.userSettings.timezone == 'auto' ? jstz.determine().name() : LoungeUser.userSettings.timezone);
 
 var container = document.createElement('div');
 
