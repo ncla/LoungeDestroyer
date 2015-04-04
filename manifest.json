@@ -13,7 +13,6 @@
         "scripts": [
             "lib/js/jquery-2.1.1.min.js",
             "lib/js/css-lib.js",
-            "app/errorObserver.js",
             "app/helpers.js",
             "app/user.js",
             "app/match.js",
@@ -51,7 +50,7 @@
                 "lib/js/jquery-ui-1.11.2.min.js",
                 "lib/js/moment.min.js",
                 "lib/js/moment-timezone-with-data.min.js",
-                "app/errorObserver.js",
+                "lib/js/jstz-1.0.4.min.js",
                 "app/helpers.js",
                 "app/user.js",
                 "app/match.js",
@@ -84,7 +83,6 @@
             ],
             "js": [
                 "lib/js/jquery-2.1.1.min.js",
-                "app/errorObserver.js",
                 "app/helpers.js",
                 "app/user.js",
                 "app/items.js",
