@@ -36,8 +36,8 @@
         "storage",
         "webRequest",
         "webRequestBlocking",
-        "tabs",
-        "alarms"
+        "alarms",
+        "unlimitedStorage"
     ],
     "content_scripts": [
         {
