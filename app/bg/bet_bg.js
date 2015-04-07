@@ -73,9 +73,13 @@ function handleQueue(data, game, sender) {
                     return;
                 }
 
+                // Focus on trade offer tab when created if true
+                var focusOnTradeOfferTab = LoungeUser.userSettings.focusOnTradeofferTab === '1';
+
                 chrome.tabs.create({
                     url: data.offer,
-                    windowId: sender.tab.windowId
+                    windowId: sender.tab.windowId,
+                    active: focusOnTradeOfferTab
                 });
             });
         }

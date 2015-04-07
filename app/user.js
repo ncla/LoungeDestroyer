@@ -44,7 +44,8 @@ User.prototype.defaultSettings =
     largeBetPercentage: '20',
     showBettedIndicator: '0',
     beepSoundDisable: '0',
-    customTradeOfferSound: ''
+    customTradeOfferSound: '',
+    focusOnTradeofferTab: '0'
 };
 
 // defaultSettings get modified when changing settings?
