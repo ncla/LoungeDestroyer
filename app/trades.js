@@ -7,20 +7,21 @@
  * and displaying its trade description
  */
 var Trade = function(tradeElement) {
-    var self = this;
+    var _this = this;
     this.tradeElement = tradeElement;
 
-    var tradeAnchor = $("a[href^=\"trade?\"]:eq(0)", self.tradeElement);
-    if($(tradeAnchor).length) {
-        this.tradeID = tradeAnchor.attr("href").match(/\d+$/)[0] || false;
+    var tradeAnchor = $('a[href^="trade?"]:eq(0)', _this.tradeElement);
+    if ($(tradeAnchor).length) {
+        this.tradeID = tradeAnchor.attr('href').match(/\d+$/)[0] || false;
     } else {
-        console.log("Anchor not found");
+        console.log('Anchor not found');
     }
 
     // check if matches hide/mark trade filter
     this.getTradeDescriptionFromHTML();
     this.testFilters();
 };
+
 // test self against filters set by user
 Trade.prototype.testFilters = function() {
     if (!this.tradeDescription) return;
@@ -29,58 +30,63 @@ Trade.prototype.testFilters = function() {
         this.hideSelf();
         return -1;
     }
+
     if (tradeMarkFilter && tradeMarkFilter.test(this.tradeDescription)) {
-        this.tradeElement.classList.add("ld-marked");
+        this.tradeElement.classList.add('ld-marked');
         return 0;
     }
+
     return 1;
-}
+};
+
 // hide self
 // possibly expand later so that it replaces self with a new trade?
 Trade.prototype.hideSelf = function() {
-    this.tradeElement.setAttribute("style", "display: none !important;");
-}
-Trade.prototype.generateTradeURL = function() {
-    return;
+    this.tradeElement.setAttribute('style', 'display: none !important;');
 };
+
+Trade.prototype.generateTradeURL = function() {
+
+};
+
 Trade.prototype.getTradeDescriptionFromHTML = function() {
-    var self = this;
-    this.tradeDescription = $(self.tradeElement).find(".tradeheader").attr("title");
+    this.tradeDescription = $(this.tradeElement).find('.tradeheader').attr('title');
     return this.tradeDescription;
 };
+
 Trade.prototype.getExtendedTradeDescription = function(callback) {
-    var self = this;
-    console.log("Fetching extended trade description for " + window.location.origin + "/trade?t=" + self.tradeID);
+    var _this = this;
+    console.log('Fetching extended trade description for ' + window.location.origin + '/trade?t=' + _this.tradeID);
     $.ajax({
-        url: window.location.origin + "/trade?t=" + self.tradeID,
-        type: "GET",
+        url: window.location.origin + '/trade?t=' + _this.tradeID,
+        type: 'GET',
         success: function(data) {
-            var doc = document.implementation.createHTMLDocument("");
+            var doc = document.implementation.createHTMLDocument('');
             doc.body.innerHTML = data;
-            var desc = $(doc).find(".standard.msgtxt").text().trim();
-            self.tradeDescription = desc;
-            self.descriptionExtended = true;
+            var desc = $(doc).find('.standard.msgtxt').text().trim();
+            _this.tradeDescription = desc;
+            _this.descriptionExtended = true;
             callback(desc);
         }
     });
 };
-Trade.prototype.addTradeDescription = function() {
-    if (LoungeUser.userSettings.showDescriptions === "0") return;
 
-    var self = this;
-    if(self.tradeDescription.length > 0) {
-        $(self.tradeElement).find(".tradecnt").after('<div class="trade-description"><p>' + removeTags($.trim(self.tradeDescription)) + (self.tradeDescription.length > 240 ? "..." : "") + '</p></div>');
-        var tradeDescription = $(".trade-description", self.tradeElement);
-        if(self.tradeDescription.length > 240) {
-            self.getExtendedTradeDescription(
+Trade.prototype.addTradeDescription = function() {
+    if (LoungeUser.userSettings.showDescriptions === '0') return;
+
+    var _this = this;
+    if (_this.tradeDescription.length > 0) {
+        $(_this.tradeElement).find('.tradecnt').after('<div class="trade-description"><p>' + removeTags($.trim(_this.tradeDescription)) + (_this.tradeDescription.length > 240 ? '...' : '') + '</p></div>');
+        var tradeDescription = $('.trade-description', _this.tradeElement);
+        if (_this.tradeDescription.length > 240) {
+            _this.getExtendedTradeDescription(
                 function(tradeDescriptionExtended) {
-                    $(".trade-description p", self.tradeElement).html(textToUrl(removeTags(tradeDescriptionExtended)));
-                    self.testFilters();
-                }
-            );
+                    $('.trade-description p', _this.tradeElement).html(textToUrl(removeTags(tradeDescriptionExtended)));
+                    _this.testFilters();
+                });
         } else {
-            $(".trade-description p", self.tradeElement).html(
-                textToUrl(removeTags($(".trade-description p", self.tradeElement).text()))
+            $('.trade-description p', _this.tradeElement).html(
+                textToUrl(removeTags($('.trade-description p', _this.tradeElement).text()))
             );
         }
     }

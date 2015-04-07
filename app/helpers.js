@@ -1,3 +1,4 @@
+// jscs: disable
 /* HELPER FUCNTIONS */
 /* Get URL parameter */
 function gup(a) {
@@ -80,7 +81,7 @@ function createKeywordRegexp(keywords) {
  * @param {string} url - The URL to request to
  * @param {object} data - the POST data
  * @param {function} callback - The function to call once the request is performed
- * @param {object} headers - a header object in the format {header: value} 
+ * @param {object} headers - a header object in the format {header: value}
  */
 function post(url, data, callback, headers) {
     // create xmlhttprequest instance
