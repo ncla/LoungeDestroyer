@@ -205,6 +205,35 @@ Item.prototype.fetchSteamMarketPrice = function() {
         });
 };
 
+Item.prototype.fetchLoungeValueFromAPI = function(success, error) {
+    var _this = this;
+    $.ajax({
+        url: 'http://csgolounge.com/api/schema.php',
+        type: 'GET',
+        success: function(data) {
+            var itemFound = false;
+            $.each(data, function(itemID, item) {
+                if (item.name == _this.itemName) {
+                    itemFound = true;
+                    var worth = parseFloat(item.worth).toFixed(2);
+                    if (worth > 0) {
+                        success(worth);
+                    } else {
+                        error(_this.itemName + ' is not available for betting on CSGOLounge.com');
+                    }
+
+                    return false;
+                }
+            });
+
+            if (!itemFound) {
+                error(_this.itemName + ' was not found in CSGOLounge.com database');
+            }
+        }
+    });
+    return this;
+};
+
 Item.prototype.generateMarketURL = function() {
     if (!(this instanceof Item)) {
         throw new TypeError('\'this\' must be instance of Item');

@@ -30,40 +30,24 @@ chrome.storage.local.get(['currencyConversionRates', 'ajaxCache'], function(resu
     currencies = result.currencyConversionRates || {};
     ajaxCache = result.ajaxCache || {};
     LoungeUser.loadUserSettings(function() {
-        itemName = getItemName();
-        if (itemName) {
-            $('#largeiteminfo_item_actions').append('<span class="btn_small btn_grey_white_innerfade" id="csglpricecheck">' +
+        var itemObj = new Item();
+        itemObj.itemName = getItemName();
+        if (itemObj.hasOwnProperty('itemName')) {
+            $('#largeiteminfo_item_actions').show().append('<span class="btn_small btn_grey_white_innerfade" id="csglpricecheck">' +
             '<span>Check CSGOLounge.com item betting value</span>' +
             '</span>');
         }
 
+        var successCallback = errorCallback = function(response) {
+            if (!isNaN(response)) {
+                alert(itemObj.itemName + ' is worth ' + convertPrice(response, true) + ' on CSGOLounge.com');
+            } else {
+                alert(response);
+            }
+        };
+
         $('#csglpricecheck').click(function() {
-            var itemFound = false;
-
-            // TODO: Move this logic to Items class
-            $.ajax({
-                url: 'http://csgolounge.com/api/schema.php',
-                type: 'GET',
-                success: function(data) {
-                    $.each(data, function(i, v) {
-                        if (v.name == itemName) {
-                            var worth = parseFloat(v.worth).toFixed(2);
-                            itemFound = true;
-                            if (worth > 0) {
-                                alert(itemName + ' is worth ' + convertPrice(worth, true) + ' on CSGOLounge.com');
-                            } else {
-                                alert(itemName + ' is not available for betting on CSGOLounge.com');
-                            }
-
-                            return false;
-                        }
-                    });
-
-                    if (!itemFound) {
-                        alert(itemName + ' was not found in CSGOLounge.com database');
-                    }
-                }
-            });
+            itemObj.fetchLoungeValueFromAPI(successCallback, errorCallback);
         });
     });
 });

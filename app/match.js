@@ -82,7 +82,7 @@ Match.prototype.appendExtraMatchInfo = function(targetElement) {
     }
 
     if (this.matchFormat) {
-        $(matchHeaderBlock).append('<span class="seperator">|</span> <span class="bestoftype">' + this.matchFormat + '</span>');
+        $(matchHeaderBlock).append(' <span class="seperator">|</span> <span class="bestoftype">' + this.matchFormat + '</span>');
     }
 
     // trim the unneeded spaces
