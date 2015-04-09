@@ -30,6 +30,7 @@ var Item = function(item) {
 };
 /**
  * Replaces text of .rarity element with the market price for every item that has the same item name
+ * TODO: This is too DRY
  * @param lowestPrice float Market price in USD
  * @returns {Item}
  */
@@ -50,6 +51,13 @@ Item.prototype.insertMarketValue = function(marketValue) {
         }
     }
     else {
+        // For the item we just called getMarketPrice method from
+        this.marketPriced = true;
+        this.marketValue = marketValue;
+        $(this.item).addClass('marketPriced').find('.rarity').html(marketValueHTML);
+        this.displayWeaponQuality().calculateMarketDifference().calculateMarketOverprice();
+
+        // All other items
         $('.oitm:not(.marketPriced)').each(function() {
             if ($(this).find('img.smallimg').attr('alt').trim() === _this.itemName) {
                 var itemObj = itemObject(this);
