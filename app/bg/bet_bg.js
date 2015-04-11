@@ -119,7 +119,8 @@ var bet = { // not a class - don't instantiate
     lastBetTime: [0, 0],
     numTries: [0, 0],
     baseUrls: ['http://csgolounge.com/', 'http://dota2lounge.com/'],
-    loopTimer: null
+    loopTimer: null,
+    tabId: [-1, -1]
 };
 
 // example data:
@@ -154,6 +155,7 @@ bet.enableAuto = function(url, data, csgo, cookies) {
     if (bet.autoBetting[g]) {
         // send event to all lounge tabs
         var msg = {};
+
         msg[bet.type[g]] = {
             time: bet.lastBetTime[g],
             rebetDelay: bet.autoDelay,
@@ -173,6 +175,24 @@ bet.disableAuto = function(success, game) {
 
     var msg = {};
     msg[bet.type[game]] = success || false;
+
+    // Previously app/bet.js would refresh tabs on successful auto-bet, but now it refreshes tab that auto-betting
+    // was started from. If that tab does not exist no longer, a new one will be created
+    if (success) {
+        chrome.tabs.reload(bet.tabId[game], function() {
+            var e = chrome.runtime.lastError;
+            if (e) {
+                console.log('Error finding tab that auto-bet was started from: ', e);
+                chrome.tabs.create({url: bet.baseUrls[game]}, function(details) {
+                    var e = chrome.runtime.lastError;
+                    if (e) {
+                        console.log('Error creating a new tab', e);
+                    }
+                });
+            }
+        });
+    }
+
     sendMessageToContentScript(msg, -1 - game);
 };
 
@@ -335,10 +355,12 @@ chrome.webRequest.onBeforeRequest.addListener(function requestListener(details) 
             data = details.requestBody.formData;
         }
 
-        newCallback = (function(url, data) {
+        // This is basically a function, which later gets called by adding more bet data
+        newCallback = (function(url, data, tabId) {
             return function(response) {
                 bet.type[game] = this.type || bet.disableAuto(true, game);
                 bet.matchNum[game] = this.match ? data.match : '';
+                bet.tabId[game] = tabId;
 
                 console.log('Reached newCallback: ', url, data);
 
@@ -349,7 +371,7 @@ chrome.webRequest.onBeforeRequest.addListener(function requestListener(details) 
 
                 bet.enableAuto(url, this.data || '', !game, this.cookies);
             }
-        })(details.url, data);
+        })(details.url, data, details.tabId);
 
         // if it's a return request
         if (details.method === 'GET') { // gawd damnit csgl, why did you have to make returning a two-step process

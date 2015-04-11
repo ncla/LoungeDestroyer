@@ -118,7 +118,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
         if (!streamPlaying) {
             localStorage.playedbet = false;
             localStorage.playedreturn = false;
-            document.location.reload();
+            //document.location.reload();
         }
 
         return;
