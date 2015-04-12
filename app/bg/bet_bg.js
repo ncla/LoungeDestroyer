@@ -50,21 +50,11 @@ var queue = {
 function handleQueue(data, game, sender) {
     if (data.offer !== queue.lastOffer[game]) {
         if (LoungeUser.userSettings.notifyTradeOffer == '1') {
-            chrome.tabs.query({
-                active: true,
-                url: '*://' + (['csgo', 'dota2'])[game] + 'lounge.com/*',
-                lastFocusedWindow: true
-            }, function(tabs) {
-                if (!tabs.length) {
-                    if (['0', '2'].indexOf(LoungeUser.userSettings.enableAuto) !== -1) {
-                        createNotification('Queue trade offer received',
-                            (['CSGO', 'Dota2'])[game] + 'Lounge has sent you a trade offer',
-                            'offer',
-                            {title: 'Open trade offer'},
-                            data.offer);
-                    }
-                }
-            });
+            createNotification('Queue trade offer received',
+                (['CSGO', 'Dota2'])[game] + 'Lounge has sent you a trade offer',
+                'offer',
+                {title: 'Open trade offer'},
+                data.offer);
         }
 
         if (['0', '2'].indexOf(LoungeUser.userSettings.enableAuto) === -1) {
@@ -183,7 +173,7 @@ bet.disableAuto = function(success, game) {
             var e = chrome.runtime.lastError;
             if (e) {
                 console.log('Error finding tab that auto-bet was started from: ', e);
-                chrome.tabs.create({url: bet.baseUrls[game]}, function(details) {
+                chrome.tabs.create({url: bet.baseUrls[game], active: false}, function(details) {
                     var e = chrome.runtime.lastError;
                     if (e) {
                         console.log('Error creating a new tab', e);
