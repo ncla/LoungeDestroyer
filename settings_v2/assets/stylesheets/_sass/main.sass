@@ -1,0 +1,1037 @@
+@import normalize.scss
+@import font-face.scss
+@import selectize.scss
+@import mixins.scss
+@import modal.scss
+
+$main-orange: #e79403
+$main-width: 980px
+
+*
+	box-sizing: border-box
+
+	&:focus
+		outline: none
+
+ul, ol
+	list-style: none
+	padding: 0
+	margin: 0
+
+ul
+	&.list
+		margin: 4px 0 4px 19px
+		display: inline-block
+
+		> li
+			position: relative
+			padding-left: 17px
+
+			&:before
+				-webkit-border-radius: 2.5px
+				display: inline-block
+				background: #9f9f9f
+				position: absolute
+				height: 5px
+				width: 5px
+				top: 7.5px
+				left: 0
+				content: ""
+
+			+ li
+				margin-top: 12px
+
+			+ .list-headline
+				margin-top: 24px
+
+			&.list-headline
+				text-transform: uppercase
+				font-weight: bold
+				font-size: 14px
+				padding-left: 0
+				color: #777777
+
+				&:before
+					content: none
+
+				+ li
+					margin-top: 5px
+
+	&.list-team
+		margin-top: 10px
+
+		> li
+			display: table
+			width: 100%
+			height: 70px
+			+clearfix
+
+			+ li
+				margin-top: 23px
+
+			.image
+				display: table-cell
+				width: 70px
+
+				img
+					height: 70px
+					width: 70px
+					border-radius: 35px
+	
+			p
+				vertical-align: middle
+				display: table-cell
+				padding-left: 17px
+				line-height: 18px
+
+				strong, span
+					display: block
+
+				strong
+					font-weight: bold
+					font-size: 18px
+					color: #454444
+
+				span
+					font-size: 14px
+
+a
+	text-decoration: none
+	color: $main-orange
+
+	&.link
+		&:hover
+			text-decoration: underline
+
+p
+	margin: 0
+
+	&.paragraph
+		display: inline-block
+		padding: 10px 0
+
+		&.pad-zero
+			padding: 0
+
+		&.pad-top
+			padding: 10px 0 0 0
+
+		&.pad-top-half
+			padding: 5px 0 0 0
+
+		&.pad-bottom
+			padding: 0 0 10px 0
+
+		&.pad-bottom-half
+			padding: 0 0 5px 0
+
+img
+	display: block
+	max-width: 100%
+
+b, strong
+	font-weight: 500
+
+h1, h2, h3, h4, h5, h6
+	font-weight: normal
+	padding: 0
+	margin: 0
+
+	small
+		font-size: 0.8em
+		color: #acacac
+		text-transform: none
+		margin-left: 4px
+		display: inline-block
+
+br
+	&.minus-margin
+		display: block
+		margin: -12px 0
+		content: " "
+
+	&.margin
+		display: block
+		margin: 24px 0
+		content: " "
+
+.hidden
+	display: none !important
+
+.left
+	float: left !important
+
+.right
+	float: right !important
+
+html, body
+	height: 100%
+
+body
+	background: #e2e2e2
+	font-family: "Roboto"
+	font-weight: normal
+	font-size: 15px
+	color: #999999
+	overflow-y: scroll
+	-webkit-font-feature-settings: "kern"
+	min-height: 100%
+
+	&.remove-scroll
+		overflow-y: hidden
+		padding-right: 17px
+
+	// #
+	// # Top background
+	// #
+
+	&:before
+		background: #0a0b0f url(../images/top.jpg) center no-repeat
+		background-size: cover
+		display: inline-block
+		position: absolute
+		height: 408px
+		width: 100%
+		right: 0
+		left: 0
+		top: 0
+		z-index: -1
+		content: ""
+
+// #
+// # Navigation
+// #
+
+nav[role="navigation"]
+	background: url(../images/top-navbar.png) center top no-repeat
+	height: 102px
+	width: 100%
+
+	.btn
+		text-shadow: 0 1px 1px rgba(0,0,0,0.2) !important
+		box-shadow: 0 1px 1px rgba(0,0,0,0.2) !important
+		color: $main-orange !important
+		border: 1px solid $main-orange
+		background: none
+		border-radius: 0
+
+		&:active,
+		&:hover
+			text-shadow: none !important
+			color: white !important
+			border-color: transparent
+
+	> ul
+		display: block
+		margin: auto
+		width: 980px
+
+		> li
+			line-height: 102px
+			float: left
+			margin-right: 9px
+
+			&:not(:first-child)
+				> a:not(.btn)
+					text-shadow: 0 1px 1px rgba(0,0,0,0.2)
+					color: rgba(192,215,246,0.25)
+					text-transform: uppercase
+					transition: color 0.2s
+					padding: 7px 13px
+
+					&:hover
+						color: rgba(192,215,246,0.45)
+
+			&.active
+				> a:not(.btn)
+					color: white !important
+					cursor: default
+
+			&.logo
+				height: 102px
+				position: relative
+				margin-right: 26px
+				padding-right: 37px
+
+				&:after
+					background: rgba(192,215,246,0.25)
+					display: inline-block
+					position: absolute
+					margin-top: -9.5px
+					height: 19px
+					width: 1px
+					right: 0
+					top: 50%
+					content: ""
+
+				> a
+					display: block
+
+					&:active
+						> img
+							opacity: 0.7
+
+					> img
+						margin: 25px 0
+						transition: opacity 0.2s
+
+			&.right
+				margin: 0 0 0 35px
+
+// #
+// # Last time the extension had been updated
+// #
+
+.date-updated
+	text-align: center
+	line-height: 23px
+	display: table
+	height: 180px
+	color: white
+	width: 100%
+
+	> div
+		vertical-align: middle
+		display: table-cell
+
+	h2
+		text-shadow: 0 1px 3px rgba(0,0,0,0.3)
+		font-size: 25px
+
+	span
+		color: rgba(192,215,246,0.25)
+		text-transform: uppercase
+		vertical-align: middle
+		font-weight: 300
+		font-size: 14px
+
+// #
+// # Wrapper
+// #
+
+main
+	height: calc(100% - (102px + 55px))
+	position: relative
+	width: $main-width + 20px
+	margin: auto
+	+clearfix
+
+section
+	transition: margin-top 0.2s
+	+clearfix
+
+	&.hidden
+		margin-top: -10px
+		transition: margin-top 0
+
+// #
+// # Buttons
+// #
+
++keyframes("button-loading")
+	0%
+		opacity: 1
+	50%
+		opacity: 0.5
+	100%
+		opacity: 1
+
+input, button
+	&.btn
+		border: none
+
+.btn
+	text-transform: uppercase
+	-webkit-user-select: none
+	background: $main-orange
+	display: inline-block
+	transition: all 0.2s
+	position: relative
+	line-height: 32px
+	text-shadow: none
+	text-align: left
+	padding: 0 15px
+	cursor: pointer
+	font-size: 15px
+	color: white
+
+	&:not([disabled]):hover
+		background: #de8e03
+		box-shadow: 0 1px 6px 0 rgba(0,0,0,0.12), 0 1px 6px 0 rgba(0,0,0,0.12)
+
+	&:not([disabled]):active
+		background: #d28100
+		box-shadow: 0 5px 11px 0 rgba(0,0,0,0.18), 0 4px 15px 0 rgba(0,0,0,0.15)
+
+	&[disabled]
+		opacity: 0.75
+		cursor: default
+
+		&:before
+			background: $main-orange
+			transition: all 0.2s
+			visibility: hidden
+			position: absolute
+			opacity: 0
+			bottom: 0
+			right: 0
+			left: 0
+			top: 0
+			content: ""
+
+		&:after
+			position: absolute
+			text-align: center
+			display: block
+			bottom: 0
+			right: 0
+			left: 0
+			top: 0
+			content: attr(data-loading)
+
+		&.btn-loading
+			&:before, &:after
+				visibility: visible
+				opacity: 1
+
+			&:before
+				-webkit-animation: "button-loading" 1.35s infinite
+
+.btn-row
+	margin-top: 9px
+	+clearfix
+
+	&.btns-right
+		float: right
+
+		> li
+			margin: 0 0 0 7px
+
+	> li
+		margin-right: 7px
+		float: left
+
+// #
+// # Inputs
+// #
+
+$field-height: 42px
+
+form
+	&.form-inline
+		.row
+			position: relative
+
+		.btn
+			position: absolute
+			bottom: 4.5px
+			z-index: 10
+			right: 0
+
+input[type="text"],
+input[type="number"],
+input[type="url"],
+input[type="email"],
+textarea
+	background: white
+	height: $field-height
+	display: block
+	width: 100%
+	border: none
+	color: #6d6d6d
+	font-size: 15px
+	border-bottom: 1px solid #dedede
+	transition: all 0.2s
+	padding: 0
+
+	&:not([disabled]):hover
+		border-bottom-color: silver
+
+	&:not([disabled]):focus
+		border-bottom-color: $main-orange
+		-webkit-box-shadow: 0 1px 0 0 $main-orange
+
+		&::-webkit-input-placeholder
+			color: #a4a4a4
+
+	&::-webkit-input-placeholder
+		color: #b3b3b3
+
+	&[disabled]
+		cursor: not-allowed
+
+input[type="number"]
+	&::-webkit-outer-spin-button,
+	&::-webkit-inner-spin-button
+		-webkit-appearance: none
+
+textarea
+	resize: none
+	padding: 10px 0
+
+	@for $i from 1 through 10
+		&[rows="#{$i}"]
+			height: ($field-height * $i)
+
+// #
+// # Checkboxes
+// #
+
+$labelDisabled: #aaaaaa
+$labelSize: 16px
+
+input[type="checkbox"],
+input[type="radio"]
+	display: none
+
+	&:checked + label
+		&:before
+			background-color: $main-orange
+			border-color: $main-orange
+
+	&[disabled] + label
+		cursor: default
+		color: $labelDisabled
+
+		&:before
+			border-color: $labelDisabled
+
+input[type="radio"] + label:before
+	box-shadow: inset 0 0 0 3px white
+	background-image: none
+	border-radius: $labelSize
+
+label
+	-webkit-user-select: none
+	cursor: pointer
+	display: block
+	color: #666666
+	+clearfix
+
+	&:before
+		background: white url(../images/checkbox-icon.png) center center no-repeat
+		border: 2px solid #666666
+		display: inline-block
+		transition: all 0.12s
+		margin-right: 13px
+		border-radius: 2px
+		height: $labelSize
+		width: $labelSize
+		float: left
+		content: ""
+
+.label-group
+	+ .label-group
+		margin-top: 13px
+
+// #
+// # Code <code>
+// #
+
+code
+	background: #ffeed0
+	-webkit-border-radius: 2px
+	padding: 0 5px 1px 5px
+	margin: 0 1px
+	color: $main-orange
+	font-size: 13px
+	display: inline-block
+
+// #
+// # Grid
+// #
+
+$border-color: #ebebeb
+
+.row
+	+clearfix
+
+[class*="col-"]
+	float: left
+
+.card [class*="col-"]
+	padding: 0 23px
+
+[class*="col-"], .card .col-def-pad
+	padding: 0 10px
+
+.col-border-right
+	border-right: 1px solid $border-color
+
+.col-border-left
+	border-left: 1px solid $border-color
+
+.col-grid-12
+	width: 100%
+
+.col-grid-11
+	width: 91.66666667%
+
+.col-grid-10
+	width: 83.33333333%
+
+.col-grid-9
+	width: 75%
+
+.col-grid-8
+	width: 66.66666667%
+
+.col-grid-7
+	width: 58.33333333%
+
+.col-grid-6
+	width: 50%
+
+.col-grid-5
+	width: 41.66666667%
+
+.col-grid-4
+	width: 33.33333333%
+
+.col-grid-3
+	width: 25%
+
+.col-grid-2
+	width: 16.66666667%
+
+.col-grid-1
+	width: 8.33333333%
+
+// #
+// # Cards
+// #
+
+.card
+	display: inline-block
+	margin-bottom: 20px
+	border-radius: 2px
+	background: white
+	min-height: 1px
+	width: 100%
+	+card-shadow
+
+	> div
+		width: 100%
+		+clearfix
+
+	.pad-zero
+		padding: 0
+
+	.pad-vert
+		padding: 11px 7px 24px
+
+	.pad-hori
+		padding: 11px 30px 11px
+
+	.pad-full
+		padding: 11px 30px 24px
+
+	h2
+		text-transform: uppercase
+		padding: 20px 30px 0
+		font-size: 22px
+		color: #454444
+
+	h3
+		font-size: 17px
+		color: #595959
+		margin-bottom: 10px
+
+// #
+// # Groups
+// #
+
+$error-color: #d32f2f
+
+.group
+	position: relative
+
+	> span
+		text-transform: uppercase
+		margin-bottom: 5px
+		font-weight: bold
+		font-size: 13px
+		cursor: default
+		display: block
+		color: #9f9f9f
+		transition: color 0.2s
+
+		> b
+			color: $main-orange
+			font-weight: bold
+			cursor: help
+
+			&:hover
+				text-decoration: underline
+
+	.error-labels
+		transition: height 0.2s
+		position: relative
+		+clearfix
+
+	p
+		transition: margin-bottom 0.24s, visibility 0.24s, padding-top 0.30s, opacity 0.44s
+		margin: 0 0 -23px 0
+		visibility: hidden
+		line-height: 15px
+		font-size: 13px
+		cursor: default
+		padding-top: 0
+		opacity: 0
+		top: 0
+
+		&.pre-error-label
+			visibility: visible
+			padding-top: 8px
+			margin-bottom: 0
+			opacity: 1
+
+		&.error-label
+			color: $error-color
+			position: absolute
+
+	&.group-disabled
+		opacity: 0.65
+
+		*
+			opacity: 1
+
+	&.group-error
+		> span
+			color: $error-color
+
+		input:not(.btn),
+		textarea
+			color: $error-color
+			border-bottom-color: $error-color
+			-webkit-box-shadow: 0 1px 0 0 $error-color
+
+			&::-webkit-input-placeholder
+				color: $error-color
+
+		.pre-error-label
+			visibility: hidden
+			position: absolute
+			padding-top: 0
+			opacity: 0
+			height: 0
+
+		.error-label
+			visibility: visible
+			position: static
+			margin-bottom: 0
+			padding-top: 8px
+			height: auto
+			opacity: 1
+
+// #
+// # Tooltips
+// #
+
+.tooltip
+	transition: opacity 0.2s, margin-top 0.2s, visibility 0.2s
+	-webkit-border-radius: 2px
+	-webkit-user-select: none
+	display: inline-block
+	background: #393c3d
+	position: absolute
+	visibility: hidden
+	padding: 7px 11px
+	line-height: 17px
+	max-width: 200px
+	font-size: 12px
+	cursor: default
+	color: #e1e1e1
+	z-index: 1000
+	opacity: 0
+	left: 0
+	top: 0
+
+	&.show
+		visibility: visible
+		margin-top: 5px
+		opacity: 1
+
+// #
+// # :: Themes
+// #
+
+$slider-height: 551px
+
+#page-themes
+	margin-top: 5px
+
+	.card
+		.group[class*="col-"]
+			padding: 0
+
+			+ .group[class*="col-"]
+				padding-left: 20px
+
+	#themes-slider
+		height: $slider-height + 39px + 71px
+		margin-bottom: -5px
+		position: relative
+		top: -5px
+		+clearfix
+
+		> li
+			position: absolute
+			visibility: hidden
+			bottom: 0
+			right: 0
+			left: 0
+			top: 0
+
+			&.current
+				visibility: visible
+
+		&.slider-hide-navs
+			> .prev, .next
+				visibility: hidden !important
+				opacity: 0 !important
+				width: 0 !important
+
+		.prev,
+		.next
+			width: 10%
+			height: $slider-height
+			display: table
+			visibility: visible
+			opacity: 0.5
+			cursor: pointer
+			z-index: 500
+			transition: all 0.25s
+			-webkit-user-select: none
+
+			> span
+				display: table-cell
+				vertical-align: middle
+				text-align: center
+
+				&:after
+					background: url(../images/slider-navs.png) no-repeat
+					display: inline-block
+					height: 41px
+					width: 27px
+					content: ""
+
+			&:hover
+				opacity: 1
+				width: 12%
+
+			&:active
+				opacity: 0.7
+
+		.prev
+			left: 0
+			right: auto
+
+		.next
+			right: 0
+			left: auto
+
+			> span
+				&:after
+					background-position: -40px 0
+
+.theme-select
+	visibility: visible !important
+	bottom: 15px !important
+	right: 15px !important
+	padding: 0 !important
+	left: auto !important
+	top: auto !important
+	z-index: 9999
+	right: 15px
+
+.theme-preview
+	-webkit-border-radius: 2px 2px 0 0
+	height: $slider-height
+	position: relative
+	overflow: hidden
+
+	.theme-overlay
+		-webkit-box-shadow: inset 0 0 250px rgba(0,0,0,0.6)
+		transition: background 0.32s
+		position: absolute
+		display: table
+		height: 100%
+		width: 100%
+		bottom: 0
+		right: 0
+		left: 0
+		top: 0
+
+	&.theme-settings-open
+		.theme-overlay
+			background: rgba(0,0,0,0.5)
+
+		.theme-settings
+			visibility: visible
+			margin-top: 0
+			opacity: 1
+
+		> .btn-row
+			visibility: hidden
+			padding-bottom: 0
+			opacity: 0
+
+	.theme-settings
+		+modal-shadow
+		transition: margin-top 0.2s, opacity 0.2s, visibility 0.2s
+		visibility: hidden
+		position: absolute
+		border-radius: 2px
+		background: white
+		margin-top: -20px
+		font-size: 14px
+		padding: 12.5px
+		opacity: 0
+		width: 60%
+		left: 50%
+		top: 50%
+		+clearfix
+
+		h2
+			padding: 0 7.5px 15px 7.5px
+
+		.content
+			padding: 0 7.5px 7px 7.5px
+
+	> .btn-row
+		padding: 0 11px 11px 11px
+		transition: all 0.32s
+		position: absolute
+		z-index: 600
+		margin: 0
+		bottom: 0
+		right: 0
+		left: 0
+
+		> li
+			&.right
+				margin: 0
+
+	.btn	
+		&.enabled
+			background: rgba(85,139,47,0.9)
+			text-indent: 39px
+			padding-left: 0
+
+			&:after
+				transition: all 0.15s
+				background: #a82222
+				position: absolute
+				display: block
+				opacity: 0
+				bottom: 0
+				right: 0
+				left: 0
+				top: 0
+				content: "Disable"
+
+			i, &:before
+				background: url(../images/enable-disable-sprites.png) center top no-repeat
+				position: absolute
+				display: block
+				height: 12px
+				width: 16px
+				left: 13px
+				top: 10px
+
+			&:before
+				background: url(../images/enable-disable-sprites.png) center bottom no-repeat
+				opacity: 0
+				z-index: 10
+				content: ""
+				transition: all 0.15s
+
+			&:hover
+				&:after, &:before
+					opacity: 1
+
+			&:active
+				&:after
+					background: #971f1f
+
+	&.theme-no-image
+		background: #333
+
+		img
+			display: none
+
+		&:before
+			content: "No preview"
+			text-transform: uppercase
+			color: #555555
+			font-size: 3.2em
+			line-height: $slider-height
+			display: block
+			text-align: center
+
+.theme-desc
+	border-bottom: 1px solid #eeeeee
+	padding: 10px 15px
+	font-size: 13px
+
+.theme-info
+	line-height: 44px
+	padding: 13px
+	height: 71px
+
+	.icon
+		-webkit-border-radius: 2px
+		-webkit-box-shadow: 0 1px 3px rgba(0,0,0,0.1)
+
+	h2
+		float: left
+		text-indent: 17px
+		padding: 0
+
+		small
+			font-size: 0.71em
+			margin-left: -7px
+
+		b
+			color: $main-orange
+			cursor: help
+
+			&:hover
+				text-decoration: underline
+
+	[class*="col"]
+		padding: 0
+
+// #
+// # :: About
+// #
+
+#page-about
+	[class*="col-"]:first-child
+		.card
+			background-image: url(../images/ld-logo-2.png)
+			background-position: right 138px center
+			background-repeat: no-repeat
+
+// #
+// # Footer
+// #
+
+footer[role="contentinfo"]
+	padding-bottom: 17px
+	font-size: 14px
+	display: table
+	color: #868686
+	margin: auto
+	width: $main-width
+
+	> p
+		display: table-cell
+		width: 50%
+
+		&:last-child
+			text-align: right
+
+	a
+		color: #595959

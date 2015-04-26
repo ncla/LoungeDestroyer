@@ -1,0 +1,68 @@
+.modal {
+	background: rgba(0,0,0,0.3);
+	-webkit-user-select: none;
+	position: fixed;
+	z-index: 9999;
+	bottom: 0;
+	right: 0;
+	left: 0;
+	top: 0;
+	display: none;
+
+	> div {
+		@include modal-shadow;
+		-webkit-user-select: initial;
+		transition: margin-top 0.27s;
+		border-radius: 2px;
+		position: absolute;
+		background: white;
+		max-width: 500px;
+		min-width: 300px;
+		left: 50%;
+		top: 50%;
+
+		header {
+			display: inline-block;
+			position: relative;
+			line-height: 55px;
+			text-align: left;
+			overflow: hidden;
+			padding: 0 20px;
+			width: 100%;
+
+			h2 {
+				font-size: 22px;
+				color: #454444;
+			}
+
+			.modal-close {
+				-webkit-user-select: none;
+				display: inline-block;
+				transition: all 0.2s;
+				position: absolute;
+				cursor: pointer;
+				padding: 0 20px;
+				right: 0px;
+				top: 0px;
+
+				&:hover {
+					color: #555555;
+				}
+			}
+		}
+
+		.modal-content {
+			padding: 0 20px 10px 20px;
+
+			p {
+				font-size: 13px;
+			}
+		}
+
+		footer {
+			padding: 0 20px 20px 20px;
+			text-align: right;
+			@include clearfix
+		}
+	}
+}

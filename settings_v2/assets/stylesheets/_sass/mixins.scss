@@ -1,0 +1,21 @@
+@mixin card-shadow {
+	-webkit-box-shadow: 0 3px 6px rgba(0,0,0,0.08);
+}
+
+@mixin modal-shadow {
+	-webkit-box-shadow: 0 10px 10px rgba(0,0,0,0.2);
+}
+
+@mixin clearfix {
+	&:after {
+		content: "";
+		display: table;
+		clear: both;
+	}
+}
+
+@mixin keyframes($name) {
+	@keyframes #{$name} {
+		@content;
+	}
+}
