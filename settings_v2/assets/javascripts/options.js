@@ -730,14 +730,17 @@ function select_theme(name) {
 
 function show_theme(name) {
     console.log('show_theme', name);
-    // Remove currently active class from theme in the slider
 
-    $('#themes-slider li.current').removeClass('current');
+    if($('#themes-slider li[data-theme="' + name + '"]').length) {
+        // Remove currently active class from theme in the slider
 
-    // Add current class to selected theme
+        $('#themes-slider li.current').removeClass('current');
 
-    $('#themes-slider li[data-theme="' + name + '"]').addClass('current');
+        // Add current class to selected theme
 
+        $('#themes-slider li[data-theme="' + name + '"]').addClass('current');
+    }
+    
     //var current = document.querySelector("#themes-carousel .item.current"),
     //    active = document.querySelector("#themes-carousel .item.active"),
     //    ownElm = document.querySelector("#themes-carousel .item[data-theme-name='"+name+"']");
