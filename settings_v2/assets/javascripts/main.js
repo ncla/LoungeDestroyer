@@ -341,6 +341,15 @@ function initSlider() {
             });
         });
 
+        console.log($slides);
+        console.log($slides.has('.hidden').length);
+        console.log($slides.has('.current').length);
+
+        // If before initSlider a current slide was not determined (happens when user has no theme set)
+        // Select first slide to show
+        if($slides.has('.current').length == 0) {
+            $slides.eq(0).addClass('current');
+        }
         $slides.not('.current').addClass('hidden');
 
         // Carousel
