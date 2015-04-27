@@ -314,109 +314,98 @@ function disableBtn(element, loading, loadingText) {
 }
 
 // -----------------------------------------
-// Enable selectize.js
-// -----------------------------------------
-
-$('select').each( function() {
-	var select = $(this).selectize({
-		closeAfterSelect: false,
-		readOnly: true, 
-		onDelete:  function() { return false }
-	});
-});
-
-// -----------------------------------------
 // Theme slider
 // -----------------------------------------
-
 var $themeSlider 		= $('#themes-slider');
 var sliderNavsEnabled 	= true;
 var cssEditorVisible 	= false;
 var $cssEditor, $cssSave;
 
-$themeSlider.each( function() {
-	// Variables
-	var self			= $(this);
-	var $allSettings 	= self.find('div.theme-settings');
-	var $preview 		= self.find('div.theme-preview');
-	var $slides 		= self.find('li[data-theme]');
+function initSlider() {
+    $themeSlider.each( function() {
+        // Variables
+        var self			= $(this);
+        var $allSettings 	= self.find('div.theme-settings');
+        var $preview 		= self.find('div.theme-preview');
+        var $slides 		= self.find('li[data-theme]');
 
-	// Aligning settings box in the middle of the preview area
-	$allSettings.each(function() {
-		var $settings 	= $(this);
-		var top 		= ($preview.height() - $settings.outerHeight()) / 2;
-		var left 		= ($preview.width() - $settings.outerWidth()) / 2;
+        // Aligning settings box in the middle of the preview area
+        $allSettings.each(function() {
+            var $settings 	= $(this);
+            var top 		= ($preview.height() - $settings.outerHeight()) / 2;
+            var left 		= ($preview.width() - $settings.outerWidth()) / 2;
 
-		$settings.css({
-			top: top,
-			left: left
-		});
-	});
+            $settings.css({
+                top: top,
+                left: left
+            });
+        });
 
-	$slides.not('.current').addClass('hidden');
+        $slides.not('.current').addClass('hidden');
 
-	// Carousel
-	var currSlide 	= $slides.index($('.current')) + 1;
-	var allSlides	= $slides.length;
-	var $prev		= self.find('li.prev');
-	var $next		= self.find('li.next');
+        // Carousel
+        var currSlide 	= $slides.index($('.current')) + 1;
+        var allSlides	= $slides.length;
+        var $prev		= self.find('li.prev');
+        var $next		= self.find('li.next');
 
-	// Hide navs, if there are not enough slides
-	if (allSlides < 2) {
-		$themeSlider.addClass('slider-hide-navs');
-		sliderNavsEnabled = false;
-	}
+        // Hide navs, if there are not enough slides
+        if (allSlides < 2) {
+            $themeSlider.addClass('slider-hide-navs');
+            sliderNavsEnabled = false;
+        }
 
-	if (sliderNavsEnabled) {
-		// Switch to previous slide by clicking on the arrow "left"
-		$prev.click(function() {
-			prevSlide();
-		});
+        if (sliderNavsEnabled) {
+            // Switch to previous slide by clicking on the arrow "left"
+            $prev.click(function() {
+                prevSlide();
+            });
 
-		// Switch to next slide by clicking on the arrow "right"
-		$next.click(function() {
-			nextSlide();
-		});
+            // Switch to next slide by clicking on the arrow "right"
+            $next.click(function() {
+                nextSlide();
+            });
 
-		// Switch between slides by using "left" / "right" arrow keys
-		$('body').keydown(function(e) {
-			if (e.keyCode == 37)
-				prevSlide();
-			else if (e.keyCode == 39)
-				nextSlide();
-		});
-	}
+            // Switch between slides by using "left" / "right" arrow keys
+            $('body').keydown(function(e) {
+                if (e.keyCode == 37)
+                    prevSlide();
+                else if (e.keyCode == 39)
+                    nextSlide();
+            });
+        }
 
-	// Previous slide function
-	function prevSlide() {
-		if (currSlide == 1) {
-			$slides.removeClass('current').addClass('hidden');
-			$slides.last('li[data-theme]').removeClass('hidden').addClass('current');
+        // Previous slide function
+        function prevSlide() {
+            if (currSlide == 1) {
+                $slides.removeClass('current').addClass('hidden');
+                $slides.last('li[data-theme]').removeClass('hidden').addClass('current');
 
-			currSlide = allSlides;
-		} else {
-			$slides.removeClass('current').addClass('hidden');
-			$slides.prev('li[data-theme]').removeClass('hidden').addClass('current');
+                currSlide = allSlides;
+            } else {
+                $slides.removeClass('current').addClass('hidden');
+                $slides.prev('li[data-theme]').removeClass('hidden').addClass('current');
 
-			currSlide--;
-		}
-	}
+                currSlide--;
+            }
+        }
 
-	// Next slide function
-	function nextSlide() {
-		if (currSlide == allSlides) {
-			$slides.removeClass('current').addClass('hidden');
-			$slides.first('li[data-theme]').removeClass('hidden').addClass('current');
+        // Next slide function
+        function nextSlide() {
+            if (currSlide == allSlides) {
+                $slides.removeClass('current').addClass('hidden');
+                $slides.first('li[data-theme]').removeClass('hidden').addClass('current');
 
-			currSlide = 1;
-		} else {
-			$slides.removeClass('current').addClass('hidden');
-			$slides.next('li[data-theme]').removeClass('hidden').addClass('current');
+                currSlide = 1;
+            } else {
+                $slides.removeClass('current').addClass('hidden');
+                $slides.next('li[data-theme]').removeClass('hidden').addClass('current');
 
-			currSlide++;
-		}
-	}
-});
+                currSlide++;
+            }
+        }
+    });
+}
 
 $('button.btn[data-theme-action]').click( function() {
 	var self = $(this);
