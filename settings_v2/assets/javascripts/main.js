@@ -339,6 +339,7 @@ $themeSlider.each( function() {
 	var self			= $(this);
 	var $allSettings 	= self.find('div.theme-settings');
 	var $preview 		= self.find('div.theme-preview');
+	var $slides 		= self.find('li[data-theme]');
 
 	// Aligning settings box in the middle of the preview area
 	$allSettings.each(function() {
@@ -352,8 +353,9 @@ $themeSlider.each( function() {
 		});
 	});
 
+	$slides.not('.current').addClass('hidden');
+
 	// Carousel
-	var $slides 	= self.find('li[data-theme]');
 	var currSlide 	= $slides.index($('.current')) + 1;
 	var allSlides	= $slides.length;
 	var $prev		= self.find('li.prev');
@@ -388,13 +390,13 @@ $themeSlider.each( function() {
 	// Previous slide function
 	function prevSlide() {
 		if (currSlide == 1) {
-			$slides.removeClass('current');
-			$slides.last('li[data-theme]').addClass('current');
+			$slides.removeClass('current').addClass('hidden');
+			$slides.last('li[data-theme]').removeClass('hidden').addClass('current');
 
 			currSlide = allSlides;
 		} else {
-			$slides.removeClass('current');
-			$slides.prev('li[data-theme]').addClass('current');
+			$slides.removeClass('current').addClass('hidden');
+			$slides.prev('li[data-theme]').removeClass('hidden').addClass('current');
 
 			currSlide--;
 		}
@@ -403,13 +405,13 @@ $themeSlider.each( function() {
 	// Next slide function
 	function nextSlide() {
 		if (currSlide == allSlides) {
-			$slides.removeClass('current');
-			$slides.first('li[data-theme]').addClass('current');
+			$slides.removeClass('current').addClass('hidden');
+			$slides.first('li[data-theme]').removeClass('hidden').addClass('current');
 
 			currSlide = 1;
 		} else {
-			$slides.removeClass('current');
-			$slides.next('li[data-theme]').addClass('current');
+			$slides.removeClass('current').addClass('hidden');
+			$slides.next('li[data-theme]').removeClass('hidden').addClass('current');
 
 			currSlide++;
 		}
