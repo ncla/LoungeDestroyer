@@ -575,6 +575,9 @@ function theme_create_element(name, obj, active) {
         select_theme(name);
     });
 
+    $(item).find('.btn.enabled').click(function() {
+        select_theme(' ');
+    });
 
     //var dropdownOption = document.createElement("option");
     //dropdownOption.setAttribute("value", name);
