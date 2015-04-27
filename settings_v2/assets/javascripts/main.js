@@ -331,18 +331,20 @@ $('select').each( function() {
 
 var $themeSlider 		= $('#themes-slider');
 var sliderNavsEnabled 	= true;
+var cssEditorVisible 	= false;
+var $cssEditor, $cssSave;
 
 $themeSlider.each( function() {
 	// Variables
 	var self			= $(this);
 	var $allSettings 	= self.find('div.theme-settings');
-	var $preview 		= self.find('li.current div.theme-preview');
+	var $preview 		= self.find('div.theme-preview');
 
 	// Aligning settings box in the middle of the preview area
 	$allSettings.each(function() {
-		var $settings 		= $(this);
-		var top 			= ($preview.height() - $settings.outerHeight()) / 2;
-		var left 			= ($preview.width() - $settings.outerWidth()) / 2;
+		var $settings 	= $(this);
+		var top 		= ($preview.height() - $settings.outerHeight()) / 2;
+		var left 		= ($preview.width() - $settings.outerWidth()) / 2;
 
 		$settings.css({
 			top: top,
@@ -414,6 +416,27 @@ $themeSlider.each( function() {
 	}
 });
 
+$('button.btn[data-theme-action]').click( function() {
+	var self = $(this);
+	var data = self.data('theme-action');
+	var current = $('li[data-theme].current');
+
+	if (data == 'edit') {
+		cssEditorVisible 	= true;
+		$cssEditor 			= current.find('.css-edit');
+		$cssSave 			= current.find('.btn-save');
+
+		$cssEditor.addClass('css-edit-show');
+		$cssSave.addClass('btn-save-show');
+
+		setTimeout(function() {
+			current.find('textarea').focus();
+		}, 320);
+	} else if (data == 'delete') {
+		alert('LOL U MAD?! [436th line @ main.js]');
+	}
+});
+
 $('button.btn[data-theme-settings]').click( function() {
 	var self 	= $(this);
 	var data 	= self.data('theme-settings');
@@ -425,11 +448,18 @@ $('button.btn[data-theme-settings]').click( function() {
 		if (data == 'open') {
 			if (sliderNavsEnabled)
 				self.addClass('slider-hide-navs');
+
 			$preview.addClass('theme-settings-open');
 		} else if (data == 'close') {
 			if (sliderNavsEnabled)
 				self.removeClass('slider-hide-navs');
+
 			$preview.removeClass('theme-settings-open');
+
+			if (cssEditorVisible) {
+				$cssEditor.removeClass('css-edit-show');
+				$cssSave.removeClass('btn-save-show');
+			}
 		}
 	});
 });

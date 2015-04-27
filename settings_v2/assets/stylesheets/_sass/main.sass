@@ -340,10 +340,30 @@ input, button
 	&.btn
 		border: none
 
+$btnRegular: $main-orange
+$btnRegularHover: darken($btnRegular, 3%)
+$btnRegularActive: darken($btnRegular, 6%)
+
+$btnRed: #cc1e1e
+$btnRedHover: darken($btnRed, 4%)
+$btnRedActive: darken($btnRed, 7%)
+
+$btnGreen: #61a90c
+$btnGreenHover: darken($btnGreen, 4%)
+$btnGreenActive: darken($btnGreen, 7%)
+
+$btnBlue: #147fc3
+$btnBlueHover: darken($btnBlue, 4%)
+$btnBlueActive: darken($btnBlue, 7%)
+
+$btnGray: #4d4d4d
+$btnGrayHover: darken($btnGray, 4%)
+$btnGrayActive: darken($btnGray, 7%)
+
 .btn
 	text-transform: uppercase
 	-webkit-user-select: none
-	background: $main-orange
+	background: $btnRegular
 	display: inline-block
 	transition: all 0.2s
 	position: relative
@@ -356,11 +376,11 @@ input, button
 	color: white
 
 	&:not([disabled]):hover
-		background: #de8e03
+		background: $btnRegularHover
 		box-shadow: 0 1px 6px 0 rgba(0,0,0,0.12), 0 1px 6px 0 rgba(0,0,0,0.12)
 
 	&:not([disabled]):active
-		background: #d28100
+		background: $btnRegularActive
 		box-shadow: 0 5px 11px 0 rgba(0,0,0,0.18), 0 4px 15px 0 rgba(0,0,0,0.15)
 
 	&[disabled]
@@ -368,7 +388,7 @@ input, button
 		cursor: default
 
 		&:before
-			background: $main-orange
+			background: $btnRegular
 			transition: all 0.2s
 			visibility: hidden
 			position: absolute
@@ -397,6 +417,42 @@ input, button
 			&:before
 				-webkit-animation: "button-loading" 1.35s infinite
 
+	&.btn-red
+		background: $btnRed
+
+		&:hover
+			background: $btnRedHover
+
+		&:active
+			background: $btnRedActive
+
+	&.btn-green
+		background: $btnGreen
+
+		&:hover
+			background: $btnGreenHover
+
+		&:active
+			background: $btnGreenActive
+
+	&.btn-blue
+		background: $btnBlue
+
+		&:hover
+			background: $btnBlueHover
+
+		&:active
+			background: $btnBlueActive
+
+	&.btn-gray
+		background: $btnGray
+
+		&:hover
+			background: $btnGrayHover
+
+		&:active
+			background: $btnGrayActive
+
 .btn-row
 	margin-top: 9px
 	+clearfix
@@ -410,6 +466,12 @@ input, button
 	> li
 		margin-right: 7px
 		float: left
+
+		&:last-child
+			margin-right: 0
+
+		&.right
+			margin: 0 0 0 7px
 
 // #
 // # Inputs
@@ -863,9 +925,72 @@ $slider-height: 551px
 		left: 0
 		top: 0
 
+		> .btn-row, .css-edit, .btn-save
+			transition: all 0.32s
+			visibility: hidden
+			opacity: 0
+
+		> .btn-row
+			position: absolute
+			padding-bottom: 0
+			z-index: 10
+			right: 11px
+			bottom: 0
+
+		.btn-save
+			margin-bottom: -11px
+
+		.btn-save-show
+			visibility: visible
+			margin-bottom: 0
+			opacity: 1
+
+		.css-edit
+			background: rgba(255,255,255,0.96)
+			border-bottom: 1px solid #eee
+			transition: all 0.32s
+			padding-bottom: 98px
+			position: absolute
+			visibility: hidden
+			opacity: 0
+			bottom: 0
+			right: 0
+			left: 0
+			top: 0
+
+			&:before
+				content: "Stylesheet Editor"
+				font-size: 17px
+				display: block
+				color: #595959
+				padding: 10px 15px
+				border-bottom: 1px solid #eeeeee
+
+			&.css-edit-show
+				visibility: visible
+				opacity: 1
+
+			textarea
+				-webkit-box-shadow: none
+				font-family: "Consolas"
+				overflow-y: scroll
+				line-height: 18px
+				background: none
+				font-size: 13px
+				padding: 15px
+				border: none
+				height: 100%
+
 	&.theme-settings-open
 		.theme-overlay
 			background: rgba(0,0,0,0.5)
+
+			> .btn-row
+				visibility: visible
+				opacity: 1
+
+			> .btn-row
+				padding-bottom: 11px
 
 		.theme-settings
 			visibility: visible
@@ -899,6 +1024,15 @@ $slider-height: 551px
 		.content
 			padding: 0 7.5px 7px 7.5px
 
+		&.theme-edit
+			-webkit-box-shadow: none
+			text-align: center
+			background: none
+			width: auto
+
+			> .btn-row
+				padding: 0 0 7px 0
+
 	> .btn-row
 		padding: 0 11px 11px 11px
 		transition: all 0.32s
@@ -908,10 +1042,6 @@ $slider-height: 551px
 		bottom: 0
 		right: 0
 		left: 0
-
-		> li
-			&.right
-				margin: 0
 
 	.btn	
 		&.enabled
