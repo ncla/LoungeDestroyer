@@ -1,846 +1,897 @@
 <!doctype html>
 <html lang="en">
 <head>
-   <meta charset="utf-8">
-   <title>LoungeDestroyer v0.8.2.2 - Settings</title>
-   <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
-   <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:400,400italic,500,500italic,700,700italic">
-   <link rel="stylesheet" href="assets/stylesheets/main.min.css">
+	<meta charset="utf-8">
+	<title>LoungeDestroyer v0.8.2.1 - Settings</title>
+	<link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+	<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:400,400italic,500,500italic,700,700italic">
+	<link rel="stylesheet" href="assets/stylesheets/main.min.css">
 </head>
 <body>
-   
-   <!-- # Navigation -->
-   <nav role="navigation">
-      <ul>
-         <li class="logo">
-            <a href="#page-settings" role="button">
-               <img src="assets/images/ld-logo.png?v=0821" alt="LD Logo" width="197" height="46">
-            </a>
-         </li>
-
-         <li><a href="#page-settings" role="button">Settings</a></li>
-         <li><a href="#page-themes" role="button">Themes</a></li>
-         <li><a href="#page-about" role="button">About</a></li>
-         <li><a href="#page-changelog" role="button">Changelog</a></li>
-
-         <li class="right">
-            <a href="#page-donate" class="btn" role="button">Donate</a>
-         </li>
-      </ul>
-   </nav>
-   <!-- # /Navigation -->
-
-   <!-- # Wrapper -->
-   <main>
-
-      <!-- # Last time the extension had been updated -->
-      <div class="date-updated">
-         <div>
-            <h2>Last update was received <strong>43 days</strong> ago</h2>
-            <span>&mdash; February 22nd, 2015 &mdash;</span>
-         </div>
-      </div>
-      <!-- # /Last time the extension had been updated -->
-
-      <!-- # Page: "Settings" -->
-      <section id="page-settings" class="hidden">
-         <!-- # Items -->
-         <div class="col-grid-12">
-            <div class="card">
-               <h2>Items</h2>
-               <div class="pad-vert">
-                  <!-- # Row -->
-                  <div class="row">
-                     <div class="group col-grid-6">
-                        <span>Market prices on items:</span>
-                        <select id="itemMarketPricesv2">
-                           <option value="2">Load market price automatically</option>
-                           <option value="1">Only when mouse is over an item</option>
-                           <option value="0">Disabled</option>
-                        </select>
-                     </div>
-                     <div class="group col-grid-6">
-                        <span>Use cached item price list <b data-tooltip="LoungeDestroyer can provide item price values where available from <strong>our own dedicated API</strong>. The item price list cache updates periodically.">( ? )</b>:</span>
-                        <select id="useCachedPriceList">
-                           <option value="1">Enabled</option>
-                           <option value="0">Disabled</option>
-                        </select>
-                     </div>
-                  </div>
-                  <!-- # /Row -->
-                  
-                  <br class="margin">
-
-                  <!-- # Row -->
-                  <div class="row">
-                     <div class="group col-grid-6">
-                        <span>Steam market currency:</span>
-                        <!-- 
-                           .............................
-                        -->
-                        <select id="marketCurrency">
-                           <option value="1">USD</option>
-                           <option value="2">GBP</option>
-                           <option value="3">EUR</option>
-                           <option value="5">RUB</option>
-                           <option value="7">BRL</option>
-                           <option value="8">JPY</option>
-                           <option value="9">NOK</option>
-                           <option value="10">IDR</option>
-                           <option value="11">MYR</option>
-                           <option value="12">PHP</option>
-                           <option value="13">SGD</option>
-                           <option value="14">THB</option>
-                           <option value="15">VND</option>
-                           <option value="16">KRW</option>
-                           <option value="17">TRY</option>
-                           <option value="18">UAH</option>
-                           <option value="19">MXN</option>
-                           <option value="20">CAD</option>
-                           <option value="21">AUD</option>
-                           <option value="22">NZD</option>
-                        </select>
-                     </div>
-                     <div class="group col-grid-6">
-                        <span>Convert Lounge prices to chosen currency:</span>
-                        <select id="convertLoungePrices">
-                           <option value="1">Enabled</option>
-                           <option value="0">Disabled</option>
-                        </select>
-                     </div>
-                  </div>
-                  <!-- # /Row -->
-
-                  <br class="margin">
-
-                  <!-- # Row -->
-                  <div class="row">
-                     <div class="group col-grid-6">
-                        <span>Black-list items that do not have a market listing <b data-tooltip="When a request is made to Steam market API for an item and there are no listings for this item, extension can black-list this item to reduce amount of requests made for non-marketable/non-existing items.">( ? )</b>:</span>
-                        <select id="blacklistNonExistingItems">
-                           <option value="1">Enabled</option>
-                           <option value="0">Disabled</option>
-                        </select>
-                     </div>
-                     <div class="group col-grid-6">
-                        <span>Show weapon exterior/rarity next to Steam market price:</span>
-                        <select id="displayCsgoWeaponQuality">
-                           <option value="1">Enabled</option>
-                           <option value="0">Disabled</option>
-                        </select>
-                     </div>
-                  </div>
-                  <!-- # /Row -->
-
-                  <br class="margin">
-
-                  <!-- # Row -->
-                  <div class="row">
-                     <div class="group col-grid-6">
-                        <span>Allow groups in inventory:</span>
-                        <select id="groupInventory">
-                           <option value="1">Enabled</option>
-                           <option value="0">Disabled</option>
-                        </select>
-                     </div>
-                  </div>
-                  <!-- # /Row -->
-               </div>
-            </div>
-         </div>
-         <!-- # /Items -->
-
-         <!-- # Notifications -->
-         <div class="col-grid-12">
-            <div class="card">
-               <h2>Notifications</h2>
-               <div class="pad-vert">
-                  <!-- # Row -->
-                  <div class="row">
-                     <div class="group col-grid-6">
-                        <span>Notify about new matches:</span>
-                        <select id="notifyMatches">
-                           <option value="1">Both</option>
-                           <option value="2">Dota2 Lounge matches only</option>
-                           <option value="3">CS:GO Lounge matches only</option>
-                           <option value="4">Disabled</option>
-                        </select>
-                     </div>
-                     <div class="group col-grid-6">
-                        <span>Notify about new trade offers:</span>
-                        <select id="notifyTrades">
-                           <option value="1">Both</option>
-                           <option value="2">Dota2 Lounge matches only</option>
-                           <option value="3">CS:GO Lounge matches only</option>
-                           <option value="4">Disabled</option>
-                        </select>
-                     </div>
-                  </div>
-                  <!-- # /Row -->
-
-                  <br class="margin">
-
-                  <!-- # Row -->
-                  <div class="row">
-                     <div class="group col-grid-6">
-                        <span>Notify about items that are going to expire soon:</span>
-                        <select id="notifyExpiredItems">
-                           <option value="1">Both</option>
-                           <option value="2">Dota2 Lounge matches only</option>
-                           <option value="3">CS:GO Lounge matches only</option>
-                           <option value="4">Disabled</option>
-                        </select>
-                     </div>
-                     <div class="group col-grid-6">
-                        <span>Notify on queue trade offer:</span>
-                        <select id="notifyTradeOffer">
-                           <option value="1">Enabled</option>
-                           <option value="4">Disabled</option>
-                        </select>
-                     </div>
-                  </div>
-                  <!-- # /Row -->
-               </div>
-            </div>
-         </div>
-         <!-- # /Notifications -->
-
-         <!-- # Time and date -->
-         <div class="col-grid-12">
-            <div class="card">
-               <h2>Time &amp; date</h2>
-               <div class="pad-vert">
-                  <!-- # Row -->
-                  <div class="row">
-                     <div class="group col-grid-6">
-                        <span>Automatically change match time to local time:</span>
-                        <select id="changeTimeToLocal">
-                           <option value="1">Enabled</option>
-                           <option value="0">Disabled</option>
-                        </select>
-                     </div>
-                     <div class="group col-grid-6">
-                        <span>Time zone:</span>
-                        <select id="timezone">
-                           <option value="auto">Detect automatically</option>
-                           <!--
-                           ..............................
-                           -->
-                        </select>
-                     </div>
-                  </div>
-                  <!-- # /Row -->
-
-                  <br class="margin">
-
-                  <!-- # Row -->
-                  <div class="row">
-                     <div class="group col-grid-6">
-                        <span>12/24 hour clock:</span>
-                        <select id="americanosTime">
-                           <option value="1">12 hour clock</option>
-                           <option value="0">24 hour clock</option>
-                        </select>
-                     </div>
-                     <div class="group col-grid-6">
-                        <span>Display time zone abbreviation:</span>
-                        <select id="displayTzAbbr">
-                           <option value="1">Enabled</option>
-                           <option value="0">Disabled</option>
-                        </select>
-                     </div>
-                  </div>
-                  <!-- # /Row -->
-               </div>
-            </div>
-         </div>
-         <!-- # /Time and date -->
-
-         <!-- # Features -->
-         <div class="col-grid-12">
-            <div class="card">
-               <h2>Features</h2>
-               <div class="pad-vert">
-                  <!-- # Row -->
-                  <div class="row">
-                     <div class="group col-grid-6">
-                        <span>Redirect from item draft page <b data-tooltip="CS:GO Lounge does an annoying redirect to item drafting page, which can be stopped by extension. This may cause some lag issues as this will keep redirecting to intended page instead of item drafting page.">( ? )</b>:</span>
-                        <select id="redirect">
-                           <option value="1">Enabled</option>
-                           <option value="0">Disabled</option>
-                        </select>
-                     </div>
-                     <div class="group col-grid-6">
-                        <span>Show trade descriptions:</span>
-                        <select id="showDescriptions">
-                           <option value="1">Enabled</option>
-                           <option value="0">Disabled</option>
-                        </select>
-                     </div>
-                  </div>
-                  <!-- # /Row -->
-
-                  <br class="margin">
-
-                  <!-- # Row -->
-                  <div class="row">
-                     <div class="group col-grid-6">
-                        <span>Enable auto-betting/-returning/-accept:</span>
-                        <select id="enableAuto">
-                           <option value="3">Auto-accept only</option>
-                           <option value="2">Auto-betting/-returning only</option>
-                           <option value="1">Enabled</option>
-                           <option value="0">Disabled</option>
-                        </select>
-                     </div>
-                     <div class="group col-grid-6">
-                        <span>Add preview buttons to trades:</span>
-                        <select id="addTradePreviews">
-                           <option value="1">Enabled</option>
-                           <option value="0">Disabled</option>
-                        </select>
-                     </div>
-                  </div>
-                  <!-- # /Row -->
-
-                  <br class="margin">
-
-                  <!-- # Row -->
-                  <div class="row">
-                     <div class="group col-grid-6">
-                        <span>Show match type and exact time:</span>
-                        <select id="showExtraMatchInfo">
-                           <option value="2">Load automatically for upcoming matches + on hover</option>
-                           <option value="1">Trigger only when mouse is over the match</option>
-                           <option value="0">Disabled</option>
-                        </select>
-                     </div>
-                     <div class="group col-grid-6">
-                        <span>Attempt to auto-bump trades every 10 minutes:</span>
-                        <select id="autoBump">
-                           <option value="570">Dota 2 Lounge trades only</option>
-                           <option value="730">CS:GO Lounge trades only</option>
-                           <option value="1">Enabled</option>
-                           <option value="0">Disabled</option>
-                        </select>
-                     </div>
-                  </div>
-                  <!-- # /Row -->
-               </div>
-            </div>
-         </div>
-         <!-- # /Features -->
-
-         <!-- # Features -->
-         <div class="col-grid-12">
-            <div class="card">
-               <h2>Audio</h2>
-               <div class="pad-vert">
-                  <!-- # Row -->
-                  <div class="row">
-                     <div class="group col-grid-6">
-                        <span>Change the "trade offer received" beep noise:</span>
-                        <select>
-                           <option value="000">Disabled (no changes)</option>
-                           <option value="00">Remove the audio completely</option>
-                           <option value="0" data-trigger="#custom-audio-url">Custom audio</option>
-                        </select>
-                     </div>
-
-                     <div class="col-grid-6">
-                        <form action="#" class="form-inline" id="custom-audio-url">
-                           <div class="group">
-                              <span>Custom audio for the received trade offer <b data-tooltip="qweoiqwjoeiws">( ? )</b>:</span>
-                              <div class="row">
-                                 <input type="text" placeholder="HTTP URL to your custom .mp3 audio" data-validation="url" data-validation-type="mp3" data-required>
-                                 <input type="submit" class="btn" value="Play">
-                              </div>
-                              <div class="error-labels">
-                                 <p class="error-label">
-                                    You must type an URL of an <strong>.mp3</strong> file (e.g. http://example.com/audio.mp3)
-                                 </p>
-                              </div>
-                           </div>
-                        </form>
-                     </div>
-                  </div>
-                  <!-- # /Row -->
-               </div>
-            </div>
-         </div>
-         <!-- # /Features -->
-
-         <!-- # Betting inventory statistics -->
-         <div class="col-grid-12">
-            <div class="card">
-               <h2>Betting inventory statistics</h2>
-               <div class="pad-full"></div>
-            </div>
-         </div>
-         <!-- # /Betting inventory statistics -->
-
-         <!-- # Misc -->
-         <div class="col-grid-12">
-            <div class="card">
-               <h2>Misc</h2>
-               <div class="pad-full">
-                  <p>If the cached item price list is empty, broken or out-dated, or the currency conversion rates are broken, press these buttons gently.</p>
-
-                  <ul class="btn-row">
-                     <li><a href="#" class="btn" id="refetchmarketcrap">Re-fetch item price list for cache</a></li>
-                     <li><a href="#" class="btn" id="refetchcurrencies">Re-fetch currency conversion rates</a></li>
-                     <li><a href="#" class="btn" id="updatethemes">Update theme CSS</a></li>
-                  </ul>
-
-                  <br>
-
-                  <p>If you want to restore default settings, including auto-betting/-returning/-accept delays and item groups, press this button furiously.</p>
-
-                  <ul class="btn-row">
-                     <li><a href="#" class="btn">Restore default settings</a></li>
-                  </ul>
-               </div>
-
-               <br class="minus-margin">
-
-               <div class="row pad-vert">
-                  <div class="group col-grid-6">
-                     <span>Profanity:</span>
-                     <select id="renameButtons">
-                        <option value="1">Enabled</option>
-                        <option value="0">Disabled</option>
-                     </select>
-                  </div>
-               </div>
-            </div>
-         </div>
-         <!-- # /Misc -->
-      </section>
-      <!-- # /Page: "Settings" -->
-
-      <!-- # Page: "Themes" -->
-      <section id="page-themes">
-         <div class="col-grid-12">
-            <div class="card">
-               <ul id="themes-slider">
-                  <li class="prev"><span></span></li>
-
-                  <li class="col-grid-3 theme-select">
-                     <select id="themes">
-                        <option value="cleanloungedark">CleanLounge - Dark</option>
-                        <option value="cleanloungelight">CleanLounge - Light</option>
-                        <option value="loungecompanion">LoungeCompanion</option>
-                     </select>
-                  </li>
-
-                  <li id="theme-cleanlounge-dark" class="current" data-theme>
-                     <div class="theme-preview">
-                        <div class="theme-overlay">
-                           <div class="theme-settings">
-                              <h2>Settings</h2>
-                              
-                              <div class="content">
-                                 <div class="label-group">
-                                    <input type="checkbox" value="1" id="a">
-                                    <label for="a">
-                                       If selected, CSGOLounge and DOTA2Lounge will have background images.
-                                    </label>
-                                 </div>
-                                 
-                                 <div class="label-group">
-                                    <input type="checkbox" value="1" id="b">
-                                    <label for="b">
-                                       If selected, your item price (the one, that CSGL provides) will be shown only on hover.
-                                    </label>
-                                 </div>
-                              </div>
-
-                              <ul class="btn-row btns-right">
-                                 <li><button class="btn" data-theme-settings="close">Close</button></li>
-                              </ul>
-                           </div>
-                        </div>
-
-                        <ul class="btn-row">
-                           <li class="right"><button class="btn" data-theme-settings="open">Settings</button></li>
-                           <li class="hidden"><button class="btn left">Use this theme</button></li>
-                           <li><button class="btn left enabled"><i></i>Currently enabled</button></li>
-                        </ul>
-
-                        <img src="themes/cleanlounge-dark/preview.jpg" alt="CleanLounge - Dark preview" width="980" height="551">
-                     </div>
-
-                     <div class="theme-desc">
-                        A little description and motivational message for everyone to use exactly this theme
-                     </div>
-
-                     <div class="theme-info">
-                        <div class="left">
-                           <img src="themes/cleanlounge-dark/icon.jpg" alt="" width="44" height="44" class="icon left">
-                           <h2>
-                              CleanLounge - Dark
-                              <small>
-                                 by <strong>farblood</strong>,
-                                 version 1.0.4 <b data-tooltip="Last update was received on:<br>March 13th, 2015">( ? )</b>
-                              </small>
-                           </h2>
-                        </div>
-                     </div>
-                  </li>
-
-                  <li class="next"><span></span></li>
-               </ul>
-            </div>
-         </div>
-
-         <div class="col-grid-12">
-            <div class="card">
-               <h2>Add your own</h2>
-               <div class="row pad-vert">
-                  <!-- # From URL -->
-                  <div class="col-grid-6">
-                     <h3>From URL:</h3>
-                     <form action="#" class="form-inline">
-                        <div class="group">
-                           <span>URL of JSON:</span>
-                           <div class="row">
-                              <input type="text" placeholder="Enter URL" data-validation="url" data-validation-type="json" data-required>
-                              <input type="submit" class="btn" value="Add theme">
-                           </div>
-                           <div class="error-labels">
-                              <p class="error-label">
-                                 You must type an URL of your theme's <strong>.json</strong> file
-                              </p>
-                           </div>
-                        </div>
-                     </form>
-
-                     <p class="paragraph">
-                        There are strict rules for the structure of the remote directory.<br>
-                        <br>
-                        The following must be true for the JSON at the URL, in addition
-                        to the rules found in <a href="#" target="_blank" class="link">THEMES.md</a>:
-                     </p>
-
-                     <ul class="list">
-                        <li>
-                           Must have a <code>name</code> key, with the value being the shortname
-                           of the extension. Same rules apply to the shortname, as
-                           does for javascript variable names.
-                        </li>
-                        <li>
-                           Must have a <code>css</code> key, with a value of the absolute URL of
-                           the CSS for the theme.
-                        </li>
-                        <li>
-                           Must have a <code>bg</code> key, with a value of the absolute URL of
-                           the background image.
-                        </li>
-                        <li>
-                           If an icon is wanted, must have an <code>icon</code> key, with a value
-                           of the absolute URL of the icon image.
-                        </li>
-                     </ul>
-
-                     <p class="paragraph pad-top">
-                        In addition to this, the server the JSON is hosted on must allow
-                        cross-origin <code>GET</code> requests from all domains (i.e. return the
-                        <code>Access-Control-Allow-Origin: *</code> and, optionally,
-                        <code>Access-Control-Allow-Methods: GET</code> headers).<br>
-                        <br>
-                        Background, icon and CSS are hotlinked.<br>
-                        <br>
-                        Themes are automatically updated once a day.
-                     </p>
-                  </div>
-                  <!-- # /From URL -->
-
-                  <!-- # User-inputted -->
-                  <div class="col-grid-6">
-                     <h3>User-inputted:</h3>
-                     <form action="#">
-                        <div class="group">
-                           <span>Title of the theme:</span>
-                           <input type="text" placeholder="Enter title" maxlength="20" data-required>
-                           <div class="error-labels">
-                              <p class="error-label">
-                                 You must type theme's title
-                              </p>
-                           </div>
-                        </div>
-
-                        <br>
-
-                        <div class="group">
-                           <span>Description (Optional):</span>
-                           <textarea placeholder="Enter description" rows="2"></textarea>
-                        </div>
-
-                        <br>
-
-                        <div class="group">
-                           <span>Preview image (Optional):</span>
-                           <input type="text" placeholder="Enter URL" data-validation="url" data-validation-type="image">
-                           <div class="error-labels">
-                              <p class="pre-error-label">
-                                 Suggested size is <strong>980x551</strong>
-                              </p>
-                              <p class="error-label">
-                                 You must type an URL of your theme's preview <strong>image</strong>
-                              </p>
-                           </div>
-                        </div>
-
-                        <br>
-
-                        <div class="row">
-                           <div class="group col-grid-8">
-                              <span>Author:</span>
-                              <input type="text" placeholder="Enter author" data-required>
-                              <div class="error-labels">
-                                 <p class="error-label">
-                                    You must type theme's original author
-                                 </p>
-                              </div>
-                           </div>
-
-                           <div class="group col-grid-4">
-                              <span>Version:</span>
-                              <input type="text" placeholder="Enter version" maxlength="8" data-validation="number" data-required>
-                              <div class="error-labels">
-                                 <p class="error-label">
-                                    You must type theme's version
-                                 </p>
-                              </div>
-                           </div>
-                        </div>
-
-                        <br>
-
-                        <div class="group">
-                           <span>Theme's CSS <b data-tooltip="Some explanation here...">( ? )</b>:</span>
-                           <textarea placeholder="Enter CSS" rows="4" data-required></textarea>
-                           <div class="error-labels">
-                              <p class="error-label">
-                                 You must type your theme's styling code
-                              </p>
-                           </div>
-                        </div>
-
-                        <br>
-
-                        <input type="submit" value="Add theme" class="btn">
-                     </form>
-                  </div>
-                  <!-- # /User-inputted -->
-               </div>
-            </div>
-         </div>
-      </section>
-      <!-- # /Page: "Themes" -->
-
-      <!-- # Page: "About" -->
-      <section id="page-about" class="hidden">
-         <div class="col-grid-12">
-            <div class="card">
-               <h2>About</h2>
-               <div class="pad-full">
-                  <div class="col-grid-7 pad-zero">
-                     <p class="paragraph pad-bottom-half">
-                        LoungeDestroyer makes a shitty website more bearable, enough said.<br>
-                        <a href="https://www.youtube.com/watch?v=fJrGo92Qwk0" class="link" target="_blank">
-                           Here is theme song for LoungeDestroyer
-                        </a>
-                     </p>
-
-                     <ul class="btn-row">
-                        <li><a href="http://reddit.com/r/loungedestroyer" class="btn" target="_blank">Subreddit</a></li>
-                        <li><a href="https://github.com/ncla/LoungeDestroyer" class="btn" target="_blank">GitHub</a></li>
-                        <li><a href="http://steamcommunity.com/groups/loungedestroyer" class="btn" target="_blank">Steam Group</a></li>
-                        <li><a href="https://github.com/ncla/LoungeDestroyer/issues" class="btn" target="_blank">Report a bug</a></li>
-                     </ul>
-                  </div>
-               </div>
-            </div>
-         </div>
-
-         <div class="col-grid-12">
-            <div class="card">
-               <div class="row">
-                  <div class="col-grid-4 col-border-right pad-zero">
-                     <h2>Our team</h2>
-                     <div class="pad-full">
-                        <ul class="list-team">
-                           <!-- # ncla -->
-                           <li>
-                              <span class="image">
-                                 <img src="team/ncla.jpg" alt="ncla" width="70" height="70">
-                              </span>
-                              <p>
-                                 <strong>ncla</strong>
-                                 <span>main developer</span>
-                              </p>
-                           </li>
-                           <!-- # /ncla -->
-
-                           <!-- # birjolaxew -->
-                           <li>
-                              <span class="image">
-                                 <img src="team/birjolaxew.jpg" alt="birjolaxew" width="70" height="70">
-                              </span>
-                              <p>
-                                 <strong>birjolaxew</strong>
-                                 <span>co-developer</span>
-                              </p>
-                           </li>
-                           <!-- # /birjolaxew -->
-
-                           <!-- # farblood -->
-                           <li>
-                              <span class="image">
-                                 <img src="team/farblood.jpg" alt="farblood" width="70" height="70">
-                              </span>
-                              <p>
-                                 <strong>farblood</strong>
-                                 <span>designer / theme creator</span>
-                              </p>
-                           </li>
-                           <!-- # /farblood -->
-                        </ul>
-                     </div>
-                  </div>
-
-                  <div class="col-grid-8 pad-zero">
-                     <h2>A little story</h2>
-                     <div class="pad-full">
-                        <p class="paragraph">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Distinctio sit vitae quae a quis impedit officiis, quibusdam pariatur labore provident nisi error expedita obcaecati minima vero. Eaque iure sunt beatae?</p>
-
-                        <p class="paragraph">Laboriosam nulla officia exercitationem, quibusdam animi labore ratione totam. Porro architecto beatae eum magnam, harum, aliquam quaerat facere reiciendis rem a impedit at quam natus eos omnis officiis odit saepe.</p>
-                        
-                        <p class="paragraph">Eaque officiis tempora commodi laborum iste voluptatibus dolore ducimus autem, reiciendis dolor nisi impedit neque nulla quo laudantium. Eaque temporibus provident beatae eos quas suscipit velit ratione dicta facilis fuga.</p>
-                     </div>
-                  </div>
-               </div>
-            </div>
-         </div>
-      </section>
-      <!-- # /Page: "About" -->
-
-      <!-- # Page: "Changelog" -->
-      <section id="page-changelog" class="hidden">
-         <div class="col-grid-12">
-            <div class="card">
-               <h2>Changelog</h2>
-               <div class="pad-full">
-                  <!-- # Version -->
-                  <h3>v0.8.2.2 <small>released on april 31st, 2015</small></h3>
-                  <ul class="list">
-                     <li class="list-headline">New:</li>
-                     <li>Brought back extra match info caching, this time however the cached information will last 5 minutes before requesting fresh information again</li>
-                     <li>Rarity is now also shown near market price for Dota2 items</li>
-                     <li>NEW LOGO!!!!!!11 by <a href="http://www.reddit.com/u/farblood" class="link" target="_blank">/u/farblood</a></li>
-                     <li>Item groups now differentiate between identical items</li>
-                     <li>Added options to change small/medium/large bet %</li>
-                     <li>Added option to select for which inventory groups you want inventory statistics to be calculated</li>
-                     <li>Added button in options to reset your user settings to default ones</li>
-
-                     <li class="list-headline">Bug fixes:</li>
-                     <li>'undefined' item name when doing a CSGOLounge item value check if you were using non-English language for Steam</li>
-                     <li>Fixed match notifications not working thanks to a bugfix that degraded it even further</li>
-                     <li>Fixed rare cases where market price didn't fetch because CSGOLounge added items that have unnecessary spaces at the end of item name</li>
-                     <li>Changed Canadian dollar symbol to be shorter</li>
-                     <li>Finally fixed the inconsistency in detecting when betting inventory has loaded</li>
-                     <li>Changed market price loading function to not load market prices pointlessly for items that are already market priced</li>
-                     <li>Fixed 'Total value bet' calculated incorrectly if you were using non-USD currency</li>
-                     <li>Auto-betting/-returning now works in incognito mode</li>
-                     <li>Fixed broken inventory loading if the user used 'Force refresh' button</li>
-                     <li>Item groups now work with our cached inventories</li>
-                     <li>Fixed 'Base' quality being ordered too high in inventory statistics</li>
-                     <li>Fixed a rare case where trade offer was not automatically accepted because of faulty check for how much time is left for trade offer to accept</li>
-                     <li>Minimum auto trade offer accepting delay is now forced properly to 10 seconds (this also caused auto offer accepting to not work)</li>
-                     <li>Accounted for chrome.alarms bug when setting system time back which caused scheduled tasks to be messed up, resulting in things like auto-bumping being broken</li>
-                  </ul>
-                  <!-- # /Version -->
-               </div>
-            </div>
-         </div>
-      </section>
-
-      <!-- # Page: "Donate" -->
-      <section id="page-donate" class="hidden">
-         <div class="col-grid-12">
-            <div class="card">
-               <h2>Donate</h2>
-               <div class="pad-full">
-                  
-               </div>
-            </div>
-         </div>
-      </section>
-      <!-- # /Page: "Donate" -->
-
-   </main>
-   <!-- # /Wrapper -->
-
-   <!-- # Footer -->
-   <div class="col-grid-12">
-      <footer role="contentinfo">
-         <p>Created by <a href="https://github.com/ncla" target="_blank" class="link"><strong>NCLA</strong></a>,
-         co-developed by <a href="https://github.com/birjolaxew" target="_blank" class="link"><strong>birjolaxew</strong></a><br>
-         and the rare occasional <a href="https://github.com/ncla/LoungeDestroyer/graphs/contributors" target="_blank" class="link"><strong>contributors on GitHub</strong></a></p>
-
-         <p>Re-designed by <a href="https://github.com/farblood" target="_blank" class="link"><strong>farblood</strong></a><br>
-         Copyrights &copy; 2015</p>
-      </footer>
-   </div>
-   <!-- # /Footer -->
-
-   <!-- # "First time visit" tour -->
-   <div class="modal" id="tour">
-      <div>
-         <header>
-            <h2>Dialog</h2>
-            <span class="modal-close" data-modal="close">&times;</span>
-         </header>
-         <div class="modal-content">
-            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Soluta placeat itaque dignissimos alias, nisi nostrum cum quae, eos, ducimus blanditiis ad obcaecati voluptates aut tempora possimus sunt impedit, tenetur eum.</p>
-         </div>
-         <footer>
-            <ul class="btn-row btns-right">
-               <li>
-                  <button class="btn" data-modal="close">Close</button>
-               </li>
-               <li>
-                  <button class="btn">Next</button>
-               </li>
-            </ul>
-         </footer>
-      </div>
-   </div>
-   <!-- # /"First time visit" tour -->
-
-   <div class="modal">
-      <div>
-         <header>
-            <h2>Dialog</h2>
-            <span class="modal-close" data-modal="close">&times;</span>
-         </header>
-         <div class="modal-content">
-            <p></p>
-         </div>
-         <footer>
-            <ul class="btn-row btns-right">
-               <li>
-                  <button class="btn" data-modal="close">Close</button>
-               </li>
-            </ul>
-         </footer>
-      </div>
-   </div>
-
-   <script src="assets/javascripts/min/jquery.min.js"></script>
-   <script src="assets/javascripts/min/selectize.min.js"></script>
-   <script src="assets/javascripts/main.js"></script>
+	
+	<!-- # Navigation -->
+	<nav role="navigation">
+		<ul>
+			<li class="logo">
+				<a href="#page-settings" role="button">
+					<img src="assets/images/ld-logo.png?v=0821" alt="LD Logo" width="197" height="46">
+				</a>
+			</li>
+
+			<li><a href="#page-settings" role="button">Settings</a></li>
+			<li><a href="#page-themes" role="button">Themes</a></li>
+			<li><a href="#page-about" role="button">About</a></li>
+			<li><a href="#page-changelog" role="button">Changelog</a></li>
+
+			<li class="right">
+				<a href="#page-donate" class="btn" role="button">Donate</a>
+			</li>
+		</ul>
+	</nav>
+	<!-- # /Navigation -->
+
+	<!-- # Wrapper -->
+	<main>
+
+		<!-- # Last time the extension had been updated -->
+		<div class="date-updated">
+			<div>
+				<h2>Last update was received <strong>43 days</strong> ago</h2>
+				<span>&mdash; February 22nd, 2015 &mdash;</span>
+			</div>
+		</div>
+		<!-- # /Last time the extension had been updated -->
+
+		<!-- # Page: "Settings" -->
+		<section id="page-settings" class="hidden">
+			<!-- # Items -->
+			<div class="col-grid-12">
+				<div class="card">
+					<h2>Items</h2>
+					<div class="pad-vert">
+						<!-- # Row -->
+						<div class="row">
+							<div class="group col-grid-6">
+								<span>Market prices on items:</span>
+								<select id="itemMarketPricesv2">
+									<option value="2">Load market price automatically</option>
+									<option value="1">Only when mouse is over an item</option>
+									<option value="0">Disabled</option>
+								</select>
+							</div>
+							<div class="group col-grid-6">
+								<span>Use cached item price list <b data-tooltip="LoungeDestroyer can provide item price values where available from <strong>our own dedicated API</strong>. The item price list cache updates periodically.">( ? )</b>:</span>
+								<select id="useCachedPriceList">
+									<option value="1">Enabled</option>
+									<option value="0">Disabled</option>
+								</select>
+							</div>
+						</div>
+						<!-- # /Row -->
+						
+						<br class="margin">
+
+						<!-- # Row -->
+						<div class="row">
+							<div class="group col-grid-6">
+								<span>Steam market currency:</span>
+								<!-- 
+									.............................
+								-->
+								<select id="marketCurrency">
+									<option value="1">USD</option>
+									<option value="2">GBP</option>
+									<option value="3">EUR</option>
+									<option value="5">RUB</option>
+									<option value="7">BRL</option>
+									<option value="8">JPY</option>
+									<option value="9">NOK</option>
+									<option value="10">IDR</option>
+									<option value="11">MYR</option>
+									<option value="12">PHP</option>
+									<option value="13">SGD</option>
+									<option value="14">THB</option>
+									<option value="15">VND</option>
+									<option value="16">KRW</option>
+									<option value="17">TRY</option>
+									<option value="18">UAH</option>
+									<option value="19">MXN</option>
+									<option value="20">CAD</option>
+									<option value="21">AUD</option>
+									<option value="22">NZD</option>
+								</select>
+							</div>
+							<div class="group col-grid-6">
+								<span>Convert Lounge prices to chosen currency:</span>
+								<select id="convertLoungePrices">
+									<option value="1">Enabled</option>
+									<option value="0">Disabled</option>
+								</select>
+							</div>
+						</div>
+						<!-- # /Row -->
+
+						<br class="margin">
+
+						<!-- # Row -->
+						<div class="row">
+							<div class="group col-grid-6">
+								<span>Black-list items that do not have a market listing <b data-tooltip="When a request is made to Steam market API for an item and there are no listings for this item, extension can black-list this item to reduce amount of requests made for non-marketable/non-existing items.">( ? )</b>:</span>
+								<select id="blacklistNonExistingItems">
+									<option value="1">Enabled</option>
+									<option value="0">Disabled</option>
+								</select>
+							</div>
+							<div class="group col-grid-6">
+								<span>Show weapon exterior/rarity next to Steam market price:</span>
+								<select id="displayCsgoWeaponQuality">
+									<option value="1">Enabled</option>
+									<option value="0">Disabled</option>
+								</select>
+							</div>
+						</div>
+						<!-- # /Row -->
+
+						<br class="margin">
+
+						<!-- # Row -->
+						<div class="row">
+							<div class="group col-grid-6">
+								<span>Allow groups in inventory:</span>
+								<select id="groupInventory">
+									<option value="1">Enabled</option>
+									<option value="0">Disabled</option>
+								</select>
+							</div>
+						</div>
+						<!-- # /Row -->
+					</div>
+				</div>
+			</div>
+			<!-- # /Items -->
+
+			<!-- # Notifications -->
+			<div class="col-grid-12">
+				<div class="card">
+					<h2>Notifications</h2>
+					<div class="pad-vert">
+						<!-- # Row -->
+						<div class="row">
+							<div class="group col-grid-6">
+								<span>Notify about new matches:</span>
+								<select id="notifyMatches">
+									<option value="1">Both</option>
+									<option value="2">Dota2 Lounge matches only</option>
+									<option value="3">CS:GO Lounge matches only</option>
+									<option value="4">Disabled</option>
+								</select>
+							</div>
+							<div class="group col-grid-6">
+								<span>Notify about new trade offers:</span>
+								<select id="notifyTrades">
+									<option value="1">Both</option>
+									<option value="2">Dota2 Lounge matches only</option>
+									<option value="3">CS:GO Lounge matches only</option>
+									<option value="4">Disabled</option>
+								</select>
+							</div>
+						</div>
+						<!-- # /Row -->
+
+						<br class="margin">
+
+						<!-- # Row -->
+						<div class="row">
+							<div class="group col-grid-6">
+								<span>Notify about items that are going to expire soon:</span>
+								<select id="notifyExpiredItems">
+									<option value="1">Both</option>
+									<option value="2">Dota2 Lounge matches only</option>
+									<option value="3">CS:GO Lounge matches only</option>
+									<option value="4">Disabled</option>
+								</select>
+							</div>
+							<div class="group col-grid-6">
+								<span>Notify on queue trade offer:</span>
+								<select id="notifyTradeOffer">
+									<option value="1">Enabled</option>
+									<option value="4">Disabled</option>
+								</select>
+							</div>
+						</div>
+						<!-- # /Row -->
+					</div>
+				</div>
+			</div>
+			<!-- # /Notifications -->
+
+			<!-- # Time and date -->
+			<div class="col-grid-12">
+				<div class="card">
+					<h2>Time &amp; date</h2>
+					<div class="pad-vert">
+						<!-- # Row -->
+						<div class="row">
+							<div class="group col-grid-6">
+								<span>Automatically change match time to local time:</span>
+								<select id="changeTimeToLocal">
+									<option value="1">Enabled</option>
+									<option value="0">Disabled</option>
+								</select>
+							</div>
+							<div class="group col-grid-6">
+								<span>Time zone:</span>
+								<select id="timezone">
+									<option value="auto">Detect automatically</option>
+									<!--
+									..............................
+									-->
+								</select>
+							</div>
+						</div>
+						<!-- # /Row -->
+
+						<br class="margin">
+
+						<!-- # Row -->
+						<div class="row">
+							<div class="group col-grid-6">
+								<span>12/24 hour clock:</span>
+								<select id="americanosTime">
+									<option value="1">12 hour clock</option>
+									<option value="0">24 hour clock</option>
+								</select>
+							</div>
+							<div class="group col-grid-6">
+								<span>Display time zone abbreviation:</span>
+								<select id="displayTzAbbr">
+									<option value="1">Enabled</option>
+									<option value="0">Disabled</option>
+								</select>
+							</div>
+						</div>
+						<!-- # /Row -->
+					</div>
+				</div>
+			</div>
+			<!-- # /Time and date -->
+
+			<!-- # Features -->
+			<div class="col-grid-12">
+				<div class="card">
+					<h2>Features</h2>
+					<div class="pad-vert">
+						<!-- # Row -->
+						<div class="row">
+							<div class="group col-grid-6">
+								<span>Redirect from item draft page <b data-tooltip="CS:GO Lounge does an annoying redirect to item drafting page, which can be stopped by extension. This may cause some lag issues as this will keep redirecting to intended page instead of item drafting page.">( ? )</b>:</span>
+								<select id="redirect">
+									<option value="1">Enabled</option>
+									<option value="0">Disabled</option>
+								</select>
+							</div>
+							<div class="group col-grid-6">
+								<span>Show trade descriptions:</span>
+								<select id="showDescriptions">
+									<option value="1">Enabled</option>
+									<option value="0">Disabled</option>
+								</select>
+							</div>
+						</div>
+						<!-- # /Row -->
+
+						<br class="margin">
+
+						<!-- # Row -->
+						<div class="row">
+							<div class="group col-grid-6">
+								<span>Enable auto-betting/-returning/-accept:</span>
+								<select id="enableAuto">
+									<option value="3">Auto-accept only</option>
+									<option value="2">Auto-betting/-returning only</option>
+									<option value="1">Enabled</option>
+									<option value="0">Disabled</option>
+								</select>
+							</div>
+							<div class="group col-grid-6">
+								<span>Add preview buttons to trades:</span>
+								<select id="addTradePreviews">
+									<option value="1">Enabled</option>
+									<option value="0">Disabled</option>
+								</select>
+							</div>
+						</div>
+						<!-- # /Row -->
+
+						<br class="margin">
+
+						<!-- # Row -->
+						<div class="row">
+							<div class="group col-grid-6">
+								<span>Show match type and exact time:</span>
+								<select id="showExtraMatchInfo">
+									<option value="2">Load automatically for upcoming matches + on hover</option>
+									<option value="1">Trigger only when mouse is over the match</option>
+									<option value="0">Disabled</option>
+								</select>
+							</div>
+							<div class="group col-grid-6">
+								<span>Attempt to auto-bump trades every 10 minutes:</span>
+								<select id="autoBump">
+									<option value="570">Dota 2 Lounge trades only</option>
+									<option value="730">CS:GO Lounge trades only</option>
+									<option value="1">Enabled</option>
+									<option value="0">Disabled</option>
+								</select>
+							</div>
+						</div>
+						<!-- # /Row -->
+					</div>
+				</div>
+			</div>
+			<!-- # /Features -->
+
+			<!-- # Features -->
+			<div class="col-grid-12">
+				<div class="card">
+					<h2>Audio</h2>
+					<div class="pad-vert">
+						<!-- # Row -->
+						<div class="row">
+							<div class="group col-grid-6">
+								<span>Change the "trade offer received" beep noise:</span>
+								<select>
+									<option value="000">Disabled (no changes)</option>
+									<option value="00">Remove the audio completely</option>
+									<option value="0" data-trigger="#custom-audio-url">Custom audio</option>
+								</select>
+							</div>
+
+							<div class="col-grid-6">
+								<form action="#" class="form-inline" id="custom-audio-url">
+									<div class="group">
+										<span>Custom audio for the received trade offer <b data-tooltip="qweoiqwjoeiws">( ? )</b>:</span>
+										<div class="row">
+											<input type="text" placeholder="HTTP URL to your custom .mp3 audio" data-validation="url" data-validation-type="mp3" data-required>
+											<input type="submit" class="btn" value="Play">
+										</div>
+										<div class="error-labels">
+											<p class="error-label">
+												You must type an URL of an <strong>.mp3</strong> file (e.g. http://example.com/audio.mp3)
+											</p>
+										</div>
+									</div>
+								</form>
+							</div>
+						</div>
+						<!-- # /Row -->
+					</div>
+				</div>
+			</div>
+			<!-- # /Features -->
+
+			<!-- # Betting inventory statistics -->
+			<div class="col-grid-12">
+				<div class="card">
+					<h2>Betting inventory statistics</h2>
+					<div class="pad-full"></div>
+				</div>
+			</div>
+			<!-- # /Betting inventory statistics -->
+
+			<!-- # Misc -->
+			<div class="col-grid-12">
+				<div class="card">
+					<h2>Misc</h2>
+					<div class="pad-full">
+						<p>If the cached item price list is empty, broken or out-dated, or the currency conversion rates are broken, press these buttons gently.</p>
+
+						<ul class="btn-row">
+							<li><a href="#" class="btn" id="refetchmarketcrap">Re-fetch item price list for cache</a></li>
+							<li><a href="#" class="btn" id="refetchcurrencies">Re-fetch currency conversion rates</a></li>
+							<li><a href="#" class="btn" id="updatethemes">Update theme CSS</a></li>
+						</ul>
+
+						<br>
+
+						<p>If you want to restore default settings, including auto-betting/-returning/-accept delays and item groups, press this button furiously.</p>
+
+						<ul class="btn-row">
+							<li><a href="#" class="btn">Restore default settings</a></li>
+						</ul>
+					</div>
+
+					<br class="minus-margin">
+
+					<div class="row pad-vert">
+						<div class="group col-grid-6">
+							<span>Profanity:</span>
+							<select id="renameButtons">
+								<option value="1">Enabled</option>
+								<option value="0">Disabled</option>
+							</select>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- # /Misc -->
+		</section>
+		<!-- # /Page: "Settings" -->
+
+		<!-- # Page: "Themes" -->
+		<section id="page-themes">
+			<div class="col-grid-12">
+				<div class="card">
+					<ul id="themes-slider">
+						<li class="prev"><span></span></li>
+
+						<li class="col-grid-3 theme-select">
+							<select id="themes">
+								<option value="cleanloungedark">CleanLounge - Dark</option>
+								<option value="cleanloungelight">CleanLounge - Light</option>
+								<option value="loungecompanion">LoungeCompanion</option>
+							</select>
+						</li>
+
+						<li data-theme>
+							<div class="theme-preview">
+								<div class="theme-overlay">
+									<div class="theme-settings">
+										<h2>Settings</h2>
+										
+										<div class="content">
+											<div class="label-group">
+												<input type="checkbox" value="1" id="a">
+												<label for="a">
+													If selected, CSGOLounge and DOTA2Lounge will have background images.
+												</label>
+											</div>
+											
+											<div class="label-group">
+												<input type="checkbox" value="1" id="b">
+												<label for="b">
+													If selected, your item price (the one, that CSGL provides) will be shown only on hover.
+												</label>
+											</div>
+										</div>
+									</div>
+
+									<ul class="btn-row">
+										<li><button class="btn" data-theme-settings="close">Close</button></li>
+									</ul>
+								</div>
+
+								<ul class="btn-row">
+									<li class="right"><button class="btn" data-theme-settings="open">Settings</button></li>
+									<li class="hidden"><button class="btn left">Use this theme</button></li>
+									<li><button class="btn left enabled"><i></i>Currently enabled</button></li>
+								</ul>
+
+								<img src="themes/cleanlounge-dark/preview.jpg" alt="CleanLounge - Dark preview" width="980" height="551">
+							</div>
+
+							<div class="theme-desc">
+								A little description and motivational message for everyone to use exactly this theme
+							</div>
+
+							<div class="theme-info">
+								<div class="left">
+									<img src="themes/cleanlounge-dark/icon.jpg" alt="" width="44" height="44" class="icon left">
+									<h2>
+										CleanLounge - Dark
+										<small>
+											by <strong>farblood</strong>,
+											version 1.0.4 <b data-tooltip="Last update was received on:<br>March 13th, 2015">( ? )</b>
+										</small>
+									</h2>
+								</div>
+							</div>
+						</li>
+
+						<li class="current" data-theme>
+							<div class="theme-preview">
+								<div class="theme-overlay">
+									<div class="theme-settings theme-edit">
+										<ul class="btn-row">
+											<li>
+												<button class="btn" data-theme-action="edit">Edit stylesheet</button>
+											</li>
+											<li>
+												<button class="btn btn-red" data-theme-action="delete">Delete</button>
+											</li>
+										</ul>
+									</div>
+
+									<ul class="btn-row">
+										<li class="btn-save"><button class="btn btn-gray">Save</button></li>
+										<li><button class="btn" data-theme-settings="close">Close</button></li>
+									</ul>
+
+									<div class="css-edit">
+										<textarea id="blablabla"></textarea>
+									</div>
+								</div>
+
+								<ul class="btn-row">
+									<li class="right"><button class="btn" data-theme-settings="open">Settings</button></li>
+									<li class="hidden"><button class="btn left">Use this theme</button></li>
+									<li><button class="btn left enabled"><i></i>Currently enabled</button></li>
+								</ul>
+
+								<img src="themes/cleanlounge-dark/preview.jpg" alt="CleanLounge - Dark preview" width="980" height="551">
+							</div>
+
+							<div class="theme-desc">
+								A little description and motivational message for everyone to use exactly this theme
+							</div>
+
+							<div class="theme-info">
+								<div class="left">
+									<img src="themes/cleanlounge-dark/icon.jpg" alt="" width="44" height="44" class="icon left">
+									<h2>
+										Your mom
+										<small>
+											by <strong>farblood</strong>,
+											version 1.0.4 <b data-tooltip="Last update was received on:<br>March 13th, 2015">( ? )</b>
+										</small>
+									</h2>
+								</div>
+							</div>
+						</li>
+
+						<li class="next"><span></span></li>
+					</ul>
+				</div>
+			</div>
+
+			<div class="col-grid-12">
+				<div class="card">
+					<h2>Add your own</h2>
+					<div class="row pad-vert">
+						<!-- # From URL -->
+						<div class="col-grid-6">
+							<h3>From URL:</h3>
+							<form action="#" class="form-inline">
+								<div class="group">
+									<span>URL of JSON:</span>
+									<div class="row">
+										<input type="text" placeholder="Enter URL" data-validation="url" data-validation-type="json" data-required>
+										<input type="submit" class="btn" value="Add theme">
+									</div>
+									<div class="error-labels">
+										<p class="error-label">
+											You must type an URL of your theme's <strong>.json</strong> file
+										</p>
+									</div>
+								</div>
+							</form>
+
+							<p class="paragraph">
+								There are strict rules for the structure of the remote directory.<br>
+								<br>
+								The following must be true for the JSON at the URL, in addition
+								to the rules found in <a href="#" target="_blank" class="link">THEMES.md</a>:
+							</p>
+
+							<ul class="list">
+								<li>
+									Must have a <code>name</code> key, with the value being the shortname
+									of the extension. Same rules apply to the shortname, as
+									does for javascript variable names.
+								</li>
+								<li>
+									Must have a <code>css</code> key, with a value of the absolute URL of
+									the CSS for the theme.
+								</li>
+								<li>
+									Must have a <code>bg</code> key, with a value of the absolute URL of
+									the background image.
+								</li>
+								<li>
+									If an icon is wanted, must have an <code>icon</code> key, with a value
+									of the absolute URL of the icon image.
+								</li>
+							</ul>
+
+							<p class="paragraph pad-top">
+								In addition to this, the server the JSON is hosted on must allow
+								cross-origin <code>GET</code> requests from all domains (i.e. return the
+								<code>Access-Control-Allow-Origin: *</code> and, optionally,
+								<code>Access-Control-Allow-Methods: GET</code> headers).<br>
+								<br>
+								Background, icon and CSS are hotlinked.<br>
+								<br>
+								Themes are automatically updated once a day.
+							</p>
+						</div>
+						<!-- # /From URL -->
+
+						<!-- # User-inputted -->
+						<div class="col-grid-6">
+							<h3>User-inputted:</h3>
+							<form action="#">
+								<div class="group">
+									<span>Title of the theme:</span>
+									<input type="text" placeholder="Enter title" maxlength="20" data-required>
+									<div class="error-labels">
+										<p class="error-label">
+											You must type theme's title
+										</p>
+									</div>
+								</div>
+
+								<br>
+
+								<div class="group">
+									<span>Description (Optional):</span>
+									<textarea placeholder="Enter description" rows="2"></textarea>
+								</div>
+
+								<br>
+
+								<div class="group">
+									<span>Preview image (Optional):</span>
+									<input type="text" placeholder="Enter URL" data-validation="url" data-validation-type="image">
+									<div class="error-labels">
+										<p class="pre-error-label">
+											Suggested size is <strong>980x551</strong>
+										</p>
+										<p class="error-label">
+											You must type an URL of your theme's preview <strong>image</strong>
+										</p>
+									</div>
+								</div>
+
+								<br>
+
+								<div class="row">
+									<div class="group col-grid-8">
+										<span>Author:</span>
+										<input type="text" placeholder="Enter author" data-required>
+										<div class="error-labels">
+											<p class="error-label">
+												You must type theme's original author
+											</p>
+										</div>
+									</div>
+
+									<div class="group col-grid-4">
+										<span>Version:</span>
+										<input type="text" placeholder="Enter version" maxlength="8" data-validation="number" data-required>
+										<div class="error-labels">
+											<p class="error-label">
+												You must type theme's version
+											</p>
+										</div>
+									</div>
+								</div>
+
+								<br>
+
+								<div class="group">
+									<span>Theme's CSS <b data-tooltip="Some explanation here...">( ? )</b>:</span>
+									<textarea placeholder="Enter CSS" rows="4" data-required></textarea>
+									<div class="error-labels">
+										<p class="error-label">
+											You must type your theme's styling code
+										</p>
+									</div>
+								</div>
+
+								<br>
+
+								<input type="submit" value="Add theme" class="btn">
+							</form>
+						</div>
+						<!-- # /User-inputted -->
+					</div>
+				</div>
+			</div>
+		</section>
+		<!-- # /Page: "Themes" -->
+
+		<!-- # Page: "About" -->
+		<section id="page-about" class="hidden">
+			<div class="col-grid-12">
+				<div class="card">
+					<h2>About</h2>
+					<div class="pad-full">
+						<div class="col-grid-7 pad-zero">
+							<p class="paragraph pad-bottom-half">
+								LoungeDestroyer makes a shitty website more bearable, enough said.<br>
+								<a href="https://www.youtube.com/watch?v=fJrGo92Qwk0" class="link" target="_blank">
+									Here is theme song for LoungeDestroyer
+								</a>
+							</p>
+
+							<ul class="btn-row">
+								<li><a href="http://reddit.com/r/loungedestroyer" class="btn" target="_blank">Subreddit</a></li>
+								<li><a href="https://github.com/ncla/LoungeDestroyer" class="btn" target="_blank">GitHub</a></li>
+								<li><a href="http://steamcommunity.com/groups/loungedestroyer" class="btn" target="_blank">Steam Group</a></li>
+								<li><a href="https://github.com/ncla/LoungeDestroyer/issues" class="btn" target="_blank">Report a bug</a></li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="col-grid-12">
+				<div class="card">
+					<div class="row">
+						<div class="col-grid-4 col-border-right pad-zero">
+							<h2>Our team</h2>
+							<div class="pad-full">
+								<ul class="list-team">
+									<!-- # ncla -->
+									<li>
+										<span class="image">
+											<img src="team/ncla.jpg" alt="ncla" width="70" height="70">
+										</span>
+										<p>
+											<strong>ncla</strong>
+											<span>main developer</span>
+										</p>
+									</li>
+									<!-- # /ncla -->
+
+									<!-- # birjolaxew -->
+									<li>
+										<span class="image">
+											<img src="team/birjolaxew.jpg" alt="birjolaxew" width="70" height="70">
+										</span>
+										<p>
+											<strong>birjolaxew</strong>
+											<span>co-developer</span>
+										</p>
+									</li>
+									<!-- # /birjolaxew -->
+
+									<!-- # farblood -->
+									<li>
+										<span class="image">
+											<img src="team/farblood.jpg" alt="farblood" width="70" height="70">
+										</span>
+										<p>
+											<strong>farblood</strong>
+											<span>designer / theme creator</span>
+										</p>
+									</li>
+									<!-- # /farblood -->
+								</ul>
+							</div>
+						</div>
+
+						<div class="col-grid-8 pad-zero">
+							<h2>A little story</h2>
+							<div class="pad-full">
+								<p class="paragraph">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Distinctio sit vitae quae a quis impedit officiis, quibusdam pariatur labore provident nisi error expedita obcaecati minima vero. Eaque iure sunt beatae?</p>
+
+								<p class="paragraph">Laboriosam nulla officia exercitationem, quibusdam animi labore ratione totam. Porro architecto beatae eum magnam, harum, aliquam quaerat facere reiciendis rem a impedit at quam natus eos omnis officiis odit saepe.</p>
+								
+								<p class="paragraph">Eaque officiis tempora commodi laborum iste voluptatibus dolore ducimus autem, reiciendis dolor nisi impedit neque nulla quo laudantium. Eaque temporibus provident beatae eos quas suscipit velit ratione dicta facilis fuga.</p>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+		<!-- # /Page: "About" -->
+
+		<!-- # Page: "Changelog" -->
+		<section id="page-changelog" class="hidden">
+			<div class="col-grid-12">
+				<div class="card">
+					<h2>Changelog</h2>
+					<div class="pad-full">
+						<!-- # Version -->
+						<h3>v0.8.2.2 <small>released on april 31st, 2015</small></h3>
+						<ul class="list">
+							<li class="list-headline">New:</li>
+							<li>Brought back extra match info caching, this time however the cached information will last 5 minutes before requesting fresh information again</li>
+							<li>Rarity is now also shown near market price for Dota2 items</li>
+							<li>NEW LOGO!!!!!!11 by <a href="http://www.reddit.com/u/farblood" class="link" target="_blank">/u/farblood</a></li>
+							<li>Item groups now differentiate between identical items</li>
+							<li>Added options to change small/medium/large bet %</li>
+							<li>Added option to select for which inventory groups you want inventory statistics to be calculated</li>
+							<li>Added button in options to reset your user settings to default ones</li>
+
+							<li class="list-headline">Bug fixes:</li>
+							<li>'undefined' item name when doing a CSGOLounge item value check if you were using non-English language for Steam</li>
+							<li>Fixed match notifications not working thanks to a bugfix that degraded it even further</li>
+							<li>Fixed rare cases where market price didn't fetch because CSGOLounge added items that have unnecessary spaces at the end of item name</li>
+							<li>Changed Canadian dollar symbol to be shorter</li>
+							<li>Finally fixed the inconsistency in detecting when betting inventory has loaded</li>
+							<li>Changed market price loading function to not load market prices pointlessly for items that are already market priced</li>
+							<li>Fixed 'Total value bet' calculated incorrectly if you were using non-USD currency</li>
+							<li>Auto-betting/-returning now works in incognito mode</li>
+							<li>Fixed broken inventory loading if the user used 'Force refresh' button</li>
+							<li>Item groups now work with our cached inventories</li>
+							<li>Fixed 'Base' quality being ordered too high in inventory statistics</li>
+							<li>Fixed a rare case where trade offer was not automatically accepted because of faulty check for how much time is left for trade offer to accept</li>
+							<li>Minimum auto trade offer accepting delay is now forced properly to 10 seconds (this also caused auto offer accepting to not work)</li>
+							<li>Accounted for chrome.alarms bug when setting system time back which caused scheduled tasks to be messed up, resulting in things like auto-bumping being broken</li>
+						</ul>
+						<!-- # /Version -->
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- # Page: "Donate" -->
+		<section id="page-donate" class="hidden">
+			<div class="col-grid-12">
+				<div class="card">
+					<h2>Donate</h2>
+					<div class="pad-full">
+						
+					</div>
+				</div>
+			</div>
+		</section>
+		<!-- # /Page: "Donate" -->
+
+	</main>
+	<!-- # /Wrapper -->
+
+	<!-- # Footer -->
+	<div class="col-grid-12">
+		<footer role="contentinfo">
+			<p>Created by <a href="https://github.com/ncla" target="_blank" class="link"><strong>NCLA</strong></a>,
+			co-developed by <a href="https://github.com/birjolaxew" target="_blank" class="link"><strong>birjolaxew</strong></a><br>
+			and the rare occasional <a href="https://github.com/ncla/LoungeDestroyer/graphs/contributors" target="_blank" class="link"><strong>contributors on GitHub</strong></a></p>
+
+			<p>Re-designed by <a href="https://github.com/farblood" target="_blank" class="link"><strong>farblood</strong></a><br>
+			Copyrights &copy; 2015</p>
+		</footer>
+	</div>
+	<!-- # /Footer -->
+
+	<!-- # "First time visit" tour -->
+	<div class="modal" id="tour">
+		<div>
+			<header>
+				<h2>Dialog</h2>
+				<span class="modal-close" data-modal="close">&times;</span>
+			</header>
+			<div class="modal-content">
+				<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Soluta placeat itaque dignissimos alias, nisi nostrum cum quae, eos, ducimus blanditiis ad obcaecati voluptates aut tempora possimus sunt impedit, tenetur eum.</p>
+			</div>
+			<footer>
+				<ul class="btn-row btns-right">
+					<li>
+						<button class="btn" data-modal="close">Close</button>
+					</li>
+					<li>
+						<button class="btn">Next</button>
+					</li>
+				</ul>
+			</footer>
+		</div>
+	</div>
+	<!-- # /"First time visit" tour -->
+
+	<div class="modal">
+		<div>
+			<header>
+				<h2>Dialog</h2>
+				<span class="modal-close" data-modal="close">&times;</span>
+			</header>
+			<div class="modal-content">
+				<p></p>
+			</div>
+			<footer>
+				<ul class="btn-row btns-right">
+					<li>
+						<button class="btn" data-modal="close">Close</button>
+					</li>
+				</ul>
+			</footer>
+		</div>
+	</div>
+
+	<script src="assets/javascripts/min/jquery.min.js"></script>
+	<script src="assets/javascripts/min/selectize.min.js"></script>
+	<script src="assets/javascripts/main.js"></script>
 
 </body>
 </html>
