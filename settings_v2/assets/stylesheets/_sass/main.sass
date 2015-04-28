@@ -837,12 +837,19 @@ $slider-height: 551px
 		top: -5px
 		+clearfix
 
+		&.slider-loaded
+			> li[data-theme]
+				display: none
+
 		> li
 			position: absolute
 			bottom: 0
 			right: 0
 			left: 0
 			top: 0
+
+			&.current
+				display: block !important
 
 		&.slider-hide-navs
 			> .prev, .next
