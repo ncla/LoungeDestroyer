@@ -341,16 +341,13 @@ function initSlider() {
             });
         });
 
-        console.log($slides);
-        console.log($slides.has('.hidden').length);
-        console.log($slides.has('.current').length);
+        $themeSlider.addClass('slider-loaded');
 
-        // If before initSlider a current slide was not determined (happens when user has no theme set)
-        // Select first slide to show
-        if($slides.has('.current').length == 0) {
+        if($slides.has('active').length) {
+            $slides.has('active').addClass('current');
+        } else {
             $slides.eq(0).addClass('current');
         }
-        $slides.not('.current').addClass('hidden');
 
         // Carousel
         var currSlide 	= $slides.index($('.current')) + 1;
@@ -387,13 +384,13 @@ function initSlider() {
         // Previous slide function
         function prevSlide() {
             if (currSlide == 1) {
-                $slides.removeClass('current').addClass('hidden');
-                $slides.last('li[data-theme]').removeClass('hidden').addClass('current');
+                $slides.removeClass('current');
+                $slides.last('li[data-theme]').addClass('current');
 
                 currSlide = allSlides;
             } else {
-                $slides.removeClass('current').addClass('hidden');
-                $slides.prev('li[data-theme]').removeClass('hidden').addClass('current');
+                $slides.removeClass('current');
+                $slides.prev('li[data-theme]').addClass('current');
 
                 currSlide--;
             }
@@ -402,13 +399,13 @@ function initSlider() {
         // Next slide function
         function nextSlide() {
             if (currSlide == allSlides) {
-                $slides.removeClass('current').addClass('hidden');
-                $slides.first('li[data-theme]').removeClass('hidden').addClass('current');
+                $slides.removeClass('current');
+                $slides.first('li[data-theme]').addClass('current');
 
                 currSlide = 1;
             } else {
-                $slides.removeClass('current').addClass('hidden');
-                $slides.next('li[data-theme]').removeClass('hidden').addClass('current');
+                $slides.removeClass('current');
+                $slides.next('li[data-theme]').addClass('current');
 
                 currSlide++;
             }

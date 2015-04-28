@@ -554,20 +554,21 @@ function theme_create_element(name, obj, active) {
     // Select current active theme, show buttons for enabling/disabling theme
 
     if (name === Settings.currentTheme) {
-        var act = document.querySelector("#themes-slider li.current");
-        if (act) {
-            act.classList.remove("current");
-        }
+        //var act = document.querySelector("#themes-slider li.current");
+        //if (act) {
+        //    act.classList.remove("current");
+        //}
+        $('#themes-slider li.current').removeClass('current');
 
-        $(item).find('.btn.enabled').parent().removeClass('hidden');
-        $(item).find('.btn.enable-this-theme').parent().addClass('hidden');
+        //$(item).find('.btn.enabled').parent().removeClass('hidden');
+        //$(item).find('.btn.enable-this-theme').parent().addClass('hidden');
 
-        $(item).addClass('current');
+        $(item).addClass('active');
 
         show_theme(name);
     } else {
-        $(item).find('.btn.enabled').parent().addClass('hidden');
-        $(item).find('.btn.enable-this-theme').parent().removeClass('hidden');
+        //$(item).find('.btn.enabled').parent().addClass('hidden');
+        //$(item).find('.btn.enable-this-theme').parent().removeClass('hidden');
     }
 
     // On click, select theme
@@ -739,8 +740,13 @@ function show_theme(name) {
         // Add current class to selected theme
 
         $('#themes-slider li[data-theme="' + name + '"]').addClass('current');
+    } else {
+        // Else just show the first slide..
+        console.log('Themes disabled...');
+        ('#themes-slider li[data-theme]').addClass('hidden');
+        $('#themes-slider li[data-theme]:eq(0)').addClass('current').removeClass('hidden');
     }
-    
+
     //var current = document.querySelector("#themes-carousel .item.current"),
     //    active = document.querySelector("#themes-carousel .item.active"),
     //    ownElm = document.querySelector("#themes-carousel .item[data-theme-name='"+name+"']");
