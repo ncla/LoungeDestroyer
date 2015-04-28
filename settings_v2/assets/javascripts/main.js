@@ -2,6 +2,7 @@
 var navAnchor	= $('nav[role="navigation"] ul a');
 var navList 	= $('nav[role="navigation"] ul li');
 var navEnabled	= true;
+var $pages = $('section[id*="page-"]');
 
 // -----------------------------------------
 // Add class 'active' to currently visible page
@@ -342,6 +343,7 @@ function initSlider() {
         });
 
         $themeSlider.addClass('slider-loaded');
+		$pages.addClass('hidden').first().removeClass('hidden');
 
         if(self.find('li[data-theme].active').length) {
             console.log('test');
@@ -462,128 +464,3 @@ $('button.btn[data-theme-settings]').click( function() {
 		}
 	});
 });
-
-// ----------------------------------------
-// Modals
-// ----------------------------------------
-
-// $.fn.ldModal =  function(options) {
-// 	var self 		= $(this);
-// 	var defaults 	= {
-// 		visible: false
-// 	};
-// 	var settings 	= $.extend({}, defaults, options);
-
-// 	// Looping through every element
-// 	return self.each( function() {
-// 		// Variables
-// 		var container 		= $(self.find('> div'));
-// 		var containerTop	= Math.round(container.outerHeight() / 2);
-// 		var containerLeft 	= Math.round(container.outerWidth() / 2);
-// 		var closeEls		= $(self.find('*[data-modal]'));
-// 		var delayedEffect 	= false;
-// 		var toggleModal 	=  function(state) {
-// 			if (state == 'on') {
-// 				self.hide();
-// 				self.stop().fadeIn(250);
-
-// 				clearTimeout(delayedEffect);
-// 				delayedEffect = setTimeout( function() {
-// 					container.stop().fadeIn(250)
-// 						.css('marginTop', -(containerTop - 15));
-// 				}, 170);
-
-// 				settings.visible = true;
-// 			} else if (state == 'off') {
-// 				container.fadeOut(250)
-// 						.css('marginTop', -(containerTop + 15));
-
-// 				clearTimeout(delayedEffect);
-// 				delayedEffect = setTimeout( function() {
-// 					self.fadeOut(250);
-// 				}, 170);
-
-// 				settings.visible = false;
-// 			}
-// 		}
-
-// 		// Aligning the container in the middle of the screen
-// 		container.css({
-// 			marginLeft: -containerLeft,
-// 			marginTop: -(containerTop + 15)
-// 		}).hide();
-
-// 		// Show / hide modal by default
-// 		if (settings.visible == false) {
-// 			self.hide();
-// 		} else {
-// 			toggleModal('on');
-// 		}
-
-// 		// Disable page scrolling, when modal is visible
-// 		self.on('mousewheel',  function(e) {
-// 			e.preventDefault();
-// 			e.stopPropagation();
-// 		});
-
-// 		// Hide modal, if closing button was clicked
-// 		closeEls.click( function() {
-// 			toggleModal('off');
-// 		});
-// 	});
-// }
-
-// $.fn.modal = function(options) {
-// 	var defaults = $.extend({
-
-// 	}, options);
-// 	var settings 	= $.extend({}, defaults, options);
-
-// 	var $window 	= $(window);
-// 	var $modal 		= $(this);
-// 	var $modals 	= $('div.modal');
-// 	var $container 	= $(this).find('> div');
-// 	var top, left, delayedEffect;
-
-// 	function show() {
-// 		$modal.stop().fadeIn(250);
-
-// 		clearTimeout(delayedEffect);
-// 		delayedEffect = setTimeout(function() {
-// 			$container.stop().fadeIn(250).css('marginTop', + 15);
-// 		}, 250);
-// 	}
-
-// 	function hide() {
-// 		$container.fadeOut(250).css('marginTop', 0);
-
-// 		clearTimeout(delayedEffect);
-// 		delayedEffect = setTimeout(function() {
-// 			$modal.fadeOut(250);
-// 		}, 250);
-// 	}
-
-// 	return $modal.each( function() {
-// 		// Disable page scrolling, when modal is visible
-// 		$modal.on('mousewheel', function(e) {
-// 			e.preventDefault();
-// 			e.stopPropagation();
-// 		});
-
-// 		// Center the modal in the viewport
-// 		top 	= Math.max($window.height() - $container.outerHeight(), 0) / 2;
-// 		left 	= Math.max($window.width() - $container.outerWidth(), 0) / 2;
-
-// 		$container.css({
-// 			top: 	top,
-// 			left: 	left
-// 		}).hide();
-
-// 		// Hide every modal
-// 		$modals.hide();
-// 	});
-
-// 	return this;
-// }
-
-var element = $('div.modal#tour');
