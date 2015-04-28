@@ -1225,9 +1225,14 @@ input[type="number"]::-webkit-outer-spin-button, input[type="number"]::-webkit-i
   top: 0;
 }
 
-select[multiple] {
+select {
+  height: 42px;
   width: 100%;
   border: none;
+}
+
+select[multiple] {
+  height: auto;
 }
 
 textarea {
