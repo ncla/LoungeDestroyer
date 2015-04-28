@@ -382,20 +382,11 @@ function theme_create_element(name, obj, active) {
             $(item).find('.theme-settings').remove();
             $(item).find('button.btn[data-theme-settings]').remove();
         }
-
-        //$(".options-toggle",item).click(function(){
-        //    a.classList.toggle("blurred");
-        //});
     }
 
     // Setting theme name to data-theme attribute
     $(item).attr('data-theme', name);
     $(item).removeAttr('id');
-
-    // Temporary
-    //$(item).addClass('current');
-    //$(item).removeClass('hidden');
-
 
     // AUTHOR, VERSION, DESCRIPTION, NAME
     $(item).find('.theme-info .theme-author').text(obj.author);
@@ -414,47 +405,12 @@ function theme_create_element(name, obj, active) {
 
     $(item).find('.theme-info .icon.left').attr('src', themeIcon);
 
-
-    // dirty dirty
-    //a.innerHTML = "<div class='highlight'></div>"+
-    //"<div class='carousel-caption'>"+
-    //"<h2>"+obj.title+"</h2><h4 class='author'>by "+obj.author+" (v "+obj.version+")</h4><p style='font-size: 18px'>"+obj.description+"</p>"+
-    //"</div>";
-    //
-    //var bgImg = document.createElement("img");
-    //bgImg.src = obj.bg;
-    //bgImg.onerror = function(){
-    //    bgImg.src = "./bg_placeholder.png";
-    //}
-    //a.insertBefore(bgImg, a.firstChild);
-    //
-    //if (obj.icon) {
-    //    var iconImg = document.createElement("img");
-    //    iconImg.className = "icon";
-    //    iconImg.src = obj.icon;
-    //    iconImg.onerror = function(){
-    //        iconImg.style.display = "none";
-    //    };
-    //
-    //    var caption = a.querySelector(".carousel-caption");
-    //    if (caption) {
-    //        caption.insertBefore(iconImg, caption.firstChild);
-    //    }
-    //}
-
     // Add settings related shit
     if (obj.options || obj.custom) {
 
         // Looping through all theme settings and appending them
         if (obj.options) {
             for (var k in obj.options) {
-                //optionsHTML += "<div class=\"label-group\">";
-                //optionsHTML += "<label for='"+name+"-"+k+"'>";
-                //optionsHTML += "<input "+(obj.options[k].checked ? "checked ":"")+"type='checkbox' id='"+name+"-"+k+"' data-theme='"+name+"' data-option='"+k+"'>";
-                //optionsHTML += obj.options[k].description+"</label>";
-                //optionsHTML += "</div>";
-                console.log('test', obj.options[k]);
-
                 var optionTemplate = $(item).find('.theme-settings.bundled .label-group.blank-template').clone();
 
                 $(optionTemplate).removeClass('blank-template');
@@ -476,12 +432,6 @@ function theme_create_element(name, obj, active) {
 
         } else {
             $(item).find('.theme-settings.bundled').remove();
-        }
-
-        // Hide delete theme / edit CSS buttons for bundled themes
-
-        if(!obj.custom) {
-            $(item).find('.theme-settings .edit-theme-btn, .theme-settings .delete-theme-btn').hide();
         }
 
         // On setting changes
@@ -543,32 +493,12 @@ function theme_create_element(name, obj, active) {
     // Add theme to dropdown
 
     themesSelectSelectize.addOption({value: name, text: obj.title, silent: true});
-    //themesSelectSelectize.addItem(name, true);
-    //themesSelectSelectize.refreshOptions(false);
-    //throw Error('swag');
 
-    //$('#themes').append($("<option></option>")
-    //    .attr("value", name)
-    //    .text(obj.title));
-
-    // Select current active theme, show buttons for enabling/disabling theme
-
+    // Select current active theme
     if (name === Settings.currentTheme) {
-        //var act = document.querySelector("#themes-slider li.current");
-        //if (act) {
-        //    act.classList.remove("current");
-        //}
         $('#themes-slider li.current').removeClass('current');
 
-        //$(item).find('.btn.enabled').parent().removeClass('hidden');
-        //$(item).find('.btn.enable-this-theme').parent().addClass('hidden');
-
         $(item).addClass('active');
-
-        show_theme(name);
-    } else {
-        //$(item).find('.btn.enabled').parent().addClass('hidden');
-        //$(item).find('.btn.enable-this-theme').parent().removeClass('hidden');
     }
 
     // On click, select theme
@@ -579,11 +509,6 @@ function theme_create_element(name, obj, active) {
     $(item).find('.btn.enabled').click(function() {
         select_theme(' ');
     });
-
-    //var dropdownOption = document.createElement("option");
-    //dropdownOption.setAttribute("value", name);
-    //dropdownOption.textContent = obj.title;
-    //document.querySelector(".cur-theme").appendChild(dropdownOption);
 
     //if (name === Settings.currentTheme) {
     //    var act = document.querySelector("#themes-carousel .item.active");
@@ -694,19 +619,6 @@ function select_theme(name) {
 
     show_theme(name);
 
-    // FIXME: Dry code, repeats from create_theme_element
-    $('#themes-slider li[data-theme]').each(function() {
-        if($(this).attr('data-theme') == name) {
-            console.log('This is the theme we need');
-            $(this).find('.btn.enabled').parent().removeClass('hidden');
-            $(this).find('.btn.enable-this-theme').parent().addClass('hidden');
-        } else {
-            console.log('This is the theme we dont need');
-            $(this).find('.btn.enabled').parent().addClass('hidden');
-            $(this).find('.btn.enable-this-theme').parent().removeClass('hidden');
-        }
-    });
-
     //var current = document.querySelector("#themes-carousel .item.current"),
     //    active = document.querySelector("#themes-carousel .item.active"),
     //    ownElm = document.querySelector("#themes-carousel .item[data-theme-name='"+name+"']");
@@ -735,16 +647,13 @@ function show_theme(name) {
     if($('#themes-slider li[data-theme="' + name + '"]').length) {
         // Remove currently active class from theme in the slider
 
-        $('#themes-slider li.current').removeClass('current');
+        $('#themes-slider li[data-theme]').removeClass('current').removeClass('active');
 
         // Add current class to selected theme
 
-        $('#themes-slider li[data-theme="' + name + '"]').addClass('current');
+        $('#themes-slider li[data-theme="' + name + '"]').addClass('current').addClass('active');
     } else {
-        // Else just show the first slide..
-        console.log('Themes disabled...');
-        ('#themes-slider li[data-theme]').addClass('hidden');
-        $('#themes-slider li[data-theme]:eq(0)').addClass('current').removeClass('hidden');
+        $('#themes-slider li[data-theme]').removeClass('active');
     }
 
     //var current = document.querySelector("#themes-carousel .item.current"),

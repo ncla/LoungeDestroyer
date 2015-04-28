@@ -1581,6 +1581,14 @@ code {
   left: 0;
   top: 0;
 }
+#page-themes #themes-slider > li .btn.enable-this-theme, #page-themes #themes-slider > li.active .btn.enabled  {
+    display: inline-block;
+}
+#page-themes #themes-slider > li.active .btn.enable-this-theme, #page-themes #themes-slider > li .btn.enabled {
+    display: none;
+}
+
+
 #page-themes #themes-slider.slider-hide-navs > .prev, #page-themes #themes-slider.slider-hide-navs .next {
   visibility: hidden !important;
   opacity: 0 !important;

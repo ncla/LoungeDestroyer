@@ -343,12 +343,11 @@ function initSlider() {
 
         $themeSlider.addClass('slider-loaded');
 
-        // ---- This doesn't seem to work right.
-        // ---- If I have a theme enabled already, it will
-        // ---- add class "current" to the first slide anyway...
-        if($slides.has('active').length) {
-            $slides.has('active').addClass('current');
+        if(self.find('li[data-theme].active').length) {
+            console.log('test');
+            self.find('li[data-theme].active').addClass('current');
         } else {
+            console.log('test2');
             $slides.eq(0).addClass('current');
         }
 
