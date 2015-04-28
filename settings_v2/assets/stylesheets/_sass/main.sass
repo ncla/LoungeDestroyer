@@ -872,6 +872,13 @@ $slider-height: 551px
 				opacity: 0 !important
 				width: 0 !important
 
+		&.slider-loaded
+			> li
+				display: none
+
+				&.current
+					display: block
+
 		.prev,
 		.next
 			width: 10%

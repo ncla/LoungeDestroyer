@@ -1586,6 +1586,12 @@ code {
   opacity: 0 !important;
   width: 0 !important;
 }
+#page-themes #themes-slider.slider-loaded > li {
+  display: none;
+}
+#page-themes #themes-slider.slider-loaded > li.current {
+  display: block;
+}
 #page-themes #themes-slider .prev,
 #page-themes #themes-slider .next {
   width: 10%;
