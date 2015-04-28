@@ -45,7 +45,9 @@ navAnchor.click( function(e) {
 			$('section#' + page).removeClass('hidden');
 
 			// Clearing out text fields on page switch
-			$('input, textarea').not('.btn').val('');
+            // FIXME: http://i.imgur.com/fbGCaA3.png
+
+            //$('input, textarea').not('.btn').val('');
 
 			// Removing class 'group-error' on page switch
 			$('div.group-error').removeClass('group-error');
@@ -346,10 +348,8 @@ function initSlider() {
 		$pages.addClass('hidden').first().removeClass('hidden');
 
         if(self.find('li[data-theme].active').length) {
-            console.log('test');
             self.find('li[data-theme].active').addClass('current');
         } else {
-            console.log('test2');
             $slides.eq(0).addClass('current');
         }
 

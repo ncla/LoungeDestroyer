@@ -14,8 +14,6 @@ var optionsSelectize = {
 var themesSelect = $('#themes').selectize(optionsSelectize);
 var themesSelectSelectize = themesSelect[0].selectize;
 
-//themesSelectSelectize.addOption({value: "", text: "Disabled"});
-
 function restore_options() {
     var manifesto = chrome.runtime.getManifest();
     //document.getElementById("version").innerHTML = manifesto.version;
@@ -100,27 +98,6 @@ function restore_options() {
         // Enable selectize
         // TODO: Readd .ld-settings class to inputs/selects so we dont have to manually whitelist here elements dont need Selectize
         $('select:not(#inventoryStatisticsGroup, #themes)').selectize(optionsSelectize);
-
-        // populate themes
-        // FIXME: Is this firing after themes have been appended (which happens in another chrome.storage.get)?
-        //var curTheme = document.querySelector(".item[data-theme-name='"+Settings.currentTheme+"']");
-        //if (curTheme) {
-        //    var act;
-        //    if (act = document.querySelector("#themes-carousel .item.active")) {
-        //        act.classList.remove("active");
-        //    }
-        //    if (act = document.querySelector("#themes-carousel .item.current")) {
-        //        act.classList.remove("current");
-        //    }
-        //
-        //    curTheme.classList.add("current", "active");
-        //    console.log("Found curTheme! Setting to ",Settings.currentTheme);
-        //    document.querySelector(".cur-theme").value = Settings.currentTheme || "-none";
-        //}
-        //
-        //if (document.querySelectorAll("#themes-carousel .carousel-inner > div").length < 2) {
-        //    $("#themes-carousel .carousel-control").hide();
-        //}
     });
     $("#refetchmarketcrap").click(function() {
         var that = this;
@@ -356,32 +333,15 @@ function theme_create_element(name, obj, active) {
     console.log("Creating theme element for ",name);
     console.log(obj);
 
-
-    //var item = document.createElement("div"),
-    //    a = document.createElement("div");
-    //
-    //a.className = "theme-container";
-    //item.className = "item "+(!document.querySelectorAll("#themes-carousel .item.active").length ? "active" : "");
-    //item.setAttribute("data-theme-name", name);
-    //
-    //if (active) {
-    //    var act;
-    //    if (act = document.querySelector("#themes-carousel .item.active")) {
-    //        act.classList.remove("active");
-    //    }
-    //    item.classList.add("active");
-    //}
     var item = $('#theme-blank').clone(true);
 
     // avoid HTML injection
     obj = escape_obj(obj);
 
-    // create the options button
-    if (obj.options || obj.custom) {
-        if (!(obj.options || obj.custom)) {
-            $(item).find('.theme-settings').remove();
-            $(item).find('button.btn[data-theme-settings]').remove();
-        }
+    // Removing unnecessary stuff
+    if (!(obj.options || obj.custom)) {
+        $(item).find('.theme-settings').remove();
+        $(item).find('button.btn[data-theme-settings]').remove();
     }
 
     // Setting theme name to data-theme attribute
@@ -453,6 +413,40 @@ function theme_create_element(name, obj, active) {
 
 
         // On theme edit css button press
+        if(obj.custom) {
+            if(obj.cachedCSS) {
+                $(item).find('.css-edit textarea').val(obj.cachedCSS);
+            }
+
+            $(item).find('.theme-overlay .btn-save').click(function() {
+                var theme = $(item).attr("data-theme");
+                if (!theme || !themes.hasOwnProperty(theme)) {
+                    console.error("Can't edit CSS of a theme that doesn't exist");
+                    return;
+                }
+
+                var css = $(item).find('.css-edit textarea').val();
+                if (!css) {
+                    alert("Can't set theme CSS to be empty");
+                    return;
+                }
+
+                chrome.runtime.getBackgroundPage(function (bg) {
+                    var newCSS = bg.importantifyCSS(css);
+                    if (newCSS) {
+                        themes[theme].cachedCSS = newCSS;
+                        chrome.storage.local.set({themes: themes}, function (x) {
+                            chrome.runtime.sendMessage({setCurrentTheme: theme});
+                            alert("CSS has been successfully saved!");1
+                        });
+                    } else {
+                        alert("Failed to parse theme CSS!");
+                        console.error("Failed to parse CSS: ", {received: css, minimized: newCSS});
+                        return;
+                    }
+                });
+            });
+        }
 
         //var tmpElm = document.createElement("div");
         //tmpElm.className = "theme-option";
