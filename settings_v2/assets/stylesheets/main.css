@@ -946,12 +946,27 @@ nav[role="navigation"] > ul > li.logo:after {
 nav[role="navigation"] > ul > li.logo > a {
   display: block;
 }
-nav[role="navigation"] > ul > li.logo > a:active > img {
+nav[role="navigation"] > ul > li.logo > a:active p {
   opacity: 0.7;
 }
-nav[role="navigation"] > ul > li.logo > a > img {
-  margin: 25px 0;
+nav[role="navigation"] > ul > li.logo > a:hover span, nav[role="navigation"] > ul > li.logo > a:active span {
+  color: rgba(192, 215, 246, 0.45);
+}
+nav[role="navigation"] > ul > li.logo > a p {
   transition: opacity 0.2s;
+  position: relative;
+  margin: 25px 0;
+}
+nav[role="navigation"] > ul > li.logo > a span {
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+  color: rgba(192, 215, 246, 0.25);
+  transition: color 0.2s;
+  line-height: normal;
+  position: absolute;
+  text-align: right;
+  font-size: 13px;
+  bottom: 0;
+  right: 0;
 }
 nav[role="navigation"] > ul > li.right {
   margin: 0 0 0 35px;
@@ -974,6 +989,7 @@ nav[role="navigation"] > ul > li.right {
   font-size: 25px;
 }
 .date-updated span {
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
   color: rgba(192, 215, 246, 0.25);
   text-transform: uppercase;
   vertical-align: middle;
