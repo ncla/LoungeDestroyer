@@ -353,7 +353,7 @@ $themeSlider.each( function() {
 		});
 	});
 
-	$slides.not('.current').addClass('hidden');
+	$themeSlider.addClass('slider-loaded');
 
 	// Carousel
 	var currSlide 	= $slides.index($('.current')) + 1;
@@ -390,13 +390,13 @@ $themeSlider.each( function() {
 	// Previous slide function
 	function prevSlide() {
 		if (currSlide == 1) {
-			$slides.removeClass('current').addClass('hidden');
-			$slides.last('li[data-theme]').removeClass('hidden').addClass('current');
+			$slides.removeClass('current');
+			$slides.last('li[data-theme]').addClass('current');
 
 			currSlide = allSlides;
 		} else {
-			$slides.removeClass('current').addClass('hidden');
-			$slides.prev('li[data-theme]').removeClass('hidden').addClass('current');
+			$slides.removeClass('current');
+			$slides.prev('li[data-theme]').addClass('current');
 
 			currSlide--;
 		}
@@ -405,13 +405,13 @@ $themeSlider.each( function() {
 	// Next slide function
 	function nextSlide() {
 		if (currSlide == allSlides) {
-			$slides.removeClass('current').addClass('hidden');
-			$slides.first('li[data-theme]').removeClass('hidden').addClass('current');
+			$slides.removeClass('current');
+			$slides.first('li[data-theme]').addClass('current');
 
 			currSlide = 1;
 		} else {
-			$slides.removeClass('current').addClass('hidden');
-			$slides.next('li[data-theme]').removeClass('hidden').addClass('current');
+			$slides.removeClass('current');
+			$slides.next('li[data-theme]').addClass('current');
 
 			currSlide++;
 		}
