@@ -343,6 +343,9 @@ function initSlider() {
 
         $themeSlider.addClass('slider-loaded');
 
+        // ---- This doesn't seem to work right.
+        // ---- If I have a theme enabled already, it will
+        // ---- add class "current" to the first slide anyway...
         if($slides.has('active').length) {
             $slides.has('active').addClass('current');
         } else {
@@ -354,8 +357,6 @@ function initSlider() {
         var allSlides	= $slides.length;
         var $prev		= self.find('li.prev');
         var $next		= self.find('li.next');
-
-        console.log(currSlide, allSlides);
 
         // Hide navs, if there are not enough slides
         if (allSlides < 2) {
