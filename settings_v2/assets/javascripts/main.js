@@ -383,31 +383,31 @@ function initSlider() {
 
         // Previous slide function
         function prevSlide() {
+            $slides.removeClass('current');
+
             if (currSlide == 1) {
-                $slides.removeClass('current');
-                $slides.last('li[data-theme]').addClass('current');
-
                 currSlide = allSlides;
-            } else {
-                $slides.removeClass('current');
-                $slides.prev('li[data-theme]').addClass('current');
 
+                $slides.last('li[data-theme]').addClass('current');
+            } else {
                 currSlide--;
+
+                $slides.eq(currSlide - 1).addClass('current');
             }
         }
 
         // Next slide function
         function nextSlide() {
+            $slides.removeClass('current');
+
             if (currSlide == allSlides) {
-                $slides.removeClass('current');
-                $slides.first('li[data-theme]').addClass('current');
-
                 currSlide = 1;
-            } else {
-                $slides.removeClass('current');
-                $slides.next('li[data-theme]').addClass('current');
 
+                $slides.first('li[data-theme]').addClass('current');
+            } else {
                 currSlide++;
+
+                $slides.eq(currSlide - 1).addClass('current');
             }
         }
     });
