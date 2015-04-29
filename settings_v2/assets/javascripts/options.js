@@ -446,6 +446,40 @@ function theme_create_element(name, obj, active) {
                     }
                 });
             });
+
+            $(item).find('.btn[data-theme-action="delete"]').click(function() {
+                var theme = $(item).attr("data-theme");
+                if (!theme || !themes.hasOwnProperty(theme)) {
+                    console.error("Can't delete a theme that doesn't exist");
+                    return;
+                }
+
+                $('#themes-slider li[data-theme="' + theme + '"]').remove();
+                //$('#themes-slider li[data-theme]:eq(0)').addClass('current');
+                initSlider();
+
+                throw Error('hue');
+
+                //$(".theme-modal-confirm-delete").modal("hide");
+                //var themeElm = document.querySelector("#themes-carousel .item[data-theme-name='" + theme + "']"),
+                //    nextThemeElm = themeElm.nextSibling || themeElm.parentNode.querySelector(".item:first-of-type");
+                //
+                //if (themeElm.classList.contains("current")) {
+                //    defaultUser.saveSetting("currentTheme", "");
+                //    document.querySelector(".cur-theme").value = "-none";
+                //}
+                //
+                //themeElm.parentNode.removeChild(themeElm);
+                //nextThemeElm.classList.add("active");
+
+                delete themes[theme];
+                chrome.storage.local.set({themes: themes});
+                chrome.runtime.sendMessage({setCurrentTheme: true});
+
+                //if (document.querySelectorAll("#themes-carousel .carousel-inner > div").length < 2) {
+                //    $("#themes-carousel .carousel-control").hide();
+                //}
+            });
         }
 
         //var tmpElm = document.createElement("div");

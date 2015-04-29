@@ -345,7 +345,7 @@ function initSlider() {
         });
 
         $themeSlider.addClass('slider-loaded');
-		$pages.addClass('hidden').first().removeClass('hidden');
+		//$pages.addClass('hidden').first().removeClass('hidden');
 
         if(self.find('li[data-theme].active').length) {
             self.find('li[data-theme].active').addClass('current');
@@ -363,6 +363,8 @@ function initSlider() {
         if (allSlides < 2) {
             $themeSlider.addClass('slider-hide-navs');
             sliderNavsEnabled = false;
+        } else {
+            $themeSlider.removeClass('slider-hide-navs');
         }
 
         if (sliderNavsEnabled) {
@@ -434,7 +436,7 @@ $('button.btn[data-theme-action]').click( function() {
 			current.find('textarea').focus();
 		}, 320);
 	} else if (data == 'delete') {
-		alert('LOL U MAD?! [436th line @ main.js]');
+		//alert('');
 	}
 });
 
