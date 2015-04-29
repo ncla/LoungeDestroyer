@@ -16,7 +16,7 @@ var themesSelectSelectize = themesSelect[0].selectize;
 
 function restore_options() {
     var manifesto = chrome.runtime.getManifest();
-    //document.getElementById("version").innerHTML = manifesto.version;
+    document.getElementById("version").innerHTML = manifesto.version;
 
     $.each(currencyData, function(i, v) {
         $("#marketCurrency").append('<option value="' + i + '">' + v["naming"] + '</option>');

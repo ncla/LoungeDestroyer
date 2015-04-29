@@ -32,7 +32,7 @@
         "*://csgolounge.com/*",
         "*://steamcommunity.com/*",
         "*://dota2lounge.com/*",
-        "http://api.ncla.me/*",
+        "*://api.ncla.me/*",
         "storage",
         "webRequest",
         "webRequestBlocking",
