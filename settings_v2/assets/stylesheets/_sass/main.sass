@@ -13,7 +13,7 @@ $main-width: 980px
 	&:focus
 		outline: none
 
-ul, ol
+ul,ol
 	list-style: none
 	padding: 0
 	margin: 0
@@ -84,7 +84,7 @@ ul
 				padding-left: 17px
 				line-height: 18px
 
-				strong, span
+				strong,span
 					display: block
 
 				strong
@@ -129,10 +129,10 @@ img
 	display: block
 	max-width: 100%
 
-b, strong
+b,strong
 	font-weight: 500
 
-h1, h2, h3, h4, h5, h6
+h1,h2,h3,h4,h5,h6
 	font-weight: normal
 	padding: 0
 	margin: 0
@@ -164,7 +164,7 @@ br
 .right
 	float: right !important
 
-html, body
+html,body
 	height: 100%
 
 body
@@ -268,12 +268,29 @@ nav[role="navigation"]
 					display: block
 
 					&:active
-						> img
+						p
 							opacity: 0.7
 
-					> img
-						margin: 25px 0
+					&:hover,
+					&:active
+						span
+							color: rgba(192,215,246,0.45)
+
+					p
 						transition: opacity 0.2s
+						position: relative
+						margin: 25px 0
+
+					span
+						text-shadow: 0 1px 1px rgba(0,0,0,0.2)
+						color: rgba(192,215,246,0.25)
+						transition: color 0.2s
+						line-height: normal
+						position: absolute
+						text-align: right
+						font-size: 13px
+						bottom: 0
+						right: 0
 
 			&.right
 				margin: 0 0 0 35px
@@ -299,6 +316,7 @@ nav[role="navigation"]
 		font-size: 25px
 
 	span
+		text-shadow: 0 1px 1px rgba(0,0,0,0.2)
 		color: rgba(192,215,246,0.25)
 		text-transform: uppercase
 		vertical-align: middle
@@ -336,29 +354,29 @@ section
 	100%
 		opacity: 1
 
-input, button
+input,button
 	&.btn
 		border: none
 
 $btnRegular: $main-orange
-$btnRegularHover: darken($btnRegular, 3%)
-$btnRegularActive: darken($btnRegular, 6%)
+$btnRegularHover: darken($btnRegular,3%)
+$btnRegularActive: darken($btnRegular,6%)
 
 $btnRed: #cc1e1e
-$btnRedHover: darken($btnRed, 4%)
-$btnRedActive: darken($btnRed, 7%)
+$btnRedHover: darken($btnRed,4%)
+$btnRedActive: darken($btnRed,7%)
 
 $btnGreen: #61a90c
-$btnGreenHover: darken($btnGreen, 4%)
-$btnGreenActive: darken($btnGreen, 7%)
+$btnGreenHover: darken($btnGreen,4%)
+$btnGreenActive: darken($btnGreen,7%)
 
 $btnBlue: #147fc3
-$btnBlueHover: darken($btnBlue, 4%)
-$btnBlueActive: darken($btnBlue, 7%)
+$btnBlueHover: darken($btnBlue,4%)
+$btnBlueActive: darken($btnBlue,7%)
 
 $btnGray: #4d4d4d
-$btnGrayHover: darken($btnGray, 4%)
-$btnGrayActive: darken($btnGray, 7%)
+$btnGrayHover: darken($btnGray,4%)
+$btnGrayActive: darken($btnGray,7%)
 
 .btn
 	text-transform: uppercase
@@ -377,11 +395,11 @@ $btnGrayActive: darken($btnGray, 7%)
 
 	&:not([disabled]):hover
 		background: $btnRegularHover
-		box-shadow: 0 1px 6px 0 rgba(0,0,0,0.12), 0 1px 6px 0 rgba(0,0,0,0.12)
+		box-shadow: 0 1px 6px 0 rgba(0,0,0,0.12),0 1px 6px 0 rgba(0,0,0,0.12)
 
 	&:not([disabled]):active
 		background: $btnRegularActive
-		box-shadow: 0 5px 11px 0 rgba(0,0,0,0.18), 0 4px 15px 0 rgba(0,0,0,0.15)
+		box-shadow: 0 5px 11px 0 rgba(0,0,0,0.18),0 4px 15px 0 rgba(0,0,0,0.15)
 
 	&[disabled]
 		opacity: 0.75
@@ -410,7 +428,7 @@ $btnGrayActive: darken($btnGray, 7%)
 			content: attr(data-loading)
 
 		&.btn-loading
-			&:before, &:after
+			&:before,&:after
 				visibility: visible
 				opacity: 1
 
@@ -640,7 +658,7 @@ $border-color: #ebebeb
 .card [class*="col-"]
 	padding: 0 23px
 
-[class*="col-"], .card .col-def-pad
+[class*="col-"],.card .col-def-pad
 	padding: 0 10px
 
 .col-border-right
@@ -758,7 +776,7 @@ $error-color: #d32f2f
 		+clearfix
 
 	p
-		transition: margin-bottom 0.24s, visibility 0.24s, padding-top 0.30s, opacity 0.44s
+		transition: margin-bottom 0.24s,visibility 0.24s,padding-top 0.30s,opacity 0.44s
 		margin: 0 0 -23px 0
 		visibility: hidden
 		line-height: 15px
@@ -817,7 +835,7 @@ $error-color: #d32f2f
 // #
 
 .tooltip
-	transition: opacity 0.2s, margin-top 0.2s, visibility 0.2s
+	transition: opacity 0.2s,margin-top 0.2s,visibility 0.2s
 	-webkit-border-radius: 2px
 	-webkit-user-select: none
 	display: inline-block
@@ -871,7 +889,7 @@ $slider-height: 551px
 			top: 0
 
 		&.slider-hide-navs
-			> .prev, .next
+			> .prev,.next
 				visibility: hidden !important
 				opacity: 0 !important
 				width: 0 !important
@@ -954,7 +972,7 @@ $slider-height: 551px
 		left: 0
 		top: 0
 
-		> .btn-row, .css-edit, .btn-save
+		> .btn-row,.css-edit,.btn-save
 			transition: all 0.32s
 			visibility: hidden
 			opacity: 0
@@ -1033,7 +1051,7 @@ $slider-height: 551px
 
 	.theme-settings
 		+modal-shadow
-		transition: margin-top 0.2s, opacity 0.2s, visibility 0.2s
+		transition: margin-top 0.2s,opacity 0.2s,visibility 0.2s
 		visibility: hidden
 		position: absolute
 		border-radius: 2px
@@ -1090,7 +1108,7 @@ $slider-height: 551px
 				top: 0
 				content: "Disable"
 
-			i, &:before
+			i,&:before
 				background: url(../images/enable-disable-sprites.png) center top no-repeat
 				position: absolute
 				display: block
@@ -1107,7 +1125,7 @@ $slider-height: 551px
 				transition: all 0.15s
 
 			&:hover
-				&:after, &:before
+				&:after,&:before
 					opacity: 1
 
 			&:active
