@@ -42,7 +42,7 @@ User.prototype.defaultSettings =
     smallBetPercentage: '5',
     mediumBetPercentage: '10',
     largeBetPercentage: '20',
-    showBettedIndicator: '0',
+    showBettedIndicator: '1',
     beepSoundDisable: '0',
     customTradeOfferSound: '',
     focusOnTradeofferTab: '0'
