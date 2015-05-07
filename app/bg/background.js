@@ -692,9 +692,11 @@ chrome.alarms.onAlarm.addListener(function(alarm) {
         var msSinceLastVisit = (new Date().getTime() - lastTimeUserVisited);
         console.log('Since last visit on CS:GL has passed: ' + msSinceLastVisit);
 
-        // Updating only if the user has recently visited CS:GL (less than 2 hours). Might want to rethink this.
-        if (msSinceLastVisit < 7200000) {
+        // Updating only if the user has recently visited Lounge (less than 2 hours). Might want to rethink this.
+        if (msSinceLastVisit < 7200000 && LoungeUser.userSettings.useCachedPriceList === '1') {
             updateMarketPriceList();
+        } else {
+            console.log('Updating conditions were not met: user has not visited site recently and cached price list is disabled');
         }
     }
 
@@ -867,10 +869,20 @@ chrome.runtime.onInstalled.addListener(function(details) {
                 {title: 'Read changelog'},
                 'https://github.com/ncla/LoungeDestroyer/releases'
             );
+            // Migration forcing setting change for users that have cached item list and hover only market prices
+            if(details.previousVersion == '0.8.3.0' && thisVersion == '0.8.3.1') {
+                console.log('Migration 0.8.3.0 => 0.8.3.1');
+                if(LoungeUser.userSettings.useCachedPriceList === '1' && LoungeUser.userSettings.itemMarketPricesv2 !== '2') {
+                    console.log('Disabling cached market price list');
+                    LoungeUser.saveSetting('useCachedPriceList', '0');
+                }
+            }
         }
     }
 
     updateCurrencyConversion();
-    updateMarketPriceList();
+    if(LoungeUser.userSettings.useCachedPriceList === '1') {
+        updateMarketPriceList();
+    }
     updateThemes();
 });

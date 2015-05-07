@@ -21,7 +21,7 @@ User.prototype.defaultSettings =
     autoDelay: '5',
     enableAuto: '1',
     renameButtons: '1',
-    useCachedPriceList: '1',
+    useCachedPriceList: '0',
     notifyExpiredItems: '1',
     addTradePreviews: '1',
     notifyTradeOffer: '1',
