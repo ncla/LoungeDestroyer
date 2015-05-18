@@ -155,8 +155,11 @@ function init() {
 
         // dark/light theme
         if (themeChangeElm = document.querySelector('.ddbtn a:nth-of-type(2)')) {
-            var theme = /\?skin=([0-9])/.exec(themeChangeElm.href)[1];
-            document.body.classList.add(['ld-dark', 'ld-light'][theme]);
+            var theme = /skin=([0-9])/.exec(themeChangeElm.href);
+            
+            if (theme.length===2) {
+                document.body.classList.add(['ld-dark', 'ld-light'][theme[1]]);
+            }
         }
 
         // main/match/whatever
