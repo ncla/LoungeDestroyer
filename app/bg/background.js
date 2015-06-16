@@ -281,12 +281,34 @@ chrome.webRequest.onHeadersReceived.addListener(function(details) {
     },
     ['responseHeaders', 'blocking']
 );
-var lastBackpackAjaxURL = null;
+var lastBackpackAjaxData = null;
+
+chrome.webRequest.onBeforeRequest.addListener(function(details) {
+        lastBackpackAjaxData = {
+            url: details.url,
+            method: details.method
+        };
+
+        var postData = null;
+
+        if(details.requestBody.formData && details.method === 'POST') {
+            $.each(details.requestBody.formData, function(postDataIndex, postDataValue) {
+                postData[postDataIndex] = postDataValue[0];
+            });
+        }
+        lastBackpackAjaxData['data'] = postData;
+    },
+
+    {
+        urls: ['*://*/ajax/betReturns*', '*://*/ajax/betBackpack*', '*://*/ajax/tradeBackpack*', '*://*/ajax/tradeGifts*', '*://*/ajax/backpack*', '*://*/ajax/showBackpackApi*', '*://*/ajax/tradeCsRight*', '*://*/ajax/tradeWhatRight*'],
+        types: ['xmlhttprequest']
+    }
+);
 
 chrome.webRequest.onCompleted.addListener(function(details) {
-        lastBackpackAjaxURL = details.url;
         console.log('Backpack AJAX request detected with URL ', details.url, +new Date());
-        var message = {inventory: details.url};
+        console.log(lastBackpackAjaxData);
+        var message = {inventory: lastBackpackAjaxData};
         sendMessageToContentScript(message, details.tabId);
     },
 

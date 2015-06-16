@@ -39,9 +39,9 @@ chrome.extension.onMessage.addListener(function(msg, sender, sendResponse) {
     var args = {};
 
     if (msg.inventory) {
-        console.log('Backpack AJAX request detected from background script with URL ', msg.inventory, +new Date());
+        console.log('Backpack AJAX request detected from background script with URL ', msg.inventory.url, +new Date());
         if (LoungeUser.userSettingsLoaded) {
-            if (msg.inventory.indexOf('tradeCsRight') != -1 || msg.inventory.indexOf('tradeWhatRight') != -1) {
+            if (msg.inventory.url.indexOf('tradeCsRight') != -1 || msg.inventory.url.indexOf('tradeWhatRight') != -1) {
                 if (LoungeUser.userSettings.itemMarketPricesv2 === '2') {
                     getMarketPricesForElementList($('#itemlist .oitm:not(.marketPriced)'), true);
                 }

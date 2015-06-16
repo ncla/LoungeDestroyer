@@ -36,22 +36,22 @@ Inventory.prototype.loadInventory = function() {
     var _this = this;
 
     // We get rid of the .php extension, the AJAX requests work anyway without it
-    _this.backpackAjaxURL = _this.backpackAjaxURL.replace('.php', '');
+    _this.backpackAjaxData.url = _this.backpackAjaxData.url.replace('.php', '');
 
     // This will be default URL if none of the conditions below are met
-    var theURL = _this.backpackAjaxURL;
+    var theURL = _this.backpackAjaxData.url;
 
     // Don't bother with force refresh requests
-    if (_this.backpackAjaxURL.indexOf('?refresh=1') == -1) {
+    if (_this.backpackAjaxData.url.indexOf('?refresh=1') == -1) {
         // There are two APIs for inventory loading, we want to switch back and forth between two of them
         // By adding and remove Api at the end of AJAX request URL
-        if (_this.backpackAjaxURL.indexOf('Api') != -1) {
-            theURL = _this.backpackAjaxURL.replace('Api', '');
+        if (_this.backpackAjaxData.url.indexOf('Api') != -1) {
+            theURL = _this.backpackAjaxData.url.replace('Api', '');
         } else {
             // Loop through all the Lounge requests that support 'Api' at the end of request
             $.each(backpackAjaxURLs, function(i, v) {
-                if (_this.backpackAjaxURL.indexOf(v) != -1) {
-                    theURL = _this.backpackAjaxURL + 'Api';
+                if (_this.backpackAjaxData.url.indexOf(v) != -1) {
+                    theURL = _this.backpackAjaxData.url + 'Api';
                     return false;
                 }
             });
@@ -60,11 +60,12 @@ Inventory.prototype.loadInventory = function() {
 
     console.log('Loading inventory with URL ', theURL);
 
-    _this.backpackAjaxURL = theURL;
+    _this.backpackAjaxData.url = theURL;
 
     // Send AJAX request, necessary to be set as a property because user may need to abort the request
-    this.ajaxRequest = $.ajax({
+    var ajaxDetails = {
         url: theURL,
+        type: _this.backpackAjaxData.method,
         success: function(data) {
             // All inventory requests usually throw this string if the backpack loading was successful, or return nothing at all
             if ($(data).text().indexOf('Can\'t get items.') == -1 && data.length != 0) {
@@ -88,7 +89,7 @@ Inventory.prototype.loadInventory = function() {
                 document.getElementById('LDerr').innerHTML = $(data).text();
                 setTimeout(function() {
                     _this.loadInventory();
-                }, 1000);
+                }, (1000 + Math.random() * 2000 - 500));
             }
         },
 
@@ -100,7 +101,14 @@ Inventory.prototype.loadInventory = function() {
                 }, 5000);
             }
         }
-    });
+    };
+
+    // Add post data if necessary
+    if (_this.backpackAjaxData.method === 'POST' && _this.backpackAjaxData.data !== null) {
+        ajaxDetails.data = _this.backpackAjaxData.data;
+    }
+
+    this.ajaxRequest = $.ajax(ajaxDetails);
 };
 
 /*
@@ -159,7 +167,7 @@ Inventory.prototype.stopLoadingInventory = function() {
     Gets called every time the inventory has loaded (except sometimes manually fired on match page)
     @param url AJAX request URL, necessary for loading inventory through this extension
  */
-Inventory.prototype.onInventoryLoaded = function(url) {
+Inventory.prototype.onInventoryLoaded = function(requestData) {
     // Determining where the backpack is
     this.determineBackpackElement();
     if (!this.backpackElement || this.inventoryIsLoading) {
@@ -167,7 +175,7 @@ Inventory.prototype.onInventoryLoaded = function(url) {
     }
 
     console.log('onInventoryLoaded has been fired');
-    this.backpackAjaxURL = url;
+    this.backpackAjaxData = requestData;
 
     var whereToLookAt = $('#backpack');
     /*
