@@ -576,14 +576,16 @@ function updateCurrencyConversion(callback) {
     var oReq = new XMLHttpRequest();
     oReq.onload = function() {
         var parsed = JSON.parse(this.responseText);
-        var rates = parsed.query.results.rate;
+
         var conversionList = {};
-        $.each(rates, function(i, v) {
-            conversionList[v.id] = parseFloat(v.Rate);
+
+        $.each(parsed, function(i, v) {
+            conversionList['USD' + v.abbreviation] = parseFloat(v.rate);
         });
 
         console.log('Currency conversion rates:');
         console.log(conversionList);
+
         chrome.storage.local.set({'currencyConversionRates': conversionList});
         if (callback) {
             console.log('Callback:', callback);
@@ -592,11 +594,11 @@ function updateCurrencyConversion(callback) {
     };
 
     oReq.onerror = function() {
-        setTimeout(updateCurrencyConversion, 30000);
+        setTimeout(updateCurrencyConversion, 60000);
         chrome.storage.local.set({'currencyConversionRates': currencyFallback});
     };
 
-    oReq.open('get', 'http://query.yahooapis.com/v1/public/yql?q=select * from yahoo.finance.xchange where pair in (' + currencyList + ')&format=json&env=store://datatables.org/alltableswithkeys&callback=', true);
+    oReq.open('get', 'http://api.ncla.me/destroyer/currencies', true);
     oReq.send();
 }
 
