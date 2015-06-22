@@ -356,3 +356,36 @@ http://codepen.io/larrygeams/pen/nhgze
 .ld-item-group-header {
     margin-top: 10px;
 }
+
+.destroyer.auto-info hr {
+    margin: 10px 0;
+    width: 100%;
+}
+
+.destroyer.auto-info button.patreon {
+    float: left;
+    width: 50%;
+    box-sizing: border-box;
+    margin: 5px 0 0 0;
+    border-radius: 3px 0 0 3px;
+    border-right: none;
+    background: #e6461a;
+    border-color: #d33c12;
+    color: white;
+    cursor: pointer;
+}
+
+.destroyer.auto-info button.steam {
+    float: left;
+    width: 50%;
+    margin: 5px 0 0 0;
+    box-sizing: border-box;
+    border-radius: 0 3px 3px 0;
+    background: #333;
+    border-color: #151515;
+    color: white;
+    cursor: pointer;
+}
+.destroyer.auto-info .support {
+    font-size: 12px;
+}

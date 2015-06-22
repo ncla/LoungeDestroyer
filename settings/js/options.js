@@ -199,6 +199,27 @@ function restore_options() {
 
         return keywords;
     }
+
+    $.ajax('http://api.ncla.me/destroyer/patreonlist', {
+        type: 'GET',
+        success: function(data) {
+            if(data.length) {
+                $('.patreon-list').removeClass('hidden');
+                var placeHolder = $('.patreon-list .placeholder');
+                $.each(data, function(i, v) {
+                    var newRow = $(placeHolder).clone().removeClass('hidden');
+                    $(newRow).find('th:eq(0)').text(v.id);
+                    $(newRow).find('td:eq(0)').text(v.name);
+                    $('.patreon-list tbody').append($(newRow));
+                })
+            } else {
+                $('.no-patreons').removeClass('hidden');
+            }
+        },
+        error: function(jqXHR) {
+            $('.not-loaded-patreons').removeClass('hidden');
+        }
+    })
 }
 
 $textarea = $("#reportlog-textarea textarea");

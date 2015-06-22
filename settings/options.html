@@ -24,7 +24,7 @@
             <ul class="nav navbar-nav" role="tablist" id="ld_tab">
                 <li class="active"><a href="#settings" aria-controls="settings" role="tab" data-toggle="tab">Settings</a></li>
                 <li><a href="#themes" aria-controls="themes" role="tab" data-toggle="tab">Themes</a></li>
-                <li><a href="#about" aria-controls="about" role="tab" data-toggle="tab">About</a></li>
+                <li><a href="#about" aria-controls="about" role="tab" data-toggle="tab">About & Support</a></li>
             </ul>
         </div><!--/.nav-collapse -->
     </div>
@@ -446,16 +446,76 @@
         </div>
         <div role="tabpanel" class="tab-pane" id="about">
             <div class="page-header">
-                <h1>About</h1>
+                <h1>Patreon & Support</h1>
             </div>
-            <p>LoungeDestroyer makes a shitty website more bearable, enough said.</p>
+
+            <p>You can support the developers of the extension through <a href="https://www.patreon.com/loungedestroyer" target="_blank">Patreon</a>. There are certain milestones which can be unlocked once reached if enough people pledge.</p>
+
+            <a href="https://www.patreon.com/loungedestroyer" target="_blank">
+                <button class="btn btn-primary" type="button" style="margin-bottom: 15px;">
+                    Visit our Patreon page
+                </button>
+            </a>
+
+            <div class="alert alert-danger not-loaded-patreons hidden" role="alert">
+                Failed to get Patreon supporter list. :( Try again later?
+            </div>
+            <div class="alert alert-info no-patreons hidden" role="alert">
+                There are currently no Patreons supporting us. <a href="https://www.patreon.com/loungedestroyer" target="_blank">Why don't you be the first one?</a>
+            </div>
+            <div class="patreon-list hidden">
+                <strong>Thank you to the following Patreons for supporting us!</strong>
+                <table class="table table-hover table-condensed">
+                    <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Name</th>
+                        <th>Supporter Level</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr class="placeholder hidden">
+                        <th scope="row">1</th>
+                        <td>Placeholder</td>
+                        <td>Level 1</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+
+            <div class="page-header">
+                <h1>About us</h1>
+            </div>
+            <p>
+                LoungeDestroyer was made by web developers who found CSGOLounge.com frustrating to navigate, the experience was so frustrating, ncla decided to automate it.
+                And so it began, the first iteration of LoungeDestroyer was basic auto-betting with no delay what so ever, the auto-betting progress was outputted to
+                console log and did not have any UI. You can watch the video <a href="https://www.youtube.com/watch?v=JT2a4h35o90" target="_blank">here</a> on how it worked back then.
+                It was just a basic user script, not an extension. Soon after the first release, more additions were necessary as full queues were not the only problem with the site.
+            </p>
+
+            <p>
+                Eventually ncla wanted to do too much with a user-script. LoungeDestroyer had to be made into an extension to utilize more browser features and to be able to operate in the background.
+                Some time passed, another extension poped up by birjolaxew called LoungeEnhancer which had similar functionality. Ncla quickly offered birjolaxew to work on LoungeDestroyer after
+                LoungeEnhancer announcement, birjolaxew agreed to put effort and time into this project. He is co-developer of LoungeDestroyer and has made half of what LoungeDestroyer is now.
+                Another member of LoungeDestroyer team is farblood, he is creator of CleanLounge theme for LoungeDestroyer, overall designer on our team and and he created the logo for us.
+            </p>
+
+            <p>
+                For every blocking measure there will be another anti-blocking measure. Our auto-betting feature has been targeted two times by the site admins and both times we have patched our extension.
+            </p>
+
+            <p>
+                Perfection is achieved through iteration.
+            </p>
+
+
             <a href="https://www.youtube.com/watch?v=fJrGo92Qwk0" target="_blank">Here is theme song for LoungeDestroyer</a>
             <div style="margin: 10px 0;">
                 <a class="btn btn-primary" role="button" href="http://reddit.com/r/loungedestroyer" target="_blank">Subreddit</a>
                 <a class="btn btn-primary" role="button" href="http://github.com/ncla/LoungeDestroyer" target="_blank">GitHub</a>
                 <a class="btn btn-primary" role="button" href="http://steamcommunity.com/groups/loungedestroyer" target="_blank">Steam group</a>
-                <a class="btn btn-primary" role="button" href="https://github.com/ncla/LoungeDestroyer/issues" target="_blank">Report a bug</a>
-                <a class="btn btn-default" role="button" href="#" id="reportlog" style="display: none;">Generate report log</a>
+                <a class="btn btn-primary" role="button" href="https://www.patreon.com/loungedestroyer" target="_blank">Patreon page</a>
             </div>
             <div class="form-group" id="reportlog-textarea" style="display: none;">
                 <p>Report log:</p>
