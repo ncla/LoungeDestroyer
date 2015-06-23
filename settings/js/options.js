@@ -208,7 +208,7 @@ function restore_options() {
                 var placeHolder = $('.patreon-list .placeholder');
                 $.each(data, function(i, v) {
                     var newRow = $(placeHolder).clone().removeClass('hidden');
-                    $(newRow).find('th:eq(0)').text(v.id);
+                    $(newRow).find('th:eq(0)').text(i + 1);
                     $(newRow).find('td:eq(0)').text(v.name);
                     $('.patreon-list tbody').append($(newRow));
                 })
