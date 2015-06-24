@@ -210,6 +210,7 @@ function restore_options() {
                     var newRow = $(placeHolder).clone().removeClass('hidden');
                     $(newRow).find('th:eq(0)').text(i + 1);
                     $(newRow).find('td:eq(0)').text(v.name);
+                    $(newRow).find('td:eq(1)').text('$' + v.amount);
                     $('.patreon-list tbody').append($(newRow));
                 })
             } else {
