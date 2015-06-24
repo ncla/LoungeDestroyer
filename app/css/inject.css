@@ -158,6 +158,8 @@ http://codepen.io/larrygeams/pen/nhgze
     border-radius: 3px;
     box-shadow: 0 5px 20px rgba(0,0,0,0.1);
     font-size: 14px;
+
+    z-index: 100;
 }
 .destroyer.auto-info button { margin: 10px 0; width: 100%; }
 .destroyer.auto-info .worth, .destroyer.auto-info .num-tries, .destroyer.auto-info .match-link { font-weight: 700; }
@@ -360,9 +362,10 @@ http://codepen.io/larrygeams/pen/nhgze
 .destroyer.auto-info hr {
     margin: 10px 0;
     width: 100%;
+    border-top: inherit !important;
 }
 
-.destroyer.auto-info button.patreon {
+.destroyer.auto-info a.patreon button {
     float: left;
     width: 50%;
     box-sizing: border-box;
@@ -375,7 +378,7 @@ http://codepen.io/larrygeams/pen/nhgze
     cursor: pointer;
 }
 
-.destroyer.auto-info button.steam {
+.destroyer.auto-info a.steam button {
     float: left;
     width: 50%;
     margin: 5px 0 0 0;
