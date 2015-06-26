@@ -462,8 +462,8 @@ $(document).ready(function() {
     '<button class="red">Disable auto-bet</button>' +
     '<p class="destroyer error-title">Last error (<span class="destroyer time-since">0s</span>):</p><p class="destroyer error-text"></p>' +
     '<label>Seconds between retries:</label><input id="bet-time" type="number" min="2" max="60" step="1">' +
-    '<hr><p class="support">Support LoungeDestroyer development</p> <a href="https://www.patreon.com/loungedestroyer" target="_blank" class="patreon"><button>Patreon</button></a>' +
-    '<a href="https://steamcommunity.com/tradeoffer/new/?partner=106750833&token=CXFPs7ON" target="_blank" class="steam"><button>Steam</button></a>';
+    '<hr><p class="support">Support LoungeDestroyer development <br/><b style="color: red;">by donating</b></p> <a href="https://www.patreon.com/loungedestroyer" target="_blank" class="patreon"><button>Patreon support</button></a>' +
+    '<a href="https://steamcommunity.com/tradeoffer/new/?partner=106750833&token=eYnKX2Un" target="_blank" class="steam"><button>Steam donations</button></a>';
 
     container.querySelector('button').addEventListener('click', function() {
         chrome.runtime.sendMessage({type: 'autoBet', autoBet: false});
@@ -481,7 +481,7 @@ $(document).ready(function() {
     document.body.appendChild(container);
 
     $('.destroyer.auto-info a.steam').on('click', function() {
-        return confirm('You are about to open a trade with LoungeDestroyer donation bot. This account is not related in any way with CSGOLounge.com or DOTA2Lounge.com. Are you sure?');
+        return confirm('You are about to open a trade with LoungeDestroyer donation account. \n\nTHIS TRADE OFFER IS NOT RELATED TO CSGOLOUNGE.COM NOR DOTA2LOUNGE.COM IN ANY WAY. \n\nAre you sure?');
     });
 
     document.addEventListener('click', function(ev) {

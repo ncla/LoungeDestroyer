@@ -376,6 +376,7 @@ http://codepen.io/larrygeams/pen/nhgze
     border-color: #d33c12;
     color: white;
     cursor: pointer;
+    font-size: 12px;
 }
 
 .destroyer.auto-info a.steam button {
@@ -388,6 +389,7 @@ http://codepen.io/larrygeams/pen/nhgze
     border-color: #151515;
     color: white;
     cursor: pointer;
+    font-size: 12px;
 }
 .destroyer.auto-info .support {
     font-size: 12px;
