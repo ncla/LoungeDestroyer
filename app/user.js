@@ -20,7 +20,7 @@ User.prototype.defaultSettings =
     notifyTrades: '1',
     autoDelay: '5',
     enableAuto: '1',
-    renameButtons: '1',
+    renameButtons2: '0',
     useCachedPriceList: '0',
     notifyExpiredItems: '1',
     addTradePreviews: '1',
@@ -45,7 +45,8 @@ User.prototype.defaultSettings =
     showBettedIndicator: '1',
     beepSoundDisable: '0',
     customTradeOfferSound: '',
-    focusOnTradeofferTab: '0'
+    focusOnTradeofferTab: '0',
+    opskins: '1'
 };
 
 // defaultSettings get modified when changing settings?

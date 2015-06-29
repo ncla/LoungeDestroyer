@@ -394,3 +394,8 @@ http://codepen.io/larrygeams/pen/nhgze
 .destroyer.auto-info .support {
     font-size: 12px;
 }
+
+.opskins-aff small {
+    font-size: 10px;
+    cursor: help;
+}

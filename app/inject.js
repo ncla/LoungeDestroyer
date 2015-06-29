@@ -225,11 +225,12 @@ function init() {
                 }
             }
 
-            if (LoungeUser.userSettings.renameButtons === '1') {
-                var btn = document.getElementById('freezebutton');
-                if (btn) {
-                    btn.textContent = 'FUCKING REQUEST RETURNS';
-                }
+            $freezeBtn = $('#freezebutton');
+
+            $freezeBtn.css('text-transform', 'uppercase');
+
+            if (LoungeUser.userSettings.renameButtons2 === '1') {
+                $freezeBtn.text('Fucking ' + $('#placebut').text());
             }
 
             if (['2', '1'].indexOf(LoungeUser.userSettings.enableAuto) !== -1) {
@@ -289,12 +290,11 @@ function init() {
         }
 
         if (document.URL.indexOf('/match?m=') != -1 || document.URL.indexOf('/predict') != -1) {
-            if (LoungeUser.userSettings.renameButtons === '1') {
-                var btn = document.getElementById('placebut');
-                if (btn) {
-                    var txt = btn.textContent.toUpperCase();
-                    btn.textContent = 'FUCKING ' + txt;
-                }
+            $betBtn = $('#placebut');
+            $betBtn.css('text-transform', 'uppercase');
+
+            if (LoungeUser.userSettings.renameButtons2 === '1') {
+                $betBtn.text('Fucking ' + $('#placebut').text());
             }
 
             // convert time to local time

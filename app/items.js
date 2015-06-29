@@ -275,6 +275,14 @@ Item.prototype.generateSteamStoreURL = function() {
     return window.location.protocol + '//store.steampowered.com/search/?term=' + encodeURI(this.itemName);
 };
 
+Item.prototype.generateOPSkinsURL = function(itemName) {
+    if (!(this instanceof Item)) {
+        throw new TypeError('\'this\' must be instance of Item');
+    }
+
+    return window.location.protocol + '//opskins.com/index.php?loc=shop_search&ref=destroyer&aid=80&search_item=' + encodeURI(itemName) + '&min=&max=&StatTrak=0&inline=&grade=&inline=&type=&inline=&sort=lh';
+};
+
 Item.prototype.convertLoungeValue = function() {
     if (LoungeUser.userSettings.convertLoungePrices === '1' && !this.loungeValueConverted) {
         var $valElm = $('.value', this.item);
@@ -317,8 +325,12 @@ Item.prototype.appendHoverElements = function() {
             $('.name', _this.item).append('<br/>' +
             '<a href="' + _this.generateMarketSearchURL() + '" target="_blank">Market Search</a>' +
             '<br/><br/><small><a class="refreshPriceMarket">Show Steam market price</a></small>');
-        }
 
+            if(appID == '730' && LoungeUser.userSettings.opskins == '1') {
+                $('.name', _this.item).append('<br/><p class="opskins-aff"><a href="' + _this.generateOPSkinsURL(_this.itemName) +'" target="_blank">Buy on OPSKINS.com</a>' +
+                '<small title="This affiliate link is added by LoungeDestroyer and supports the developers, you can remove this affiliate link in the settings if you wish."> (?)</small></p>');
+            }
+        }
         _this.extraAppended = true;
     }
 
