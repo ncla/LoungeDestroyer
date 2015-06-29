@@ -280,7 +280,7 @@ Item.prototype.generateOPSkinsURL = function(itemName) {
         throw new TypeError('\'this\' must be instance of Item');
     }
 
-    return window.location.protocol + '//opskins.com/index.php?loc=shop_search&ref=destroyer&aid=80&search_item=' + encodeURI(itemName) + '&min=&max=&StatTrak=0&inline=&grade=&inline=&type=&inline=&sort=lh';
+    return window.location.protocol + '//opskins.com/index.php?loc=shop_search&ref=destroyer&aid=91&search_item=' + encodeURI(itemName) + '&min=&max=&StatTrak=0&inline=&grade=&inline=&type=&inline=&sort=lh';
 };
 
 Item.prototype.convertLoungeValue = function() {
