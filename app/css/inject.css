@@ -164,7 +164,7 @@ http://codepen.io/larrygeams/pen/nhgze
 .destroyer.auto-info button { margin: 10px 0; width: 100%; }
 .destroyer.auto-info .worth, .destroyer.auto-info .num-tries, .destroyer.auto-info .match-link { font-weight: 700; }
 .destroyer.auto-info .error-title { margin-bottom: 0; }
-.destroyer.auto-info .error-text { padding-left: 10px; }
+.destroyer.auto-info .error-text { padding-left: 10px; white-space: pre-wrap; }
 .destroyer.auto-info label { margin-right: 10px; }
 .destroyer.auto-info input { margin-top: 10px; }
 

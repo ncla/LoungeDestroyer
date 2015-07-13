@@ -244,7 +244,7 @@ bet.autoLoop = function(game) {
                         var extraDelay = 0;
                         if (data.indexOf('Try again in few seconds.') !== -1) {
                             console.log('Waiting a few seconds to avoid blocking');
-                            data += '\r\nDelayed auto by 2 seconds to avoid block.';
+                            data += '\n\r\n\rDelaying request by 2 seconds to avoid block.';
                             extraDelay = 2000;
                         }
 
