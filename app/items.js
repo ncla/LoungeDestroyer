@@ -275,12 +275,17 @@ Item.prototype.generateSteamStoreURL = function() {
     return window.location.protocol + '//store.steampowered.com/search/?term=' + encodeURI(this.itemName);
 };
 
-Item.prototype.generateOPSkinsURL = function(itemName) {
+Item.prototype.generateOPSkinsURL = function(itemName, stattrak) {
     if (!(this instanceof Item)) {
         throw new TypeError('\'this\' must be instance of Item');
     }
 
-    return window.location.protocol + '//opskins.com/index.php?loc=shop_search&ref=destroyer&aid=91&search_item=' + encodeURI(itemName) + '&min=&max=&StatTrak=0&inline=&grade=&inline=&type=&inline=&sort=lh';
+    if(stattrak === undefined) {
+        stattrak = 0;
+    }
+
+    return window.location.protocol + '//opskins.com/index.php?loc=shop_search&ref=destroyer&aid=91&search_item=' + encodeURI(itemName) +
+        '&min=&max=&StatTrak=' + stattrak + '&inline=&grade=&inline=&type=&inline=&sort=lh';
 };
 
 Item.prototype.convertLoungeValue = function() {
@@ -327,7 +332,8 @@ Item.prototype.appendHoverElements = function() {
             '<br/><br/><small><a class="refreshPriceMarket">Show Steam market price</a></small>');
 
             if(appID == '730' && LoungeUser.userSettings.opskins == '1') {
-                $('.name', _this.item).append('<br/><p class="opskins-aff"><a href="' + _this.generateOPSkinsURL(_this.itemName) +'" target="_blank">Buy on OPSKINS.com</a>' +
+                var isStattrak = (_this.itemName.indexOf('StatTrak™ ') !== -1) ? 1 : 0;
+                $('.name', _this.item).append('<br/><p class="opskins-aff"><a href="' + _this.generateOPSkinsURL(_this.itemName, isStattrak) +'" target="_blank">Buy on OPSKINS.com</a>' +
                 '<small title="This affiliate link is added by LoungeDestroyer and supports the developers, you can remove this affiliate link in the settings if you wish."> (?)</small></p>');
             }
         }
