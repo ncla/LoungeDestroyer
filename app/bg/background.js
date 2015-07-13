@@ -281,22 +281,26 @@ chrome.webRequest.onHeadersReceived.addListener(function(details) {
     },
     ['responseHeaders', 'blocking']
 );
-var lastBackpackAjaxData = null;
+
+var lastBackpackAjaxData = [];
 
 chrome.webRequest.onBeforeRequest.addListener(function(details) {
-        lastBackpackAjaxData = {
+        console.log('onbefore url ' + details.url);
+        lastBackpackAjaxData[details.url] = {
             url: details.url,
             method: details.method
         };
 
-        var postData = null;
+        var postData = [];
 
-        if(details.requestBody.formData && details.method === 'POST') {
+        console.log(details.requestBody);
+
+        if(details.method === 'POST' && details.hasOwnProperty('requestBody') && details.requestBody.hasOwnProperty('formData')) {
             $.each(details.requestBody.formData, function(postDataIndex, postDataValue) {
                 postData[postDataIndex] = postDataValue[0];
             });
         }
-        lastBackpackAjaxData['data'] = postData;
+        lastBackpackAjaxData[details.url]['data'] = postData;
     },
 
     {
@@ -307,8 +311,8 @@ chrome.webRequest.onBeforeRequest.addListener(function(details) {
 
 chrome.webRequest.onCompleted.addListener(function(details) {
         console.log('Backpack AJAX request detected with URL ', details.url, +new Date());
-        console.log(lastBackpackAjaxData);
-        var message = {inventory: lastBackpackAjaxData};
+        console.log(lastBackpackAjaxData[details.url]);
+        var message = {inventory: lastBackpackAjaxData[details.url]};
         sendMessageToContentScript(message, details.tabId);
     },
 
