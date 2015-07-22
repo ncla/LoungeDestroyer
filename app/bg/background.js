@@ -423,7 +423,10 @@ function checkNewMatches(ajaxResponse, appID) {
         // We do not want to overwhelm user with many new matches
         if (newMatchesCount <= 3) {
             $.each(matchesToNotificate, function(index, value) {
-                var msg = (value.teamA.length > 0) ? (value.teamA + ' vs. ' + value.teamB + ' @ ' + value.tournamentName + '\nMatch begins ' + value.timeFromNow) : (value.tournamentName + '\nMatch begins ' + value.timeFromNow);
+                var msg = (value.teamA.length > 0) ?
+                    (value.teamA + ' vs. ' + value.teamB + ' @ ' + value.tournamentName + (value.bestOf ? ', ' + value.bestOf : null) + '\nMatch begins ' + value.timeFromNow) :
+                    (value.tournamentName + '\nMatch begins ' + value.timeFromNow);
+
                 createNotification(
                     'A new ' + (appID == 730 ? 'CS:GO' : 'DOTA2') + ' match has been added!',
                     msg,

@@ -38,6 +38,7 @@ Match.prototype.parseMatchElement = function(elm) {
     this.matchID = $('a[href]:first', elm).attr('href').replace(/\D/g, '');
     this.teamA = $('.teamtext:eq(0) b', elm).text().trim() || $('.changeteam:eq(0)', elm).text().trim() || undefined;
     this.teamB = $('.teamtext:eq(1) b', elm).text().trim() || $('.changeteam:eq(1)', elm).text().trim() || undefined;
+    this.bestOf = $('span.format', elm).text().trim().replace('BO', 'Best of ') || undefined;
     this.parsedMatchElement = true;
 };
 /**
