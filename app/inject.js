@@ -69,7 +69,7 @@ chrome.extension.onMessage.addListener(function(msg, sender, sendResponse) {
     }
 
     if (msg.tradesNotification) {
-        var tradesBtn = $('#menu>a').eq(1);
+        var tradesBtn = $('#menu>a[href="mytrades"]');
         if (tradesBtn.find('.notification').length) {
             tradesBtn.find('.notification').text(msg.tradesNotification);
         } else {
@@ -78,7 +78,7 @@ chrome.extension.onMessage.addListener(function(msg, sender, sendResponse) {
     }
     
     if (msg.offersNotification) {
-        var offersBtn = $('#menu>a').eq(2);
+        var offersBtn = $('#menu>a[href="myoffers"]');
         if (offersBtn.find('.notification').length) {
             offersBtn.find('.notification').text(msg.offersNotification);
         } else {
