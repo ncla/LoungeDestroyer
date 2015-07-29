@@ -68,6 +68,25 @@ chrome.extension.onMessage.addListener(function(msg, sender, sendResponse) {
         args.cookies = document.cookie;
     }
 
+    if (msg.tradesNotification) {
+        var tradesBtn = $('#menu>a[href="mytrades"]');
+        if (tradesBtn.find('.notification').length) {
+            tradesBtn.find('.notification').text(msg.tradesNotification);
+        } else {
+            tradesBtn.prepend($('<div>').attr('class', 'notification').text(msg.tradesNotification));
+        }          
+    }
+    
+    if (msg.offersNotification) {
+        var offersBtn = $('#menu>a[href="myoffers"]');
+        if (offersBtn.find('.notification').length) {
+            offersBtn.find('.notification').text(msg.offersNotification);
+        } else {
+            offersBtn.prepend($('<div>').attr('class', 'notification').text(msg.offersNotification));
+        }      
+    }
+    
+    
     if (!$.isEmptyObject(args)) {
         sendResponse(args);
     }
