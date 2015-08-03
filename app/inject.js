@@ -651,12 +651,10 @@ var itemObs = new MutationObserver(function(records) {
             }
         }
         if(records[i].addedNodes && records[i].addedNodes.length && records[i].target.id == 'ajaxCont' && records[i].target.className == 'full') {
-            console.time('init item obj');
             initiateItemObjectForElementList($('#ajaxCont.full .oitm'), true);
-            console.timeEnd('init item obj');
+
             var betHistoryColSett = LoungeUser.userSettings.betHistoryTotalColumn;
             if(['1', '2'].indexOf(betHistoryColSett) !== -1) {
-                console.time('table');
                 $('table tbody tr:visible').each(function(i, v) {
                     var status = -1;
                     var text = '-';
@@ -690,11 +688,9 @@ var itemObs = new MutationObserver(function(records) {
                     var newTd = $('<td></td>').text(text);
                     $('td:eq(5)', v).after(newTd);
                 });
-                console.timeEnd('table');
+
                 // Adjust the column width because we added another column
-                console.time('colspan');
                 $('table td[colspan=5]').attr('colspan', '6');
-                console.timeEnd('colspan');
             }
 
         }
