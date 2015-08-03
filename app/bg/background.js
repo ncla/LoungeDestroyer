@@ -479,6 +479,10 @@ function checkForNewTradeOffers(data, appID) {
             success: function(data) {
                 var doc = document.implementation.createHTMLDocument('');
                 doc.body.innerHTML = data;
+                var allNotifications = $('.tradepoll .notification', doc).length;
+                if (allNotifications) {
+                    sendMessageToContentScript({'tradesNotification' : allNotifications}, appID == 730 ? -1 : -2);
+                }
                 $('.tradepoll', doc).each(function(i, v) {
                     if ($('.notification', v).length) {
                         var notifyAmount = parseInt($('.notification', v).text(), 10);
@@ -506,6 +510,10 @@ function checkForNewTradeOffers(data, appID) {
             success: function(data) {
                 var doc = document.implementation.createHTMLDocument('');
                 doc.body.innerHTML = data;
+                var allNotifications = $('.tradepoll .notification', doc).length;
+                if (allNotifications) {
+                    sendMessageToContentScript({'tradesNotification' : allNotifications}, appID == 730 ? -1 : -2);
+                }
                 $('.tradepoll', doc).each(function(i, v) {
                     if ($('.notification', v).length) {
                         var offerURL = urlStart + $('a[href]:eq(0)', v).attr('href');
