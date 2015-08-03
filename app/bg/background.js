@@ -211,6 +211,13 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
             return true;
         }
     }
+
+    if (request.hasOwnProperty('refetchCsglValues')) {
+        updateCsgoloungeItemValues(sendResponse);
+        if (sendResponse) {
+            return true;
+        }
+    }
 });
 
 /**
@@ -346,6 +353,18 @@ chrome.webRequest.onBeforeRequest.addListener(function requestListener(details) 
     ['blocking']
 );
 
+chrome.webRequest.onBeforeRequest.addListener(function(details) {
+        if(LoungeUser.userSettings.disableStylesheetLoading === '1') {
+            return {cancel: true}
+        }
+    },
+    {
+        urls: ['*://csgolounge.com/css/*', '*://dota2lounge.com/css/*'],
+        types: ['stylesheet']
+    },
+    ['blocking']
+);
+
 var notificationID = 0;
 var notifications = {};
 
@@ -424,7 +443,7 @@ function checkNewMatches(ajaxResponse, appID) {
         if (newMatchesCount <= 3) {
             $.each(matchesToNotificate, function(index, value) {
                 var msg = (value.teamA.length > 0) ?
-                    (value.teamA + ' vs. ' + value.teamB + ' @ ' + value.tournamentName + (value.bestOf ? ', ' + value.bestOf : null) + '\nMatch begins ' + value.timeFromNow) :
+                    (value.teamA + ' vs. ' + value.teamB + ' @ ' + value.tournamentName + (value.bestOf ? ', ' + value.bestOf : '') + '\nMatch begins ' + value.timeFromNow) :
                     (value.tournamentName + '\nMatch begins ' + value.timeFromNow);
 
                 createNotification(
@@ -609,6 +628,31 @@ function updateCurrencyConversion(callback) {
     oReq.send();
 }
 
+function updateCsgoloungeItemValues(callback) {
+    console.log('Updating CS:GO Lounge item betting values!');
+
+    $.ajax({
+        url: 'http://csgolounge.com/api/schema.php',
+        success: function(response) {
+            var valueStorage = {};
+
+            $.each(response, function(i, v) {
+                var floatValue = parseFloat(v.worth);
+                if(floatValue > 0) {
+                    valueStorage[v.name] = floatValue;
+                }
+            });
+
+            chrome.storage.local.set({'csglBettingValues': valueStorage});
+            if(callback) callback();
+            console.log('CS:GO Lounge item betting values updated.');
+        },
+        error: function(error) {
+            console.log('Error getting betting values from API', error);
+        }
+    });
+}
+
 function checkForExpiredItems(appID) {
     console.log('Checking for expired items on ' + appID);
     var urlStart = baseURLs[appID];
@@ -687,7 +731,8 @@ var alarms = {
     currencyUpdate: 10080,
     expiredReturnsChecking: 360,
     remoteThemesUpdate: 1440,
-    autoBump: 10
+    autoBump: 10,
+    csglBettingValues: 1440
 };
 
 // make sure we don't create alarms that already exist
@@ -753,6 +798,12 @@ chrome.alarms.onAlarm.addListener(function(alarm) {
     if (alarm.name == 'autoBump') {
         if (['1', '730', '570'].indexOf(LoungeUser.userSettings.autoBump) !== -1) {
             autoBumpTrades();
+        }
+    }
+
+    if (alarm.name == 'csglBettingValues') {
+        if (LoungeUser.userSettings.csglBettingValues === '1') {
+            updateCsgoloungeItemValues();
         }
     }
 });

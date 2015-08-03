@@ -18,13 +18,16 @@ var timezoneName = (LoungeUser.userSettings.timezone == 'auto' ? jstz.determine(
 
 var container = document.createElement('div');
 
-chrome.storage.local.get(['marketPriceList', 'currencyConversionRates', 'themes', 'matchInfoCachev2', 'lastAutoAccept', 'blacklistedItemList', 'ajaxCache'], function(result) {
+chrome.storage.local.get(['marketPriceList', 'currencyConversionRates', 'themes', 'matchInfoCachev2', 'lastAutoAccept', 'blacklistedItemList', 'csglBettingValues'], function(result) {
     blacklistedItemList = result.blacklistedItemList || {};
     storageMarketItems = result.marketPriceList || {};
     currencies = result.currencyConversionRates || {};
     matchInfoCachev2 = result.matchInfoCachev2 || {'730': {}, '570': {}};
     themes = result.themes || {};
     lastAccept = result.lastAutoAccept || 0;
+    csglBettingValues = result.csglBettingValues || {};
+
+    // TODO: Maybe load user settings by passing the result from the same storage get callback?
     LoungeUser.loadUserSettings(function() {
         console.log('User settings have been loaded in content script!', +new Date());
         init();
@@ -42,9 +45,8 @@ chrome.extension.onMessage.addListener(function(msg, sender, sendResponse) {
         console.log('Backpack AJAX request detected from background script with URL ', msg.inventory.url, +new Date());
         if (LoungeUser.userSettingsLoaded) {
             if (msg.inventory.url.indexOf('tradeCsRight') != -1 || msg.inventory.url.indexOf('tradeWhatRight') != -1) {
-                if (LoungeUser.userSettings.itemMarketPricesv2 === '2') {
-                    getMarketPricesForElementList($('#itemlist .oitm:not(.marketPriced)'), true);
-                }
+                initiateItemObjectForElementList($('#itemlist .oitm:not(.marketPriced)'), true);
+                //getMarketPricesForElementList($('#itemlist .oitm:not(.marketPriced)'), true);
             } else {
                 inventory.onInventoryLoaded(msg.inventory);
             }
@@ -441,9 +443,10 @@ function init() {
             });
         }
 
-        if (LoungeUser.userSettings.itemMarketPricesv2 === '2') {
-            getMarketPricesForElementList();
-        }
+        //if (LoungeUser.userSettings.itemMarketPricesv2 === '2') {
+            initiateItemObjectForElementList();
+            //getMarketPricesForElementList();
+        //}
     });
 }
 /*
@@ -623,9 +626,58 @@ var itemObs = new MutationObserver(function(records) {
 
             if (hasTradeNodes) {
                 if (LoungeUser.userSettings.itemMarketPricesv2 === '2') {
-                    getMarketPricesForElementList($(records[i].addedNodes).find('.oitm'));
+                    //getMarketPricesForElementList($(records[i].addedNodes).find('.oitm'));
+                    initiateItemObjectForElementList($(records[i].addedNodes).find('.oitm'));
                 }
             }
+        }
+        if(records[i].addedNodes && records[i].addedNodes.length && records[i].target.id == 'ajaxCont' && records[i].target.className == 'full') {
+            console.time('init item obj');
+            initiateItemObjectForElementList($('#ajaxCont.full .oitm'), true);
+            console.timeEnd('init item obj');
+            var betHistoryColSett = LoungeUser.userSettings.betHistoryTotalColumn;
+            if(['1', '2'].indexOf(betHistoryColSett) !== -1) {
+                console.time('table');
+                $('table tbody tr:visible').each(function(i, v) {
+                    var status = -1;
+                    var text = '-';
+
+                    if($('.won', v).length) {
+                        status = 1;
+                    }
+
+                    if($('.lost', v).length) {
+                        status = 0;
+                    }
+
+                    var total = 0;
+
+                    if(status === 0) {
+                        $(v).next().find('.oitm').each(function(itemId, itemValue) {
+                            var item = itemObject(itemValue);
+                            total = total - ((betHistoryColSett === '1') ? item.loungeValue : item.marketValue);
+                        });
+                        text = '- ' + convertPrice(Math.abs(total), true);
+                    }
+
+                    if(status === 1) {
+                        $(v).next().next().find('.oitm').each(function(itemId, itemValue) {
+                            var item = itemObject(itemValue);
+                            total = total + ((betHistoryColSett === '1') ? item.loungeValue : item.marketValue);
+                        });
+                        text = '+ ' + convertPrice(Math.abs(total), true);
+                    }
+
+                    var newTd = $('<td></td>').text(text);
+                    $('td:eq(5)', v).after(newTd);
+                });
+                console.timeEnd('table');
+                // Adjust the column width because we added another column
+                console.time('colspan');
+                $('table td[colspan=5]').attr('colspan', '6');
+                console.timeEnd('colspan');
+            }
+
         }
     }
 });

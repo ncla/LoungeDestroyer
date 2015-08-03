@@ -46,7 +46,10 @@ User.prototype.defaultSettings =
     beepSoundDisable: '0',
     customTradeOfferSound: '',
     focusOnTradeofferTab: '0',
-    opskins: '1'
+    opskins: '1',
+    bettingValuesCsgo: '0',
+    betHistoryTotalColumn: '2',
+    disableStylesheetLoading: '0'
 };
 
 // defaultSettings get modified when changing settings?

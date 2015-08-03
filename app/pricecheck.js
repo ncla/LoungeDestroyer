@@ -36,6 +36,14 @@ chrome.storage.local.get(['currencyConversionRates', 'ajaxCache'], function(resu
             $('#largeiteminfo_item_actions').show().append('<span class="btn_small btn_grey_white_innerfade" id="csglpricecheck">' +
             '<span>Check CSGOLounge.com item betting value</span>' +
             '</span>');
+
+            if(LoungeUser.userSettings.opskins == '1') {
+                var isStattrak = (itemObj.itemName.indexOf('StatTrak™ ') !== -1) ? 1 : 0;
+
+                $('#largeiteminfo_item_actions').append('<a href="' + itemObj.generateOPSkinsURL(itemObj.itemName, isStattrak) + '" class="btn_small btn_grey_white_innerfade" id="buyOnOpskins" target="_blank">' +
+                '<span>Buy on OPSKINS.com without 7 day trade ban <small title="This affiliate link is added by LoungeDestroyer and ' +
+                'supports the developers, you can remove this affiliate link in the settings if you wish."> (?)</small></span></a>');
+            }
         }
 
         var successCallback = errorCallback = function(response) {

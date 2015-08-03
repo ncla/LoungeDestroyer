@@ -119,6 +119,14 @@ function restore_options() {
         defaultUser.restoreDefaults();
         document.location.reload();
     });
+    $("#refetchcsglvalues").click(function() {
+        var that = this;
+        that.disabled = true;
+        chrome.runtime.sendMessage({refetchCsglValues: true},
+            function(){
+                that.disabled = false;
+            });
+    });
     $("#reportlog").click(function() {
         $("#reportlog-textarea").show();
 
@@ -317,6 +325,11 @@ $(".ld-setting select, .ld-setting input").on('change', function() {
                 return;
             }
         }
+    }
+
+    if(this.id == 'bettingValuesCsgo' && this.value == '1') {
+        console.log('Fetching betting values for CS:GO Lounge now');
+        chrome.runtime.sendMessage({refetchCsglValues: true}, function() {});
     }
 
     // save setting

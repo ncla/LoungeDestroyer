@@ -16,6 +16,17 @@ var Item = function(item) {
 
         this.item = item;
         this.itemName = $('.smallimg', this.item).attr('alt').trim();
+
+        this.loungeValue = null;
+
+        var $valElm = $('.value', this.item);
+        if($valElm.length) {
+            var bettingValue = parseFloat($valElm.text().match(/[0-9.]+/));
+            if (!isNaN(bettingValue)) {
+                this.loungeValue = bettingValue;
+            }
+        }
+
         var quality = $('.rarity', this.item).text().trim();
         $.each(skinQualities, function(i, v) {
             if (quality.indexOf(i) !== -1) {
@@ -26,6 +37,7 @@ var Item = function(item) {
         });
 
         this.convertLoungeValue();
+        this.addLoungeValue();
     }
 };
 /**
@@ -291,7 +303,7 @@ Item.prototype.generateOPSkinsURL = function(itemName, stattrak) {
 Item.prototype.convertLoungeValue = function() {
     if (LoungeUser.userSettings.convertLoungePrices === '1' && !this.loungeValueConverted) {
         var $valElm = $('.value', this.item);
-        if ($valElm.length) {
+        if ($valElm.length && this.loungeValue > 0) {
             var loungeValue = parseFloat($valElm.text().match(/[0-9.]+/));
 
             // If the the value is parsable as a number, convert the lounge's price
@@ -305,6 +317,21 @@ Item.prototype.convertLoungeValue = function() {
 
     return this;
 };
+
+Item.prototype.addLoungeValue = function() {
+    if (appID === '730' && LoungeUser.userSettings.bettingValuesCsgo === '1') {
+        if (this.loungeValue === null && csglBettingValues.hasOwnProperty(this.itemName)) {
+            var newValElm = $('<div class="value"></div>');
+            $(newValElm).text(convertPrice(csglBettingValues[this.itemName], true));
+            $('.item', this.item).prepend(newValElm);
+            this.loungeValue = csglBettingValues[this.itemName];
+            this.loungeValueConverted = true;
+        }
+    }
+
+    return this;
+};
+
 /**
  * Black-lists an item from ever creating requests to Steam API
  * @returns {Item}
@@ -344,37 +371,42 @@ Item.prototype.appendHoverElements = function() {
 };
 
 /**
- * Get market prices for an element list in a performance friendly way
- * @param {Array} elmList - list of jQuery element objects (optional)
+ *  Initiate item class for all items, that way we don't initiate it only on market price loading.
+ *  This allow us to use the item class in other cases, for example, when converting betting values
+ *  @param {Array} elmList - list of jQuery element objects (optional)
+ *  @param {Boolean} cachedOnly - If true, append market prices only from the price list cache
  */
-function getMarketPricesForElementList(elmList, cachedOnly) {
+function initiateItemObjectForElementList(elmList, cachedOnly) {
     if (!elmList) {
-        elmList = $('body .oitm:not(.marketPriced)');
-    }
-
-    if (!cachedOnly) {
-        cachedOnly = false;
+        elmList = $('body .oitm');
     }
 
     var cachedItemList = [];
 
     // Loop through all the items and push them in an array if we found duplicates
+    // We also initiate item class on the element
     for (var i = 0, j = elmList.length; i < j; ++i) {
         var item = itemObject(elmList[i]);
-        if (!cachedItemList.hasOwnProperty(item.itemName)) {
-            cachedItemList[item.itemName] = [];
-        }
 
-        cachedItemList[item.itemName].push(item);
+        if(LoungeUser.userSettings.itemMarketPricesv2 === '2') {
+            if (!cachedItemList.hasOwnProperty(item.itemName)) {
+                cachedItemList[item.itemName] = [];
+            }
+
+            cachedItemList[item.itemName].push(item);
+        }
     }
 
     // Then we fetch market prices only for unique, non-duplicate items
-    for (var index in cachedItemList) {
-        var itemForScience = cachedItemList[index][0];
-        itemForScience.myFriends = cachedItemList[index];
-        itemForScience.getMarketPrice(cachedOnly);
+    if(LoungeUser.userSettings.itemMarketPricesv2 === '2') {
+        for (var index in cachedItemList) {
+            var itemForScience = cachedItemList[index][0];
+            itemForScience.myFriends = cachedItemList[index];
+            itemForScience.getMarketPrice(cachedOnly);
+        }
     }
 }
+
 
 /**
  * Converts Lounge value (assuming it is USD by default) to users currency

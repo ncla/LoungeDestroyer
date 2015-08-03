@@ -117,7 +117,8 @@ Inventory.prototype.loadInventory = function() {
  */
 Inventory.prototype.getMarketPrices = function() {
     // TODO: PHPStorm keeps screaming about ineffiecient jQuery selector usage :(
-    getMarketPricesForElementList($('#backpack .oitm:not(.marketPriced)'));
+    initiateItemObjectForElementList($('#backpack .oitm:not(.marketPriced)'));
+    //getMarketPricesForElementList($('#backpack .oitm:not(.marketPriced)'));
 };
 
 /*
@@ -264,9 +265,7 @@ Inventory.prototype.onInventoryLoaded = function(requestData) {
             }
         }
 
-        if (LoungeUser.userSettings.itemMarketPricesv2 === '2') {
-            this.getMarketPrices(true);
-        }
+        initiateItemObjectForElementList($('#backpack .oitm:not(.marketPriced)'));
     }
 };
 
