@@ -36,7 +36,9 @@ chrome.storage.local.get(['marketPriceList', 'currencyConversionRates', 'themes'
 });
 
 // Inject theme as quickly as possible
-chrome.runtime.sendMessage({injectCSSTheme: true});
+if(window.location.href.indexOf('/api/') === -1) {
+    chrome.runtime.sendMessage({injectCSSTheme: true});
+}
 
 chrome.extension.onMessage.addListener(function(msg, sender, sendResponse) {
     // if non-empty, calls sendResponse with arguments at end
