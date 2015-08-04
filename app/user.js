@@ -55,32 +55,47 @@ User.prototype.defaultSettings =
 // defaultSettings get modified when changing settings?
 User.prototype.defaults = $.extend({}, User.prototype.defaultSettings);
 
-User.prototype.loadUserSettings = function(callback) {
+/**
+ * Loads user settings from the storage. You can pass existing storage to avoid unnecessary chrome.storage calls
+ * @param function callback
+ * @param mixed settingsStorage Undefined if not passed, Null if no settings, Object if settings
+ */
+User.prototype.loadUserSettings = function(callback, settingsStorage) {
     if (!(this instanceof User)) {
         throw new TypeError('\'this\' must be instance of User');
     }
 
     var _this = this;
 
-    chrome.storage.local.get('userSettings', function(result) {
-        if (jQuery.isEmptyObject(result)) {
-            console.log('No settings have been set, setting default ones');
-            console.log(_this.defaultSettings);
-            chrome.storage.local.set({'userSettings': JSON.stringify(_this.defaultSettings)});
-        }
-        else {
-            var storageUserSettings = JSON.parse(result.userSettings);
+    if (typeof settingsStorage !== 'undefined') {
+        if (settingsStorage === null) {
+            _this.restoreDefaults();
+        } else {
+            var storageUserSettings = JSON.parse(settingsStorage);
 
             $.extend(_this.userSettings, storageUserSettings);
-
-            // restrict options
-            _this.userSettings.autoDelay = Math.max(2, _this.userSettings.autoDelay);
-            _this.userSettings.acceptDelay = Math.max(10, _this.userSettings.acceptDelay);
+            _this.restrictOptions();
         }
-        /* Start the scripterino */
+
         _this.userSettingsLoaded = true;
         callback();
-    });
+    } else {
+        chrome.storage.local.get('userSettings', function(result) {
+            // result is an object because we are not accessing the result properties directly
+            if (jQuery.isEmptyObject(result)) {
+                _this.restoreDefaults();
+            }
+            else {
+                var storageUserSettings = JSON.parse(result.userSettings);
+
+                $.extend(_this.userSettings, storageUserSettings);
+                _this.restrictOptions();
+            }
+
+            _this.userSettingsLoaded = true;
+            callback();
+        });
+    }
 };
 
 User.prototype.saveSetting = function(settingName, settingValue) {
@@ -111,14 +126,32 @@ User.prototype.saveSetting = function(settingName, settingValue) {
     }
 
     console.log('Saving user setting [' + settingName + '] to ', settingValue);
+    return this;
 };
 
+/**
+ * TODO: Optimize this to use only one chrome.storage.set call
+ */
 User.prototype.restoreDefaults = function() {
     if (!(this instanceof User)) {
         throw new TypeError('\'this\' must be instance of User');
     }
 
+    console.log('Reseting to default user settings');
+
     for (var k in User.prototype.defaults) {
         this.saveSetting(k, User.prototype.defaults[k]);
     }
+
+    return this;
+};
+
+/**
+ * Necessary so users don't set low or 0 delay
+ */
+User.prototype.restrictOptions = function() {
+    this.userSettings.autoDelay = Math.max(2, this.userSettings.autoDelay);
+    this.userSettings.acceptDelay = Math.max(10, this.userSettings.acceptDelay);
+
+    return this;
 };

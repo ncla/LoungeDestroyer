@@ -18,7 +18,7 @@ var timezoneName = (LoungeUser.userSettings.timezone == 'auto' ? jstz.determine(
 
 var container = document.createElement('div');
 
-chrome.storage.local.get(['marketPriceList', 'currencyConversionRates', 'themes', 'matchInfoCachev2', 'lastAutoAccept', 'blacklistedItemList', 'csglBettingValues'], function(result) {
+chrome.storage.local.get(['marketPriceList', 'currencyConversionRates', 'themes', 'matchInfoCachev2', 'lastAutoAccept', 'blacklistedItemList', 'csglBettingValues', 'userSettings'], function(result) {
     blacklistedItemList = result.blacklistedItemList || {};
     storageMarketItems = result.marketPriceList || {};
     currencies = result.currencyConversionRates || {};
@@ -26,12 +26,13 @@ chrome.storage.local.get(['marketPriceList', 'currencyConversionRates', 'themes'
     themes = result.themes || {};
     lastAccept = result.lastAutoAccept || 0;
     csglBettingValues = result.csglBettingValues || {};
-
+    var userSettings = result.userSettings || null;
+    console.log('Local storage loaded', +new Date());
     // TODO: Maybe load user settings by passing the result from the same storage get callback?
     LoungeUser.loadUserSettings(function() {
         console.log('User settings have been loaded in content script!', +new Date());
         init();
-    });
+    }, userSettings);
 });
 
 // Inject theme as quickly as possible

@@ -26,9 +26,10 @@ function getItemName() {
 }
 
 var LoungeUser = new User();
-chrome.storage.local.get(['currencyConversionRates', 'ajaxCache'], function(result) {
+chrome.storage.local.get(['currencyConversionRates', 'ajaxCache', 'userSettings'], function(result) {
     currencies = result.currencyConversionRates || {};
     ajaxCache = result.ajaxCache || {};
+    userSettings = result.userSettings || null;
     LoungeUser.loadUserSettings(function() {
         var itemObj = new Item();
         itemObj.itemName = getItemName();
@@ -57,5 +58,5 @@ chrome.storage.local.get(['currencyConversionRates', 'ajaxCache'], function(resu
         $('#csglpricecheck').click(function() {
             itemObj.fetchLoungeValueFromAPI(successCallback, errorCallback);
         });
-    });
+    }, userSettings);
 });
