@@ -332,6 +332,11 @@ $(".ld-setting select, .ld-setting input").on('change', function() {
         chrome.runtime.sendMessage({refetchCsglValues: true}, function() {});
     }
 
+    if(this.id == 'useCachedPriceList' && this.value == '1') {
+        console.log('Fetching market price list');
+        chrome.runtime.sendMessage({refetchMarketPriceList: true}, function() {});
+    }
+
     // save setting
     defaultUser.saveSetting(this.id, this.value);
 });

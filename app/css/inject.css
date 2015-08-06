@@ -395,7 +395,7 @@ http://codepen.io/larrygeams/pen/nhgze
     font-size: 12px;
 }
 
-.opskins-aff small {
+.opskins-aff small, .small-note-ld {
     font-size: 10px;
     cursor: help;
 }
