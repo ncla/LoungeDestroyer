@@ -659,36 +659,38 @@ var itemObs = new MutationObserver(function(records) {
             var betHistoryColSett = LoungeUser.userSettings.betHistoryTotalColumn;
             if(['1', '2'].indexOf(betHistoryColSett) !== -1) {
                 $('table tbody tr:visible').each(function(i, v) {
-                    var status = -1;
-                    var text = '-';
-
-                    if($('.won', v).length) {
-                        status = 1;
-                    }
-
-                    if($('.lost', v).length) {
-                        status = 0;
-                    }
-
                     var total = 0;
 
-                    if(status === 0) {
+                    // Won items
+                    $(v).next().next().find('.oitm').each(function(itemId, itemValue) {
+                        var item = itemObject(itemValue);
+                        total = total + ((betHistoryColSett === '1') ? (item.loungeValue || 0) : (item.marketValue || 0));
+                    });
+
+                    if(total === 0 && $('.lost', v).length) {
+                        // Placed items, deduct from Total if there were no items won
                         $(v).next().find('.oitm').each(function(itemId, itemValue) {
                             var item = itemObject(itemValue);
-                            total = total - ((betHistoryColSett === '1') ? item.loungeValue : item.marketValue);
+                            total = total - ((betHistoryColSett === '1') ? (item.loungeValue || 0) : (item.marketValue || 0));
                         });
-                        text = '- ' + convertPrice(Math.abs(total), true);
                     }
 
-                    if(status === 1) {
-                        $(v).next().next().find('.oitm').each(function(itemId, itemValue) {
-                            var item = itemObject(itemValue);
-                            total = total + ((betHistoryColSett === '1') ? item.loungeValue : item.marketValue);
-                        });
-                        text = '+ ' + convertPrice(Math.abs(total), true);
+                    if(total > 0) {
+                        text = '+ ' + convertPrice(total, true);
+                    } else if(total < 0) {
+                        text = '- ' + convertPrice(Math.abs(total), true);
+                    } else {
+                        text = convertPrice(0, true);
                     }
 
                     var newTd = $('<td></td>').text(text);
+
+                    if(total === 0 && ($('.lost', v).length || $('.won', v).length)) {
+                        $(newTd).append('<small class="small-note-ld" title="You are seeing ' + convertPrice(0, true) + ' as a total because you have not ' +
+                            'set LoungeDestroyer settings to use cached price list and to load prices automatically. If you do have ' +
+                            'both enabled, then it might be possible that the item does not have a betting/market value."> (?)</small>');
+                    }
+
                     $('td:eq(5)', v).after(newTd);
                 });
 
