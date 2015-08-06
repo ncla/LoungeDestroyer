@@ -30,15 +30,15 @@ gulp.task('build', function () {
     var htmlFilter = gulpFilter(['**/*.html']);
 
     return gulp.src(requiredStuff, {base: '.'})
-        .pipe(jsFilter)
-        .pipe(uglify())
-        .pipe(jsFilter.restore())
-        .pipe(cssFilter)
-        .pipe(minifyCss())
-        .pipe(cssFilter.restore())
-        .pipe(htmlFilter)
-        .pipe(minifyHTML())
-        .pipe(htmlFilter.restore())
+        //.pipe(jsFilter)
+        //.pipe(uglify())
+        //.pipe(jsFilter.restore())
+        //.pipe(cssFilter)
+        //.pipe(minifyCss())
+        //.pipe(cssFilter.restore())
+        //.pipe(htmlFilter)
+        //.pipe(minifyHTML())
+        //.pipe(htmlFilter.restore())
         .pipe(zip('ld_build.zip'))
         .pipe(gulp.dest('build/'));
 });
