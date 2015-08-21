@@ -399,3 +399,201 @@ http://codepen.io/larrygeams/pen/nhgze
     font-size: 10px;
     cursor: help;
 }
+.tradepoll.ld-filtered {
+    opacity: 0.65;
+    transition: opacity 0.3s ease-in-out;
+}
+.tradepoll.ld-filtered:hover {
+    opacity: 1;
+}
+.tradepoll.ld-filtered .ld-steam-extra {
+    border-left: 3px solid red;
+}
+.tradepoll.ld-filtered .trade-description p, .tradepoll.ld-filtered:hover .trade-description p {
+    border-left: 3px solid red !important;
+}
+
+/* Steam profile info containers */
+.ld-steam-extra-wrapper {
+    display: block;
+    float: left;
+    width: 100%;
+    transition: all 0.35s;
+
+    /* Fade in effects */
+    margin: 0;
+    height: 0;
+    visibility: hidden;
+}
+
+.ld-steam-extra-wrapper:before,
+.ld-steam-extra-wrapper:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+.ld-steam-extra {
+    background: rgb(224, 224, 224);
+    border-left: 3px solid #828282;
+    border-radius: 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    height: 50px;
+    position: relative;
+    box-sizing: border-box;
+    transition: opacity 0.35s;
+    transition-delay: 0.25s;
+
+    /* Fade in effects */
+    opacity: 0;
+}
+
+.ld-steam-extra:after {
+    content: "";
+    display: block;
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 20px;
+    pointer-events: none;
+    background-image: linear-gradient(to left, rgb(224, 224, 224), transparent);
+}
+/* END Steam profile info containers */
+
+/* Steam profile info cells */
+.ld-steam-extra .ld-steam-info {
+    border-right: 1px solid #b9b9b9;
+    text-align: left;
+    display: inline-block;
+    font-size: 13px;
+    line-height: 15px;
+    height: 50px;
+    padding: 10px 12px;
+    overflow: hidden;
+    position: relative;
+    box-sizing: border-box;
+}
+
+.ld-steam-extra .ld-steam-info:first-child {
+    padding: 0 12px 0 0;
+}
+
+.ld-steam-extra .ld-steam-info:last-child {
+    border-right: none;
+}
+/* END Steam profile info cells */
+
+/* Steam profile info inside */
+.ld-steam-extra .ld-steam-info .ld-info-label {
+    font-size: 11px;
+    font-weight: bold;
+    display: block;
+    white-space: nowrap;
+}
+
+.ld-steam-extra .ld-steam-info .ld-info-val {
+    display: block;
+    white-space: nowrap;
+}
+.ld-steam-extra .ld-steam-info + .ld-steam-info {
+    margin-left: -3px;
+}
+/* END Steam profile info inside */
+
+/* Steam profile picture */
+.ld-steam-extra .ld-steam-img {
+    padding: 5px;
+    width: 40px;
+    display: block;
+    height: 40px;
+    float: left;
+}
+
+.ld-steam-extra .ld-steam-img img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+}
+/* END Steam profile picture */
+
+/* Steam profile status */
+.ld-steam-extra .ld-steam-info .ld-steam-status {
+    font-weight: bold;
+    float: left;
+    margin-left: 6px;
+    line-height: 50px;
+}
+/* END Steam profile status */
+
+/* Steam profile info "private profile" */
+.ld-steam-extra .ld-steam-private {
+    color: #ce2525;
+}
+/* END Steam profile info "private profile" */
+
+/* Steam profile container fade/slide effect */
+.ld-slidedown {
+    margin: 5px 0 10px 0;
+    height: 50px;
+    opacity: 1;
+    visibility: visible;
+}
+
+.ld-slidedown .ld-steam-extra {
+    opacity: 1;
+}
+/* END Steam profile container fade/slide effect */
+
+.ld-trade-filters {
+    display: block;
+    margin: 50px 9px -35px 9px;
+    height: 45px;
+    font-size: 13px;
+    padding: 15px 8px;
+    background: rgb(224,224,224);
+    border-radius: 3px;
+    box-sizing: border-box;
+}
+
+.ld-trade-filters:before {
+    content: "";
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    float: left;
+    margin: -1px 7px 0 0;
+    background: url(http://i.imgur.com/jaryKUa.png) no-repeat;
+}
+
+.ld-trade-filters:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+.ld-trade-filters a:not(.buttonright):hover {
+    text-decoration: underline;
+}
+
+.ld-trade-filters-info {
+    float: left;
+    margin-top: -4px;
+    font-size: 12px;
+}
+
+.ld-trade-filters-buttons {
+    float: right;
+    margin: calc(-0.4em - 3px) -0.4em -0.4em -0.4em;
+    display: inline-block;
+}
+@media all and (min-width: 1300px) {
+    .ld-trade-filters .ld-trade-filters-info {
+        margin: 0;
+    }
+
+    .ld-trade-filters br {
+        display: none;
+    }
+}

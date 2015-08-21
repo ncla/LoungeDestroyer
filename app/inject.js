@@ -12,9 +12,11 @@ var inventory = new Inventory();
 var lastAccept = 0;
 var blacklistedItemList = {};
 var earlyBackpackLoad = false;
+var tradeShowFilter;
 var tradeHideFilter;
 var tradeMarkFilter;
 var timezoneName = (LoungeUser.userSettings.timezone == 'auto' ? jstz.determine().name() : LoungeUser.userSettings.timezone);
+var tradesFiltered = 0;
 
 var container = document.createElement('div');
 
@@ -166,10 +168,12 @@ function init() {
     }
 
     // create RegExp's from users trade filters
+    var tradeShowArr = LoungeUser.userSettings.showTradesFilterArray || [];
     var tradeHideArr = LoungeUser.userSettings.hideTradesFilterArray || [];
-    var tradeMarkArr = LoungeUser.userSettings.markTradesFilterArray || [];
+    var tradeItemsHaveArr = LoungeUser.userSettings.hideTradesItemsHave || [];
+    var tradeItemsWantArr = LoungeUser.userSettings.hideTradesItemsWant || [];
+    tradeShowFilter = createKeywordRegexp(tradeShowArr);
     tradeHideFilter = createKeywordRegexp(tradeHideArr);
-    tradeMarkFilter = createKeywordRegexp(tradeMarkArr);
 
     // the following requires DOM
     $(document).ready(function() {
@@ -306,11 +310,44 @@ function init() {
             });
         }
 
-        if ($('a[href="/trades"]').length || document.URL.indexOf('/result?') !== -1 || document.URL.indexOf('/trades') !== -1) {
-            $('.tradepoll').each(function(index, value) {
-                var trade = new Trade(value);
-                trade.addTradeDescription();
+        var isHomepage = ($('.title a[href="/trades"]').length > 0);
+
+        if (isHomepage || document.URL.indexOf('/result?') !== -1 || document.URL.indexOf('/trades') !== -1) {
+            if(LoungeUser.userSettings.showTradeFilterBox === '1') {
+                $('div.title:eq(0)').after('<div class="ld-trade-filters">' +
+                    '<div class="ld-trade-filters-buttons">' +
+                        //'<button class="buttonright">Hide this</button>' +
+                    '<a href="#" class="buttonright" id="changefilters">Change filters</a>' +
+                    '<button class="buttonright" id="showtrades">Show trades</button></div>' +
+                    '<div class="ld-trade-filters-info"><span class="ld-filtered-amount">0 trades</span> were filtered <br>by your <a href="#"><b>trade settings</b></a>' +
+                    '</div> </div>');
+
+                $('.ld-trade-filters #changefilters, .ld-trade-filters .ld-trade-filters-info a').click(function() {
+                    chrome.runtime.sendMessage({openSettings: true}, function(data) {
+                        console.log('Message sent for opening settings page');
+                    });
+                });
+
+                $('.ld-trade-filters #showtrades').click(function() {
+                    $('.tradepoll').each(function(index, value) {
+                        var trade = tradeObject(value);
+                        $(trade.tradeElement).show();
+                    });
+                });
+            }
+
+            $('.tradepoll:not(.notavailable)').each(function(index, value) {
+                var trade = tradeObject(value);
+                if((LoungeUser.userSettings.tradeLoadExtra === '1' && isHomepage) || LoungeUser.userSettings.tradeLoadExtra === '2') {
+                    if(isScrolledIntoView(trade.tradeElement)) {
+                        trade.fetchExtraData(function() {});
+                    }
+                }
+                if(LoungeUser.userSettings.tradeLoadExtra === '1' && !isHomepage) {
+                    trade.fetchExtraData(function() {});
+                }
             });
+
         }
 
         if (document.URL.indexOf('/match?m=') != -1 || document.URL.indexOf('/predict') != -1) {
@@ -356,104 +393,104 @@ function init() {
 
         // add custom 'Preview' buttons to trades that don't have it
         // first create preview element if it doesn't exist
-        (function() {
-            if (LoungeUser.userSettings.addTradePreviews === '0') {
-                return;
-            }
-
-            if (!document.getElementById('logout')) {
-                return;
-            }
-
-            var previewElm = document.getElementById('preview');
-
-            if (previewElm) {
-                return;
-            }
-
-            if (document.querySelector('.tradepoll')) {
-                previewElm = document.createElement('section');
-                previewElm.id = 'preview';
-                previewElm.className = 'destroyer';
-                document.body.appendChild(previewElm);
-                customPreview = true;
-            }
-
-            previewElm = $(previewElm);
-
-            $('.tradepoll').each(function(ind, elm) {
-                if (!elm.querySelector('.tradeheader a.button[onclick^="livePreview"]')) {
-                    var header = elm.querySelector('.tradeheader');
-                    var span = (header && header.querySelector('span[style*="float: right"]')) || false;
-                    var btn = document.createElement('a');
-
-                    btn.className = 'button destroyer live-preview';
-                    btn.innerHTML = 'Preview';
-                    btn.style.float = 'none';
-
-                    if (!header) {
-                        return;
-                    }
-
-                    if (!span) {
-                        // if buttons already exist in header, don't place within span
-                        if (elm.querySelector('.tradeheader > a.button')) {
-                            span = header;
-                            btn.className = 'buttonright';
-                            btn.style.float = 'right';
-                        } else {
-                            span = document.createElement('span');
-                            span.style.float = 'right';
-                            header.appendChild(span);
-                        }
-                    }
-
-                    var tradeId = elm.querySelector('a[href^="trade?"]');
-                    var self = this instanceof $ ? this : $(this);
-                    if (tradeId) {
-                        tradeId = tradeId.getAttribute('href').replace('trade?t=', '');
-                    } else {
-                        return;
-                    }
-
-                    // magic happens here
-                    btn.addEventListener('click', function() {
-                        if (previewElm.attr('data-index') == ind) {
-                            previewElm.hide();
-                            previewElm.attr('data-index', '-1');
-                            return;
-                        }
-
-                        previewElm.show();
-                        previewElm.html('<img src="../img/load.gif" id="loading" style="margin: 0.75em 2%">');
-
-                        var offset = self.offset();
-                        if ($(document).width() > offset.left + self.outerWidth() + Math.max(410, $(document).width() * 0.5)) {
-                            offset.top = Math.floor(offset.top - 20);
-                            offset.left = Math.floor(offset.left + self.outerWidth() + 10);
-                        } else {
-                            // position below if not enough space on right
-                            offset.top = Math.floor(offset.top + self.height() + 10);
-                            offset.left = Math.floor(offset.left);
-                        }
-
-                        previewElm.offset(offset);
-
-                        $.ajax({
-                            url: 'ajax/livePreview.php',
-                            type: 'POST',
-                            data: 't=' + tradeId,
-                            success: function(d) {
-                                previewElm.html(d).slideDown('fast');
-                                previewElm.attr('data-index', ind);
-                            }
-                        })
-                    });
-
-                    span.appendChild(btn);
-                }
-            });
-        })();
+        //(function() {
+        //    if (LoungeUser.userSettings.addTradePreviews === '0') {
+        //        return;
+        //    }
+        //
+        //    if (!document.getElementById('logout')) {
+        //        return;
+        //    }
+        //
+        //    var previewElm = document.getElementById('preview');
+        //
+        //    if (previewElm) {
+        //        return;
+        //    }
+        //
+        //    if (document.querySelector('.tradepoll')) {
+        //        previewElm = document.createElement('section');
+        //        previewElm.id = 'preview';
+        //        previewElm.className = 'destroyer';
+        //        document.body.appendChild(previewElm);
+        //        customPreview = true;
+        //    }
+        //
+        //    previewElm = $(previewElm);
+        //
+        //    $('.tradepoll').each(function(ind, elm) {
+        //        if (!elm.querySelector('.tradeheader a.button[onclick^="livePreview"]')) {
+        //            var header = elm.querySelector('.tradeheader');
+        //            var span = (header && header.querySelector('span[style*="float: right"]')) || false;
+        //            var btn = document.createElement('a');
+        //
+        //            btn.className = 'button destroyer live-preview';
+        //            btn.innerHTML = 'Preview';
+        //            btn.style.float = 'none';
+        //
+        //            if (!header) {
+        //                return;
+        //            }
+        //
+        //            if (!span) {
+        //                // if buttons already exist in header, don't place within span
+        //                if (elm.querySelector('.tradeheader > a.button')) {
+        //                    span = header;
+        //                    btn.className = 'buttonright';
+        //                    btn.style.float = 'right';
+        //                } else {
+        //                    span = document.createElement('span');
+        //                    span.style.float = 'right';
+        //                    header.appendChild(span);
+        //                }
+        //            }
+        //
+        //            var tradeId = elm.querySelector('a[href^="trade?"]');
+        //            var self = this instanceof $ ? this : $(this);
+        //            if (tradeId) {
+        //                tradeId = tradeId.getAttribute('href').replace('trade?t=', '');
+        //            } else {
+        //                return;
+        //            }
+        //
+        //            // magic happens here
+        //            btn.addEventListener('click', function() {
+        //                if (previewElm.attr('data-index') == ind) {
+        //                    previewElm.hide();
+        //                    previewElm.attr('data-index', '-1');
+        //                    return;
+        //                }
+        //
+        //                previewElm.show();
+        //                previewElm.html('<img src="../img/load.gif" id="loading" style="margin: 0.75em 2%">');
+        //
+        //                var offset = self.offset();
+        //                if ($(document).width() > offset.left + self.outerWidth() + Math.max(410, $(document).width() * 0.5)) {
+        //                    offset.top = Math.floor(offset.top - 20);
+        //                    offset.left = Math.floor(offset.left + self.outerWidth() + 10);
+        //                } else {
+        //                    // position below if not enough space on right
+        //                    offset.top = Math.floor(offset.top + self.height() + 10);
+        //                    offset.left = Math.floor(offset.left);
+        //                }
+        //
+        //                previewElm.offset(offset);
+        //
+        //                $.ajax({
+        //                    url: 'ajax/livePreview.php',
+        //                    type: 'POST',
+        //                    data: 't=' + tradeId,
+        //                    success: function(d) {
+        //                        previewElm.html(d).slideDown('fast');
+        //                        previewElm.attr('data-index', ind);
+        //                    }
+        //                })
+        //            });
+        //
+        //            span.appendChild(btn);
+        //        }
+        //    });
+        //})();
 
         container.querySelector('input').value = LoungeUser.userSettings.autoDelay || 5;
 
@@ -630,6 +667,23 @@ $(document).on('mouseover', '.matchmain', function() {
     }
 });
 
+$(document).on('mouseover', '.tradepoll:not(.notavailable)', function() {
+    if(LoungeUser.userSettings.tradeLoadExtra === '3') {
+        var trade = tradeObject(this);
+        trade.fetchExtraData(function(){});
+    }
+});
+
+$(window).scrolled(function() {
+    console.log('Scrolled');
+    $('.tradepoll:not(.notavailable)').each(function(index, value) {
+        if(isScrolledIntoView(value) && ['1', '2'].indexOf(LoungeUser.userSettings.tradeLoadExtra) !== -1) {
+            var trade = tradeObject(value);
+            trade.fetchExtraData(function(){});
+        }
+    });
+});
+
 // auto-magically add market prices to newly added items, currently only for trade list
 var itemObs = new MutationObserver(function(records) {
     for (var i = 0, j = records.length; i < j; ++i) {
@@ -638,10 +692,9 @@ var itemObs = new MutationObserver(function(records) {
             for (var k = 0, l = records[i].addedNodes.length; k < l; ++k) {
                 var elm = records[i].addedNodes[k];
                 if (elm.classList) {
-                    if (elm.classList.contains('tradepoll')) {
+                    if (elm.classList.contains('tradepoll') && !elm.classList.contains('notavailable')) {
                         hasTradeNodes = true;
-                        var trade = new Trade(elm);
-                        trade.addTradeDescription();
+                        var trade = tradeObject(elm);
                     }
                 }
             }

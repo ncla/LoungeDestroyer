@@ -196,13 +196,6 @@
                         </select>
                     </div>
                     <div class="col-md-6 ld-setting">
-                        <label class="control-label">Show trade descriptions:</label>
-                        <select id="showDescriptions" class="form-control">
-                            <option value="1">Enabled</option>
-                            <option value="0">Disabled</option>
-                        </select>
-                    </div>
-                    <div class="col-md-6 ld-setting">
                         <label class="control-label">Enable auto-betting/-returning/-accept:</label>
                         <select id="enableAuto" class="form-control">
                             <option value="3">Auto-accept only</option>
@@ -211,13 +204,13 @@
                             <option value="0">Disabled</option>
                         </select>
                     </div>
-                    <div class="col-md-6 ld-setting">
-                        <label class="control-label">Add preview buttons to all trades:</label>
-                        <select id="addTradePreviews" class="form-control">
-                            <option value="1">Enabled</option>
-                            <option value="0">Disabled</option>
-                        </select>
-                    </div>
+                    <!--<div class="col-md-6 ld-setting">-->
+                        <!--<label class="control-label">Add preview buttons to all trades:</label>-->
+                        <!--<select id="addTradePreviews" class="form-control">-->
+                            <!--<option value="1">Enabled</option>-->
+                            <!--<option value="0">Disabled</option>-->
+                        <!--</select>-->
+                    <!--</div>-->
                     <div class="col-md-6 ld-setting">
                         <label class="control-label">Show match type and exact time:</label>
                         <select id="showExtraMatchInfo" class="form-control">
@@ -266,29 +259,160 @@
                     </div>
                 </div>
 
-                <h3 class="page-header">Trade filters</h3>
+                <h3 class="page-header">Trades</h3>
+
+                <h4 class="page-header">Trade features</h4>
+
                 <div class="row">
                     <div class="col-md-6 ld-setting">
-                        <label class="control-label">Hide trades that include:</label>
-                        <input type="text" id="hideTradesFilter" class="form-control" placeholder="Enter keywords">
+                        <label class="control-label">Trade filtering:</label>
+                        <select id="globalTradeFilters" class="form-control">
+                            <option value="1">Enable trade filters</option>
+                            <option value="0">Disable trade filters</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 ld-setting">
+                        <label class="control-label">Load extra trade data:</label>
+                        <select id="tradeLoadExtra" class="form-control">
+                            <option value="3">Load when mouse is over the trade</option>
+                            <option value="2">Load only for trades that are in the view</option>
+                            <option value="1">Load automatically for all trades on search, in view on home page</option>
+                            <option value="0">Disable</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 ld-setting">
+                        <label class="control-label">Load Steam profile data:</label>
+                        <select id="tradeLoadSteamData" class="form-control">
+                            <option value="1">Enable</option>
+                            <option value="0">Disable</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 ld-setting">
+                        <label class="control-label">Show 'x trades were filtered' info box on the page:</label>
+                        <select id="showTradeFilterBox" class="form-control">
+                            <option value="1">Enable</option>
+                            <option value="0">Disable</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 ld-setting">
+                        <label class="control-label">Hide filtered trades:</label>
+                        <select id="hideFilteredTrades" class="form-control">
+                            <option value="1">Enable</option>
+                            <option value="0">Disable</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6 ld-setting">
+                        <label class="control-label">Show trade descriptions:</label>
+                        <select id="showTradeDescriptions" class="form-control">
+                            <option value="1">Enabled</option>
+                            <option value="0">Disabled</option>
+                        </select>
+                    </div>
+                </div>
+
+                <h4 class="page-header">Trade filters</h4>
+
+                <div class="row">
+                    <div class="col-md-4 ld-setting">
+                        <label class="control-label">Hide trades posted by site donators:</label>
+                        <select id="hideDonatorTrades" class="form-control">
+                            <option value="1">Enable</option>
+                            <option value="0">Disable</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4 ld-setting">
+                        <label class="control-label">Hide trades that do not have trade offer link:</label>
+                        <select id="hideNoTradeofferTrades" class="form-control">
+                            <option value="1">Enable</option>
+                            <option value="0">Disable</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4 ld-setting">
+                        <label class="control-label">Hide trades where the user has private profile:</label>
+                        <select id="hideTradesPrivateProfile" class="form-control">
+                            <option value="1">Enable</option>
+                            <option value="0">Disable</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-3 ld-setting">
+                        <label for="smallBetPercentage" class="control-label">Maximum amount of VAC bans:</label>
+                        <input type="number" min="0" max="100" class="form-control" id="maxVacBans">
+                    </div>
+                    <div class="col-md-3 ld-setting">
+                        <label for="smallBetPercentage" class="control-label">Minimum Steam level:</label>
+                        <input type="number" min="0" max="100" class="form-control" id="minSteamLevel">
+                    </div>
+                    <div class="col-md-3 ld-setting">
+                        <label for="smallBetPercentage" class="control-label">Minimum account age in days:</label>
+                        <input type="number" min="0" max="100" class="form-control" id="minAccAgeDays">
+                    </div>
+                    <div class="col-md-3 ld-setting">
+                        <label for="smallBetPercentage" class="control-label">Minimum all time play time:</label>
+                        <input type="number" min="0" max="100" class="form-control" id="minAlltimePlaytime">
+                    </div>
+                </div>
+
+
+
+                <div class="row">
+                    <div class="col-md-6 ld-setting">
+                        <label class="control-label">Show only trades where descriptions include:</label>
+                        <input type="text" id="showTradesFilter" class="form-control" placeholder="Enter keywords">
                         <p class="help-block">
-                            Any trades that include these keywords will be hidden. Keywords are separated by space, unless enclosed in quotes. Punctuation and leading/trailing whitespace is ignored when matching.
+                            Only trades that include these keywords will be shown.
                         </p>
                         <p class="help-block">Currently matching:
                             <span class="keywordsContainer"></span>
                         </p>
                     </div>
                     <div class="col-md-6 ld-setting">
-                        <label class="control-label">Mark trades that include:</label>
-                        <input type="text" id="markTradesFilter" class="form-control" placeholder="Enter keywords">
+                        <label class="control-label">Hide trades where descriptions include:</label>
+                        <input type="text" id="hideTradesFilter" class="form-control" placeholder="Enter keywords">
                         <p class="help-block">
-                            Any trades that include these keywords will be visibly marked with a red line next to their description. Keywords are separated by space, unless enclosed in quotes. Punctuation and leading/trailing whitespace is ignored when matching.
+                            Any trades that include these keywords will be hidden.
+                        </p>
+                        <p class="help-block">Currently matching:
+                            <span class="keywordsContainer"></span>
+                        </p>
+                    </div>
+
+                    <!--<div class="col-md-4 ld-setting">-->
+                        <!--<label class="control-label">Mark trades that include:</label>-->
+                        <!--<input type="text" id="markTradesFilter" class="form-control" placeholder="Enter keywords">-->
+                        <!--<p class="help-block">-->
+                            <!--Any trades that include these keywords will be visibly marked with a red line next to their description.-->
+                        <!--</p>-->
+                        <!--<p class="help-block">Currently matching:-->
+                            <!--<span class="keywordsContainer"></span>-->
+                        <!--</p>-->
+                    <!--</div>-->
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 ld-setting">
+                        <label class="control-label">Hide trades where user has following items:</label>
+                        <input type="text" id="hideTradesItemsHave" class="form-control" placeholder="Enter item names">
+                        <p class="help-block">
+                            Only trades that include these item names will be shown.
+                        </p>
+                        <p class="help-block">Currently matching:
+                            <span class="keywordsContainer"></span>
+                        </p>
+                    </div>
+                    <div class="col-md-6 ld-setting">
+                        <label class="control-label">Hide trades where user wants following items:</label>
+                        <input type="text" id="hideTradesItemsWant" class="form-control" placeholder="Enter item names">
+                        <p class="help-block">
+                            Only trades that include these item names will be shown.
                         </p>
                         <p class="help-block">Currently matching:
                             <span class="keywordsContainer"></span>
                         </p>
                     </div>
                 </div>
+
+                <div class="alert alert-info">Keywords are separated by space, unless enclosed in quotes. Punctuation and leading/trailing whitespace is ignored when matching for trade description. Item names need to have full item name, separated by double quotes.</div>
 
                 <h3 class="page-header">Betting inventory statistics</h3>
                 <div class="row">

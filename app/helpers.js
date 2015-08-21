@@ -215,3 +215,39 @@ var currencyData = {
     21: { naming: "AUD", decimal: '.', id: 21, symbol: "A$", symbolBefore: true },
     22: { naming: "NZD", decimal: '.', id: 22, symbol: "NZ$", symbolBefore: true }
 };
+// http://stackoverflow.com/a/488073
+function isScrolledIntoView(elem) {
+    var $elem = $(elem);
+    var $window = $(window);
+
+    var docViewTop = $window.scrollTop();
+    var docViewBottom = docViewTop + ($window.height() * 1.5);
+
+    var elemTop = $elem.offset().top;
+    var elemBottom = elemTop + $elem.height();
+
+    return ((elemBottom <= docViewBottom) && (elemTop >= docViewTop));
+}
+// http://stackoverflow.com/a/7392655
+(function($) {
+    var uniqueCntr = 0;
+    $.fn.scrolled = function (waitTime, fn) {
+        if (typeof waitTime === "function") {
+            fn = waitTime;
+            waitTime = 250;
+        }
+        var tag = "scrollTimer" + uniqueCntr++;
+        this.scroll(function () {
+            var self = $(this);
+            var timer = self.data(tag);
+            if (timer) {
+                clearTimeout(timer);
+            }
+            timer = setTimeout(function () {
+                self.removeData(tag);
+                fn.call(self[0]);
+            }, waitTime);
+            self.data(tag, timer);
+        });
+    }
+})(jQuery);

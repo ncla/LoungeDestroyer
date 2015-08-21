@@ -49,7 +49,22 @@ User.prototype.defaultSettings =
     opskins: '1',
     bettingValuesCsgo: '0',
     betHistoryTotalColumn: '2',
-    disableStylesheetLoading: '0'
+    disableStylesheetLoading: '0',
+
+    globalTradeFilters: '1',
+    showTradeFilterBox: '1',
+    tradeLoadExtra: '1',
+    tradeLoadSteamData: '1',
+    hideFilteredTrades: '1',
+    showTradeDescriptions: '1',
+
+    hideDonatorTrades: '0',
+    hideNoTradeofferTrades: '0',
+    hideTradesPrivateProfile: '0',
+    maxVacBans: '0',
+    minSteamLevel: '0',
+    minAccAgeDays: '0',
+    minAlltimePlaytime: '0'
 };
 
 // defaultSettings get modified when changing settings?
