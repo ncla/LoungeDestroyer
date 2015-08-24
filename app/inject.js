@@ -580,10 +580,11 @@ function newFreezeReturn(tries) {
                 toHide[i].classList.remove('hidden');
         }
 
+        // The reason why this should never happen is because we cancel out this request from bet_bg.js
         $.ajax({
             url: 'ajax/postToReturn.php',
             success: function(data) {
-                if (data) { // this should never happen
+                if (data) {
                     console.error('Whoops, this shouldn\'t happen: ', data);
                     alert(data);
                 } else {
