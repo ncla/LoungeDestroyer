@@ -40,7 +40,7 @@ function restore_options() {
         });
 
         // display the keywords list
-        $("#hideTradesFilter, #markTradesFilter").each(function(){
+        $("#showTradesFilter, #hideTradesFilter, #hideTradesItemsHave, #hideTradesItemsWant").each(function(){
             parseAndDisplayKeywords.apply(this);
         });
 
@@ -85,15 +85,11 @@ function restore_options() {
 
         for (var theme in result.themes) {
             console.log("Creating theme " + theme);
-            theme_data_handler.call({
-                result: "{}",
-                obj: themes[theme],
-                themeName: theme
-            });
+            theme_create_element(theme, themes[theme], false);
         }
 
-        // Initialize slider cuz it does some epic fancy calculations based on the content
-        initSlider();
+        // We no longer initialize here because we need the slider to be visible to do some calculations because we bad
+        // initSlider();
 
         // Enable selectize
         // TODO: Readd .ld-settings class to inputs/selects so we dont have to manually whitelist here elements dont need Selectize
@@ -127,16 +123,23 @@ function restore_options() {
         defaultUser.restoreDefaults();
         document.location.reload();
     });
-
+    $("#refetchcsglvalues").click(function() {
+        var that = this;
+        that.disabled = true;
+        chrome.runtime.sendMessage({refetchCsglValues: true},
+            function(){
+                that.disabled = false;
+            });
+    });
     $("#offer-audio-play-btn").click(function(){
-        var url = this.parentNode.parentNode.querySelector("input[type='url']").value,
+        var url = $('#customTradeOfferSound').val(),
             a = new Audio(url);
         a.play();
     });
-    $("#hideTradesFilter, #markTradesFilter").on("change", function(){
+    $("#showTradesFilter, #hideTradesFilter, #hideTradesItemsHave, #hideTradesItemsWant").on("change", function(){
         var outp = parseAndDisplayKeywords.apply(this);
 
-        defaultUser.saveSetting(this.id+"Array", outp);
+        defaultUser.saveSetting(this.id + "Array", outp);
     });
 
     //// handles extracting and displaying keywords. Should be used as event handler for input
@@ -144,19 +147,19 @@ function restore_options() {
         var quoteRegexp = /(["'])((?:\\?.)*?)\1/g,
             input = this.value,
             keywords = [],
-            container = $(this).siblings("p").children(".keywordsContainer");
+            container = $(this).parent().find(".keywordsContainer");
 
         // get all text within quotes
         input = input.replace(quoteRegexp, function(m1,m2,m3){
             if (m3.length && keywords.indexOf(m3) === -1) {
-                keywords.push(m3.trim().toLowerCase()); // push the content (sans quotes) to keywords
+                keywords.push(m3.trim()); // push the content (sans quotes) to keywords
             }
             return ""; // remove from string
         });
         // get all words (separated by whitespace)
         input.replace(/[^\s]+/g, function(m1){
             if (m1.length && keywords.indexOf(m1) === -1) {
-                keywords.push(m1.trim().toLowerCase()); // push word to keywords
+                keywords.push(m1.trim()); // push word to keywords
             }
             return "";
         });
@@ -268,61 +271,6 @@ var themes = {},
     themeDirectory;
 
 /**
-* Called when data.json has been loaded for a theme
-* Must be called with this.result, this.obj and this.themeName set
-* this.result - plaintext JSON
-* this.obj - stored parsed JSON, or empty object
-* this.themeName - shortname of theme
-* Merges .obj and parsed JSON of data, and saves to window.themes
-*/
-function theme_data_handler(){
-    var data = this.result,
-        json = JSON.parse(data),
-        obj = this.obj,
-        name = this.themeName;
-
-    if (!json.bg) {
-        json.bg = obj.bg;
-    }
-    if (!json.icon) {
-        json.icon = obj.icon;
-    }
-
-    // overwrite settings with saved settings
-    if (json.options) {
-        for (var k in obj.options) {
-            if (json.options.hasOwnProperty(k)) {
-                json.options[k].checked = obj.options[k].checked;
-            } else {
-                delete obj.options[k];
-            }
-        }
-    }
-
-    // if JSON isn't empty, remove any key not found in JSON
-    if (Object.keys(json).length > 2) {
-        console.log("Removing keys from ",obj, " based on ",json);
-        for (var k in obj) {
-            if (!json.hasOwnProperty(k)) {
-                delete obj[k];
-            }
-        }
-    }
-
-    // merge obj and json
-    $.extend(true, obj, json);
-
-    if (!obj.title || !obj.bg || !obj.description || !obj.version) {
-        console.error("["+name+"] Invalid data.json - missing title, background, description or version");
-        return;
-    }
-
-    themes[name] = obj;
-    chrome.storage.local.set({themes: themes});
-    theme_create_element(name, obj);
-}
-
-/**
 * Creates the .item element that goes into the carousel for a theme
 * And appends this element to the carousel
 * @param string name - name of theme
@@ -368,8 +316,10 @@ function theme_create_element(name, obj, active) {
     // Add settings related shit
     if (obj.options || obj.custom) {
 
+        console.log('Have options/custom shit');
         // Looping through all theme settings and appending them
         if (obj.options) {
+            console.log('Theme has theme settings');
             for (var k in obj.options) {
                 var optionTemplate = $(item).find('.theme-settings.bundled .label-group.blank-template').clone();
 
@@ -391,6 +341,7 @@ function theme_create_element(name, obj, active) {
             $(item).find('.theme-settings.theme-edit').remove();
 
         } else {
+            console.log('theme does not have settings');
             $(item).find('.theme-settings.bundled').remove();
         }
 
@@ -404,116 +355,13 @@ function theme_create_element(name, obj, active) {
                 return;
             }
 
-            themes[theme].options[option].checked = this.checked;
-            chrome.storage.local.set({themes: themes});
+            chrome.runtime.sendMessage({changeThemeSetting: {
+                themeId: theme,
+                settingId: option,
+                settingValue: this.checked
+            }});
         });
 
-        // On theme remove button press
-
-
-
-        // On theme edit css button press
-        if(obj.custom) {
-            if(obj.cachedCSS) {
-                $(item).find('.css-edit textarea').val(obj.cachedCSS);
-            }
-
-            $(item).find('.theme-overlay .btn-save').click(function() {
-                var theme = $(item).attr("data-theme");
-                if (!theme || !themes.hasOwnProperty(theme)) {
-                    console.error("Can't edit CSS of a theme that doesn't exist");
-                    return;
-                }
-
-                var css = $(item).find('.css-edit textarea').val();
-                if (!css) {
-                    alert("Can't set theme CSS to be empty");
-                    return;
-                }
-
-                chrome.runtime.getBackgroundPage(function (bg) {
-                    var newCSS = bg.importantifyCSS(css);
-                    if (newCSS) {
-                        themes[theme].cachedCSS = newCSS;
-                        chrome.storage.local.set({themes: themes}, function (x) {
-                            chrome.runtime.sendMessage({setCurrentTheme: theme});
-                            alert("CSS has been successfully saved!");1
-                        });
-                    } else {
-                        alert("Failed to parse theme CSS!");
-                        console.error("Failed to parse CSS: ", {received: css, minimized: newCSS});
-                        return;
-                    }
-                });
-            });
-
-            $(item).find('.btn[data-theme-action="delete"]').click(function() {
-                var theme = $(item).attr("data-theme");
-                if (!theme || !themes.hasOwnProperty(theme)) {
-                    console.error("Can't delete a theme that doesn't exist");
-                    return;
-                }
-
-                $('#themes-slider li[data-theme="' + theme + '"]').remove();
-                //$('#themes-slider li[data-theme]:eq(0)').addClass('current');
-                initSlider();
-
-                throw Error('hue');
-
-                //$(".theme-modal-confirm-delete").modal("hide");
-                //var themeElm = document.querySelector("#themes-carousel .item[data-theme-name='" + theme + "']"),
-                //    nextThemeElm = themeElm.nextSibling || themeElm.parentNode.querySelector(".item:first-of-type");
-                //
-                //if (themeElm.classList.contains("current")) {
-                //    defaultUser.saveSetting("currentTheme", "");
-                //    document.querySelector(".cur-theme").value = "-none";
-                //}
-                //
-                //themeElm.parentNode.removeChild(themeElm);
-                //nextThemeElm.classList.add("active");
-
-                delete themes[theme];
-                chrome.storage.local.set({themes: themes});
-                chrome.runtime.sendMessage({setCurrentTheme: true});
-
-                //if (document.querySelectorAll("#themes-carousel .carousel-inner > div").length < 2) {
-                //    $("#themes-carousel .carousel-control").hide();
-                //}
-            });
-        }
-
-        //var tmpElm = document.createElement("div");
-        //tmpElm.className = "theme-option";
-        //tmpElm.innerHTML = optionsHTML;
-        //item.appendChild(tmpElm);
-        //
-        //if (obj.custom) {
-        //    tmpElm.innerHTML += "<div class='theme-btns-container'>"+
-        //    "<button class='btn btn-danger theme-remove' data-toggle='modal' data-target='.theme-modal-confirm-delete'>Delete theme</button>" +
-        //    ((!obj.remote) ? "<button class='btn btn-primary theme-edit-css' data-toggle='modal' data-target='.theme-modal-edit-css'>Edit theme CSS</button>" : "") +
-        //    "</div>";
-        //}
-        //
-        //// on option change, save
-        //$(tmpElm).find("input").on("change", function(){
-        //    var theme = this.getAttribute("data-theme"),
-        //        option = this.getAttribute("data-option");
-        //
-        //    if (!theme || !option) {
-        //        return;
-        //    }
-        //
-        //    themes[theme].options[option].checked = this.checked;
-        //    chrome.storage.local.set({themes: themes});
-        //});
-        //$(tmpElm).find(".theme-remove").on("click", function(){
-        //    document.querySelector(".theme-modal-confirm-delete .confirm").setAttribute("data-theme", name);
-        //});
-        //$(tmpElm).find(".theme-edit-css").on("click", function(){
-        //    document.querySelector(".theme-modal-edit-css .theme-css-owner").textContent = themes[name].title;
-        //    document.querySelector(".theme-modal-edit-css .theme-css-textarea").value = themes[name].cachedCSS || "";
-        //    document.querySelector(".theme-modal-edit-css .confirm").setAttribute("data-theme", name);
-        //});
     }
 
     $('.col-grid-3.theme-select').after(item);
@@ -524,9 +372,11 @@ function theme_create_element(name, obj, active) {
 
     // Select current active theme
     if (name === Settings.currentTheme) {
+        console.log('Theme', name, 'is active');
         $('#themes-slider li.current').removeClass('current');
 
         $(item).addClass('active');
+        themesSelect[0].selectize.setValue(name, true);
     }
 
     // On click, select theme
@@ -537,105 +387,7 @@ function theme_create_element(name, obj, active) {
     $(item).find('.btn.enabled').click(function() {
         select_theme(' ');
     });
-
-    //if (name === Settings.currentTheme) {
-    //    var act = document.querySelector("#themes-carousel .item.active");
-    //    if (act) {
-    //        act.classList.remove("active");
-    //    }
-    //
-    //    item.classList.add("active");
-    //
-    //    select_theme(name);
-    //}
-    //
-    //if (document.querySelectorAll("#themes-carousel .carousel-inner > div").length > 1) {
-    //    $("#themes-carousel .carousel-control").show();
-    //}
 }
-
-/**
-* Creates/saves a custom theme, based on given data
-* @param String name - folder/theme name
-* @param Object json - JSON to get data from, only containing description, author and version if local
-* @param String css - css to be injected on page load/URL to load from if remote
-* @param String bg - URL of the background image
-* @param String remoteUrl - if set, theme is considered remote (css is URL)
-* @param Function callback - callback to call with true or error string
-* @param Boolean active - whether slide should be active
-*/
-function create_theme(name, json, css, bg, callback, remoteUrl, icon, active) {
-    if (!callback) {
-        callback = error_proxy;
-    }
-
-    if (!name || !json || !css || (!bg && !json.bg)) {
-        console.error("Necesarry information not provided for create_theme on ",name);
-        callback("Necesarry information not provided.");
-        return;
-    }
-
-    var theme = {};
-    theme.custom = true;
-    theme.title = json.title || "Custom theme";
-    theme.author = json.author || "Unknown";
-    theme.version = json.version || "0.0.1";
-    theme.description = json.description || "Custom theme";
-    if (json.options) {
-        theme.options = json.options;
-    }
-    theme.bg = bg || json.bg;
-
-    if (remoteUrl) {
-        theme.remote = true;
-        theme.url = remoteUrl;
-
-        console.log("URL:",theme.url);
-
-        $.ajax({
-            type: "GET",
-            url: css+"?cachebreak="+Date.now(),
-            success: function(data, status) {
-                var css = data;
-                chrome.runtime.getBackgroundPage(function(bg){
-                    var newCSS = bg.importantifyCSS(css);
-                    if (newCSS) {
-                        theme.cachedCSS = newCSS;
-                        themes[name] = theme;
-                        theme_create_element(name, theme, active);
-                        chrome.storage.local.set({themes: themes}, function(x){
-                            callback(true);
-                        });
-                    } else {
-                        alert("Failed to parse theme CSS!");
-                        console.error("Failed to parse CSS: ",{received: css, minimized: newCSS});
-                        return;
-                    }
-                });
-            },
-            error: function(xhr, status, err) {
-                alert("Failed to load theme CSS!\r\nError:\r\n"+err);
-            }
-        });
-    } else {
-        chrome.runtime.getBackgroundPage(function(bg){
-            console.log("Added local theme ",name," : ",theme);
-            var newCSS = bg.importantifyCSS(css);
-            if (newCSS) {
-                theme.cachedCSS = newCSS;
-                themes[name] = theme;
-                theme_create_element(name, theme, active);
-                chrome.storage.local.set({themes: themes}, function(){
-                    callback(true);
-                });
-            } else {
-                alert("Failed to parse theme CSS!");
-                console.error("Failed to parse CSS: ",{received: css, minimized: newCSS});
-            }
-        });
-    }
-}
-
 
 /**
 * Set a specific theme to currently selected
@@ -643,30 +395,9 @@ function create_theme(name, json, css, bg, callback, remoteUrl, icon, active) {
 */
 function select_theme(name) {
     console.log('Selecting theme', name);
-    defaultUser.saveSetting("currentTheme", name);
 
     show_theme(name);
-
-    //var current = document.querySelector("#themes-carousel .item.current"),
-    //    active = document.querySelector("#themes-carousel .item.active"),
-    //    ownElm = document.querySelector("#themes-carousel .item[data-theme-name='"+name+"']");
-    //
-    //if (current) {
-    //    current.classList.remove("current");
-    //}
-    //
-    //if (name && ownElm) {
-    //    if (active) {
-    //        active.classList.remove("active");
-    //    }
-    //
-    //    ownElm.classList.add("current");
-    //    ownElm.classList.add("active");
-    //}
-    //
-    //document.querySelector(".cur-theme").value = name || "-none";
-    //
-    chrome.runtime.sendMessage({setCurrentTheme: true});
+    chrome.runtime.sendMessage({setCurrentTheme: name});
 }
 
 function show_theme(name) {
@@ -684,223 +415,15 @@ function show_theme(name) {
         $('#themes-slider li[data-theme]').removeClass('active');
     }
 
-    //var current = document.querySelector("#themes-carousel .item.current"),
-    //    active = document.querySelector("#themes-carousel .item.active"),
-    //    ownElm = document.querySelector("#themes-carousel .item[data-theme-name='"+name+"']");
-    //
-    //if (current) {
-    //    current.classList.remove("current");
-    //}
-    //
-    //if (name && ownElm) {
-    //    if (active) {
-    //        active.classList.remove("active");
-    //    }
-    //
-    //    ownElm.classList.add("current");
-    //    ownElm.classList.add("active");
-    //}
-
     // Can't select with $("#themes").val() >_<
     console.log(themesSelect);
     themesSelect[0].selectize.setValue(name, true);
-
-    //document.querySelector(".cur-theme").value = name || "-none";
-
 }
 
 themesSelectSelectize.on('change', function(value) {
     console.log('Dropdown selected', value);
     select_theme(value);
 });
-
-//document.querySelector("#themes").addEventListener("change", function(){
-//    console.log('Dropdown selected', this.value);
-//    var val = this.value;
-//    select_theme(val);
-//});
-
-//
-//
-//
-///**
-// * USER INPUT
-// */
-//
-///**
-// * Hook remote add theme button
-// */
-//document.querySelector("#add-theme-remote button[type='submit']").addEventListener("click", function(ev){
-//    ev.preventDefault();
-//
-//    var url = document.getElementById("add-theme-url").value;
-//    if (!url) {
-//        alert("Missing the following information: url");
-//        return;
-//    }
-//
-//    get(url, function(){
-//        if (this.status === 0) {
-//            alert("Failed to connect to the URL - please make sure it's spelled correctly");
-//            return;
-//        }
-//
-//        try {
-//            var data = this.responseText,
-//                json = JSON.parse(data),
-//                err = "";
-//            required = ["name", "title", "css", "bg"]
-//
-//            for (var i = 0; i < required.length; ++i) {
-//                if (!json[required[i]]) {
-//                    if (!err)
-//                        err = "The following information is missing from the JSON: ";
-//
-//                    err += required[i] + " ";
-//                }
-//            }
-//
-//            if (err) {
-//                alert(err);
-//                return;
-//            }
-//        } catch (err) {
-//            alert("JSON could not be parsed. Please make sure you're using the correct URL");
-//            return;
-//        }
-//
-//        if (themes.hasOwnProperty(json.name)) {
-//            alert("A theme with that name is already installed\r\nPlease uninstall "+themes[json.name].title+" before re-attempting.");
-//            return;
-//        }
-//
-//        create_theme(json.name, json, json.css, json.bg, function(val){
-//            if (val !== true)
-//                error_proxy.apply({}, arguments);
-//            else {
-//                select_theme(json.name);
-//                chrome.runtime.sendMessage({updateThemes: true});
-//            }
-//        }, url, json.icon, true);
-//    });
-//});
-//
-///**
-// * Hook local add theme button
-// */
-//document.querySelector("#add-theme-local button[type='submit']").addEventListener("click", function(ev){
-//    ev.preventDefault();
-//
-//    var form = document.getElementById("add-theme-local"),
-//        title = document.getElementById("add-theme-title").value,
-//        description = document.getElementById("add-theme-description").value,
-//        bg = document.getElementById("add-theme-bg").value,
-//        author = document.getElementById("add-theme-author").value,
-//        version = document.getElementById("add-theme-version").value,
-//        css = document.getElementById("add-theme-css").value,
-//        name = "custom_",
-//        err = "",
-//        vals = [title, bg, author, version, css],
-//        names = ["title", "background", "author", "version", "css"];
-//
-//    for (var i = 0; i < vals.length; ++i) {
-//        if (!vals[i]) {
-//            if (!err) {
-//                err = "We're missing the following information: ";
-//            }
-//
-//            err += names[i] + " ";
-//        }
-//    }
-//    if (err) {
-//        alert(err);
-//        return;
-//    }
-//
-//    var i = 0;
-//    while (themes.hasOwnProperty(name+i)) { ++i }
-//    name += i;
-//
-//    create_theme(name, {
-//        title: title,
-//        description: description,
-//        version: version,
-//        author: author
-//    }, css, bg, function(val){
-//        if (val !== true) {
-//            error_proxy.apply({}, arguments);
-//        } else {
-//            select_theme(name);
-//        }
-//    }, false, undefined, true);
-//});
-//
-///**
-// * Hook theme delete confirm button
-// */
-//document.querySelector(".theme-modal-confirm-delete .confirm").addEventListener("click", function(){
-//    var theme = this.getAttribute("data-theme");
-//    if (!theme || !themes.hasOwnProperty(theme)) {
-//        console.error("Can't delete a theme that doesn't exist");
-//        return;
-//    }
-//
-//    $(".theme-modal-confirm-delete").modal("hide");
-//    var themeElm = document.querySelector("#themes-carousel .item[data-theme-name='"+theme+"']"),
-//        nextThemeElm = themeElm.nextSibling || themeElm.parentNode.querySelector(".item:first-of-type");
-//
-//    if (themeElm.classList.contains("current")) {
-//        defaultUser.saveSetting("currentTheme", "");
-//        document.querySelector(".cur-theme").value = "-none";
-//    }
-//
-//    themeElm.parentNode.removeChild(themeElm);
-//    nextThemeElm.classList.add("active");
-//
-//    delete themes[theme];
-//    chrome.storage.local.set({themes: themes});
-//    chrome.runtime.sendMessage({setCurrentTheme: true});
-//
-//    if (document.querySelectorAll("#themes-carousel .carousel-inner > div").length < 2) {
-//        $("#themes-carousel .carousel-control").hide();
-//    }
-//});
-//
-///**
-// * Hook edit CSS confirm button
-// */
-//document.querySelector(".theme-modal-edit-css .confirm").addEventListener("click", function(){
-//    var theme = this.getAttribute("data-theme");
-//    if (!theme || !themes.hasOwnProperty(theme)) {
-//        console.error("Can't edit CSS of a theme that doesn't exist");
-//        return;
-//    }
-//
-//    var css = document.querySelector(".theme-modal-edit-css .theme-css-textarea").value;
-//    if (!css) {
-//        alert("Can't set theme CSS to be empty");
-//        return;
-//    }
-//
-//    chrome.runtime.getBackgroundPage(function(bg){
-//        var newCSS = bg.importantifyCSS(css);
-//        if (newCSS) {
-//            themes[theme].cachedCSS = newCSS;
-//            chrome.storage.local.set({themes: themes}, function(x){
-//                chrome.runtime.sendMessage({setCurrentTheme: theme});
-//                $(".theme-modal-edit-css").modal("hide");
-//            });
-//        } else {
-//            alert("Failed to parse theme CSS!");
-//            console.error("Failed to parse CSS: ",{received: css, minimized: newCSS});
-//            return;
-//        }
-//    });
-//});
-//
-///**
-// * Hook the "current theme" dropdown
-// */
 
 /**
 * Native code can't be passed as callbacks

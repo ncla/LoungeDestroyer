@@ -3,6 +3,7 @@
 @import selectize.scss
 @import mixins.scss
 @import modal.scss
+@import preloader.scss
 
 $main-orange: #e79403
 $main-width: 980px
@@ -335,6 +336,7 @@ main
 	+clearfix
 
 section
+	padding-top: 100px
 	transition: margin-top 0.2s
 	+clearfix
 
@@ -483,6 +485,7 @@ $btnGrayActive: darken($btnGray,7%)
 
 	> li
 		margin-right: 7px
+		margin-bottom: 5px
 		float: left
 
 		&:last-child
@@ -507,6 +510,9 @@ form
 			bottom: 4.5px
 			z-index: 10
 			right: 0
+
+div.form-inline
+	@extend form.form-inline // Might want to re-do this
 
 input[type="text"],
 input[type="number"],
@@ -865,8 +871,6 @@ $error-color: #d32f2f
 $slider-height: 551px
 
 #page-themes
-	margin-top: 5px
-
 	.card
 		.group[class*="col-"]
 			padding: 0
@@ -1147,6 +1151,18 @@ $slider-height: 551px
 			display: block
 			text-align: center
 
+#themes-slider li[data-theme]
+	.btn.enabled
+		display: none
+	.btn.enable-this-theme
+		display: inline-block
+
+#themes-slider li[data-theme].active
+	.btn.enabled
+		display: inline-block
+	.btn.enable-this-theme
+		display: none
+
 .theme-desc
 	border-bottom: 1px solid #eeeeee
 	padding: 10px 15px
@@ -1195,6 +1211,59 @@ $slider-height: 551px
 // # Footer
 // #
 
+#page-donate
+	.card:nth-child(2)
+		min-height: 500px
+	table
+		width: 100%
+		margin-top: 20px
+
+		//border-collapse: separate
+		//border-spacing: 5em
+
+		thead
+			font-size: 12px
+			color: #363636
+
+		tbody
+			font-size: 13px
+			color: #575757
+
+		tr
+			height: 35px
+			line-height: 35px
+			border-bottom: 1px solid #e4e4e4
+
+		tbody tr:hover
+			background-color: #EEEEEE
+
+		thead tr:first-child
+			border-bottom: 2px solid #e4e4e4
+
+		thead tr th:first-child
+			width: 50px
+
+		tbody tr:last-child
+			border-bottom: 0
+
+		tr th, tr td
+			text-align: right
+			padding: 0 10px
+
+		thead tr th:nth-child(2), tbody tr td:nth-child(2)
+			text-align: left
+
+		//thead th:nth-child(2), tbody tr:nth-child(1)
+		//	text-align: left
+
+#page-settings .keywordsContainer
+	.keyword
+		display: inline-block
+		background: #eaeaea
+		padding: 3px 6px
+		border-radius: 5px
+		margin: 1px
+
 footer[role="contentinfo"]
 	padding-bottom: 17px
 	font-size: 14px
@@ -1212,3 +1281,4 @@ footer[role="contentinfo"]
 
 	a
 		color: #595959
+

@@ -6,7 +6,9 @@
   "directories": {
     "test": "tests"
   },
-  "dependencies": {},
+  "dependencies": {
+    "marked": "^0.3.5"
+  },
   "devDependencies": {
     "gulp": "^3.9.0",
     "gulp-filter": "^3.0.0",

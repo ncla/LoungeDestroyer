@@ -16,8 +16,9 @@
             "app/helpers.js",
             "app/user.js",
             "app/match.js",
-            "app/bg/bet_bg.js",
-            "app/bg/background.js"
+            "app/bg/bet.js",
+            "app/bg/background.js",
+            "app/bg/themes.js"
         ],
         "persistent": true
     },
@@ -26,7 +27,7 @@
         "default_title": "LoungeDestroyer settings",
         "default_popup": "popup/popup.html"
     },
-    "options_page": "settings/options.html",
+    "options_page": "settings_v2/index.html",
     "permissions": [
         "notifications",
         "*://csgolounge.com/*",

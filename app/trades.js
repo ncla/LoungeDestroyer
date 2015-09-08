@@ -151,8 +151,9 @@ Trade.prototype.fetchExtraData = function(callback) {
 };
 
 Trade.prototype.getExtraSteamData = function(profileId, callback) {
+    console.log((window.location.protocol + '//steamcommunity.com/profiles/' + profileId + '?xml=1'));
     $.ajax({
-        url: 'http://steamcommunity.com/profiles/' + profileId + '?xml=1',
+        url: (window.location.protocol + '//steamcommunity.com/profiles/' + profileId + '?xml=1'),
         type: 'GET',
         success: function(data) {
             //console.log(data);
@@ -357,8 +358,7 @@ Trade.prototype.generateTradeURL = function(appID) {
     if(!this.tradeID) {
         return;
     }
-
-    return 'http://' + (appID == '730' ? 'csgolounge.com' : 'dota2lounge.com') + '/trade?t=' + this.tradeID;
+    return window.location.protocol + '//' + (appID == '730' ? 'csgolounge.com' : 'dota2lounge.com') + '/trade?t=' + this.tradeID;
 };
 
 Trade.prototype.getTradeDescriptionFromHTML = function() {
@@ -378,7 +378,7 @@ function tradeObject(domObj) {
 function updateFilteredCount() {
     tradesFiltered++;
     if(LoungeUser.userSettings.showTradeFilterBox === '1') {
-        $('span.ld-filtered-amount').text(tradesFiltered + (tradesFiltered === 1 ? ' trade' : ' trades'));
+        $('span.ld-filtered-amount').text(tradesFiltered + (tradesFiltered === 1 ? ' trade was' : ' trades were'));
     }
 }
 

@@ -22,6 +22,9 @@ navAnchor.each( function() {
 		parent.not('.logo').addClass('active');
 });
 
+var changelogRequested = false;
+var patreonsRequested = false;
+
 // -----------------------------------------
 // Page switcher
 // -----------------------------------------
@@ -52,6 +55,88 @@ navAnchor.click( function(e) {
 			// Removing class 'group-error' on page switch
 			$('div.group-error').removeClass('group-error');
 		}
+	}
+
+	if(page === 'page-changelog') {
+		var $changelog = $('#page-changelog .pad-full');
+		var $changelogContent = $('#changelog-content');
+
+		if(!changelogRequested) {
+			$('.preloader.loading', $changelog).show();
+			$.ajax('https://api.github.com/repos/ncla/LoungeDestroyer/releases?per_page=15', {
+				type: 'GET',
+				success: function(data) {
+					console.log(data);
+					$.each(data, function(i, release) {
+						//console.log(release);
+						//console.log(release.body);
+						console.log(marked(release.body));
+						//<h3>v0.8.2.2
+						//<small>released on april 31st, 2015</small>
+						//</h3>
+						var releaseVersion = release.tag_name;
+						var releaseDate = moment(release.published_at).format('MMMM Do, YYYY').toLowerCase();
+						console.log(releaseDate);
+						$changelogContent.append('<h3>' + releaseVersion + ' <small>released on ' + releaseDate + '</small></h3>');
+						$changelogContent.append(marked(release.body));
+						$changelogContent.append('<br class="margin"/>');
+					});
+					$changelogContent.find('ul').addClass('list');
+					changelogRequested = true;
+					$('.preloader.loading', $changelog).fadeOut(function() {
+						$changelogContent.fadeIn();
+					});
+				},
+				error: function(jqXHR) {
+					$('.preloader.loading', $changelog).fadeOut(function() {
+						$changelogContent.fadeIn();
+					});
+					$changelogContent.append('<p>Failed to load changelog.. :(</p>');
+					changelogRequested = true;
+				}
+			});
+		}
+	}
+
+	if(page === 'page-donate') {
+		if(!patreonsRequested) {
+			$('#page-donate .preloader.loading').show();
+			$.ajax('http://api.ncla.me/destroyer/patreonlist', {
+				type: 'GET',
+				success: function(data) {
+					if(data.length) {
+						//$('.patreon-list').removeClass('hidden');
+						var placeHolder = $('.patreon-list .placeholder');
+						$.each(data, function(i, v) {
+							var newRow = $(placeHolder).clone().removeClass('hidden');
+							$(newRow).find('th:eq(0)').text(i + 1);
+							$(newRow).find('td:eq(0)').text(v.name);
+							$(newRow).find('td:eq(1)').text('$' + v.amount);
+							$('.patreon-list tbody').append($(newRow));
+						})
+					} else {
+						$('.no-patreons').removeClass('hidden');
+					}
+
+					$('.preloader.loading', $changelog).fadeOut(function() {
+						setTimeout(function() {
+							$('#page-donate .patreon-list').fadeIn();
+						}, 1000);
+					});
+
+					patreonsRequested = true;
+				},
+				error: function(jqXHR) {
+					$('.not-loaded-patreons').removeClass('hidden');
+					patreonsRequested = true;
+				}
+			});
+		}
+
+	}
+
+	if(page === 'page-themes') {
+		initSlider();
 	}
 });
 
@@ -230,8 +315,9 @@ $("input[data-validation]")
 	})
 	// or when they lose focus
 	.blur( function(){
+		var self = this;
 		clearTimeout(self.validateTimer);
-		validateInput(self,  function(){}, true);
+		validateInput($(self),  function(){}, true);
 	}
 );
  

@@ -1,37 +1,9 @@
 var LoungeUser = new User();
 var currencyFallback = {'USDAUD':1.1503, 'USDCAD': 1.1359, 'USDEUR': 0.8006, 'USDGBP': 0.6256, 'USDRUB': 43.59, 'USDUSD': 1};
-var themes = {};
-var themeCSS = '';
 
 LoungeUser.loadUserSettings(function() {
     console.log('Settings for background.js have loaded!');
     bet.autoDelay = parseInt(LoungeUser.userSettings.autoDelay) * 1000 || 5000;
-
-    chrome.storage.local.get('themes', function(result) {
-        themes = result.themes || {};
-        if (LoungeUser.userSettings.currentTheme) {
-            var name = LoungeUser.userSettings.currentTheme;
-            if (themes.hasOwnProperty(name)) {
-                themeCSS = themes[name].cachedCSS || '';
-            }
-        }
-
-        // if we don't have any themes
-        if (!Object.keys(themes).length) {
-            console.log('Resetting to bundled themes!');
-
-            // add bundled themes
-            themes = {
-                cleanlounge: {
-                    url: 'http://api.ncla.me/themes/CleanLounge/data.json',
-                    remote: true
-                }
-            };
-            chrome.storage.local.set({themes: themes}, function() {
-                updateThemes()
-            });
-        }
-    });
 });
 
 var lastTimeUserVisited = null;
@@ -67,44 +39,6 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
 
     if (request.hasOwnProperty('giveMeBackpackURL')) {
         sendResponse(lastBackpackAjaxURL);
-    }
-
-    // Inject CSS file to specific tab
-    if (request.hasOwnProperty('injectCSS')) {
-        console.log('Injecting CSS (' + request.injectCSS + ') into tab ' + sender.tab.id);
-        chrome.tabs.insertCSS(sender.tab.id, {file: request.injectCSS, runAt: 'document_start'}, function(x) {
-            console.log(x)
-        });
-    }
-
-    // Inject CSS code to specific tab
-    if (request.hasOwnProperty('injectCSSCode')) {
-        // put !important on *everything* because Chrome is fucking retarded
-        console.log('Injected CSS code into tab ' + sender.tab.id);
-        chrome.tabs.insertCSS(sender.tab.id, {
-            code: importantifyCSS(request.injectCSSCode),
-            runAt: 'document_start'
-        }, function(x) {
-            console.log(x)
-        });
-    }
-
-    // Inject theme CSS (in bg for speed purposes)
-    if (request.hasOwnProperty('injectCSSTheme')) {
-        (function loop(id, tries) {
-            if (tries > 200) {
-                return;
-            }
-
-            chrome.tabs.insertCSS(id, {code: themeCSS, runAt: 'document_start'}, function(x) {
-                // retry if it's called before tab exists (dah fuck chrome?)
-                var e = chrome.runtime.lastError;
-                if (e) {
-                    console.error('Error while inserting theme CSS: ', e);
-                    setTimeout(loop.bind(this, id, tries + 1), 5);
-                }
-            });
-        })(sender.tab.id, 0);
     }
 
     // Open new tab if none exists
@@ -171,31 +105,6 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
 
             window[v] = newVar;
         }
-    }
-
-    if (request.hasOwnProperty('updateThemes')) {
-        updateThemes(sendResponse);
-        if (sendResponse) {
-            return true;
-        }
-    }
-
-    if (request.hasOwnProperty('setCurrentTheme')) {
-        var newCurTheme = request.setCurrentTheme;
-        if (typeof newCurTheme !== 'string') {
-            newCurTheme = LoungeUser.userSettings.currentTheme;
-        }
-
-        console.log('Setting current theme to ', newCurTheme);
-
-        chrome.storage.local.get('themes', function(result) {
-            themes = result.themes || {};
-            if (newCurTheme && themes.hasOwnProperty(newCurTheme)) {
-                themeCSS = themes[newCurTheme].cachedCSS || '';
-            } else {
-                themeCSS = '';
-            }
-        });
     }
 
     if (request.hasOwnProperty('refetchMarketPriceList')) {
@@ -360,18 +269,6 @@ chrome.webRequest.onBeforeRequest.addListener(function requestListener(details) 
     {
         urls: ['*://csgolounge.com/audio/*', '*://dota2lounge.com/audio/*'],
         types: ['other']
-    },
-    ['blocking']
-);
-
-chrome.webRequest.onBeforeRequest.addListener(function(details) {
-        if(LoungeUser.userSettings.disableStylesheetLoading === '1') {
-            return {cancel: true}
-        }
-    },
-    {
-        urls: ['*://csgolounge.com/css/*', '*://dota2lounge.com/css/*'],
-        types: ['stylesheet']
     },
     ['blocking']
 );
@@ -810,9 +707,10 @@ chrome.alarms.onAlarm.addListener(function(alarm) {
         }
     }
 
-    if (alarm.name == 'remoteThemesUpdate') {
-        updateThemes();
-    }
+    //if (alarm.name == 'remoteThemesUpdate') {
+    //    //updateThemes();
+    //    themes.updateThemes();
+    //}
 
     if (alarm.name == 'autoBump') {
         if (['1', '730', '570'].indexOf(LoungeUser.userSettings.autoBump) !== -1) {
@@ -826,130 +724,6 @@ chrome.alarms.onAlarm.addListener(function(alarm) {
         }
     }
 });
-
-function updateThemes(callback) {
-    console.log('Updating themes!');
-    chrome.storage.local.get('themes', function(result) {
-        var themes = result.themes;
-        for (var theme in themes) {
-            if (themes[theme].remote) {
-                console.log('Updating theme ' + theme);
-
-                // get JSON
-                var url = themes[theme].url + '?cachebreak=' + Date.now();
-                if (!url) {
-                    continue;
-                }
-
-                get(url, (function(theme) {
-                    return function() {
-                        try {
-                            var data = this.responseText;
-                            var json = JSON.parse(data);
-                            var err = '';
-                            required = ['name', 'title', 'author', 'version', 'css', 'bg']
-
-                            for (var i = 0; i < required.length; ++i) {
-                                if (!json[required[i]]) {
-                                    if (!err) {
-                                        err = 'The following information is missing from the JSON: ';
-                                    }
-
-                                    err += required[i] + ' ';
-                                }
-                            }
-
-                            if (err) {
-                                console.error(err);
-                                return;
-                            }
-
-                            if (themes[theme].version == json.version) {
-                                console.log('Version hasn\'t changed, no need to update');
-                                return;
-                            }
-
-                            console.log('Everything looks good');
-
-                            // merge new JSON into old, keeping options
-                            if (json.options) {
-                                for (var k in themes[theme].options) {
-                                    if (json.options.hasOwnProperty(k)) {
-                                        json.options[k].checked = themes[theme].options[k].checked;
-                                    } else {
-                                        delete themes[theme].options[k];
-                                    }
-                                }
-                            }
-
-                            // merge obj and json
-                            $.extend(true, themes[theme], json);
-                            chrome.storage.local.set({themes: themes});
-                        } catch (err) {
-                            console.error('[' + theme + '] Failed to update: ', err);
-                        }
-
-                        // cache CSS so we can inject instantly
-                        get(themes[theme].css + '?cachebreak=' + Date.now(), function() {
-                            if (!this.status) {
-                                console.error('[' + theme + '] Failed to retrieve CSS');
-                                return;
-                            }
-
-                            var css = importantifyCSS(this.responseText);
-                            if (css) {
-                                if (theme === LoungeUser.userSettings.currentTheme) {
-                                    themeCSS = css;
-                                }
-
-                                themes[theme].cachedCSS = css;
-                                chrome.storage.local.set({themes: themes});
-                            }
-                        });
-                    }
-                })(theme));
-            }
-        }
-
-        if (callback) {
-            // fake a delay so users don't get worried, yo
-            setTimeout(callback, 750);
-        }
-    });
-}
-
-function importantifyCSS(css) {
-    if (css) {
-        try {
-            var cssTree = parseCSS(css);
-            var rules = cssTree.stylesheet.rules;
-
-            for (var i = 0; i < rules.length; ++i) {
-                var rule = rules[i];
-                var decls = rule.declarations;
-
-                if (!decls) {
-                    continue;
-                }
-
-                for (var l = 0; l < decls.length; ++l) {
-                    if (!decls[l].value) {
-                        continue;
-                    }
-
-                    decls[l].value = decls[l].value.replace('!important', '').trim() + ' !important';
-                }
-            }
-
-            css = stringifyCSS(cssTree, {compress: true});
-        } catch (err) {
-            console.error('Tried to parse CSS, failed: ', err);
-            return '';
-        }
-    }
-
-    return css;
-}
 
 /*
  Fired when the extension is first installed, when the extension is updated to a new version, and when Chrome is updated to a new version.
@@ -985,5 +759,6 @@ chrome.runtime.onInstalled.addListener(function(details) {
     if(LoungeUser.userSettings.useCachedPriceList === '1') {
         updateMarketPriceList();
     }
-    updateThemes();
+    //updateThemes();
+    //themes.updateThemes();
 });

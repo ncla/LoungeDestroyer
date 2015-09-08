@@ -319,7 +319,7 @@ function init() {
                         //'<button class="buttonright">Hide this</button>' +
                     '<a href="#" class="buttonright" id="changefilters">Change filters</a>' +
                     '<button class="buttonright" id="showtrades">Show trades</button></div>' +
-                    '<div class="ld-trade-filters-info"><span class="ld-filtered-amount">0 trades</span> were filtered <br>by your <a href="#"><b>trade settings</b></a>' +
+                    '<div class="ld-trade-filters-info"><span class="ld-filtered-amount">0 trades were</span> filtered <br>by your <a href="#"><b>trade settings</b></a>' +
                     '</div> </div>');
 
                 $('.ld-trade-filters #changefilters, .ld-trade-filters .ld-trade-filters-info a').click(function() {
@@ -580,7 +580,7 @@ function newFreezeReturn(tries) {
                 toHide[i].classList.remove('hidden');
         }
 
-        // The reason why this should never happen is because we cancel out this request from bet_bg.js
+        // The reason why this should never happen is because we cancel out this request from bg/bet.js
         $.ajax({
             url: 'ajax/postToReturn.php',
             success: function(data) {

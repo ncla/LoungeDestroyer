@@ -7,7 +7,7 @@ With this project I want MVC and OOP feel in the application. Trades, bets, queu
 
 `app/css/` is for application stylesheets, and not 3rd party stylesheets.
 Use `lib/` for 3rd party library stuff.
-`app/bg/` is for applications background tasks. `background.js` is for most of the background task stuff, `bet_bg.js` is for auto-betting/returning stuff which is maintained by @birjolaxew.
+`app/bg/` is for applications background tasks. `background.js` is for most of the background task stuff, `bet.js` is for auto-betting/returning stuff which is maintained by @birjolaxew.
 
 If a method does not fit in a specific class, you can just create a static new function in the same file.
 
