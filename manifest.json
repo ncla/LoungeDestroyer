@@ -90,5 +90,6 @@
                 "app/pricecheck.js"
             ]
         }
-    ]
+    ],
+    "web_accessible_resources": ["icons/32x32.png"]
 }
