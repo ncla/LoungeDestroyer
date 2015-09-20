@@ -40,7 +40,7 @@ function restore_options() {
         });
 
         // display the keywords list
-        $("#showTradesFilter, #hideTradesFilter, #hideTradesItemsHave, #hideTradesItemsWant").each(function(){
+        $("#showTradesFilter, #hideTradesFilter, #hideTradesItemsHave, #hideTradesItemsWant, #matchTeamFilters, #matchTournamentFilters").each(function(){
             parseAndDisplayKeywords.apply(this);
         });
 
@@ -136,7 +136,7 @@ function restore_options() {
             a = new Audio(url);
         a.play();
     });
-    $("#showTradesFilter, #hideTradesFilter, #hideTradesItemsHave, #hideTradesItemsWant").on("change", function(){
+    $("#showTradesFilter, #hideTradesFilter, #hideTradesItemsHave, #hideTradesItemsWant, #matchTeamFilters, #matchTournamentFilters").on("change", function(){
         var outp = parseAndDisplayKeywords.apply(this);
 
         defaultUser.saveSetting(this.id + "Array", outp);
@@ -260,6 +260,16 @@ $("select, input").on('change', function() {
                 return;
             }
         }
+    }
+
+    if($(this).attr('id') == 'bettingValuesCsgo' && $(this).val() == '1') {
+        console.log('Fetching betting values for CS:GO Lounge now');
+        chrome.runtime.sendMessage({refetchCsglValues: true}, function() {});
+    }
+
+    if($(this).attr('id') == 'useCachedPriceList' && $(this).val() == '1') {
+        console.log('Fetching market price list');
+        chrome.runtime.sendMessage({refetchMarketPriceList: true}, function() {});
     }
 
     // save setting

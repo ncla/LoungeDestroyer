@@ -316,19 +316,12 @@ function init() {
             if(LoungeUser.userSettings.showTradeFilterBox === '1') {
                 $('div.title:eq(0)').after('<div class="ld-trade-filters">' +
                     '<div class="ld-trade-filters-buttons">' +
-                        //'<button class="buttonright">Hide this</button>' +
-                    '<a href="#" class="buttonright" id="changefilters">Change filters</a>' +
-                    '<button class="buttonright" id="showtrades">Show trades</button></div>' +
+                    '<a href="#" class="buttonright ld-changefilters">Change filters</a>' +
+                    '<a href="#" class="buttonright ld-trades-show">Show trades</a></div>' +
                     '<div class="ld-trade-filters-info"><span class="ld-filtered-amount">0 trades were</span> filtered <br>by your <a href="#"><b>trade settings</b></a>' +
                     '</div> </div>');
 
-                $('.ld-trade-filters #changefilters, .ld-trade-filters .ld-trade-filters-info a').click(function() {
-                    chrome.runtime.sendMessage({openSettings: true}, function(data) {
-                        console.log('Message sent for opening settings page');
-                    });
-                });
-
-                $('.ld-trade-filters #showtrades').click(function() {
+                $('.ld-trade-filters .ld-trades-show').click(function() {
                     $('.tradepoll').each(function(index, value) {
                         var trade = tradeObject(value);
                         $(trade.tradeElement).show();
@@ -349,6 +342,28 @@ function init() {
             });
 
         }
+
+        if (isHomepage && LoungeUser.userSettings.showMatchFilterBox === '1') {
+            $('div.title:eq(1)').after('<div class="ld-match-filters">' +
+                '<div class="ld-match-filters-buttons">' +
+                '<a href="#" class="buttonright ld-changefilters">Change filters</a>' +
+                '<a href="#" class="buttonright ld-matches-show">Show matches</a></div>' +
+                '<div class="ld-match-filters-info"><span class="ld-filtered-amount">0 matches were</span> filtered <br>by your <a href="#"><b>match settings</b></a>' +
+                '</div> </div>');
+        }
+
+        $('.ld-trade-filters .ld-changefilters, .ld-trade-filters-info a, .ld-match-filters .ld-changefilters, .ld-match-filters-info a').click(function() {
+            chrome.runtime.sendMessage({openSettings: true}, function(data) {
+                console.log('Message sent for opening settings page');
+            });
+        });
+
+        $('.ld-match-filters .ld-matches-show').click(function() {
+            $('.matchmain').each(function(i, v) {
+                var match = matchObject(v);
+                $(v).show();
+            });
+        });
 
         if (document.URL.indexOf('/match?m=') != -1 || document.URL.indexOf('/predict') != -1) {
             $betBtn = $('#placebut');
@@ -496,8 +511,9 @@ function init() {
 
         if (LoungeUser.userSettings.showExtraMatchInfo === '2') {
             $('.matchmain').each(function(i, v) {
-                if (!$(v).find('.notavailable').length) {
-                    loadExtraMatchInfo(v);
+                var match = matchObject(v);
+                if(!match.closedMatch && !match.matchIsFiltered && isScrolledIntoView(v)) {
+                    match.loadExtraMatchInfo();
                 }
             });
         }
@@ -664,7 +680,8 @@ $(document).on('click', 'a.refreshPriceMarket', function(e) {
 
 $(document).on('mouseover', '.matchmain', function() {
     if (LoungeUser.userSettings.showExtraMatchInfo != '0') {
-        loadExtraMatchInfo(this);
+        var match = matchObject(this);
+        match.loadExtraMatchInfo();
     }
 });
 
@@ -677,12 +694,24 @@ $(document).on('mouseover', '.tradepoll:not(.notavailable)', function() {
 
 $(window).scrolled(function() {
     console.log('Scrolled');
-    $('.tradepoll:not(.notavailable)').each(function(index, value) {
-        if(isScrolledIntoView(value) && ['1', '2'].indexOf(LoungeUser.userSettings.tradeLoadExtra) !== -1) {
-            var trade = tradeObject(value);
-            trade.fetchExtraData(function(){});
-        }
-    });
+
+    if(['1', '2'].indexOf(LoungeUser.userSettings.tradeLoadExtra) !== -1) {
+        $('.tradepoll:not(.notavailable)').each(function(index, value) {
+            if(isScrolledIntoView(value)) {
+                var trade = tradeObject(value);
+                trade.fetchExtraData(function(){});
+            }
+        });
+    }
+
+    if(LoungeUser.userSettings.showExtraMatchInfo === '2') {
+        $('.matchmain').each(function(i, v) {
+            var match = matchObject(v);
+            if(!match.closedMatch && !match.matchIsFiltered && isScrolledIntoView(v)) {
+                match.loadExtraMatchInfo();
+            }
+        });
+    }
 });
 
 // auto-magically add market prices to newly added items, currently only for trade list

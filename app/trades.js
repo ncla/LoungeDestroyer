@@ -331,14 +331,10 @@ Trade.prototype.filterBySteamData = function() {
 
 Trade.prototype.hide = function() {
     console.log('Hiding', this.tradeID);
-
-    if(LoungeUser.userSettings.hideFilteredTrades === '1') {
-        $(this.tradeElement).fadeOut();
-    }
-
+    $(this.tradeElement).fadeOut();
     $(this.tradeElement).addClass('ld-filtered');
     this.tradeIsFiltered = true;
-    updateFilteredCount();
+    updateFilteredTradeCount();
 
     return true;
 };
@@ -375,10 +371,10 @@ function tradeObject(domObj) {
     return $trade.data('trade-data');
 }
 
-function updateFilteredCount() {
+function updateFilteredTradeCount() {
     tradesFiltered++;
     if(LoungeUser.userSettings.showTradeFilterBox === '1') {
-        $('span.ld-filtered-amount').text(tradesFiltered + (tradesFiltered === 1 ? ' trade was' : ' trades were'));
+        $('.ld-trade-filters span.ld-filtered-amount').text(tradesFiltered + (tradesFiltered === 1 ? ' trade was' : ' trades were'));
     }
 }
 

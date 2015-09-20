@@ -399,11 +399,11 @@ http://codepen.io/larrygeams/pen/nhgze
     font-size: 10px;
     cursor: help;
 }
-.tradepoll.ld-filtered {
+.tradepoll.ld-filtered, .matchmain.ld-filtered {
     opacity: 0.65;
     transition: opacity 0.3s ease-in-out;
 }
-.tradepoll.ld-filtered:hover {
+.tradepoll.ld-filtered:hover, .matchmain.ld-filtered:hover {
     opacity: 1;
 }
 .tradepoll.ld-filtered .ld-steam-extra {
@@ -546,7 +546,7 @@ http://codepen.io/larrygeams/pen/nhgze
 }
 /* END Steam profile container fade/slide effect */
 
-.ld-trade-filters {
+.ld-trade-filters, .ld-match-filters {
     display: block;
     margin: 50px 9px -35px 9px;
     height: 45px;
@@ -557,7 +557,7 @@ http://codepen.io/larrygeams/pen/nhgze
     box-sizing: border-box;
 }
 
-.ld-trade-filters:before {
+.ld-trade-filters:before, .ld-match-filters:before {
     content: "";
     display: inline-block;
     width: 16px;
@@ -567,33 +567,37 @@ http://codepen.io/larrygeams/pen/nhgze
     background: url(http://i.imgur.com/jaryKUa.png) no-repeat;
 }
 
-.ld-trade-filters:after {
+.ld-trade-filters:after, .ld-match-filters:after {
     content: "";
     display: table;
     clear: both;
 }
 
-.ld-trade-filters a:not(.buttonright):hover {
+.ld-trade-filters a:not(.buttonright):hover, .ld-match-filters a:not(.buttonright):hover {
     text-decoration: underline;
 }
 
-.ld-trade-filters-info {
+.ld-trade-filters-info, .ld-match-filters-info {
     float: left;
     margin-top: -4px;
     font-size: 12px;
 }
 
-.ld-trade-filters-buttons {
+.ld-trade-filters-buttons, .ld-match-filters-buttons {
     float: right;
     margin: calc(-0.4em - 3px) -0.4em -0.4em -0.4em;
     display: inline-block;
 }
 @media all and (min-width: 1300px) {
-    .ld-trade-filters .ld-trade-filters-info {
+    .ld-trade-filters .ld-trade-filters-info, .ld-match-filters .ld-match-filters-info {
         margin: 0;
     }
 
-    .ld-trade-filters br {
+    .ld-trade-filters br, .ld-match-filters br {
         display: none;
     }
+}
+
+.ld-valueForOne {
+    font-size: 11px;
 }

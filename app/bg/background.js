@@ -351,7 +351,7 @@ function checkNewMatches(ajaxResponse, appID) {
         if (newMatchesCount <= 3) {
             $.each(matchesToNotificate, function(index, value) {
                 var msg = (value.teamA.length > 0) ?
-                    (value.teamA + ' vs. ' + value.teamB + ' @ ' + value.tournamentName + (value.bestOf ? ', ' + value.bestOf : '') + '\nMatch begins ' + value.timeFromNow) :
+                    (value.teamA + ' vs. ' + value.teamB + ' @ ' + value.tournamentName + (value.bestOf ? ', Best of ' + value.bestOf : '') + '\nMatch begins ' + value.timeFromNow) :
                     (value.tournamentName + '\nMatch begins ' + value.timeFromNow);
 
                 createNotification(

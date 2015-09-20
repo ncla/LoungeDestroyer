@@ -45,6 +45,59 @@
 
     <!-- # Page: "Settings" -->
     <section id="page-settings">
+        <!-- # Features -->
+        <div class="col-grid-12">
+            <div class="card">
+                <h2>Features</h2>
+
+                <div class="pad-vert">
+
+                    <div class="row">
+                        <div class="group col-grid-6 ld-setting">
+                            <span>Auto-refresh page when item draft message appears <b data-tooltip="CS:GO Lounge stops you from accessing My Bets page during the item draft process, if you enable this setting, LoungeDestroyer will automatically refresh this page until the item draft message is gone.">(?)</b>:</span>
+                            <select id="redirect">
+                                <option value="1">Enabled</option>
+                                <option value="0">Disabled</option>
+                            </select>
+                        </div>
+                        <div class="group col-grid-6 ld-setting">
+                            <span>Enable auto-betting/-returning/-accept:</span>
+                            <select id="enableAuto">
+                                <option value="3">Auto-accept only</option>
+                                <option value="2">Auto-betting/-returning only</option>
+                                <option value="1">Enabled</option>
+                                <option value="0">Disabled</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <br class="margin">
+
+                    <div class="row">
+                        <div class="group col-grid-6 ld-setting">
+                            <span>Show total value won/lost in bet history <b data-tooltip="Requires for you to have enabled cached item price list for market prices or 'Add betting values for CS:GO Lounge items' enabled">(?)</b>:</span>
+                            <select id="betHistoryTotalColumn">
+                                <option value="2">Show total market value</option>
+                                <option value="1">Show total bet value</option>
+                                <option value="0">Disabled</option>
+                            </select>
+                        </div>
+
+                        <div class="group col-grid-6 ld-setting">
+                            <span>Item groups in inventory:</span>
+                            <select id="groupInventory">
+                                <option value="1">Enabled</option>
+                                <option value="0">Disabled</option>
+                            </select>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <!-- # /Features -->
+
         <!-- # Items -->
         <div class="col-grid-12">
             <div class="card">
@@ -119,13 +172,6 @@
                                     <option value="0">Disabled</option>
                                 </select>
                             </div>
-                            <div class="group col-grid-6 ld-setting">
-                                <span>Allow groups in inventory</span>
-                                <select id="groupInventory">
-                                    <option value="1">Enabled</option>
-                                    <option value="0">Disabled</option>
-                                </select>
-                            </div>
                         </div>
                     </div>
                     <!-- # /Row -->
@@ -134,218 +180,144 @@
         </div>
         <!-- # /Items -->
 
-        <!-- # Notifications -->
+        <!-- # Matches -->
         <div class="col-grid-12">
             <div class="card">
-                <h2>Notifications</h2>
+                <h2>Matches</h2>
 
                 <div class="pad-vert">
                     <div class="row">
-                        <div class="group col-grid-6 ld-setting">
-                            <span>Notify about new matches:</span>
-                            <select id="notifyMatches">
-                                <option value="1">Both</option>
-                                <option value="2">Dota2 Lounge matches only</option>
-                                <option value="3">CS:GO Lounge matches only</option>
-                                <option value="4">Disabled</option>
-                            </select>
-                        </div>
 
                         <div class="group col-grid-6 ld-setting">
-                            <span>Notify about new trade offers:</span>
-                            <select id="notifyTrades">
-                                <option value="1">Both</option>
-                                <option value="2">Dota2 Lounge trades only</option>
-                                <option value="3">CS:GO Lounge trades only</option>
-                                <option value="4">Disabled</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <br class="margin">
-                    
-                    <div class="row">
-                        <div class="group col-grid-6 ld-setting">
-                            <span>Notify about items that are going to expire soon:</span>
-                            <select id="notifyExpiredItems">
-                                <option value="1">Both</option>
-                                <option value="2">Dota2 Lounge only</option>
-                                <option value="3">CS:GO Lounge only</option>
-                                <option value="4">Disabled</option>
-                            </select>
-                        </div>
-                        <div class="group col-grid-6 ld-setting">
-                            <span>Notify on queue trade offer:</span>
-                            <select id="notifyTradeOffer">
-                                <option value="1">Enabled</option>
-                                <option value="4">Disabled</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- # /Notifications -->
-
-        <!-- # Time and date -->
-        <div class="col-grid-12">
-            <div class="card">
-                <h2>Time &amp; date</h2>
-
-                <div class="pad-vert">
-                    <div class="row">
-                        <div class="group col-grid-6 ld-setting">
-                            <span>Automatically change match time to local time:</span>
-                            <select id="changeTimeToLocal" class="form-control">
-                                <option value="1">Enable</option>
-                                <option value="0">Disabled</option>
-                            </select>
-                        </div>
-                        <div class="group col-grid-6 ld-setting">
-                            <span>Time zone:</span>
-                            <select id="timezone" class="form-control">
-                                <option value="auto">Detect automatically</option>
-                                <!--
-                                    Options are generated dynamically from option.js with moment.js lib
-                                -->
-                            </select>
-                        </div>
-                    </div>
-
-                    <br class="margin">
-
-                    <div class="row">
-                        <div class="group col-grid-6 ld-setting">
-                            <span>12/24 hour clock:</span>
-                            <select id="americanosTime" class="form-control">
-                                <option value="1">12 hour clock</option>
-                                <option value="0">24 hour clock</option>
-                            </select>
-                        </div>
-                        <div class="group col-grid-6 ld-setting">
-                            <span>Display time zone abbreviation:</span>
-                            <select id="displayTzAbbr" class="form-control">
+                            <span>Match filtering:</span>
+                            <select id="globalMatchFilters">
                                 <option value="1">Enabled</option>
                                 <option value="0">Disabled</option>
                             </select>
                         </div>
-                    </div>
 
-                </div>
-            </div>
-        </div>
-        <!-- # /Time and date -->
-        
-        <!-- # Features -->
-        <div class="col-grid-12">
-            <div class="card">
-                <h2>Features</h2>
-
-                <div class="pad-vert">
-
-                    <div class="row">
                         <div class="group col-grid-6 ld-setting">
-                            <span>Auto-refresh page when item draft message appears <b data-tooltip="CS:GO Lounge stops you from accessing My Bets page during the item draft process, if you enable this setting, LoungeDestroyer will automatically refresh this page until the item draft message is gone.">(?)</b>:</span>
-                            <select id="redirect">
-                                <option value="1">Enabled</option>
-                                <option value="0">Disabled</option>
-                            </select>
-                        </div>
-                        <div class="group col-grid-6 ld-setting">
-                            <span>Enable auto-betting/-returning/-accept:</span>
-                            <select id="enableAuto">
-                                <option value="3">Auto-accept only</option>
-                                <option value="2">Auto-betting/-returning only</option>
-                                <option value="1">Enabled</option>
-                                <option value="0">Disabled</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <br class="margin">
-
-                    <div class="row">
-                        <div class="group col-grid-6 ld-setting">
-                            <span>Show match type and exact time:</span>
+                            <span>Load extra match info:</span>
                             <select id="showExtraMatchInfo">
-                                <option value="2">Load automatically for upcoming matches + on hover</option>
-                                <option value="1">Trigger only when mouse is over the match</option>
+                                <option value="2">Automatically for upcoming matches in view and on hover</option>
+                                <option value="1">Only on mouse hover</option>
                                 <option value="0">Disabled</option>
                             </select>
                         </div>
+
+                    </div>
+
+                    <br class="margin"/>
+
+                    <div class="row">
                         <div class="group col-grid-6 ld-setting">
-                            <span>Attempt to auto-bump trades every 10 minutes:</span>
-                            <select id="autoBump">
-                                <option value="570">Dota 2 Lounge trades only</option>
-                                <option value="730">CS:GO Lounge trades only</option>
+                            <span>Show 'x for 1' value indicator:</span>
+                            <select id="showValueForOneIndicator">
                                 <option value="1">Enabled</option>
                                 <option value="0">Disabled</option>
                             </select>
                         </div>
+                        <div class="group col-grid-6 ld-setting">
+                            <span>Cache time for extra match info (minutes):</span>
+                            <input type="number" min="2" max="60" id="cacheTimeMatchExtra">
+                        </div>
                     </div>
 
-                    <br class="margin">
+                    <br class="margin"/>
 
                     <div class="row">
                         <div class="group col-grid-6 ld-setting">
-                            <span>Show total won/lost bet value column for each match in bet history <b data-tooltip="Requires for you to have enabled cached item price list for market prices or 'Add betting values for CS:GO Lounge items' enabled">(?)</b>:</span>
-                            <select id="betHistoryTotalColumn">
-                                <option value="2">Show total market value</option>
-                                <option value="1">Show total bet value</option>
+                            <span>Betted match indicator <a href="#" data-tooltip="Shows a small indicator on the front page besides matches you've already betted on. This setting requires you to have extra match info setting to be enabled.">(?)</a>:</span>
+                            <select id="showBettedIndicator">
+                                <option value="3">Both betted matches and not bet</option>
+                                <option value="2">Show on matches bet on</option>
+                                <option value="1">Show on matches not bet on</option>
                                 <option value="0">Disabled</option>
+                            </select>
+                        </div>
+
+                        <div class="group col-grid-6 ld-setting">
+                            <span>Display 'x matches were filtered' info box on the page:</span>
+                            <select id="showMatchFilterBox">
+                                <option value="1">Enable</option>
+                                <option value="0">Disable</option>
                             </select>
                         </div>
                     </div>
 
                 </div>
-            </div>
-        </div>
-        <!-- # /Features -->
 
-        <!-- # Audio -->
-        <div class="col-grid-12">
-            <div class="card">
-                <h2>Audio</h2>
+                <h2>Match filters</h2>
 
                 <div class="pad-vert">
                     <!-- # Row -->
                     <div class="row">
+
                         <div class="group col-grid-6 ld-setting">
-                            <span>Change the "trade offer received" beep noise:</span>
-                            <select id="beepSoundDisable">
-                                <option value="0">Disabled (no changes)</option>
-                                <option value="1">Remove the audio completely</option>
-                                <option value="2" data-trigger="#custom-audio-url">Custom audio</option>
+                            <span>Hide already started matches:</span>
+                            <select id="matchHideLive">
+                                <option value="1">Enabled</option>
+                                <option value="0">Disabled</option>
                             </select>
                         </div>
 
-                        <div class="col-grid-6 ld-setting">
-                            <div action="#" class="form-inline" id="custom-audio-url">
-                                <div class="group">
-                                    <span>Custom audio for the received trade offer <b data-tooltip="HTTP link to a .mp3 file">(?)</b>:</span>
+                        <div class="group col-grid-6 ld-setting">
+                            <span>Hide matches where a team has odds (%) more than:</span>
+                            <div class="input-group">
+                                <input type="number" min="1" max="100" id="matchFilterMaxOdds">
+                                <span class="input-group-addon">%</span>
+                            </div>
+                        </div>
 
-                                    <div class="row">
-                                        <input type="text" id="customTradeOfferSound" placeholder="HTTP URL to your custom .mp3 audio"
-                                               data-validation="url" data-validation-type="mp3" data-required>
-                                        <input type="submit" class="btn" value="Play" id="offer-audio-play-btn">
-                                    </div>
-                                    <div class="error-labels">
-                                        <p class="error-label">
-                                            You must type an URL of an <strong>.mp3</strong> file (e.g.
-                                            http://example.com/audio.mp3)
-                                        </p>
-                                    </div>
-                                </div>
+                    </div>
+
+                    <br class="margin"/>
+
+                    <div class="row">
+
+                        <div class="group col-grid-6 ld-setting">
+                            <span>Hide matches with these team names:</span>
+                            <input type="text" id="matchTeamFilters" placeholder="Enter keywords">
+
+                            <div class="error-labels">
+                                <p class="pre-error-label">
+                                    Matches that match these exact teams names will be hidden.
+                                </p>
+
+                                <p class="pre-error-label">
+                                    Currently matching:
+                                    <span class="keywordsContainer"></span>
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="group col-grid-6 ld-setting">
+                            <span>Hide matches with these tournament names:</span>
+                            <input type="text" id="matchTournamentFilters" placeholder="Enter keywords">
+
+                            <div class="error-labels">
+                                <p class="pre-error-label">
+                                    Matches that match these tournament names will be hidden.
+                                </p>
+
+                                <p class="pre-error-label">
+                                    Currently matching:
+                                    <span class="keywordsContainer"></span>
+                                </p>
                             </div>
                         </div>
                     </div>
-                    <!-- # /Row -->
+
                 </div>
+
+                <div class="pad-full">
+                    <p>Team names and tournament names are separated by space, unless enclosed in quotes, like shown above as a default setting example.</p>
+                </div>
+                <!-- # /Row -->
             </div>
         </div>
-        <!-- # /Features -->
+        </div>
+        <!-- # /Matches -->
 
         <!-- # Trade filters -->
 
@@ -385,7 +357,7 @@
                             </select>
                         </div>
                         <div class="group col-grid-6 ld-setting">
-                            <span>Show 'x trades were filtered' info box on the page:</span>
+                            <span>Display 'x trades were filtered' info box on the page:</span>
                             <select id="showTradeFilterBox">
                                 <option value="1">Enable</option>
                                 <option value="0">Disable</option>
@@ -397,20 +369,24 @@
 
                     <div class="row">
                         <div class="group col-grid-6 ld-setting">
-                            <span>Hide filtered trades:</span>
-                            <select id="hideFilteredTrades">
-                                <option value="1">Enable</option>
-                                <option value="0">Disable</option>
-                            </select>
-                        </div>
-                        <div class="group col-grid-6 ld-setting">
                             <span>Show trade descriptions:</span>
                             <select id="showTradeDescriptions">
                                 <option value="1">Enabled</option>
                                 <option value="0">Disabled</option>
                             </select>
                         </div>
+
+                        <div class="group col-grid-6 ld-setting">
+                            <span>Attempt to auto-bump trades every 10 minutes <b data-tooltip="The auto-bumping process happens in the background as long as you have the browser opened and you are logged into the site. You do not have to leave site tabs opened. Extension every 10 minutes will attempt to bump any trades that are available for a bump.">(?)</b>:</span>
+                            <select id="autoBump">
+                                <option value="570">Dota 2 Lounge trades only</option>
+                                <option value="730">CS:GO Lounge trades only</option>
+                                <option value="1">Enabled</option>
+                                <option value="0">Disabled</option>
+                            </select>
+                        </div>
                     </div>
+
                 </div>
 
                 <h2>Trade filters</h2>
@@ -532,17 +508,164 @@
                 </div>
 
                 <div class="pad-full">
-                    <p>Keywords are separated by space, unless enclosed in quotes. Punctuation and leading/trailing whitespace is ignored when matching for trade description. Item names need to have full item name, separated by double quotes.</div>
+                    <p>Keywords are separated by space, unless enclosed in quotes. Punctuation and leading/trailing whitespace is ignored when matching for trade description. Item names need to have full item name, separated by double quotes.</p>
                 </div>
             </div>
         </div>
 
         <!-- # /Trade filters -->
 
+        <!-- # Notifications -->
+        <div class="col-grid-12">
+            <div class="card">
+                <h2>Notifications</h2>
+
+                <div class="pad-vert">
+                    <div class="row">
+                        <div class="group col-grid-6 ld-setting">
+                            <span>Notify me when a new match is added:</span>
+                            <select id="notifyMatches">
+                                <option value="1">Both</option>
+                                <option value="2">Dota2 Lounge matches only</option>
+                                <option value="3">CS:GO Lounge matches only</option>
+                                <option value="4">Disabled</option>
+                            </select>
+                        </div>
+
+                        <div class="group col-grid-6 ld-setting">
+                            <span>Notify me when I receive a Lounge trade offer:</span>
+                            <select id="notifyTrades">
+                                <option value="1">Both</option>
+                                <option value="2">Dota2 Lounge trades only</option>
+                                <option value="3">CS:GO Lounge trades only</option>
+                                <option value="4">Disabled</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <br class="margin">
+                    
+                    <div class="row">
+                        <div class="group col-grid-6 ld-setting">
+                            <span>Notify me about returns that are going to expire soon <a href="#" data-tooltip="If you have kept items inactive in your returns for 21 days or more, Lounge can take those items away and will mark them with a red border. The extension will send you a notification about this in case if you had forgotten.">(?)</a>:</span>
+                            <select id="notifyExpiredItems">
+                                <option value="1">Both sites</option>
+                                <option value="2">Dota2 Lounge only</option>
+                                <option value="3">CS:GO Lounge only</option>
+                                <option value="4">Disabled</option>
+                            </select>
+                        </div>
+                        <div class="group col-grid-6 ld-setting">
+                            <span>Notify on queue trade offer:</span>
+                            <select id="notifyTradeOffer">
+                                <option value="1">Enabled</option>
+                                <option value="4">Disabled</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- # /Notifications -->
+
+        <!-- # Time and date -->
+        <div class="col-grid-12">
+            <div class="card">
+                <h2>Time &amp; date</h2>
+
+                <div class="pad-vert">
+                    <div class="row">
+                        <div class="group col-grid-6 ld-setting">
+                            <span>Automatically change match time to local time:</span>
+                            <select id="changeTimeToLocal">
+                                <option value="1">Enable</option>
+                                <option value="0">Disabled</option>
+                            </select>
+                        </div>
+                        <div class="group col-grid-6 ld-setting">
+                            <span>Time zone:</span>
+                            <select id="timezone">
+                                <option value="auto">Detect automatically</option>
+                                <!--
+                                    Options are generated dynamically from option.js with moment.js lib
+                                -->
+                            </select>
+                        </div>
+                    </div>
+
+                    <br class="margin">
+
+                    <div class="row">
+                        <div class="group col-grid-6 ld-setting">
+                            <span>12/24 hour clock:</span>
+                            <select id="americanosTime">
+                                <option value="1">12 hour clock</option>
+                                <option value="0">24 hour clock</option>
+                            </select>
+                        </div>
+                        <div class="group col-grid-6 ld-setting">
+                            <span>Display time zone abbreviation:</span>
+                            <select id="displayTzAbbr">
+                                <option value="1">Enabled</option>
+                                <option value="0">Disabled</option>
+                            </select>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <!-- # /Time and date -->
+
+        <!-- # Audio -->
+        <div class="col-grid-12">
+            <div class="card">
+                <h2>Audio</h2>
+
+                <div class="pad-vert">
+                    <!-- # Row -->
+                    <div class="row">
+                        <div class="group col-grid-6 ld-setting">
+                            <span>Change the "trade offer received" beep noise:</span>
+                            <select id="beepSoundDisable">
+                                <option value="0">Disabled (no changes)</option>
+                                <option value="1">Remove the audio completely</option>
+                                <option value="2" data-trigger="#custom-audio-url">Custom audio</option>
+                            </select>
+                        </div>
+
+                        <div class="col-grid-6 ld-setting">
+                            <div action="#" class="form-inline" id="custom-audio-url">
+                                <div class="group">
+                                    <span>Custom audio for the received trade offer <b data-tooltip="HTTP link to a .mp3 file">(?)</b>:</span>
+
+                                    <div class="row">
+                                        <input type="text" id="customTradeOfferSound" placeholder="HTTP URL to your custom .mp3 audio"
+                                               data-validation="url" data-validation-type="mp3" data-required>
+                                        <input type="submit" class="btn" value="Play" id="offer-audio-play-btn">
+                                    </div>
+                                    <div class="error-labels">
+                                        <p class="error-label">
+                                            You must type an URL of an <strong>.mp3</strong> file (e.g.
+                                            http://example.com/audio.mp3)
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- # /Row -->
+                </div>
+            </div>
+        </div>
+        <!-- # /Audio -->
+
         <!-- # Betting inventory statistics -->
         <div class="col-grid-12">
             <div class="card">
-                <h2>Betting inventory statistics</h2>
+                <h2>Inventory statistics</h2>
 
                 <div class="pad-vert">
                     <div class="row">
@@ -612,7 +735,7 @@
                         item groups, press this button furiously.</p>
 
                     <ul class="btn-row">
-                        <li><a href="#" class="btn">Restore default settings</a></li>
+                        <li><a href="#" class="btn" id="restoreDefaults">Restore default settings</a></li>
                     </ul>
                 </div>
 
@@ -621,25 +744,13 @@
                 <div class="row pad-vert">
                     <div class="row">
                         <div class="group col-grid-6 ld-setting">
-                            <span>Betted match indicator <a href="#" data-tooltip="Shows a small indicator on the front page besides matches you've already betted on. This setting requires you to have extra match info setting to be enabled.">(?)</a>:</span>
-                            <select id="showBettedIndicator">
-                                <option value="2">Show on matches bet on</option>
-                                <option value="1">Show on matches not bet on</option>
-                                <option value="0">Disabled</option>
-                            </select>
-                        </div>
-                        <div class="group col-grid-6 ld-setting">
                             <span>Focus on trade offer tabs when auto-betting receives offer:</span>
                             <select id="focusOnTradeofferTab">
                                 <option value="1">Enabled</option>
                                 <option value="0">Disabled</option>
                             </select>
                         </div>
-                    </div>
 
-                    <br class="margin"/>
-
-                    <div class="row">
                         <div class="group col-grid-6 ld-setting">
                             <span>Show OPSKINS.com links in item pop-up:</span>
                             <select id="opskins">
