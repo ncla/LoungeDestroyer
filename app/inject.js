@@ -518,10 +518,7 @@ function init() {
             });
         }
 
-        //if (LoungeUser.userSettings.itemMarketPricesv2 === '2') {
-            initiateItemObjectForElementList();
-            //getMarketPricesForElementList();
-        //}
+        initiateItemObjectForElementList();
     });
 }
 /*
@@ -709,6 +706,17 @@ $(window).scrolled(function() {
             var match = matchObject(v);
             if(!match.closedMatch && !match.matchIsFiltered && isScrolledIntoView(v)) {
                 match.loadExtraMatchInfo();
+            }
+        });
+    }
+
+    if(LoungeUser.userSettings.itemMarketPricesv2 === '2' && LoungeUser.userSettings.useCachedPriceList === '0') {
+        $('.oitm').each(function(i, v) {
+            if(isScrolledIntoView(v)) {
+                var item = itemObject(v);
+                if(!item.marketPriced) {
+                    item.getMarketPrice();
+                }
             }
         });
     }

@@ -145,7 +145,11 @@ Item.prototype.getMarketPrice = function(cachedOnly) {
 
     if (nonMarketItems.indexOf(_this.itemName) === -1 && nonMarketItems.indexOf($('.rarity', this.item).text()) === -1 &&
         !loadingItems.hasOwnProperty(this.itemName)) {
-        this.fetchSteamMarketPrice();
+
+        if(isScrolledIntoView(this.item)) {
+            this.fetchSteamMarketPrice();
+        }
+
         return this;
     }
 };
