@@ -595,8 +595,6 @@ $(document).on('mouseover', '.tradepoll:not(.notavailable)', function() {
 });
 
 $(window).scrolled(function() {
-    console.log('Scrolled');
-
     if(['1', '2'].indexOf(LoungeUser.userSettings.tradeLoadExtra) !== -1) {
         $('.tradepoll:not(.notavailable)').each(function(index, value) {
             if(isScrolledIntoView(value)) {
@@ -644,7 +642,6 @@ var itemObs = new MutationObserver(function(records) {
 
             if (hasTradeNodes) {
                 if (LoungeUser.userSettings.itemMarketPricesv2 === '2') {
-                    //getMarketPricesForElementList($(records[i].addedNodes).find('.oitm'));
                     initiateItemObjectForElementList($(records[i].addedNodes).find('.oitm'));
                 }
             }

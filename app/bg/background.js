@@ -707,10 +707,9 @@ chrome.alarms.onAlarm.addListener(function(alarm) {
         }
     }
 
-    //if (alarm.name == 'remoteThemesUpdate') {
-    //    //updateThemes();
-    //    themes.updateThemes();
-    //}
+    if (alarm.name == 'remoteThemesUpdate') {
+        themes.updateThemes();
+    }
 
     if (alarm.name == 'autoBump') {
         if (['1', '730', '570'].indexOf(LoungeUser.userSettings.autoBump) !== -1) {
@@ -756,9 +755,10 @@ chrome.runtime.onInstalled.addListener(function(details) {
     }
 
     updateCurrencyConversion();
+    
     if(LoungeUser.userSettings.useCachedPriceList === '1') {
         updateMarketPriceList();
     }
-    //updateThemes();
-    //themes.updateThemes();
+
+    themes.updateThemes();
 });
