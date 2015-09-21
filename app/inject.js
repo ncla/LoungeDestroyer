@@ -51,7 +51,6 @@ chrome.extension.onMessage.addListener(function(msg, sender, sendResponse) {
         if (LoungeUser.userSettingsLoaded) {
             if (msg.inventory.url.indexOf('tradeCsRight') != -1 || msg.inventory.url.indexOf('tradeWhatRight') != -1) {
                 initiateItemObjectForElementList($('#itemlist .oitm:not(.marketPriced)'), true);
-                //getMarketPricesForElementList($('#itemlist .oitm:not(.marketPriced)'), true);
             } else {
                 inventory.onInventoryLoaded(msg.inventory);
             }
@@ -562,7 +561,6 @@ function newFreezeReturn(tries) {
     Mouseover action for items
  */
 $(document).on('mouseenter', '.oitm', function(e) {
-    // We do not have to do any of the stuff below anymore
     e.stopPropagation();
 
     var LoungeItem = itemObject($(this));

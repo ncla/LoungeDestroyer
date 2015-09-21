@@ -563,8 +563,6 @@
                             </select>
                         </div>
                     </div>
-
-                    </div>
                 </div>
             </div>
         </div>
@@ -694,20 +692,38 @@
                         </div>
                     </div>
 
-                    <br>
+                    <br class="margin"/>
 
-                    <div class="group col-grid-12 ld-setting">
-                        <span>Calculate inventory statistics for betting groups:</span>
-                        <select id="inventoryStatisticsGroup" multiple size="8">
-                            <option value="1" solo>Calculate for all items in inventory</option>
-                            <option value="0" solo>Disabled</option>
-                            <option disabled></option>
-                            <optgroup label="Groups (CS:GO)" id="inventoryStatisticsGroup-730" group="730">
-                            </optgroup>
-                            <optgroup label="Groups (Dota2)" id="inventoryStatisticsGroup-570" group="570">
-                            </optgroup>
-                        </select>
+                    <div class="row">
+                        <div class="group col-grid-12 ld-setting">
+                            <span>Calculate inventory statistics from:</span>
+                            <select id="invStatsUseValue">
+                                <option value="1">Betting values only</option>
+                                <option value="2">Market values only</option>
+                                <option value="3">Betting values, fallback to market values if betting value is missing</option>
+                            </select>
+                        </div>
                     </div>
+
+                    <br class="margin"/>
+                    <div class="row">
+                        <div class="group col-grid-12 ld-setting">
+                            <span>Calculate inventory statistics for betting groups:</span>
+                            <select id="inventoryStatisticsGroup" multiple size="8">
+                                <option value="1" solo>Calculate for all items in inventory</option>
+                                <option value="0" solo>Disabled</option>
+                                <option disabled></option>
+                                <optgroup label="Groups (CS:GO)" id="inventoryStatisticsGroup-730" group="730">
+                                </optgroup>
+                                <optgroup label="Groups (Dota2)" id="inventoryStatisticsGroup-570" group="570">
+                                </optgroup>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pad-full">
+                    <p>Hold CTRL buton and press left mouse button to select multiple groups for which you want inventory statistics to be calculated.</p>
                 </div>
             </div>
         </div>

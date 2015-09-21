@@ -231,7 +231,7 @@ chrome.webRequest.onBeforeRequest.addListener(function(details) {
     },
 
     {
-        urls: ['*://*/ajax/betReturns*', '*://*/ajax/betBackpack*', '*://*/ajax/tradeBackpack*', '*://*/ajax/tradeGifts*', '*://*/ajax/backpack*', '*://*/ajax/showBackpackApi*', '*://*/ajax/tradeCsRight*', '*://*/ajax/tradeWhatRight*'],
+        urls: ['*://*/ajax/betReturns*', '*://*/ajax/betBackpack*', '*://*/ajax/tradeBackpack*', '*://*/ajax/tradeGifts*', '*://*/ajax/backpack*', '*://*/ajax/showBackpack*', '*://*/ajax/tradeCsRight*', '*://*/ajax/tradeWhatRight*'],
         types: ['xmlhttprequest']
     }
 );
@@ -244,7 +244,7 @@ chrome.webRequest.onCompleted.addListener(function(details) {
     },
 
     {
-        urls: ['*://*/ajax/betReturns*', '*://*/ajax/betBackpack*', '*://*/ajax/tradeBackpack*', '*://*/ajax/tradeGifts*', '*://*/ajax/backpack*', '*://*/ajax/showBackpackApi*', '*://*/ajax/tradeCsRight*', '*://*/ajax/tradeWhatRight*'],
+        urls: ['*://*/ajax/betReturns*', '*://*/ajax/betBackpack*', '*://*/ajax/tradeBackpack*', '*://*/ajax/tradeGifts*', '*://*/ajax/backpack*', '*://*/ajax/showBackpack*', '*://*/ajax/tradeCsRight*', '*://*/ajax/tradeWhatRight*'],
         types: ['xmlhttprequest']
     }
 );

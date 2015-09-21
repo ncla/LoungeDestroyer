@@ -213,6 +213,8 @@ Inventory.prototype.onInventoryLoaded = function(requestData) {
             this.grouped = false;
             this.group();
 
+            initiateItemObjectForElementList($('#backpack .oitm'));
+
             // limit the inventory statistics to the groups the user has chosen
             var statsSetting = LoungeUser.userSettings.inventoryStatisticsGroup[appID];
             if (statsSetting.indexOf('0') === -1) {
@@ -265,7 +267,10 @@ Inventory.prototype.onInventoryLoaded = function(requestData) {
             }
         }
 
-        initiateItemObjectForElementList($('#backpack .oitm:not(.marketPriced)'));
+        if (document.URL.indexOf('/myprofile') !== -1) {
+            initiateItemObjectForElementList($('#backpack .oitm'));
+            addInventoryStatistics();
+        }
     }
 };
 
@@ -691,10 +696,22 @@ function addInventoryStatistics(targetItems, targetBackpack, groupName) {
         570: ['arcana', 'immortal', 'legendary', 'mythical', 'rare', 'uncommon', 'common', 'base']
     };
 
-    $('.item', targetItems).each(function() {
+    $('.oitm', targetItems).each(function() {
         // Lounge provides item rarities in the classnames
+        var item = itemObject(this);
         var rarity = ($('div.rarity', this).attr('class').split(' ')[1] || 'base').toLowerCase();
-        var itemValue = parseFloat($('div.value', this).text().replace('$ ', '')) || parseFloat($('input[name="worth"]').val()) || undefined;
+
+        var valueStatsSett = LoungeUser.userSettings.invStatsUseValue;
+
+        var itemValue = null;
+
+        if(valueStatsSett === '3' || ['1', '2', '3'].indexOf(valueStatsSett) === -1) {
+            itemValue = item.loungeValue || item.marketValue || undefined;
+        } else if(valueStatsSett === '2') {
+            itemValue = item.marketValue || undefined;
+        } else if(valueStatsSett === '1') {
+            itemValue = item.loungeValue || undefined;
+        }
 
         // Make sure we have both rarity and item value
         if (rarity && itemValue) {
