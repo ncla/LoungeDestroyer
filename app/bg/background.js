@@ -755,10 +755,8 @@ chrome.runtime.onInstalled.addListener(function(details) {
     }
 
     updateCurrencyConversion();
-    
+
     if(LoungeUser.userSettings.useCachedPriceList === '1') {
         updateMarketPriceList();
     }
-
-    themes.updateThemes();
 });

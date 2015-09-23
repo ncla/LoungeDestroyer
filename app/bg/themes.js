@@ -4,9 +4,9 @@ var themeListOriginal = {
     cleanlounge: {
         url: 'http://api.ncla.me/themes/CleanLounge/data.json',
         remote: true
-    },
-    cleanlounge2: {
-        url: 'http://api.ncla.me/themes/CleanLounge/data.json',
+    }
+    , swagtheme: {
+        url: 'http://127.0.0.1/themes/Swag/data.json',
         remote: true
     }
 };
@@ -16,127 +16,154 @@ var Themes = function() {
 };
 
 Themes.prototype.init = function() {
-    console.log('Themes init');
+    var _this = this;
+    console.log('THEMES :: INIT');
 
     chrome.storage.local.get('themes', function(result) {
         themes = result.themes || {};
-        console.log('t1');
+
         // If we have a selected theme, add theme CSS to the variable
         if (LoungeUser.userSettings.currentTheme) {
-            console.log('t2');
             var name = LoungeUser.userSettings.currentTheme;
             if (themes.hasOwnProperty(name)) {
-                console.log('t3');
+                console.log('THEMES :: User selected theme exists in storage, setting themeCSS');
                 themeCSS = themes[name].cachedCSS || '';
             }
         }
 
-        // if we don't have any themes
+        // If we don't have any themes
         if (!Object.keys(themes).length) {
-            console.log('Resetting to bundled themes!');
+            console.log('THEMES :: Resetting to bundled themes!');
 
             // add bundled themes
             themes = themeListOriginal;
-            chrome.storage.local.set({themes: themes}, function() {
-                updateThemes()
+            _this.syncThemesObject(function() {
+                console.log('THEMES :: Reset theme list in storage to the orinal bundled themes list');
             });
+        } else {
+            _this.addNewBundledThemes();
         }
     });
+};
+
+Themes.prototype.addNewBundledThemes = function() {
+    console.log('THEMES :: Checking if any missing bundled themes in themes storage');
+    console.log(themes);
+    for(bundledTheme in themeListOriginal) {
+        if(!themes.hasOwnProperty(bundledTheme)) {
+            console.log('THEMES :: Theme', bundledTheme, 'missing from themes storage, adding..');
+            themes[bundledTheme] = themeListOriginal[bundledTheme];
+        }
+    }
+
+    this.syncThemesObject();
+    console.log(themes);
 };
 
 Themes.prototype.updateThemes = function(callback) {
-    console.log('Updating themes!');
-    chrome.storage.local.get('themes', function(result) {
-        var themes = result.themes;
-        for (var theme in themes) {
-            if (themes[theme].remote) {
-                console.log('Updating theme ' + theme);
+    var _this = this;
 
-                // get JSON
-                var url = themes[theme].url + '?cachebreak=' + Date.now();
-                if (!url) {
-                    continue;
-                }
+    console.log('THEMES :: Updating themes!');
 
-                get(url, (function(theme) {
-                    return function() {
-                        try {
-                            var data = this.responseText;
-                            var json = JSON.parse(data);
-                            var err = '';
-                            required = ['name', 'title', 'author', 'version', 'css', 'bg'];
+     for (var theme in themes) {
+        if (themes[theme].remote) {
+            console.log('THEMES :: Fetching data.json for theme ' + theme);
 
-                            for (var i = 0; i < required.length; ++i) {
-                                if (!json[required[i]]) {
-                                    if (!err) {
-                                        err = 'The following information is missing from the JSON: ';
-                                    }
+            // get JSON
+            var url = themes[theme].url + '?cachebreak=' + Date.now();
+            if (!url) {
+                continue;
+            }
 
-                                    err += required[i] + ' ';
+            get(url, (function(theme) {
+                return function() {
+                    try {
+                        var data = this.responseText;
+                        var json = JSON.parse(data);
+                        var err = '';
+                        required = ['name', 'title', 'author', 'version', 'css', 'bg'];
+
+                        for (var i = 0; i < required.length; ++i) {
+                            if (!json[required[i]]) {
+                                if (!err) {
+                                    err = 'THEMES :: The following information is missing from the JSON: ';
                                 }
+
+                                err += required[i] + ' ';
                             }
-
-                            if (err) {
-                                console.error(err);
-                                return;
-                            }
-
-                            if (themes[theme].version == json.version) {
-                                console.log('Version hasn\'t changed, no need to update');
-                                return;
-                            }
-
-                            console.log('Everything looks good');
-
-                            // merge new JSON into old, keeping options
-                            if (json.options) {
-                                for (var k in themes[theme].options) {
-                                    if (json.options.hasOwnProperty(k)) {
-                                        json.options[k].checked = themes[theme].options[k].checked;
-                                    } else {
-                                        delete themes[theme].options[k];
-                                    }
-                                }
-                            }
-
-                            // merge obj and json
-                            $.extend(true, themes[theme], json);
-                            chrome.storage.local.set({themes: themes});
-                        } catch (err) {
-                            console.error('[' + theme + '] Failed to update: ', err);
                         }
 
-                        // cache CSS so we can inject instantly
-                        get(themes[theme].css + '?cachebreak=' + Date.now(), function() {
-                            if (!this.status) {
-                                console.error('[' + theme + '] Failed to retrieve CSS');
-                                return;
-                            }
+                        if (err) {
+                            console.error(err);
+                            return;
+                        }
 
-                            var css = importantifyCSS(this.responseText);
-                            if (css) {
-                                if (theme === LoungeUser.userSettings.currentTheme) {
-                                    themeCSS = css;
+                        if (themes[theme].version == json.version) {
+                            console.log('THEMES :: Version for ', theme, ' hasn\'t changed, no need to update');
+                            return;
+                        }
+
+                        // merge new JSON into old, keeping options
+                        if (json.options) {
+                            for (var k in themes[theme].options) {
+                                if (json.options.hasOwnProperty(k)) {
+                                    json.options[k].checked = themes[theme].options[k].checked;
+                                } else {
+                                    delete themes[theme].options[k];
                                 }
-
-                                themes[theme].cachedCSS = css;
-                                chrome.storage.local.set({themes: themes});
                             }
-                        });
-                    }
-                })(theme));
-            }
-        }
+                        }
 
-        if (callback) {
-            // fake a delay so users don't get worried, yo
-            setTimeout(callback, 750);
+                        // merge obj and json
+                        $.extend(true, themes[theme], json);
+                        chrome.storage.local.set({themes: themes});
+                    } catch (err) {
+                        console.error('THEMES :: [' + theme + '] Failed to update: ', err);
+                    }
+
+                    console.log('THEMES :: ', theme, 'fetching CSS');
+
+                    // cache CSS so we can inject instantly
+                    get(themes[theme].css + '?cachebreak=' + Date.now(), function() {
+                        if (!this.status) {
+                            console.error('THEMES :: [' + theme + '] Failed to retrieve CSS');
+                            return;
+                        }
+
+                        // If theme doesn't need to be importantified, in which case we will be disabling Lounge site stylesheets
+                        if(themes[theme].hasOwnProperty('disableCss') && themes[theme].disableCss === true) {
+                            console.log('THEMES :: ', theme, ' using raw CSS');
+                            var css = this.responseText;
+                        }
+                        // Otherwise we importantify all CSS rules (due to styling prioritization limitations)
+                        else {
+                            console.log('THEMES :: ', theme, ' using importantified CSS');
+                            var css = importantifyCSS(this.responseText);
+                        }
+
+                        if (css) {
+                            if (theme === LoungeUser.userSettings.currentTheme) {
+                                themeCSS = css;
+                            }
+
+                            themes[theme].cachedCSS = css;
+                            chrome.storage.local.set({themes: themes});
+                        }
+
+                    });
+                }
+            })(theme));
         }
-    });
+    }
+
+    if (callback) {
+        // fake a delay so users don't get worried, yo
+        setTimeout(callback, 750);
+    }
 };
 
 Themes.prototype.selectTheme = function(themeId) {
-    console.log('selecting theme with id' , themeId);
+    console.log('THEMES :: Selecting user theme with id' , themeId);
     LoungeUser.saveSetting("currentTheme", themeId);
 
     if (themes.hasOwnProperty(themeId)) {
@@ -151,35 +178,22 @@ Themes.prototype.selectTheme = function(themeId) {
 Themes.prototype.saveThemeSetting = function(themeId, settingId, settingValue) {
     themes[themeId].options[settingId].checked = settingValue;
     console.log('Saving theme setting', settingId, 'for theme', themeId, 'value', settingValue);
-    this.syncThemesObject(themes);
+    this.syncThemesObject();
     return this;
 };
 
-Themes.prototype.syncThemesObject = function(themeObj) {
-    chrome.storage.local.set({themes: themes});
+Themes.prototype.syncThemesObject = function(callback) {
+    chrome.storage.local.set({themes: themes}, function() {
+        if (callback) {
+            callback();
+        }
+    });
+
     return this;
 };
 
 var themesBg = new Themes();
 themesBg.init();
-
-/**
- * themes.init
- * Run when extension has loaded, check if themes object in storage matches the hardcoded themes list,
- * updating and readying up the themeCSS variable
- *
- * themes.update
- * Update themes from remote
- *
- * themes.selectTheme
- * Select a theme and sets it active
- *
- * themes.injectTheme
- *
- *
- * theme.returnThemesObj
- *
- */
 
 chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
     // Inject CSS file to specific tab
@@ -220,6 +234,12 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
         })(sender.tab.id, 0);
     }
 
+    if (request.hasOwnProperty('hardRefresh')) {
+        chrome.tabs.reload(sender.tab.id, {bypassCache: true}, function() {
+            console.log('THEMES :: Hard refreshed tab ' + sender.tab.id);
+        });
+    }
+
     if (request.hasOwnProperty('updateThemes')) {
         themesBg.updateThemes(sendResponse);
         if (sendResponse) {
@@ -241,8 +261,12 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
 
 });
 
+// Does not fire for on disk cached requests :(
 chrome.webRequest.onBeforeRequest.addListener(function(details) {
-        if(LoungeUser.userSettings.disableStylesheetLoading === '1') {
+        console.log('Stylesheet blocker', details);
+        var name = LoungeUser.userSettings.currentTheme;
+        if (themes.hasOwnProperty(name) && themes[name].hasOwnProperty('disableCss') && themes[name].disableCss == true) {
+            console.log('THEMES :: Disabling sites stylesheet');
             return {cancel: true}
         }
     },
@@ -255,20 +279,13 @@ chrome.webRequest.onBeforeRequest.addListener(function(details) {
 
 chrome.alarms.onAlarm.addListener(function(alarm) {
     if (alarm.name == 'remoteThemesUpdate') {
-        //updateThemes();
         themesBg.updateThemes();
     }
 });
 
 chrome.runtime.onInstalled.addListener(function(details) {
-    //updateThemes();
-    console.log(themes);
     themesBg.updateThemes();
 });
-
-function updateThemes(callback) {
-
-}
 
 function importantifyCSS(css) {
     if (css) {

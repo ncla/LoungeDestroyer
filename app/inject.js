@@ -147,6 +147,24 @@ function init() {
                         collapsibleElms[i].insertBefore(hideToggle, parentFirst);
                     }
                 }
+
+                if (theme.disableCss) {
+                    //$('link[rel=stylesheet][href*="/css/bright"], link[rel=stylesheet][href*="/css/gray"]').remove();
+                    var styles = document.styleSheets;
+                    for (var i = 0; i < styles.length; i++) {
+                        if (styles[i].href.match("/css/bright") || styles[i].href.match("/css/gray")) {
+                            if (styles[i].cssRules != null && styles[i].cssRules.length > 0) {
+                                console.log('THEMES :: Stylsheet is loaded, hard refreshing..');
+
+                                chrome.runtime.sendMessage({hardRefresh: true}, function(data) {
+                                    console.log('THEMES :: Request to hard refresh was sent');
+                                });
+
+                                break;
+                            }
+                        }
+                    }
+                }
             });
 
             // load options
