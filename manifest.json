@@ -27,7 +27,7 @@
         "default_title": "LoungeDestroyer settings",
         "default_popup": "popup/popup.html"
     },
-    "options_page": "settings_v2/index.html",
+    "options_page": "settings/index.html",
     "permissions": [
         "notifications",
         "*://csgolounge.com/*",

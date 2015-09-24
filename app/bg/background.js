@@ -129,7 +129,7 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
     }
 
     if (request.hasOwnProperty('openSettings')) {
-        var optionsUrl = chrome.extension.getURL('settings/options.html');
+        var optionsUrl = chrome.extension.getURL('settings/index.html');
         chrome.tabs.query({url: optionsUrl}, function(tabs) {
             if (tabs.length) {
                 chrome.tabs.update(tabs[0].id, {active: true});
