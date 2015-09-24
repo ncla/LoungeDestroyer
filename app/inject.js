@@ -274,9 +274,7 @@ function init() {
                 $freezeBtn = $('#freezebutton');
 
                 $freezeBtn.css('text-transform', 'uppercase');
-
-                var logoUrl = chrome.extension.getURL('icons/32x32.png');
-                $freezeBtn.prepend('<img src="' + logoUrl + '" alt="" width="15px" height="15px" style="padding-right: 3px"/>');
+                $freezeBtn.prepend('<span class="ld-btn-icon"></span>');
 
                 if (LoungeUser.userSettings.renameButtons2 === '1') {
                     $freezeBtn.text('Fucking ' + $('#placebut').text());
@@ -390,8 +388,7 @@ function init() {
                 $betBtn = $('#placebut');
                 $betBtn.css('text-transform', 'uppercase');
 
-                var logoUrl = chrome.extension.getURL('icons/32x32.png');
-                $betBtn.prepend('<img src="' + logoUrl + '" alt="" width="15px" height="15px" style="padding-right: 3px"/>');
+                $betBtn.prepend('<span class="ld-btn-icon"></span>');
 
                 if (LoungeUser.userSettings.renameButtons2 === '1') {
                     $betBtn.text('Fucking ' + $('#placebut').text());

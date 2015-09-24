@@ -564,7 +564,8 @@ http://codepen.io/larrygeams/pen/nhgze
     height: 16px;
     float: left;
     margin: -1px 7px 0 0;
-    background: url(http://i.imgur.com/jaryKUa.png) no-repeat;
+    background: url('chrome-extension://__MSG_@@extension_id__/icons/32x32.png') no-repeat;
+    background-size: cover;
 }
 
 .ld-trade-filters:after, .ld-match-filters:after {
@@ -600,4 +601,15 @@ http://codepen.io/larrygeams/pen/nhgze
 
 .ld-valueForOne {
     font-size: 11px;
+}
+
+span.ld-btn-icon {
+    width: 16px;
+    height: 16px;
+    margin-right: 3px;
+    background: url('chrome-extension://__MSG_@@extension_id__/icons/32x32.png');
+    display: inline-block;
+    background-size: cover;
+    position: relative;
+    top: 2px;
 }
