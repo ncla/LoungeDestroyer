@@ -202,7 +202,8 @@ Match.prototype.appendExtraMatchInfo = function(targetElement) {
         $('.teamtext:eq(1) i', this.matchElement).append(' <span class="ld-valueForOne">(' + this.valueForOneTeamB + ' for 1)</span>');
     }
 
-    if (LoungeUser.userSettings.underlineTeamUserBetOn === '1' && this.teamBetOn !== -1) {
+    if (LoungeUser.userSettings.underlineTeamUserBetOn === '1' && this.teamBetOn !== undefined && this.teamBetOn > -1) {
+        $(this.matchElement).addClass((this.teamBetOn === 0 ? 'ld-bet-teamleft' : 'ld-bet-teamright'));
         $('.teamtext:eq("' + this.teamBetOn + '") b', this.matchElement).addClass('ld-teambeton');
     }
 
@@ -235,7 +236,9 @@ Match.prototype.cacheMatchExtraInfo = function() {
         userBetted: this.userBetted,
         valueForOneTeamA: this.valueForOneTeamA,
         valueForOneTeamB: this.valueForOneTeamB,
-        amountOfBetsPlaced: this.amountOfBetsPlaced
+        amountOfBetsPlaced: this.amountOfBetsPlaced,
+        teamBetOn: this.teamBetOn,
+        totalBet: this.totalBet
     };
     chrome.storage.local.set({matchInfoCachev2: matchInfoCachev2});
     return true;
