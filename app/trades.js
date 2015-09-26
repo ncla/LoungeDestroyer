@@ -21,8 +21,6 @@ var Trade = function(tradeElement) {
         var tradeAnchor = $('a[href^="trade?"]:eq(0)', _this.tradeElement);
         if ($(tradeAnchor).length) {
             this.tradeID = tradeAnchor.attr('href').match(/\d+$/)[0] || false;
-        } else {
-            console.log('Anchor not found');
         }
 
         // check if matches hide/mark trade filter
@@ -31,14 +29,49 @@ var Trade = function(tradeElement) {
             this.filterByTradeData();
         }
     }
+
+    return this;
 };
 
-Trade.prototype.fetchExtraData = function(callback) {
+Trade.prototype.getExtraData = function() {
     var _this = this;
 
     if(!this.tradeID || this.fetchingExtraData || this.extraDataFetched || this.tradeIsFiltered) {
         return;
     }
+
+    // Basic trade/user data from site trade page
+    this.fetchTradeData(function() {
+        // Filter by this acquired trade data
+        if(LoungeUser.userSettings.globalTradeFilters === '1') {
+            _this.filterByExtendedTradeData();
+        }
+
+        _this.appendTradeData();
+
+        // If we need Steam user data, we fetch that as well
+        if(!_this.tradeIsFiltered && LoungeUser.userSettings.tradeLoadSteamData === '1') {
+
+            // Check here if we have profile ID
+            _this.getExtraSteamData(_this.profileId, function() {
+
+                if(LoungeUser.userSettings.globalTradeFilters === '1') {
+                    _this.filterBySteamData();
+                }
+
+                // Check here if we have all the necessary info to append
+                _this.appendSteamData();
+            });
+
+        }
+
+    });
+
+    return this;
+};
+
+Trade.prototype.fetchTradeData = function(callback) {
+    var _this = this;
 
     this.fetchingExtraData = true;
 
@@ -46,7 +79,6 @@ Trade.prototype.fetchExtraData = function(callback) {
         url: _this.generateTradeURL(),
         type: 'GET',
         success: function(data) {
-            console.time('fetchExtraData init');
             var doc = document.implementation.createHTMLDocument('');
             doc.body.innerHTML = data;
 
@@ -58,89 +90,9 @@ Trade.prototype.fetchExtraData = function(callback) {
             _this.avatarMediumUrl = $('.profilesmall img:eq(0)', doc).attr('src') || null;
             // Some users don't have a trade URL
             _this.tradeurl = $('#offer a[href*="/tradeoffer/new/?partner="]', doc).attr('href') || null;
-            _this.steamlevel = parseInt($('.profilesmall .slvl', doc).text().match(/\d+/)[0]) || null; // Maybe better handling?
-            //console.log(_this.steamlevel);
-            var steamLevelCssClass = $('.profilesmall .slvl', doc).attr('class').split(' ')[1] || null;
-
-            console.timeEnd('fetchExtraData init');
-
-            //console.log('slvl class', steamLevelCssClass);
-
-            //console.log(_this.profileId, _this.avatarMediumUrl, _this.tradeurl, _this.steamlevel, _this.tradeID);
-            //console.log(_this.tradeDescription);
-
-            console.time('fetchExtraData append');
-
-            if(!$('span[style*="float: right"]', _this.tradeElement).length) {
-                $(_this.tradeElement).find('.tradeheader').append('<span style="float: right"></span>');
-            }
-
-            $tradeHeader = $(_this.tradeElement).find('.tradeheader span[style*="float: right"]');
-
-            if(_this.profileId) {
-                var profileBtn = $('<a class="button destroyer steam-profile" style="float: none;" href="https://steamcommunity.com/profiles/' + _this.profileId + '" target="_blank">Steam profile</a>').hide();
-                $tradeHeader.append(profileBtn);
-                profileBtn.fadeIn();
-            }
-
-            if(_this.tradeurl) {
-                var tradeOfferBtn = $('<a class="button destroyer trade-offer" style="float: none;" href="' + _this.tradeurl + '" target="_blank">Trade offer</a>').hide();
-                $tradeHeader.append(tradeOfferBtn);
-                tradeOfferBtn.fadeIn();
-            }
-
-            if(LoungeUser.userSettings.tradeLoadSteamData === '0') {
-                var steamLvlElm = $('<span> (Level ' + _this.steamlevel + ')</span>').hide();
-                $('a[href^="trade?"]:eq(0)', _this.tradeElement).append(steamLvlElm);
-                $(steamLvlElm).fadeIn();
-            }
-
-            if (LoungeUser.userSettings.showTradeDescriptions === '1' && _this.tradeDescription.length > 0) {
-                var tradeDescriptionElm = $('<div class="trade-description"><p></p></div>').hide();
-                $(_this.tradeElement).find('.tradecnt').after(tradeDescriptionElm);
-                $('p', tradeDescriptionElm).html(textToUrl(removeTags(_this.tradeDescription)));
-                $(tradeDescriptionElm).slideDown();
-            }
+            _this.steamlevel = parseInt($('.profilesmall .slvl', doc).text()) || null;
 
             _this.extraDataFetched = true;
-
-            var $steamExtraElm = $('<div class="ld-steam-extra-wrapper"><div class="ld-steam-extra"></div></div>');
-
-            $('.tradeheader', _this.tradeElement).after($steamExtraElm);
-
-            console.timeEnd('fetchExtraData append');
-
-            //$('.ld-steam-extra', _this.tradeElement).hide();
-            if(LoungeUser.userSettings.globalTradeFilters === '1') {
-                _this.filterByExtendedTradeData();
-            }
-
-            if(!_this.tradeIsFiltered && LoungeUser.userSettings.tradeLoadSteamData === '1') {
-                _this.getExtraSteamData(_this.profileId, function(info) {
-                    //console.log(info);
-
-                    _this.steamData = info;
-
-                    if(LoungeUser.userSettings.globalTradeFilters === '1') {
-                        _this.filterBySteamData();
-                    }
-                    console.time('steamextra append');
-                    $steamExtra = $('.ld-steam-extra', _this.tradeElement);
-                    $steamExtra.append(
-                        '<div class="ld-steam-info">' +
-                        '<a class="ld-steam-img" href="https://steamcommunity.com/profiles/' + _this.profileId + '"><img src="' + _this.avatarMediumUrl + '"/></a>' +
-                        '<div class="ld-steam-status">' + info.onlineState + '</div>' +
-                        '</div>'
-                    );
-                    $steamExtra.append('<div class="ld-steam-info"><div class="ld-info-label">Date joined:</div> <div class="ld-info-val">' + moment.unix(info.joinDate).format('MMM Do, YYYY') + '</div></div>');
-                    $steamExtra.append('<div class="ld-steam-info"><div class="ld-info-label">VAC bans:</div> <div class="ld-info-val">' + info.vacBans + '</div></div>');
-                    $steamExtra.append('<div class="ld-steam-info"><div class="ld-info-label">Steam level:</div> <div class="ld-info-val">' + _this.steamlevel + '</div></div>');
-                    //$steamExtra.append('<div class="ld-steam-info" title="Calculated from only three recently played games, this is done to save on extra, not so necessary API requests"><div class="ld-info-label">Game time 2 weeks:</div> <div class="ld-info-val">' + info.gametime_2weeks.toFixed(1) + 'h</div></div>');
-                    $steamExtra.append('<div class="ld-steam-info" title="Calculated from only three recently played games, this is done to save on extra, not so necessary API requests"><div class="ld-info-label">Game time all time:</div> <div class="ld-info-val">' + info.gametime_total.toFixed(1) + 'h</div></div>');
-                    $('.ld-steam-extra-wrapper', _this.tradeElement).addClass('ld-slidedown');
-                    console.timeEnd('steamextra append');
-                });
-            }
 
             callback();
         },
@@ -148,44 +100,34 @@ Trade.prototype.fetchExtraData = function(callback) {
             callback();
         }
     });
+
+    return this;
 };
 
 Trade.prototype.getExtraSteamData = function(profileId, callback) {
-    console.log((window.location.protocol + '//steamcommunity.com/profiles/' + profileId + '?xml=1'));
+    var _this = this;
+
+    this.steamUser = {};
+
     $.ajax({
         url: (window.location.protocol + '//steamcommunity.com/profiles/' + profileId + '?xml=1'),
         type: 'GET',
         success: function(data) {
-            //console.log(data);
-            //console.log(this.url);
+            _this.steamUser.isPublicProfile = $(data).find('privacyState').text() !== 'private';
 
-            console.time('steamextra fetch');
+            _this.steamUser.vacBannedCount = parseInt($(data).find('vacBanned').text());
 
-            var isPublicProfile = $(data).find('privacyState').text() !== 'private';
+            _this.steamUser.onlineState = (_this.steamUser.isPublicProfile) ? $(data).find('onlineState').text() : 'private';
 
-            //console.log('vacbans', $(data).find('vacBanned').text());
-            var vacBannedCount = parseInt($(data).find('vacBanned').text());
+            _this.steamUser.creationMoment = moment($(data).find('memberSince').text(), "MMMM DD YYYY");
 
-            //console.log('online state', $(data).find('onlineState').text());
-            var onlineState = (isPublicProfile) ? $(data).find('onlineState').text() : 'private';
-
-            //console.log('trade ban', $(data).find('tradeBanState').text());
-            //var isTradeBanned = $(data).find('tradeBanState').text();
-
-            //console.log('limited account', $(data).find('isLimitedAccount').text());
-            //var isLimited = $(data).find('isLimitedAccount').text();
-
-            //console.log('member since', $(data).find('memberSince').text());
-
-            var creationMoment = moment($(data).find('memberSince').text(), "MMMM DD YYYY");
-
-            if(isPublicProfile) {
+            if(_this.steamUser.isPublicProfile) {
                 var nowMoment = moment();
-                memberSince = creationMoment.unix();
-                accAgeInDays = nowMoment.diff(creationMoment, 'days');
+                _this.steamUser.memberSince = _this.steamUser.creationMoment.unix();
+                _this.steamUser.accAgeInDays = nowMoment.diff(_this.steamUser.creationMoment, 'days');
             } else {
-                memberSince = null;
-                accAgeInDays = 0;
+                _this.steamUser.memberSince = null;
+                _this.steamUser.accAgeInDays = 0;
             }
 
 
@@ -193,38 +135,99 @@ Trade.prototype.getExtraSteamData = function(profileId, callback) {
             var hoursPlayedTotal = 0;
 
             $(data).find('mostPlayedGames > mostPlayedGame').each(function(i, v) {
-                //console.log($(v).find('gameName').text());
                 var hours2w = parseFloat($(v).find('hoursPlayed').text()) || 0;
                 var hoursAll = parseFloat($(v).find('hoursOnRecord').text().replace(',', '')) || 0;
                 hoursPlayed2w = hoursPlayed2w + hours2w;
                 hoursPlayedTotal = hoursPlayedTotal + hoursAll;
             });
 
-            console.timeEnd('steamextra fetch');
+            _this.steamUser.hoursPlayed2w = hoursPlayed2w;
+            _this.steamUser.hoursPlayedTotal = hoursPlayedTotal;
 
-            callback({
-                isPublicProfile: isPublicProfile,
-                onlineState: onlineState,
-                joinDate: memberSince, // Epoch
-                daysSinceJoinDate: accAgeInDays,
-                vacBans: vacBannedCount,
-                //limited: isLimited,
-                //isTradeBanned: isTradeBanned,
-                gametime_2weeks: hoursPlayed2w,
-                gametime_total: hoursPlayedTotal
-            });
+            callback();
         },
         error: function() {
-            callback(null);
+            callback();
         }
-    })
+    });
+
+    return this;
+};
+
+Trade.prototype.appendTradeData = function() {
+    var _this = this;
+
+    if(!$('span[style*="float: right"]', _this.tradeElement).length) {
+        $(_this.tradeElement).find('.tradeheader').append('<span style="float: right"></span>');
+    }
+
+    $tradeHeader = $(_this.tradeElement).find('.tradeheader span[style*="float: right"]');
+
+    if(_this.profileId) {
+        var profileBtn = $('<a class="button destroyer steam-profile" style="float: none;" href="https://steamcommunity.com/profiles/' + _this.profileId + '" target="_blank">Steam profile</a>').hide();
+        $tradeHeader.append(profileBtn);
+        profileBtn.fadeIn();
+    }
+
+    if(_this.tradeurl) {
+        var tradeOfferBtn = $('<a class="button destroyer trade-offer" style="float: none;" href="' + _this.tradeurl + '" target="_blank">Trade offer</a>').hide();
+        $tradeHeader.append(tradeOfferBtn);
+        tradeOfferBtn.fadeIn();
+    }
+
+    if(LoungeUser.userSettings.tradeLoadSteamData === '0' && this.steamlevel) {
+        var steamLvlElm = $('<span> (Level ' + _this.steamlevel + ')</span>').hide();
+        $('a[href^="trade?"]:eq(0)', _this.tradeElement).append(steamLvlElm);
+        $(steamLvlElm).fadeIn();
+    }
+
+    if (LoungeUser.userSettings.showTradeDescriptions === '1' && _this.tradeDescription.length > 0) {
+        var tradeDescriptionElm = $('<div class="trade-description"><p></p></div>').hide();
+        $(_this.tradeElement).find('.tradecnt').after(tradeDescriptionElm);
+        $('p', tradeDescriptionElm).html(textToUrl(removeTags(_this.tradeDescription)));
+        $(tradeDescriptionElm).slideDown();
+    }
+
+    return this;
+};
+
+Trade.prototype.appendSteamData = function() {
+    var _this = this;
+
+    var $steamExtraElm = $('<div class="ld-steam-extra-wrapper"><div class="ld-steam-extra"></div></div>');
+
+    $('.tradeheader', _this.tradeElement).after($steamExtraElm);
+
+    var $steamExtra = $('.ld-steam-extra', _this.tradeElement);
+
+    $steamExtra.append(
+        '<div class="ld-steam-info">' +
+        '<a class="ld-steam-img" href="https://steamcommunity.com/profiles/' + _this.profileId + '"><img src="' + _this.avatarMediumUrl + '"/></a>' +
+        '<div class="ld-steam-status">' + _this.steamUser.onlineState + '</div>' +
+        '</div>'
+    );
+
+    if (_this.steamUser.memberSince) {
+        $steamExtra.append('<div class="ld-steam-info"><div class="ld-info-label">Date joined:</div> <div class="ld-info-val">' + moment.unix(_this.steamUser.memberSince).format('MMM Do, YYYY') + '</div></div>');
+    }
+
+    $steamExtra.append('<div class="ld-steam-info"><div class="ld-info-label">VAC bans:</div> <div class="ld-info-val">' + _this.steamUser.vacBannedCount + '</div></div>');
+    $steamExtra.append('<div class="ld-steam-info"><div class="ld-info-label">Steam level:</div> <div class="ld-info-val">' + _this.steamlevel + '</div></div>');
+    $steamExtra.append('<div class="ld-steam-info" title="Calculated from only three recently played games, this is done to save on extra, not so necessary API requests"><div class="ld-info-label">Game time all time:</div> <div class="ld-info-val">' + _this.steamUser.hoursPlayedTotal.toFixed(1) + 'h</div></div>');
+
+    // http://stackoverflow.com/q/7069167
+    setTimeout(function() {
+        $('.ld-steam-extra-wrapper', _this.tradeElement).addClass('ld-slidedown');
+    }, 5);
+
+    return this;
 };
 
 Trade.prototype.filterByTradeData = function() {
     var _this = this;
 
     if(LoungeUser.userSettings.hideDonatorTrades === '1' && $('.tradeheader span.donor', this.tradeElement).length) {
-        console.log('hiding trade because user is donator');
+        console.log('TRADES :: Hiding trade #' + this.tradeID + ' because user is donator');
         return this.hide();
     }
 
@@ -232,13 +235,12 @@ Trade.prototype.filterByTradeData = function() {
 
     if(this.tradeIsFiltered) return true;
 
-    //var testItemsHave = ["Any Offers", "Falchion Case Key"];
     var haveItemsFiltered = false;
 
     $('.tradecnt .left .oitm.notavailable', this.tradeElement).each(function(i, v) {
         var item = itemObject(v);
         if(tradeItemsHaveArr.indexOf(item.itemName) !== -1) {
-            console.log('hiding because the item is in the have list filter');
+            console.log('TRADES :: Hiding trade #' + this.tradeID + ' because the item is in the have list filter');
             haveItemsFiltered = true;
             return false;
         }
@@ -246,13 +248,12 @@ Trade.prototype.filterByTradeData = function() {
 
     if(haveItemsFiltered) return _this.hide();
 
-    //var testItemsWant = ["Any Knife", "Falchion Case Key"];
     var wantItemsFiltered = false;
 
     $('.tradecnt .right .oitm.notavailable', this.tradeElement).each(function(i, v) {
         var item = itemObject(v);
         if(tradeItemsWantArr.indexOf(item.itemName) !== -1) {
-            console.log('hiding because the item is in the want list filter');
+            console.log('TRADES :: Hiding trade #' + this.tradeID + ' because the item is in the want list filter');
             wantItemsFiltered = true;
             return false;
         }
@@ -268,14 +269,14 @@ Trade.prototype.filterByTradeDescription = function() {
 
     if (tradeShowFilter) {
         if(this.tradeDescriptionIsExtended && !tradeShowFilter.test(this.tradeDescription)) {
-            console.log('Hiding because it did not match Show trade filter');
+            console.log('TRADES :: Hiding trade #' + this.tradeID + ' because it did not match Show trade filter');
             return this.hide();
         }
     }
 
     // Hide filters
     if (tradeHideFilter && tradeHideFilter.test(this.tradeDescription)) {
-        console.log('Hiding because it matched Hide trade filter');
+        console.log('TRADES :: Hiding trade #' + this.tradeID + ' because it matched Hide trade filter');
         return this.hide();
     }
 
@@ -286,12 +287,12 @@ Trade.prototype.filterByExtendedTradeData = function() {
     this.filterByTradeDescription();
 
     if(this.steamlevel < parseInt(LoungeUser.userSettings.minSteamLevel)) {
-        console.log('hiding because steam level did not match');
+        console.log('TRADES :: Hiding trade #' + this.tradeID + ' because Steam level did not match');
         return this.hide();
     }
 
     if(this.tradeurl == null && LoungeUser.userSettings.hideNoTradeofferTrades === '1') {
-        console.log('hiding because no trade offer link');
+        console.log('TRADES :: Hiding trade #' + this.tradeID + ' because no trade offer link');
         return this.hide();
     }
 
@@ -299,30 +300,25 @@ Trade.prototype.filterByExtendedTradeData = function() {
 };
 
 Trade.prototype.filterBySteamData = function() {
-    var minDaysSinceJoined = 100;
-    var minPlaytimeAll = 250;
-    var onlyPublicProfile = true;
-    var maxVacbanCount = 1;
+    if(!this.steamUser) return false;
 
-    if(!this.steamData) return false;
-
-    if(this.steamData.daysSinceJoinDate < parseInt(LoungeUser.userSettings.minAccAgeDays)) {
-        console.log('hiding because account age not match');
+    if(this.steamUser.accAgeInDays < parseInt(LoungeUser.userSettings.minAccAgeDays)) {
+        console.log('TRADES :: Hiding trade #' + this.tradeID + ' because account age did not match');
         return this.hide();
     }
 
-    if(this.steamData.gametime_total < parseInt(LoungeUser.userSettings.minAlltimePlaytime)) {
-        console.log('hiding because min. gametime all time did not match');
+    if(this.steamUser.hoursPlayedTotal < parseInt(LoungeUser.userSettings.minAlltimePlaytime)) {
+        console.log('TRADES :: Hiding trade #' + this.tradeID + ' because min. game time did not match');
         return this.hide();
     }
 
-    if(LoungeUser.userSettings.hideTradesPrivateProfile === '1' && this.steamData.isPublicProfile === false) {
-        console.log('hiding because profile was private');
+    if(LoungeUser.userSettings.hideTradesPrivateProfile === '1' && this.steamUser.isPublicProfile === false) {
+        console.log('TRADES :: Hiding trade #' + this.tradeID + ' because profile is private');
         return this.hide();
     }
 
-    if(this.steamData.vacBans > LoungeUser.userSettings.maxVacBans) {
-        console.log('hiding because account has vac bans');
+    if(this.steamUser.vacBannedCount > LoungeUser.userSettings.maxVacBans) {
+        console.log('TRADES :: Hiding trade #' + this.tradeID + ' because user has VAC bans');
         return this.hide();
     }
 
@@ -331,7 +327,7 @@ Trade.prototype.filterBySteamData = function() {
 
 Trade.prototype.hide = function() {
     var _this = this;
-    console.log('Hiding', this.tradeID);
+    
     $(this.tradeElement).fadeOut(400, function() {
         $(_this.tradeElement).addClass('ld-filtered');
     });
@@ -381,37 +377,3 @@ function updateFilteredTradeCount() {
         $('.ld-trade-filters .ld-trade-filters-buttons .ld-trades-show').show();
     }
 }
-
-/**
- * Uses Lounge's API for getting trades
- * Calls callback with array of Trade instances or error
- *
- * @param int after - timestamp to get trades since
- * @param function callback - function to call with trades
- */
-/*function getTrades(callback, after) {
-    var strAfter = moment(after||Date.now()).format("YYYY-MM-DD HH:mm:ss");
-
-    $.ajax({
-        url: "/ajax/liveTrades",
-        type: "POST",
-        data: "last="+strAfter+"&",
-        success: function(data){
-            var doc = document.implementation.createHTMLDocument("");
-            doc.body.innerHTML = data;
-
-            // loop through each trade
-            var trades = doc.querySelectorAll(".tradepoll"),
-                outp = [];
-
-            for (var i = 0, j = trades.length; i < j; ++i) {
-                outp.push(new Trade(trades[i]));
-            }
-
-            callback(outp);
-        },
-        error: function(jqXHR, errStatus, errText) {
-            callback([], jqXHR, errStatus, errText);
-        }
-    });
-}*/

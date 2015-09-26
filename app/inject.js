@@ -350,11 +350,11 @@ function init() {
                 var trade = tradeObject(value);
                 if((LoungeUser.userSettings.tradeLoadExtra === '1' && isHomepage) || LoungeUser.userSettings.tradeLoadExtra === '2') {
                     if(isScrolledIntoView(trade.tradeElement)) {
-                        trade.fetchExtraData(function() {});
+                        trade.getExtraData();
                     }
                 }
                 if(LoungeUser.userSettings.tradeLoadExtra === '1' && !isHomepage) {
-                    trade.fetchExtraData(function() {});
+                    trade.getExtraData();
                 }
             });
 
@@ -603,7 +603,7 @@ $(document).on('mouseover', '.matchmain', function() {
 $(document).on('mouseover', '.tradepoll:not(.notavailable)', function() {
     if(LoungeUser.userSettings.tradeLoadExtra === '3') {
         var trade = tradeObject(this);
-        trade.fetchExtraData(function(){});
+        trade.getExtraData();
     }
 });
 
@@ -612,7 +612,7 @@ $(window).scrolled(function() {
         $('.tradepoll:not(.notavailable)').each(function(index, value) {
             if(isScrolledIntoView(value)) {
                 var trade = tradeObject(value);
-                trade.fetchExtraData(function(){});
+                trade.getExtraData();
             }
         });
     }
