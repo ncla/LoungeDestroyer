@@ -23,7 +23,6 @@ var Trade = function(tradeElement) {
             this.tradeID = tradeAnchor.attr('href').match(/\d+$/)[0] || false;
         }
 
-        // check if matches hide/mark trade filter
         this.getTradeDescriptionFromHTML();
         if(LoungeUser.userSettings.globalTradeFilters === '1' && !this.tradeIsFiltered) {
             this.filterByTradeData();
@@ -73,7 +72,7 @@ Trade.prototype.fetchTradeData = function(callback) {
     this.fetchingExtraData = true;
 
     $.ajax({
-        url: _this.generateTradeURL(),
+        url: _this.generateTradeURL(appID),
         type: 'GET',
         success: function(data) {
             var doc = document.implementation.createHTMLDocument('');
@@ -335,9 +334,7 @@ Trade.prototype.filterBySteamData = function() {
 Trade.prototype.hide = function() {
     var _this = this;
     
-    $(this.tradeElement).fadeOut(400, function() {
-        $(_this.tradeElement).addClass('ld-filtered');
-    });
+    $(this.tradeElement).hide().addClass('ld-filtered');
 
     this.tradeIsFiltered = true;
     updateFilteredTradeCount();
