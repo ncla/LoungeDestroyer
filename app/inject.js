@@ -17,6 +17,7 @@ var tradeHideFilter;
 var tradeMarkFilter;
 var timezoneName = (LoungeUser.userSettings.timezone == 'auto' ? jstz.determine().name() : LoungeUser.userSettings.timezone);
 var tradesFiltered = 0;
+var isHomepage;
 
 var container = document.createElement('div');
 
@@ -328,8 +329,6 @@ function init() {
             });
         }
 
-        var isHomepage = ($('.title[style*="/img/trades.png"]').length > 0);
-
         if (isHomepage || document.URL.indexOf('/result?') !== -1 || document.URL.indexOf('/trades') !== -1) {
             if(LoungeUser.userSettings.showTradeFilterBox === '1') {
                 $('div.title:eq(0)').after('<div class="ld-trade-filters">' +
@@ -444,6 +443,7 @@ function init() {
     Code that does not rely heavily on Chrome storage data
  */
 $(document).ready(function() {
+    isHomepage = ($('.title[style*="/img/trades.png"]').length > 0);
     // listen for additions to items
     itemObs.observe(document.body, {
         childList: true,

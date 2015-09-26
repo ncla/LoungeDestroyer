@@ -25,7 +25,7 @@ var Trade = function(tradeElement) {
 
         // check if matches hide/mark trade filter
         this.getTradeDescriptionFromHTML();
-        if(LoungeUser.userSettings.globalTradeFilters === '1') {
+        if(LoungeUser.userSettings.globalTradeFilters === '1' && !this.tradeIsFiltered) {
             this.filterByTradeData();
         }
     }
@@ -229,9 +229,13 @@ Trade.prototype.appendSteamData = function() {
 Trade.prototype.filterByTradeData = function() {
     var _this = this;
 
-    if(LoungeUser.userSettings.hideDonatorTrades === '1' && $('.tradeheader span.donor', this.tradeElement).length) {
-        console.log('TRADES :: Hiding trade #' + this.tradeID + ' because user is donator');
-        return this.hide();
+    if(LoungeUser.userSettings.hideDonatorTrades === '1') {
+        $tradeLinkJumbo = $('.tradeheader a[href^="trade?"]:eq(0) span:eq(0)', this.tradeElement);
+
+        if ($tradeLinkJumbo.length && $tradeLinkJumbo.attr('class') !== undefined && $tradeLinkJumbo.attr('class').indexOf('donor') !== -1) {
+            console.log('TRADES :: Hiding trade #' + this.tradeID + ' because user is donator');
+            return this.hide();
+        }
     }
 
     this.filterByTradeDescription();
@@ -295,7 +299,6 @@ Trade.prototype.filterByExtendedTradeData = function() {
     }
 
     if(this.tradeurl == null && this.profileId && LoungeUser.userSettings.hideNoTradeofferTrades === '1') {
-        console.log(this.profileId, this);
         console.log('TRADES :: Hiding trade #' + this.tradeID + ' because no trade offer link');
         return this.hide();
     }
@@ -367,10 +370,26 @@ function tradeObject(domObj) {
     return $trade.data('trade-data');
 }
 
+
 function updateFilteredTradeCount() {
+    console.log('TRADES :: A trade was filtered, checking new trades in view');
+
     tradesFiltered++;
     if(LoungeUser.userSettings.showTradeFilterBox === '1') {
         $('.ld-trade-filters span.ld-filtered-amount').text(tradesFiltered + (tradesFiltered === 1 ? ' trade was' : ' trades were'));
         $('.ld-trade-filters .ld-trade-filters-buttons .ld-trades-show').show();
     }
+
+    // If you try to run this thing without DOM being ready, it will for some reason end up in infinite loop
+    $(document).ready(function() {
+        $('.tradepoll:not(.notavailable)').each(function(index, value) {
+            var trade = tradeObject(value);
+            if((LoungeUser.userSettings.tradeLoadExtra === '1' && isHomepage) || LoungeUser.userSettings.tradeLoadExtra === '2') {
+                if(isScrolledIntoView(trade.tradeElement)) {
+                    trade.getExtraData();
+                }
+            }
+        });
+    });
+
 }
