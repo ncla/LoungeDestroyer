@@ -328,7 +328,7 @@ function init() {
             });
         }
 
-        var isHomepage = ($('.title a[href="/trades"]').length > 0);
+        var isHomepage = ($('.title[style*="/img/trades.png"]').length > 0);
 
         if (isHomepage || document.URL.indexOf('/result?') !== -1 || document.URL.indexOf('/trades') !== -1) {
             if(LoungeUser.userSettings.showTradeFilterBox === '1') {

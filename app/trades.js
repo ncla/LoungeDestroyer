@@ -11,7 +11,7 @@ var Trade = function(tradeElement) {
 
     this.fetchingExtraData = false;
     this.extraDataFetched = false;
-    this.tradeisFiltered = false;
+    this.tradeIsFiltered = false;
     this.tradeDescriptionIsExtended = false;
 
     // This allows us to use the object functions as static functions without constructing the object
@@ -50,16 +50,13 @@ Trade.prototype.getExtraData = function() {
         _this.appendTradeData();
 
         // If we need Steam user data, we fetch that as well
-        if(!_this.tradeIsFiltered && LoungeUser.userSettings.tradeLoadSteamData === '1') {
-
-            // Check here if we have profile ID
+        if(!_this.tradeIsFiltered && LoungeUser.userSettings.tradeLoadSteamData === '1' && _this.profileId) {
             _this.getExtraSteamData(_this.profileId, function() {
 
                 if(LoungeUser.userSettings.globalTradeFilters === '1') {
                     _this.filterBySteamData();
                 }
 
-                // Check here if we have all the necessary info to append
                 _this.appendSteamData();
             });
 
@@ -83,10 +80,16 @@ Trade.prototype.fetchTradeData = function(callback) {
             doc.body.innerHTML = data;
 
             var desc = $(doc).find('.standard.msgtxt').text().trim();
-            _this.tradeDescriptionExtended = true;
+            _this.tradeDescriptionIsExtended = true;
             _this.tradeDescription = desc;
 
-            _this.profileId = $('.profilesmallheader a', doc).attr('href').match(/\d+/)[0] || null;
+            var $profileLink = $('.profilesmallheader a', doc);
+            if($profileLink.length) {
+                _this.profileId = $profileLink.attr('href').match(/\d+/)[0];
+            } else {
+                this.profileId = null;
+            }
+
             _this.avatarMediumUrl = $('.profilesmall img:eq(0)', doc).attr('src') || null;
             // Some users don't have a trade URL
             _this.tradeurl = $('#offer a[href*="/tradeoffer/new/?partner="]', doc).attr('href') || null;
@@ -286,12 +289,13 @@ Trade.prototype.filterByTradeDescription = function() {
 Trade.prototype.filterByExtendedTradeData = function() {
     this.filterByTradeDescription();
 
-    if(this.steamlevel < parseInt(LoungeUser.userSettings.minSteamLevel)) {
+    if(this.steamlevel !== null && this.steamlevel < parseInt(LoungeUser.userSettings.minSteamLevel)) {
         console.log('TRADES :: Hiding trade #' + this.tradeID + ' because Steam level did not match');
         return this.hide();
     }
 
-    if(this.tradeurl == null && LoungeUser.userSettings.hideNoTradeofferTrades === '1') {
+    if(this.tradeurl == null && this.profileId && LoungeUser.userSettings.hideNoTradeofferTrades === '1') {
+        console.log(this.profileId, this);
         console.log('TRADES :: Hiding trade #' + this.tradeID + ' because no trade offer link');
         return this.hide();
     }
@@ -336,13 +340,6 @@ Trade.prototype.hide = function() {
     updateFilteredTradeCount();
 
     return true;
-};
-
-/**
- * Runs all filter testing
- */
-Trade.prototype.testFilters = function() {
-
 };
 
 Trade.prototype.generateTradeURL = function(appID) {
