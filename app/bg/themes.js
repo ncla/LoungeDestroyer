@@ -9,6 +9,10 @@ var themeListOriginal = {
         url: 'http://127.0.0.1/themes/Swag/data.json',
         remote: true
     }
+    , glasstheme: {
+        url: 'http://nozas.com/GlassLounge/data.json',
+        remote: true
+    }
 };
 
 var Themes = function() {
@@ -75,6 +79,8 @@ Themes.prototype.updateThemes = function(callback) {
                 continue;
             }
 
+            // TODO: Instead of calling chrome.storage.set for each theme data/CSS, do it at the end only once
+
             get(url, (function(theme) {
                 return function() {
                     try {
@@ -123,7 +129,11 @@ Themes.prototype.updateThemes = function(callback) {
 
                     console.log('THEMES :: ', theme, 'fetching CSS');
 
-                    // cache CSS so we can inject instantly
+                    if(!themes[theme].hasOwnProperty('css')) {
+                        console.log('THEMES :: ', theme, 'does not have CSS url set');
+                        return;
+                    }
+
                     get(themes[theme].css + '?cachebreak=' + Date.now(), function() {
                         if (!this.status) {
                             console.error('THEMES :: [' + theme + '] Failed to retrieve CSS');

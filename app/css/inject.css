@@ -613,3 +613,7 @@ span.ld-btn-icon {
     position: relative;
     top: 2px;
 }
+
+.teamtext b.ld-teambeton {
+    text-decoration: underline;
+}

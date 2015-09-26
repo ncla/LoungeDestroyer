@@ -69,6 +69,8 @@ Match.prototype.parseMatchElement = function(elm) {
  * @param elm The body/page element of match page
  */
 Match.prototype.parseMatchPage = function(response) {
+    var _this = this;
+
     var doc = document.implementation.createHTMLDocument('');
     doc.body.innerHTML = response;
 
@@ -78,6 +80,25 @@ Match.prototype.parseMatchPage = function(response) {
     this.exactTime = $('.half:eq(2)', matchHeader).text().trim();
     this.userBetted = !!$('.box-shiny-alt .winsorloses', doc).length;
     this.amountOfBetsPlaced = parseFloat($('section.box:eq(1) .box-shiny-alt .full', doc).text()) || 0;
+
+    this.teamBetOn = -1;
+
+    $matchSection = $('section.box:eq(0) .box-shiny-alt', doc);
+    if ($('a:eq(0)', $matchSection).hasClass('active')) {
+        this.teamBetOn = 0;
+    }
+    if ($('a:eq(1)', $matchSection).hasClass('active')) {
+        this.teamBetOn = 1;
+    }
+
+    this.totalBet = 0;
+
+    if (this.teamBetOn !== -1) {
+        $('.box-shiny-alt .winsorloses .oitm', doc).each(function(itemIndex, itemValue) {
+            var item = itemObject(itemValue);
+            _this.totalBet = _this.totalBet + item.loungeValue;
+        });
+    }
 
     var textValueForOneA = $($('div[style="float: left; margin: 0.25em 2%;"]', doc).contents()[2]).text().replace(',', '.');
     var textValueForOneB = $($('div[style="float: right; margin: 0.25em 2%;"]', doc).contents()[2]).text().replace(',', '.');
@@ -181,6 +202,14 @@ Match.prototype.appendExtraMatchInfo = function(targetElement) {
         $('.teamtext:eq(1) i', this.matchElement).append(' <span class="ld-valueForOne">(' + this.valueForOneTeamB + ' for 1)</span>');
     }
 
+    if (LoungeUser.userSettings.underlineTeamUserBetOn === '1' && this.teamBetOn !== -1) {
+        $('.teamtext:eq("' + this.teamBetOn + '") b', this.matchElement).addClass('ld-teambeton');
+    }
+
+    if (this.teamBetOn !== -1 && this.totalBet > 0) {
+        $('.teamtext:eq("' + this.teamBetOn + '")', this.matchElement).parent().attr('title', 'You placed ' + convertPrice(this.totalBet, true) + ' on this match');
+    }
+
     // trim the unneeded spaces
     var redInfo = matchHeaderBlock[0].querySelector('span[style*="#D12121"]');
     if (redInfo) {
@@ -257,5 +286,6 @@ function updateFilteredMatchCount() {
     matchesFiltered++;
     if(LoungeUser.userSettings.showMatchFilterBox === '1') {
         $('.ld-match-filters span.ld-filtered-amount').text(matchesFiltered + (matchesFiltered === 1 ? ' match was' : ' matches were'));
+        $('.ld-match-filters .ld-match-filters-buttons .ld-matches-show').show();
     }
 }

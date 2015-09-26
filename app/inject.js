@@ -334,9 +334,8 @@ function init() {
             if(LoungeUser.userSettings.showTradeFilterBox === '1') {
                 $('div.title:eq(0)').after('<div class="ld-trade-filters">' +
                     '<div class="ld-trade-filters-buttons">' +
-                    '<a href="#" class="buttonright ld-changefilters">Change filters</a>' +
-                    '<a href="#" class="buttonright ld-trades-show">Show trades</a></div>' +
-                    '<div class="ld-trade-filters-info"><span class="ld-filtered-amount">0 trades were</span> filtered <br>by your <a href="#"><b>trade settings</b></a>' +
+                    '<a href="#" class="buttonright ld-trades-show" style="display: none;">Show trades</a></div>' +
+                    '<div class="ld-trade-filters-info"><span class="ld-filtered-amount">0 trades were</span> filtered <br>by your <a href="#"><b>trade filter settings</b></a>' +
                     '</div> </div>');
 
                 $('.ld-trade-filters .ld-trades-show').click(function() {
@@ -364,13 +363,12 @@ function init() {
         if (isHomepage && LoungeUser.userSettings.showMatchFilterBox === '1') {
             $('div.title:eq(1)').after('<div class="ld-match-filters">' +
                 '<div class="ld-match-filters-buttons">' +
-                '<a href="#" class="buttonright ld-changefilters">Change filters</a>' +
-                '<a href="#" class="buttonright ld-matches-show">Show matches</a></div>' +
-                '<div class="ld-match-filters-info"><span class="ld-filtered-amount">0 matches were</span> filtered <br>by your <a href="#"><b>match settings</b></a>' +
+                '<a href="#" class="buttonright ld-matches-show" style="display: none;">Show matches</a></div>' +
+                '<div class="ld-match-filters-info"><span class="ld-filtered-amount">0 matches were</span> filtered <br>by your <a href="#"><b>match filter settings</b></a>' +
                 '</div> </div>');
         }
 
-        $('.ld-trade-filters .ld-changefilters, .ld-trade-filters-info a, .ld-match-filters .ld-changefilters, .ld-match-filters-info a').click(function() {
+        $('.ld-trade-filters-info a, .ld-match-filters-info a').click(function() {
             chrome.runtime.sendMessage({openSettings: true}, function(data) {
                 console.log('Message sent for opening settings page');
             });

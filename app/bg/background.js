@@ -706,11 +706,7 @@ chrome.alarms.onAlarm.addListener(function(alarm) {
             checkForExpiredItems(730);
         }
     }
-
-    if (alarm.name == 'remoteThemesUpdate') {
-        themes.updateThemes();
-    }
-
+    
     if (alarm.name == 'autoBump') {
         if (['1', '730', '570'].indexOf(LoungeUser.userSettings.autoBump) !== -1) {
             autoBumpTrades();

@@ -64,6 +64,7 @@ User.prototype.defaultSettings =
     matchTournamentFiltersArray: ["ESL Quickscope Arena"],
     showExtraMatchInfo: '2',
     showValueForOneIndicator: '0',
+    underlineTeamUserBetOn: '1',
 
     globalTradeFilters: '1',
     showTradeFilterBox: '1',
