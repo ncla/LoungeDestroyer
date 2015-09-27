@@ -148,10 +148,15 @@ Match.prototype.testMatchFilters = function() {
 };
 
 Match.prototype.hide = function() {
-    $(this.matchElement).hide();
+    if(hideFilteredMatches === true) {
+        $(this.matchElement).hide();
+    }
+
     this.matchIsFiltered = true;
     $(this.matchElement).addClass('ld-filtered');
     updateFilteredMatchCount();
+
+    return true;
 };
 
 /**
@@ -289,4 +294,19 @@ function updateFilteredMatchCount() {
         $('.ld-match-filters span.ld-filtered-amount').text(matchesFiltered + (matchesFiltered === 1 ? ' match was' : ' matches were'));
         $('.ld-match-filters .ld-match-filters-buttons .ld-matches-show').show();
     }
+}
+
+function toggleFilteredMatches(button) {
+    hideFilteredMatches = !hideFilteredMatches;
+
+    $('.matchmain.ld-filtered').each(function(index, value) {
+        var match = matchObject(value);
+        if(hideFilteredMatches) {
+            $(match.matchElement).hide()
+        } else {
+            $(match.matchElement).show();
+        }
+    });
+
+    $(button).text(hideFilteredMatches ? 'Show filtered matches' : 'Hide filtered matches');
 }

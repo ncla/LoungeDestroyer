@@ -18,6 +18,8 @@ var tradeMarkFilter;
 var timezoneName = (LoungeUser.userSettings.timezone == 'auto' ? jstz.determine().name() : LoungeUser.userSettings.timezone);
 var tradesFiltered = 0;
 var isHomepage;
+var hideFilteredTrades = true;
+var hideFilteredMatches = true;
 
 var container = document.createElement('div');
 
@@ -332,15 +334,12 @@ function init() {
             if(LoungeUser.userSettings.showTradeFilterBox === '1') {
                 $('div.title:eq(0)').after('<div class="ld-trade-filters">' +
                     '<div class="ld-trade-filters-buttons">' +
-                    '<a href="#" class="buttonright ld-trades-show" style="display: none;">Show trades</a></div>' +
+                    '<a href="#" class="buttonright ld-trades-show" style="display: none;">Show filtered trades</a></div>' +
                     '<div class="ld-trade-filters-info"><span class="ld-filtered-amount">0 trades were</span> filtered <br>by your <a href="#"><b>trade filter settings</b></a>' +
                     '</div> </div>');
 
                 $('.ld-trade-filters .ld-trades-show').click(function() {
-                    $('.tradepoll').each(function(index, value) {
-                        var trade = tradeObject(value);
-                        $(trade.tradeElement).show();
-                    });
+                    toggleFilteredTrades(this);
                 });
             }
 
@@ -365,7 +364,7 @@ function init() {
         if (isHomepage && LoungeUser.userSettings.showMatchFilterBox === '1') {
             $('div.title:eq(1)').after('<div class="ld-match-filters">' +
                 '<div class="ld-match-filters-buttons">' +
-                '<a href="#" class="buttonright ld-matches-show" style="display: none;">Show matches</a></div>' +
+                '<a href="#" class="buttonright ld-matches-show" style="display: none;">Show filtered matches</a></div>' +
                 '<div class="ld-match-filters-info"><span class="ld-filtered-amount">0 matches were</span> filtered <br>by your <a href="#"><b>match filter settings</b></a>' +
                 '</div> </div>');
         }
@@ -377,10 +376,7 @@ function init() {
         });
 
         $('.ld-match-filters .ld-matches-show').click(function() {
-            $('.matchmain').each(function(i, v) {
-                var match = matchObject(v);
-                $(v).show();
-            });
+            toggleFilteredMatches(this);
         });
 
         if (document.URL.indexOf('/match?m=') != -1 || document.URL.indexOf('/predict') != -1) {

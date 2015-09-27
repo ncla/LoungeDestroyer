@@ -334,7 +334,10 @@ Trade.prototype.filterBySteamData = function() {
 Trade.prototype.hide = function() {
     var _this = this;
 
-    $(this.tradeElement).hide().addClass('ld-filtered');
+    if(hideFilteredTrades === true) {
+        $(this.tradeElement).hide();
+    }
+    $(this.tradeElement).addClass('ld-filtered');
 
     this.tradeIsFiltered = true;
     updateFilteredTradeCount();
@@ -387,6 +390,19 @@ function updateFilteredTradeCount() {
             });
         });
     }
+}
 
+function toggleFilteredTrades(button) {
+    hideFilteredTrades = !hideFilteredTrades;
 
+    $('.tradepoll.ld-filtered').each(function(index, value) {
+        var trade = tradeObject(value);
+        if(hideFilteredTrades) {
+            $(trade.tradeElement).hide()
+        } else {
+            $(trade.tradeElement).show();
+        }
+    });
+
+    $(button).text(hideFilteredTrades ? 'Show filtered trades' : 'Hide filtered trades');
 }
