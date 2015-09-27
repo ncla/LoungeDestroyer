@@ -332,7 +332,7 @@ function init() {
 
         if (isHomepage || document.URL.indexOf('/result?') !== -1 || document.URL.indexOf('/trades') !== -1) {
             if(LoungeUser.userSettings.showTradeFilterBox === '1') {
-                $('div.title:eq(0)').after('<div class="ld-trade-filters">' +
+                $('#tradelist').before('<div class="ld-trade-filters">' +
                     '<div class="ld-trade-filters-buttons">' +
                     '<a href="#" class="buttonright ld-trades-show" style="display: none;">Show filtered trades</a></div>' +
                     '<div class="ld-trade-filters-info"><span class="ld-filtered-amount">0 trades were</span> filtered <br>by your <a href="#"><b>trade filter settings</b></a>' +
@@ -648,6 +648,16 @@ var itemObs = new MutationObserver(function(records) {
                     if (elm.classList.contains('tradepoll') && !elm.classList.contains('notavailable')) {
                         hasTradeNodes = true;
                         var trade = tradeObject(elm);
+                        
+                        if (LoungeUser.userSettings.tradeLoadExtra === '3' || (LoungeUser.userSettings.tradeLoadExtra === '4' && !isHomepage)) {
+                            if (isScrolledIntoView(trade.tradeElement)) {
+                                trade.getExtraData();
+                            }
+                        }
+
+                        if (LoungeUser.userSettings.tradeLoadExtra === '2' || (LoungeUser.userSettings.tradeLoadExtra === '1' && !isHomepage)) {
+                            trade.getExtraData();
+                        }
                     }
                 }
             }

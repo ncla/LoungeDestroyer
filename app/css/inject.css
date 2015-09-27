@@ -617,3 +617,10 @@ span.ld-btn-icon {
 .teamtext b.ld-teambeton {
     text-decoration: underline;
 }
+/*
+    For some reason #loading doesn't like ld-trade-filters before #tradelist on /trades page, so we just get rid of it :)
+    Might want to look into a better solution in the future
+*/
+.ld-trades #loading {
+    visibility: hidden;
+}
