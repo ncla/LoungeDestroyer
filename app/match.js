@@ -10,7 +10,6 @@ var Match = function(matchElement) {
         this.addCachedMatchInfo();
         this.appendExtraMatchInfo(this.matchElement);
 
-        console.log(this);
         // Not interested in filtering when on my bets page
         // TODO: Maybe move this out of constructor and place within inject.js instead?
         if (window.location.pathname !== '/mybets' && LoungeUser.userSettings.globalMatchFilters === '1') {
@@ -113,32 +112,31 @@ Match.prototype.parseMatchPage = function(response) {
     } else {
         this.valueForOneTeamA = this.valueForOneTeamB = undefined;
     }
-    console.log(this);
 };
 
 Match.prototype.testMatchFilters = function() {
     // FIXME: This is wrong, drafted/closed matches will be hidden as well
     if(LoungeUser.userSettings.matchHideLive === '1' && this.timeFromNow.indexOf('ago') !== -1 && !this.closedMatch) {
-        console.log('Hiding match because it has already started');
+        console.log('MATCHES :: Hiding match #' + this.matchID + ' because it has already started');
         return this.hide();
     }
 
     var maxOdds = parseInt(LoungeUser.userSettings.matchFilterMaxOdds) || 100;
 
     if(this.teamOddsA >= maxOdds || this.teamOddsB >= maxOdds) {
-        console.log('Filtering because heavy favorite');
+        console.log('MATCHES :: Hiding match #' + this.matchID + ' because heavy favorite');
         return this.hide();
     }
 
     if(LoungeUser.userSettings.matchTeamFiltersArray.indexOf(this.tournamentName) !== -1) {
-        console.log('Hiding because tournament blacklisted');
+        console.log('MATCHES :: Hiding match #' + this.matchID + ' because tournament is blacklisted');
         return this.hide();
     }
 
     var teamsHideArray = LoungeUser.userSettings.matchTeamFiltersArray;
 
     if(teamsHideArray.indexOf(this.teamA) !== -1 || teamsHideArray.indexOf(this.teamB) !== -1) {
-        console.log('Hiding because team blacklisted');
+        console.log('MATCHES :: Hiding match #' + this.matchID + ' because team is blacklisted');
         return this.hide();
     }
 

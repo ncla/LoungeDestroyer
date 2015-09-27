@@ -333,7 +333,7 @@ Trade.prototype.filterBySteamData = function() {
 
 Trade.prototype.hide = function() {
     var _this = this;
-    
+
     $(this.tradeElement).hide().addClass('ld-filtered');
 
     this.tradeIsFiltered = true;

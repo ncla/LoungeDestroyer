@@ -150,10 +150,9 @@ function init() {
                 }
 
                 if (theme.disableCss) {
-                    //$('link[rel=stylesheet][href*="/css/bright"], link[rel=stylesheet][href*="/css/gray"]').remove();
                     var styles = document.styleSheets;
                     for (var i = 0; i < styles.length; i++) {
-                        if (styles[i].href.match("/css/bright") || styles[i].href.match("/css/gray")) {
+                        if (styles.href && (styles[i].href.indexOf("/css/bright") !== -1 || styles[i].href.indexOf("/css/gray") !== -1)) {
                             if (styles[i].cssRules != null && styles[i].cssRules.length > 0) {
                                 console.log('THEMES :: Stylsheet is loaded, hard refreshing..');
 
