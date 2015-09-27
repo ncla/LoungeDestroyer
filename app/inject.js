@@ -151,10 +151,14 @@ function init() {
                     }
                 }
 
-                if (theme.disableCss) {
+                if (theme.disableCss === true) {
+                    console.log('THEME :: Theme requires to have site stylesheet to be disabled');
+
                     var styles = document.styleSheets;
                     for (var i = 0; i < styles.length; i++) {
-                        if (styles.href && (styles[i].href.indexOf("/css/bright") !== -1 || styles[i].href.indexOf("/css/gray") !== -1)) {
+                        // Look if the stylesheet is remote by checking the URL attribute
+                        if (styles[i].href && (styles[i].href.indexOf("/css/bright") !== -1 || styles[i].href.indexOf("/css/gray") !== -1)) {
+                            // Check stylesheet rules, if there are any then it is likely stylesheet was not blocked
                             if (styles[i].cssRules != null && styles[i].cssRules.length > 0) {
                                 console.log('THEMES :: Stylsheet is loaded, hard refreshing..');
 
