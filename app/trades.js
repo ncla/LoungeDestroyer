@@ -369,24 +369,24 @@ function tradeObject(domObj) {
 
 
 function updateFilteredTradeCount() {
-    console.log('TRADES :: A trade was filtered, checking new trades in view');
-
     tradesFiltered++;
     if(LoungeUser.userSettings.showTradeFilterBox === '1') {
         $('.ld-trade-filters span.ld-filtered-amount').text(tradesFiltered + (tradesFiltered === 1 ? ' trade was' : ' trades were'));
         $('.ld-trade-filters .ld-trade-filters-buttons .ld-trades-show').show();
     }
 
-    // If you try to run this thing without DOM being ready, it will for some reason end up in infinite loop
-    $(document).ready(function() {
-        $('.tradepoll:not(.notavailable)').each(function(index, value) {
-            var trade = tradeObject(value);
-            if((LoungeUser.userSettings.tradeLoadExtra === '1' && isHomepage) || LoungeUser.userSettings.tradeLoadExtra === '2') {
+    if (LoungeUser.userSettings.tradeLoadExtra === '3' || (LoungeUser.userSettings.tradeLoadExtra === '4' && !isHomepage)) {
+        console.log('TRADES :: A trade was filtered, checking new trades in view');
+
+        $(document).ready(function() {
+            $('.tradepoll:not(.notavailable)').each(function(index, value) {
+                var trade = tradeObject(value);
                 if(isScrolledIntoView(trade.tradeElement)) {
                     trade.getExtraData();
                 }
-            }
+            });
         });
-    });
+    }
+
 
 }

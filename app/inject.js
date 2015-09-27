@@ -344,14 +344,18 @@ function init() {
                 });
             }
 
+            var loadExtraOpt = LoungeUser.userSettings.tradeLoadExtra;
+
             $('.tradepoll:not(.notavailable)').each(function(index, value) {
                 var trade = tradeObject(value);
-                if((LoungeUser.userSettings.tradeLoadExtra === '1' && isHomepage) || LoungeUser.userSettings.tradeLoadExtra === '2') {
-                    if(isScrolledIntoView(trade.tradeElement)) {
+
+                if (loadExtraOpt === '3' || (loadExtraOpt === '4' && !isHomepage)) {
+                    if (isScrolledIntoView(trade.tradeElement)) {
                         trade.getExtraData();
                     }
                 }
-                if(LoungeUser.userSettings.tradeLoadExtra === '1' && !isHomepage) {
+
+                if (loadExtraOpt === '2' || (loadExtraOpt === '1' && !isHomepage)) {
                     trade.getExtraData();
                 }
             });
@@ -600,23 +604,23 @@ $(document).on('mouseover', '.matchmain', function() {
 });
 
 $(document).on('mouseover', '.tradepoll:not(.notavailable)', function() {
-    if(LoungeUser.userSettings.tradeLoadExtra === '3') {
+    if (LoungeUser.userSettings.tradeLoadExtra === '5' || (isHomepage && ['1', '4'].indexOf(LoungeUser.userSettings.tradeLoadExtra) !== -1)) {
         var trade = tradeObject(this);
         trade.getExtraData();
     }
 });
 
 $(window).scrolled(function() {
-    if(['1', '2'].indexOf(LoungeUser.userSettings.tradeLoadExtra) !== -1) {
+    if (LoungeUser.userSettings.tradeLoadExtra === '3' || (LoungeUser.userSettings.tradeLoadExtra === '4' && !isHomepage)) {
         $('.tradepoll:not(.notavailable)').each(function(index, value) {
-            if(isScrolledIntoView(value)) {
-                var trade = tradeObject(value);
+            var trade = tradeObject(value);
+            if (isScrolledIntoView(trade.tradeElement)) {
                 trade.getExtraData();
             }
         });
     }
 
-    if(LoungeUser.userSettings.showExtraMatchInfo === '2') {
+    if (LoungeUser.userSettings.showExtraMatchInfo === '2') {
         $('.matchmain').each(function(i, v) {
             var match = matchObject(v);
             if(!match.closedMatch && !match.matchIsFiltered && isScrolledIntoView(v)) {
@@ -625,7 +629,7 @@ $(window).scrolled(function() {
         });
     }
 
-    if(LoungeUser.userSettings.itemMarketPricesv2 === '2' && LoungeUser.userSettings.useCachedPriceList === '0') {
+    if (LoungeUser.userSettings.itemMarketPricesv2 === '2' && LoungeUser.userSettings.useCachedPriceList === '0') {
         $('.oitm').each(function(i, v) {
             if(isScrolledIntoView(v)) {
                 var item = itemObject(v);
