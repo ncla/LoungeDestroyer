@@ -132,6 +132,10 @@ Trade.prototype.getExtraSteamData = function(profileId, callback) {
                 _this.steamUser.accAgeInDays = 0;
             }
 
+            // There are some rare cases where Lounge does not want to output avatar/Steam level in the source code of trade page
+            if (_this.avatarMediumUrl === null) {
+                _this.avatarMediumUrl = $(data).find('avatarMedium:eq(0)').text();
+            }
 
             var hoursPlayed2w = 0;
             var hoursPlayedTotal = 0;
