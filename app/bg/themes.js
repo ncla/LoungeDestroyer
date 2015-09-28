@@ -35,18 +35,27 @@ Themes.prototype.init = function() {
             }
         }
 
-        // If we don't have any themes
-        if (!Object.keys(themes).length) {
-            console.log('THEMES :: Resetting to bundled themes!');
+        // If we don't have any themes or we are missing some
+        _this.checkForMissingThemes(function() {
+            _this.updateThemes();
+        });
+    });
+};
 
-            // add bundled themes
-            themes = themeListOriginal;
-            _this.syncThemesObject(function() {
-                console.log('THEMES :: Reset theme list in storage to the orinal bundled themes list');
-            });
-        } else {
-            _this.addNewBundledThemes();
-        }
+Themes.prototype.checkForMissingThemes = function(callback) {
+    var _this = this;
+
+    if (!Object.keys(themes).length) {
+        console.log('THEMES :: Resetting to bundled themes!');
+
+        // add bundled themes
+        themes = themeListOriginal;
+    } else {
+        _this.addNewBundledThemes();
+    }
+
+    _this.syncThemesObject(function() {
+        callback();
     });
 };
 
@@ -60,7 +69,6 @@ Themes.prototype.addNewBundledThemes = function() {
         }
     }
 
-    this.syncThemesObject();
     console.log(themes);
 };
 
@@ -294,7 +302,7 @@ chrome.alarms.onAlarm.addListener(function(alarm) {
 });
 
 chrome.runtime.onInstalled.addListener(function(details) {
-    themesBg.updateThemes();
+    //themesBg.updateThemes();
 });
 
 function importantifyCSS(css) {
