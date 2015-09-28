@@ -66,14 +66,7 @@ navAnchor.click( function(e) {
 			$.ajax('https://api.github.com/repos/ncla/LoungeDestroyer/releases?per_page=15', {
 				type: 'GET',
 				success: function(data) {
-					console.log(data);
 					$.each(data, function(i, release) {
-						//console.log(release);
-						//console.log(release.body);
-						console.log(marked(release.body));
-						//<h3>v0.8.2.2
-						//<small>released on april 31st, 2015</small>
-						//</h3>
 						var releaseVersion = release.tag_name;
 						var releaseDate = moment(release.published_at).format('MMMM Do, YYYY').toLowerCase();
 						console.log(releaseDate);
