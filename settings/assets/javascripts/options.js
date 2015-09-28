@@ -11,12 +11,19 @@ var optionsSelectize = {
     }
 };
 
-var themesSelect = $('#themes').selectize(optionsSelectize);
-var themesSelectSelectize = themesSelect[0].selectize;
+var themesSelectSelectize;
 
-function restore_options() {
+$(document).ready(function() {
     var manifesto = chrome.runtime.getManifest();
     document.getElementById("version").innerHTML = manifesto.version;
+
+    var themesSelect = $('#themes').selectize(optionsSelectize);
+    themesSelectSelectize = themesSelect[0].selectize;
+
+    themesSelectSelectize.onChange(function(value) {
+        console.log('Dropdown selected', value);
+        select_theme(value);
+    });
 
     $.each(currencyData, function(i, v) {
         $("#marketCurrency").append('<option value="' + i + '">' + v["naming"] + '</option>');
@@ -172,9 +179,7 @@ function restore_options() {
 
         return keywords;
     }
-}
-
-document.addEventListener('DOMContentLoaded', restore_options);
+});
 
 $("select, input").on('change', function() {
     // make sure number inputs are limited to their min/max settings
@@ -378,6 +383,7 @@ function theme_create_element(name, obj, active) {
 
     // Add theme to dropdown
 
+    console.log(themesSelectSelectize);
     themesSelectSelectize.addOption({value: name, text: obj.title, silent: true});
 
     // Select current active theme
@@ -429,11 +435,6 @@ function show_theme(name) {
     console.log(themesSelect);
     themesSelect[0].selectize.setValue(name, true);
 }
-
-themesSelectSelectize.on('change', function(value) {
-    console.log('Dropdown selected', value);
-    select_theme(value);
-});
 
 /**
 * Native code can't be passed as callbacks

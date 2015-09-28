@@ -69,7 +69,6 @@ navAnchor.click( function(e) {
 					$.each(data, function(i, release) {
 						var releaseVersion = release.tag_name;
 						var releaseDate = moment(release.published_at).format('MMMM Do, YYYY').toLowerCase();
-						console.log(releaseDate);
 						$changelogContent.append('<h3>' + releaseVersion + ' <small>released on ' + releaseDate + '</small></h3>');
 						$changelogContent.append(marked(release.body));
 						$changelogContent.append('<br class="margin"/>');
