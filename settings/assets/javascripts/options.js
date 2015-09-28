@@ -11,19 +11,21 @@ var optionsSelectize = {
     }
 };
 
+var optionsSelectizeThemeDropdown = optionsSelectize;
+optionsSelectizeThemeDropdown.onChange = function(value) {
+    console.log('Dropdown selected', value);
+    select_theme(value);
+};
+
 var themesSelectSelectize;
+var themesSelect;
 
 $(document).ready(function() {
     var manifesto = chrome.runtime.getManifest();
     document.getElementById("version").innerHTML = manifesto.version;
 
-    var themesSelect = $('#themes').selectize(optionsSelectize);
+    themesSelect = $('#themes').selectize(optionsSelectize);
     themesSelectSelectize = themesSelect[0].selectize;
-
-    themesSelectSelectize.onChange(function(value) {
-        console.log('Dropdown selected', value);
-        select_theme(value);
-    });
 
     $.each(currencyData, function(i, v) {
         $("#marketCurrency").append('<option value="' + i + '">' + v["naming"] + '</option>');
