@@ -11,11 +11,13 @@ var optionsSelectize = {
     }
 };
 
-var optionsSelectizeThemeDropdown = optionsSelectize;
+var optionsSelectizeThemeDropdown = {};
 optionsSelectizeThemeDropdown.onChange = function(value) {
     console.log('Dropdown selected', value);
     select_theme(value);
 };
+
+$.extend(optionsSelectizeThemeDropdown, optionsSelectize);
 
 var themesSelectSelectize;
 var themesSelect;
@@ -24,7 +26,7 @@ $(document).ready(function() {
     var manifesto = chrome.runtime.getManifest();
     document.getElementById("version").innerHTML = manifesto.version;
 
-    themesSelect = $('#themes').selectize(optionsSelectize);
+    themesSelect = $('#themes').selectize(optionsSelectizeThemeDropdown);
     themesSelectSelectize = themesSelect[0].selectize;
 
     $.each(currencyData, function(i, v) {
@@ -300,7 +302,7 @@ var themes = {},
 * @param Boolean active - whether the slide should be active
 */
 function theme_create_element(name, obj, active) {
-    console.log("Creating theme element for ",name);
+    console.log("Creating theme element for ", name);
     console.log(obj);
 
     var item = $('#theme-blank').clone(true);
