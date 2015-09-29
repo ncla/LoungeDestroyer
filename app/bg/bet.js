@@ -110,7 +110,7 @@ function handleQueue(data, game, sender) {
         if (LoungeUser.userSettings.notifyTradeOffer == '1') {
             createNotification('Queue trade offer received',
                 (['CSGO', 'Dota2'])[game] + 'Lounge has sent you a trade offer',
-                'offer',
+                'taburl',
                 {title: 'Open trade offer'},
                 data.offer);
         }

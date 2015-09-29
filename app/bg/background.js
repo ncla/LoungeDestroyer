@@ -277,8 +277,19 @@ var notificationID = 0;
 var notifications = {};
 
 chrome.notifications.onButtonClicked.addListener(function(notificationID) {
-    if (notificationID.indexOf('_match') != -1 || notificationID.indexOf('_mytrade') != -1 || notificationID.indexOf('_myoffer') != -1 || notificationID.indexOf('_offer') !== -1) {
+    if (notificationID.indexOf('_taburl') !== -1) {
         chrome.tabs.create({url: notifications[notificationID]});
+    }
+
+    if (notificationID.indexOf('_changelog') !== -1) {
+        var optionsUrl = chrome.extension.getURL('settings/index.html#openchangelog');
+        chrome.tabs.query({url: optionsUrl}, function(tabs) {
+            if (tabs.length) {
+                chrome.tabs.update(tabs[0].id, {active: true});
+            } else {
+                chrome.tabs.create({url: optionsUrl});
+            }
+        });
     }
 });
 /*
@@ -357,7 +368,7 @@ function checkNewMatches(ajaxResponse, appID) {
                 createNotification(
                     'A new ' + (appID == 730 ? 'CS:GO' : 'DOTA2') + ' match has been added!',
                     msg,
-                    'match',
+                    'taburl',
                     {title: 'Open match page'},
                     baseURLs[appID] + 'match?m=' + value.matchID
                 );
@@ -400,7 +411,7 @@ function checkForNewTradeOffers(data, appID) {
                         createNotification(
                             'Trade update on ' + (appID == 730 ? 'CS:GO Lounge' : 'DOTA2 Lounge'),
                             notifyAmount == 1 ? 'You have 1 new comment on your trade #' + tradeID : 'You have ' + notifyAmount + ' new comments on your trade # ' + tradeID,
-                            'mytrade',
+                            'taburl',
                             {title: 'Open trade page'},
                             tradeURL
                         );
@@ -428,7 +439,7 @@ function checkForNewTradeOffers(data, appID) {
                         createNotification(
                             'Trade update for your offer on ' + (appID == 730 ? 'CS:GO Lounge' : 'DOTA2 Lounge'),
                             'A user has replied to your offer',
-                            'myoffer',
+                            'taburl',
                             {title: 'Open offer page'},
                             offerURL
                         );
@@ -735,9 +746,9 @@ chrome.runtime.onInstalled.addListener(function(details) {
             createNotification(
                 'LoungeDestroyer ' + thisVersion + ' update',
                 'LoungeDestroyer has updated to ' + thisVersion + ' version, bringing bug fixes and possibly new stuff. You can read about the changes by pressing button bellow',
-                'offer',
-                {title: 'Read changelog'},
-                'https://github.com/ncla/LoungeDestroyer/releases'
+                'changelog',
+                {title: 'Open changelog'},
+                ''
             );
             // Migration forcing setting change for users that have cached item list and hover only market prices
             if(details.previousVersion == '0.8.3.0' && thisVersion == '0.8.3.1') {

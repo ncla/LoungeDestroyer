@@ -181,6 +181,11 @@ $(document).ready(function() {
 
         return keywords;
     }
+
+    if(window.location.hash === '#openchangelog') {
+        $('nav[role="navigation"] ul a[href="#page-changelog"]').click();
+        window.location.hash = '';
+    }
 });
 
 $("select, input").on('change', function() {
