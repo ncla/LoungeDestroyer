@@ -19,7 +19,7 @@ Inventory.prototype.determineBackpackElement = function() {
         this.backpackElement = $('#backpack');
     } else if (document.URL.indexOf('/trade?t=') != -1) {
         this.backpackElement = $('#offer');
-        this.lastElementInBackpack = $(self.backpackElement).children().last();
+        this.lastElementInBackpack = $('#loading', this.backpackElement);
     } else if ($('#backpack').length) {
         this.backpackElement = $('#backpack');
     } else {
@@ -179,12 +179,14 @@ Inventory.prototype.onInventoryLoaded = function(requestData) {
     this.backpackAjaxData = requestData;
 
     var whereToLookAt = $('#backpack');
+
     /*
         Special care for trade page backpacks, since backpack is appended and not replaced on trade page,
         we have to wrap all elements and then check against that
      */
     if (document.URL.indexOf('/trade?t=') != -1) {
         whereToLookAt = $(this.lastElementInBackpack).nextAll();
+
         var testFake = $('<div/>');
         $(whereToLookAt).each(function(i, v) {
             var theClone = $(v).clone();
@@ -202,7 +204,6 @@ Inventory.prototype.onInventoryLoaded = function(requestData) {
         this.addInventoryLoadButton(this.backpackElement);
     } else {
         console.log('Assuming the backpack has loaded!');
-        this.determineBackpackType();
         $('#loading', this.backpackElement).hide();
         if (document.URL.indexOf('/match?m=') !== -1) {
             // We only need to cache the betting inventories
@@ -266,9 +267,11 @@ Inventory.prototype.onInventoryLoaded = function(requestData) {
                 }
             }
         }
+        if (document.URL.indexOf('/myprofile') !== -1 || document.URL.indexOf('/trade?t=') !== -1) {
+            initiateItemObjectForElementList($('#backpack .oitm'));
+        }
 
         if (document.URL.indexOf('/myprofile') !== -1) {
-            initiateItemObjectForElementList($('#backpack .oitm'));
             addInventoryStatistics();
         }
     }
