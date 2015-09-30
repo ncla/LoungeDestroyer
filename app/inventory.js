@@ -267,9 +267,8 @@ Inventory.prototype.onInventoryLoaded = function(requestData) {
                 }
             }
         }
-        if (document.URL.indexOf('/myprofile') !== -1 || document.URL.indexOf('/trade?t=') !== -1) {
-            initiateItemObjectForElementList($('#backpack .oitm'));
-        }
+        initiateItemObjectForElementList($('#backpack .oitm'));
+
 
         if (document.URL.indexOf('/myprofile') !== -1) {
             addInventoryStatistics();
