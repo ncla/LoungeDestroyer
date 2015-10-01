@@ -92,7 +92,9 @@ Trade.prototype.fetchTradeData = function(callback) {
             _this.avatarMediumUrl = $('.profilesmall img:eq(0)', doc).attr('src') || null;
             // Some users don't have a trade URL
             _this.tradeurl = $('#offer a[href*="/tradeoffer/new/?partner="]', doc).attr('href') || null;
-            _this.steamlevel = parseInt($('.profilesmall .slvl', doc).text()) || null;
+
+            var steamlevel = parseInt($('.profilesmall .slvl', doc).text());
+            _this.steamlevel = (steamlevel >= 0 ? steamlevel : null);
 
             _this.extraDataFetched = true;
 
@@ -181,7 +183,7 @@ Trade.prototype.appendTradeData = function() {
         tradeOfferBtn.fadeIn();
     }
 
-    if(LoungeUser.userSettings.tradeLoadSteamData === '0' && this.steamlevel) {
+    if(LoungeUser.userSettings.tradeLoadSteamData === '0' && this.steamlevel >= 0) {
         var steamLvlElm = $('<span> (Level ' + _this.steamlevel + ')</span>').hide();
         $('a[href^="trade?"]:eq(0)', _this.tradeElement).append(steamLvlElm);
         $(steamLvlElm).fadeIn();
@@ -218,7 +220,10 @@ Trade.prototype.appendSteamData = function() {
     }
 
     $steamExtra.append('<div class="ld-steam-info"><div class="ld-info-label">VAC bans:</div> <div class="ld-info-val">' + _this.steamUser.vacBannedCount + '</div></div>');
-    $steamExtra.append('<div class="ld-steam-info"><div class="ld-info-label">Steam level:</div> <div class="ld-info-val">' + _this.steamlevel + '</div></div>');
+
+    var steamlevel = (_this.steamlevel !== null ? _this.steamlevel : 'Not found');
+    $steamExtra.append('<div class="ld-steam-info"><div class="ld-info-label">Steam level:</div> <div class="ld-info-val">' + steamlevel + '</div></div>');
+
     $steamExtra.append('<div class="ld-steam-info" title="Calculated from only three recently played games, this is done to save on extra, not so necessary API requests"><div class="ld-info-label">Game time all time:</div> <div class="ld-info-val">' + _this.steamUser.hoursPlayedTotal.toFixed(1) + 'h</div></div>');
 
     // http://stackoverflow.com/q/7069167
