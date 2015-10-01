@@ -159,13 +159,21 @@ function init() {
                         // Look if the stylesheet is remote by checking the URL attribute
                         if (styles[i].href && (styles[i].href.indexOf("/css/bright") !== -1 || styles[i].href.indexOf("/css/gray") !== -1)) {
                             // Check stylesheet rules, if there are any then it is likely stylesheet was not blocked
-                            if (styles[i].cssRules != null && styles[i].cssRules.length > 0) {
+                            if (styles[i].cssRules !== null && styles[i].cssRules.length > 0) {
                                 console.log('THEMES :: Stylsheet is loaded, hard refreshing..');
 
                                 chrome.runtime.sendMessage({hardRefresh: true}, function(data) {
                                     console.log('THEMES :: Request to hard refresh was sent');
                                 });
 
+                                break;
+                            }
+
+                            // Stylesheets from cross domains do not allow to read their CSS properties, and we cannot block
+                            // them without requesting new permissions from the user
+                            if (styles[i].href.indexOf("://cdn.") !== -1 && styles[i].cssRules === null) {
+                                console.log('THEMES :: Stylsheet is loaded from cross domain, manually removing..');
+                                $(styles[i].ownerNode).remove();
                                 break;
                             }
                         }
