@@ -2,15 +2,11 @@ var themes = {};
 var themeCSS = '';
 var themeListOriginal = {
     cleanlounge: {
-        url: 'http://api.ncla.me/themes/CleanLounge/data.json',
-        remote: true
-    }
-    , swagtheme: {
-        url: 'http://127.0.0.1/themes/Swag/data.json',
+        url: 'http://api.ncla.me/themes/CleanLounge2/data.json',
         remote: true
     }
     , glasstheme: {
-        url: 'http://nozas.com/GlassLounge/data.json',
+        url: 'http://api.ncla.me/themes/GlassLounge/data.json',
         remote: true
     }
 };
