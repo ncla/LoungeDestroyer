@@ -147,7 +147,7 @@ Themes.prototype.updateThemes = function(callback) {
                         // If theme doesn't need to be importantified, in which case we will be disabling Lounge site stylesheets
                         if(themes[theme].hasOwnProperty('disableCss') && themes[theme].disableCss === true) {
                             console.log('THEMES :: ', theme, ' using raw CSS');
-                            var css = this.responseText;
+                            var css = parsifyCSS(this.responseText);
                         }
                         // Otherwise we importantify all CSS rules (due to styling prioritization limitations)
                         else {
@@ -301,6 +301,32 @@ chrome.runtime.onInstalled.addListener(function(details) {
     //themesBg.updateThemes();
 });
 
+/**
+ * Function to parse and minify CSS, instead of feeding direct CSS response from the server (security)
+ * @param css {string} CSS stylesheet contents
+ * @return {string}
+ */
+function parsifyCSS(css) {
+    if (css) {
+        try {
+            var cssTree = parseCSS(css);
+
+            css = stringifyCSS(cssTree, {compress: true});
+            console.log(css);
+        } catch (err) {
+            console.error('Tried to parse CSS, failed: ', err);
+            return '';
+        }
+    }
+
+    return css;
+}
+
+/**
+ * Importantifies a.k.a. appends !important to all style property values
+ * @param css {string} CSS stylesheet contents
+ * @return {string}
+ */
 function importantifyCSS(css) {
     if (css) {
         try {
