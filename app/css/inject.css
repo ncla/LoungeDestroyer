@@ -624,3 +624,9 @@ span.ld-btn-icon {
 .ld-trades #loading {
     visibility: hidden;
 }
+
+.ld-trade-load-main-err, .ld-trade-load-steam-err {
+    color: red;
+    font-weight: bold;
+    cursor: help;
+}

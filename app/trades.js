@@ -57,16 +57,24 @@ Trade.prototype.getExtraData = function() {
                 }
 
                 _this.appendSteamData();
+            }, function() {
+                // Error handling for Steam profile data
+                $('.tradeheader', _this.tradeElement).append('<span class="ld-trade-load-steam-err" title="There was an error loading Steam related information">ERROR!</span>');
+                $(_this.tradeElement).addClass('ld-trade-load-error');
             });
 
         }
 
+    }, function() {
+        // Error handle for basic trade data
+        $('.tradeheader', _this.tradeElement).append('<span class="ld-trade-load-main-err" title="There was an error loading trade data">ERROR!</span>');
+        $(_this.tradeElement).addClass('ld-trade-load-error');
     });
 
     return this;
 };
 
-Trade.prototype.fetchTradeData = function(callback) {
+Trade.prototype.fetchTradeData = function(successCallback, errorCallback) {
     var _this = this;
 
     this.fetchingExtraData = true;
@@ -83,7 +91,7 @@ Trade.prototype.fetchTradeData = function(callback) {
             _this.tradeDescription = desc;
 
             var $profileLink = $('.profilesmallheader a', doc);
-            if($profileLink.length) {
+            if ($profileLink.length) {
                 _this.profileId = $profileLink.attr('href').match(/\d+/)[0];
             } else {
                 this.profileId = null;
@@ -97,18 +105,23 @@ Trade.prototype.fetchTradeData = function(callback) {
             _this.steamlevel = (steamlevel >= 0 ? steamlevel : null);
 
             _this.extraDataFetched = true;
+            _this.fetchingExtraData = false;
 
-            callback();
+            successCallback();
         },
         error: function() {
-            callback();
+            _this.fetchingExtraData = false;
+
+            // Just so it does not bother sending more requests
+            _this.extraDataFetched = true;
+            errorCallback();
         }
     });
 
     return this;
 };
 
-Trade.prototype.getExtraSteamData = function(profileId, callback) {
+Trade.prototype.getExtraSteamData = function(profileId, successCallback, errorCallback) {
     var _this = this;
 
     this.steamUser = {};
@@ -152,10 +165,10 @@ Trade.prototype.getExtraSteamData = function(profileId, callback) {
             _this.steamUser.hoursPlayed2w = hoursPlayed2w;
             _this.steamUser.hoursPlayedTotal = hoursPlayedTotal;
 
-            callback();
+            successCallback();
         },
         error: function() {
-            callback();
+            errorCallback();
         }
     });
 

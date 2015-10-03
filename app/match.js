@@ -127,8 +127,8 @@ Match.prototype.testMatchFilters = function() {
         console.log('MATCHES :: Hiding match #' + this.matchID + ' because heavy favorite');
         return this.hide();
     }
-
-    if(LoungeUser.userSettings.matchTeamFiltersArray.indexOf(this.tournamentName) !== -1) {
+    
+    if(LoungeUser.userSettings.matchTournamentFiltersArray.indexOf(this.tournamentName) !== -1) {
         console.log('MATCHES :: Hiding match #' + this.matchID + ' because tournament is blacklisted');
         return this.hide();
     }
