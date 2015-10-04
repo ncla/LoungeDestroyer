@@ -302,7 +302,13 @@ var themes = {},
 * @param Boolean active - whether the slide should be active
 */
 function theme_create_element(name, obj, active) {
-    console.log("Creating theme element for ", name);
+    console.log('THEMES :: Creating theme element for ', name);
+
+    if (!obj.author || !obj.version || !obj.title || !obj.description) {
+        console.log('THEMES :: Missing crucial information for creating a theme element for ' + name + ', skipping');
+        return false;
+    }
+
     console.log(obj);
 
     var item = $('#theme-blank').clone(true);
@@ -323,7 +329,6 @@ function theme_create_element(name, obj, active) {
     // AUTHOR, VERSION, DESCRIPTION, NAME
     $(item).find('.theme-info .theme-author').text(obj.author);
     $(item).find('.theme-info .theme-version').text(obj.version);
-    $(item).find('theme-desc').text(obj.description);
     $(item).find('.theme-info .theme-name').text(obj.title);
     $(item).find('.theme-desc').text(obj.description);
 

@@ -125,7 +125,6 @@ Themes.prototype.updateThemes = function(callback) {
 
                         // merge obj and json
                         $.extend(true, themes[themeIndex], json);
-                        //chrome.storage.local.set({themes: themes});
                     } catch (err) {
                         console.error('THEMES :: [' + themeIndex + '] Failed to update: ', err);
                     }
