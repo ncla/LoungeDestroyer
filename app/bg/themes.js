@@ -73,23 +73,22 @@ Themes.prototype.updateThemes = function(callback) {
 
     console.log('THEMES :: Updating themes!');
 
-     for (var theme in themes) {
-        if (themes[theme].remote) {
-            console.log('THEMES :: Fetching data.json for theme ' + theme);
+    var promisesThemeData = [];
+    var promisesThemeCss = [];
 
-            // get JSON
-            var url = themes[theme].url + '?cachebreak=' + Date.now();
-            if (!url) {
-                continue;
-            }
+    $.each(themes, function(themeIndex, theme) {
+        if(!themes[themeIndex].hasOwnProperty('url') || !themes[themeIndex].hasOwnProperty('remote') || themes[themeIndex].remote !== true) {
+            console.log('THEMES :: ', themeIndex, 'does not have data.json url set / remote property set / remote property is not true');
+            return true;
+        }
 
-            // TODO: Instead of calling chrome.storage.set for each theme data/CSS, do it at the end only once
-
-            get(url, (function(theme) {
-                return function() {
+        promisesThemeData.push(
+            $.ajax({
+                url: theme.url,
+                cache: false,
+                success: function(data, textStatus, jqXHR) {
                     try {
-                        var data = this.responseText;
-                        var json = JSON.parse(data);
+                        var json = data;
                         var err = '';
                         required = ['name', 'title', 'author', 'version', 'css', 'bg'];
 
@@ -108,72 +107,97 @@ Themes.prototype.updateThemes = function(callback) {
                             return;
                         }
 
-                        if (themes[theme].version == json.version) {
-                            console.log('THEMES :: Version for ', theme, ' hasn\'t changed, no need to update');
+                        if (themes[themeIndex].version == json.version) {
+                            console.log('THEMES :: Version for ', themeIndex, ' hasn\'t changed, no need to update');
                             return;
                         }
 
                         // merge new JSON into old, keeping options
                         if (json.options) {
-                            for (var k in themes[theme].options) {
+                            for (var k in themes[themeIndex].options) {
                                 if (json.options.hasOwnProperty(k)) {
-                                    json.options[k].checked = themes[theme].options[k].checked;
+                                    json.options[k].checked = themes[themeIndex].options[k].checked;
                                 } else {
-                                    delete themes[theme].options[k];
+                                    delete themes[themeIndex].options[k];
                                 }
                             }
                         }
 
                         // merge obj and json
-                        $.extend(true, themes[theme], json);
-                        chrome.storage.local.set({themes: themes});
+                        $.extend(true, themes[themeIndex], json);
+                        //chrome.storage.local.set({themes: themes});
                     } catch (err) {
-                        console.error('THEMES :: [' + theme + '] Failed to update: ', err);
+                        console.error('THEMES :: [' + themeIndex + '] Failed to update: ', err);
                     }
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    console.error('THEMES :: [' + themeIndex + '] Failed to update: ', errorThrown);
+                }
+            })
+        );
 
-                    console.log('THEMES :: ', theme, 'fetching CSS');
+    });
 
-                    if(!themes[theme].hasOwnProperty('css')) {
-                        console.log('THEMES :: ', theme, 'does not have CSS url set');
-                        return;
-                    }
+    $.when.apply($, promisesThemeData).always(function() {
+        console.log('THEMES :: data.json fetching completed');
 
-                    get(themes[theme].css + '?cachebreak=' + Date.now(), function() {
-                        if (!this.status) {
-                            console.error('THEMES :: [' + theme + '] Failed to retrieve CSS');
-                            return;
-                        }
+        console.log('THEMES :: Fetching CSS for all themes');
 
+        $.each(themes, function(themeIndex, theme) {
+
+            if(!themes[themeIndex].hasOwnProperty('css')) {
+                console.log('THEMES :: ', themeIndex, 'does not have CSS url set');
+                return true;
+            }
+
+            promisesThemeCss.push(
+
+                $.ajax({
+                    url: theme.css,
+                    cache: false,
+                    success: function(data, textStatus, jqXHR) {
                         // If theme doesn't need to be importantified, in which case we will be disabling Lounge site stylesheets
-                        if(themes[theme].hasOwnProperty('disableCss') && themes[theme].disableCss === true) {
-                            console.log('THEMES :: ', theme, ' using raw CSS');
-                            var css = parsifyCSS(this.responseText);
+                        if(themes[themeIndex].hasOwnProperty('disableCss') && themes[themeIndex].disableCss === true) {
+                            console.log('THEMES :: ', themeIndex, ' using raw CSS');
+                            var css = parsifyCSS(data);
                         }
                         // Otherwise we importantify all CSS rules (due to styling prioritization limitations)
                         else {
-                            console.log('THEMES :: ', theme, ' using importantified CSS');
-                            var css = importantifyCSS(this.responseText);
+                            console.log('THEMES :: ', themeIndex, ' using importantified CSS');
+                            var css = importantifyCSS(data);
                         }
 
                         if (css) {
-                            if (theme === LoungeUser.userSettings.currentTheme) {
+                            if (themeIndex === LoungeUser.userSettings.currentTheme) {
                                 themeCSS = css;
                             }
 
-                            themes[theme].cachedCSS = css;
-                            chrome.storage.local.set({themes: themes});
+                            themes[themeIndex].cachedCSS = css;
                         }
+                    },
+                    error: function(jqXHR, textStatus, errorThrown) {
+                        console.error('THEMES :: [' + themeIndex + '] Failed to update: ', errorThrown);
+                    }
+                })
 
-                    });
+            );
+        });
+
+        $.when.apply($, promisesThemeCss).always(function() {
+            console.log('THEMES :: CSS fetching finished');
+
+            _this.syncThemesObject(function() {
+                console.log('THEMES :: Saved all the theme data from updating to the local storage');
+
+                if(callback) {
+                    callback();
                 }
-            })(theme));
-        }
-    }
+            });
+        });
 
-    if (callback) {
-        // fake a delay so users don't get worried, yo
-        setTimeout(callback, 750);
-    }
+    });
+
+    return this;
 };
 
 Themes.prototype.selectTheme = function(themeId) {
@@ -312,7 +336,6 @@ function parsifyCSS(css) {
             var cssTree = parseCSS(css);
 
             css = stringifyCSS(cssTree, {compress: true});
-            console.log(css);
         } catch (err) {
             console.error('Tried to parse CSS, failed: ', err);
             return '';
