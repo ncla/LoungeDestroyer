@@ -127,7 +127,7 @@ Match.prototype.testMatchFilters = function() {
         console.log('MATCHES :: Hiding match #' + this.matchID + ' because heavy favorite');
         return this.hide();
     }
-    
+
     if(LoungeUser.userSettings.matchTournamentFiltersArray.indexOf(this.tournamentName) !== -1) {
         console.log('MATCHES :: Hiding match #' + this.matchID + ' because tournament is blacklisted');
         return this.hide();
@@ -175,11 +175,11 @@ Match.prototype.generateMatchURL = function(appID) {
 Match.prototype.appendExtraMatchInfo = function(targetElement) {
     var matchHeaderBlock = $('.matchheader .whenm:eq(0)', targetElement);
 
-    if (this.userBetted === false && ['1', '3'].indexOf(LoungeUser.userSettings.showBettedIndicator) !== -1) {
+    if (this.userBetted === false && ['1', '3'].indexOf(LoungeUser.userSettings.showBettedIndicatorv2) !== -1) {
         $(matchHeaderBlock).prepend('<span class="bettedIndicator">✘</span> ');
     }
 
-    if (this.userBetted === true && ['2', '3'].indexOf(LoungeUser.userSettings.showBettedIndicator) !== -1) {
+    if (this.userBetted === true && ['2', '3'].indexOf(LoungeUser.userSettings.showBettedIndicatorv2) !== -1) {
         $(matchHeaderBlock).prepend('<span class="bettedIndicator">✔</span> ');
     }
 

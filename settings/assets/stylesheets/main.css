@@ -1135,7 +1135,7 @@ form.form-inline .row, div.form-inline .row {
 form.form-inline .btn, div.form-inline .btn {
   position: absolute;
   bottom: 4.5px;
-  z-index: 10;
+  z-index: 5;
   right: 0; }
 
 input[type="text"],

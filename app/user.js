@@ -44,7 +44,7 @@ User.prototype.defaultSettings =
     largeBetPercentage: '20',
     invStatsUseValue: '3',
 
-    showBettedIndicator: '1',
+    showBettedIndicatorv2: '3',
     beepSoundDisable: '0',
     customTradeOfferSound: '',
     focusOnTradeofferTab: '0',

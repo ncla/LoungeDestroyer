@@ -317,7 +317,7 @@ function theme_create_element(name, obj, active) {
     obj = escape_obj(obj);
 
     // Removing unnecessary stuff
-    if (!(obj.options || obj.custom)) {
+    if (!obj.options || $.isEmptyObject(obj.options)) {
         $(item).find('.theme-settings').remove();
         $(item).find('button.btn[data-theme-settings]').remove();
     }
@@ -345,10 +345,8 @@ function theme_create_element(name, obj, active) {
     // Add settings related shit
     if (obj.options || obj.custom) {
 
-        console.log('Have options/custom shit');
         // Looping through all theme settings and appending them
         if (obj.options) {
-            console.log('Theme has theme settings');
             for (var k in obj.options) {
                 var optionTemplate = $(item).find('.theme-settings.bundled .label-group.blank-template').clone();
 
@@ -370,7 +368,6 @@ function theme_create_element(name, obj, active) {
             $(item).find('.theme-settings.theme-edit').remove();
 
         } else {
-            console.log('theme does not have settings');
             $(item).find('.theme-settings.bundled').remove();
         }
 
@@ -397,7 +394,6 @@ function theme_create_element(name, obj, active) {
 
     // Add theme to dropdown
 
-    console.log(themesSelectSelectize);
     themesSelectSelectize.addOption({value: name, text: obj.title, silent: true});
 
     // Select current active theme

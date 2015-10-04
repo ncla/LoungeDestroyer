@@ -107,9 +107,9 @@
                     <!-- # Row -->
                         <div class="row">
                             <div class="group col-grid-6 ld-setting">
-                                <span>Market prices on items:</span>
+                                <span>Market prices on items <b data-tooltip="If you select 'Load market prices automatically' option, consider enabling 'Use cached item price list' for improved performance.">(?)</b>:</span>
                                 <select id="itemMarketPricesv2">
-                                    <option value="2">Load market price automatically</option>
+                                    <option value="2">Load market prices automatically</option>
                                     <option value="1">Only when mouse is over an item</option>
                                     <option value="0">Disabled</option>
                                 </select>
@@ -135,7 +135,7 @@
                                 </select>
                             </div>
                             <div class="group col-grid-6 ld-setting">
-                                <span>Convert Lounge prices to chosen currency:</span>
+                                <span>Convert Lounge item prices to your currency:</span>
                                 <select id="convertLoungePrices">
                                     <option value="1">Enabled</option>
                                     <option value="0">Disabled</option>
@@ -147,7 +147,7 @@
 
                         <div class="row">
                             <div class="group col-grid-6 ld-setting">
-                                <span>Add betting values for CS:GO Lounge items where possible:</span>
+                                <span>Add betting values for CS:GO Lounge items <b data-tooltip="If you enabled this, LoungeDestroyer will periodically fetch CS:GO Lounge item betting values in the background for the duration this setting is enabled.">(?)</b>:</span>
                                 <select id="bettingValuesCsgo">
                                     <option value="1">Enabled</option>
                                     <option value="0">Disabled</option>
@@ -228,7 +228,7 @@
                     <div class="row">
                         <div class="group col-grid-6 ld-setting">
                             <span>Betted match indicator <a href="#" data-tooltip="Shows a small indicator on the front page besides matches you've already betted on. This setting requires you to have extra match info setting to be enabled.">(?)</a>:</span>
-                            <select id="showBettedIndicator">
+                            <select id="showBettedIndicatorv2">
                                 <option value="3">Both betted matches and not bet</option>
                                 <option value="2">Show on matches bet on</option>
                                 <option value="1">Show on matches not bet on</option>
@@ -348,7 +348,7 @@
                             </select>
                         </div>
                         <div class="group col-grid-6 ld-setting">
-                            <span>Load extra trade data:</span>
+                            <span>Load extra trade data <b data-tooltip="If you disable extra trade data loading, trade filters that rely on data found on trade page will not work.">(?)</b>:</span>
                             <select id="tradeLoadExtra">
                                 <option value="5">Load only when mouse is hovered over a trade</option>
                                 <option value="4">Automatically for trades in view, on hover for home page</option>
@@ -364,7 +364,7 @@
 
                     <div class="row">
                         <div class="group col-grid-6 ld-setting">
-                            <span>Load Steam profile data:</span>
+                            <span>Load Steam profile data <b data-tooltip="If you disable Steam profile data loading, trade filters that rely on Steam profile data will not work.">(?)</b>:</span>
                             <select id="tradeLoadSteamData">
                                 <option value="1">Enable</option>
                                 <option value="0">Disable</option>
@@ -391,7 +391,7 @@
                         </div>
 
                         <div class="group col-grid-6 ld-setting">
-                            <span>Attempt to auto-bump trades every 10 minutes <b data-tooltip="The auto-bumping process happens in the background as long as you have the browser opened and you are logged into the site. You do not have to leave site tabs opened. Extension every 10 minutes will attempt to bump any trades that are available for a bump.">(?)</b>:</span>
+                            <span>Attempt to auto-bump trades every 10 minutes <b data-tooltip="The auto-bumping process happens in the background as long as you have the browser opened and you are logged into the site. You do not have to leave site tabs opened. Every 10 minutes extension will attempt to bump any trades that are available for a bump.">(?)</b>:</span>
                             <select id="autoBump">
                                 <option value="570">Dota 2 Lounge trades only</option>
                                 <option value="730">CS:GO Lounge trades only</option>

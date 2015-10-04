@@ -271,7 +271,13 @@ Inventory.prototype.onInventoryLoaded = function(requestData) {
 
 
         if (document.URL.indexOf('/myprofile') !== -1) {
-            addInventoryStatistics();
+            if(LoungeUser.userSettings.bettingValuesCsgo === '1' || (LoungeUser.userSettings.itemMarketPricesv2 === '2' && LoungeUser.userSettings.useCachedPriceList === '1')) {
+                addInventoryStatistics();
+            } else {
+                $('#backpack').prepend('<div class="inventoryStatisticsBox">' +
+                    '<div id="totalInvValue">Insufficient item data available for calculating inventory statistics. Please check LoungeDestroyer settings and enable following options ' +
+                    '"Use cached item price list" / "Market prices on items" on automatically / "Add betting values for CS:GO Lounge items where possible"</div></div>');
+            }
         }
     }
 };
