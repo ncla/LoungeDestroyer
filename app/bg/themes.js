@@ -81,6 +81,8 @@ Themes.prototype.updateThemes = function(callback) {
     var promisesThemeData = [];
     var promisesThemeCss = [];
 
+    var themesVersionChanged = [];
+
     $.each(themes, function(themeIndex, theme) {
         if(!themes[themeIndex].hasOwnProperty('url') || !themes[themeIndex].hasOwnProperty('remote') || themes[themeIndex].remote !== true) {
             console.log('THEMES :: ', themeIndex, 'does not have data.json url set / remote property set / remote property is not true');
@@ -117,6 +119,9 @@ Themes.prototype.updateThemes = function(callback) {
                             return;
                         }
 
+                        // If the version has changed we need to update CSS in most cases
+                        themesVersionChanged.push(themeIndex);
+
                         // merge new JSON into old, keeping options
                         if (json.options) {
                             for (var k in themes[themeIndex].options) {
@@ -146,8 +151,8 @@ Themes.prototype.updateThemes = function(callback) {
         console.log('THEMES :: data.json fetching completed');
 
         console.log('THEMES :: Fetching CSS for all themes');
-
-        $.each(themes, function(themeIndex, theme) {
+        
+        $.each(themesVersionChanged, function(theme, themeIndex) {
 
             if(!themes[themeIndex].hasOwnProperty('css')) {
                 console.log('THEMES :: ', themeIndex, 'does not have CSS url set');
@@ -157,7 +162,7 @@ Themes.prototype.updateThemes = function(callback) {
             promisesThemeCss.push(
 
                 $.ajax({
-                    url: theme.css,
+                    url: themes[themeIndex].css,
                     cache: false,
                     success: function(data, textStatus, jqXHR) {
                         // If theme doesn't need to be importantified, in which case we will be disabling Lounge site stylesheets
