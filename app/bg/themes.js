@@ -59,9 +59,14 @@ Themes.prototype.addNewBundledThemes = function() {
     console.log('THEMES :: Checking if any missing bundled themes in themes storage');
     console.log(themes);
     for(bundledTheme in themeListOriginal) {
-        if(!themes.hasOwnProperty(bundledTheme)) {
+        if (!themes.hasOwnProperty(bundledTheme)) {
             console.log('THEMES :: Theme', bundledTheme, 'missing from themes storage, adding..');
             themes[bundledTheme] = themeListOriginal[bundledTheme];
+        }
+
+        if (themes.hasOwnProperty(bundledTheme)) {
+            console.log('THEMES :: Theme', bundledTheme, 'not missing from themes storage, updating data.json URL');
+            themes[bundledTheme].url = themeListOriginal[bundledTheme].url;
         }
     }
 
