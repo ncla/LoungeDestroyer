@@ -265,9 +265,9 @@ Trade.prototype.filterByTradeData = function() {
 
     var haveItemsFiltered = false;
 
-    $('.tradecnt .left .oitm.notavailable', this.tradeElement).each(function(i, v) {
+    $('.tradecnt .left .oitm', this.tradeElement).each(function(i, v) {
         var item = itemObject(v);
-        if(tradeItemsHaveArr.indexOf(item.itemName) !== -1) {
+        if(LoungeUser.userSettings.hideTradesItemsHaveArray.indexOf(item.itemName) !== -1) {
             console.log('TRADES :: Hiding trade #' + this.tradeID + ' because the item is in the have list filter');
             haveItemsFiltered = true;
             return false;
@@ -278,9 +278,9 @@ Trade.prototype.filterByTradeData = function() {
 
     var wantItemsFiltered = false;
 
-    $('.tradecnt .right .oitm.notavailable', this.tradeElement).each(function(i, v) {
+    $('.tradecnt .right .oitm', this.tradeElement).each(function(i, v) {
         var item = itemObject(v);
-        if(tradeItemsWantArr.indexOf(item.itemName) !== -1) {
+        if(LoungeUser.userSettings.hideTradesItemsWantArray.indexOf(item.itemName) !== -1) {
             console.log('TRADES :: Hiding trade #' + this.tradeID + ' because the item is in the want list filter');
             wantItemsFiltered = true;
             return false;
