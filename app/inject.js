@@ -14,7 +14,8 @@ var blacklistedItemList = {};
 var earlyBackpackLoad = false;
 var tradeShowFilter;
 var tradeHideFilter;
-var tradeMarkFilter;
+var tradeItemsHaveArr;
+var tradeItemsWantArr;
 var timezoneName;
 var tradesFiltered = 0;
 var isHomepage;
@@ -196,8 +197,8 @@ function init() {
     // create RegExp's from users trade filters
     var tradeShowArr = LoungeUser.userSettings.showTradesFilterArray || [];
     var tradeHideArr = LoungeUser.userSettings.hideTradesFilterArray || [];
-    var tradeItemsHaveArr = LoungeUser.userSettings.hideTradesItemsHave || [];
-    var tradeItemsWantArr = LoungeUser.userSettings.hideTradesItemsWant || [];
+    tradeItemsHaveArr = LoungeUser.userSettings.hideTradesItemsHaveArray || [];
+    tradeItemsWantArr = LoungeUser.userSettings.hideTradesItemsWantArray || [];
     tradeShowFilter = createKeywordRegexp(tradeShowArr);
     tradeHideFilter = createKeywordRegexp(tradeHideArr);
 
