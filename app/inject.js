@@ -131,24 +131,17 @@ function init() {
 
             $(document).ready(function() {
                 // collapsible menus and columns
-                if (theme.collapsibleColumns) {
-                    var collapsibleElms = document.querySelectorAll('#submenu, .box');
-                    for (var i = 0, j = collapsibleElms.length; i < j; ++i) {
-                        var hideToggle = document.createElement('div');
-                        var parentFirst = collapsibleElms[i].firstChild;
+                console.log('THEMES :: collapsibleColumns', theme.collapsibleColumns);
+                if (theme.collapsibleColumns === true) {
+                    $('#submenu, .box').each(function(columnIndex, columnValue) {
+                        $toggle = $('<div class="ld-collapse-toggle"></div>');
 
-                        hideToggle.className = 'ld-collapse-toggle';
+                        $toggle.click(function() {
+                            $(columnValue).toggleClass('ld-collapsed');
+                        });
 
-                        // TODO: birjolaxew get rid of this anonymous self-execution function bs
-                        // jscs: disable
-                        hideToggle.addEventListener('click', (function(elm) {
-                            return function() {
-                                elm.classList.toggle('ld-collapsed');
-                            }
-                        })(collapsibleElms[i]));
-                        // jscs: enable
-                        collapsibleElms[i].insertBefore(hideToggle, parentFirst);
-                    }
+                        $(columnValue).append($toggle);
+                    });
                 }
 
                 if (theme.disableCss === true) {
