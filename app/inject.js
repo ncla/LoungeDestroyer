@@ -15,7 +15,7 @@ var earlyBackpackLoad = false;
 var tradeShowFilter;
 var tradeHideFilter;
 var tradeMarkFilter;
-var timezoneName = (LoungeUser.userSettings.timezone == 'auto' ? jstz.determine().name() : LoungeUser.userSettings.timezone);
+var timezoneName;
 var tradesFiltered = 0;
 var isHomepage;
 var hideFilteredTrades = true;
@@ -112,6 +112,8 @@ function init() {
     if (earlyBackpackLoad) {
         inventory.onInventoryLoaded(earlyBackpackLoad);
     }
+
+    timezoneName = (LoungeUser.userSettings.timezone == 'auto' ? jstz.determine().name() : LoungeUser.userSettings.timezone);
 
     // do theme-related stuff
     if (LoungeUser.userSettings.currentTheme) {
@@ -397,11 +399,13 @@ function init() {
             }
 
             // convert time to local time
-            var timeElm = document.querySelector('main > .box:first-child > div:first-child > div:first-child .half:nth-child(3)');
-            if (timeElm) {
-                var newTime = convertLoungeTime(timeElm.textContent, true);
-                if (newTime) {
-                    timeElm.textContent = timeElm.textContent + (newTime ? ', ' + newTime : newTime);
+            if (LoungeUser.userSettings.changeTimeToLocal === '1') {
+                var timeElm = document.querySelector('main > .box:first-child > div:first-child > div:first-child .half:nth-child(3)');
+                if (timeElm) {
+                    var newTime = convertLoungeTime(timeElm.textContent);
+                    if (newTime) {
+                        timeElm.textContent = timeElm.textContent + (newTime ? ', ' + newTime : newTime);
+                    }
                 }
             }
 
@@ -723,18 +727,18 @@ var itemObs = new MutationObserver(function(records) {
 });
 
 function convertLoungeTime(loungeTimeString) {
-    if (LoungeUser.userSettings.changeTimeToLocal != '0') {
+    if (LoungeUser.userSettings.changeTimeToLocal !== '0') {
         // I am no timezone expert, but I assume moment.js treats CET/CEST automatically
         var trimmedTime = loungeTimeString.replace('CET', '').replace('CEST', '').trim();
 
-        // Intl.DateTimeFormat().resolved.timeZone, might be derpy in other browsers
-
         if (moment.tz.zone(timezoneName)) {
-            var format = (LoungeUser.userSettings.americanosTime == '0' ? 'HH:mm' : 'h:mm A');
-            format = (LoungeUser.userSettings.displayTzAbbr == '0' ? format : format + ' z');
+            var format = (LoungeUser.userSettings.americanosTime === '0' ? 'HH:mm' : 'h:mm A');
+            format = (LoungeUser.userSettings.displayTzAbbr === '0' ? format : format + ' z');
             return moment.tz(trimmedTime, 'HH:mm', 'CET').tz(timezoneName).format(format);
         }
+
+        return loungeTimeString;
     }
 
-    return false;
+    return loungeTimeString;
 }

@@ -184,12 +184,11 @@ Match.prototype.appendExtraMatchInfo = function(targetElement) {
     }
 
     if (this.exactTime) {
-        var convertedTime = convertLoungeTime(this.exactTime);
-        if (convertedTime) {
-            this.exactTimeConverted = convertedTime;
-        }
+        var time = this.exactTimeConverted = (LoungeUser.userSettings.changeTimeToLocal === '1' ? convertLoungeTime(this.exactTime) : this.exactTime);
 
-        $(matchHeaderBlock).append('<span class="matchExactTime"> <span class="seperator">|</span> ' + this.exactTimeConverted + '</span>');
+        if (time) {
+            $(matchHeaderBlock).append('<span class="matchExactTime"> <span class="seperator">|</span> ' + time + '</span>');
+        }
     }
 
     if (this.matchFormat) {
