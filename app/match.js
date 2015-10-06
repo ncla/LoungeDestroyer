@@ -4,6 +4,8 @@ var Match = function(matchElement) {
     if (matchElement !== undefined) {
         this.matchElement = matchElement;
         this.matchIsFiltered = false;
+        this.extraMatchInfoLoaded = false;
+        this.parsedMatchElement = false;
 
         this.parseMatchElement(matchElement);
 
@@ -15,7 +17,6 @@ var Match = function(matchElement) {
         if (window.location.pathname !== '/mybets' && LoungeUser.userSettings.globalMatchFilters === '1') {
             this.testMatchFilters();
         }
-
     }
 };
 /**
@@ -265,7 +266,7 @@ Match.prototype.loadExtraMatchInfo = function() {
     var _this = this;
 
     // Simple check to see if we have the extra match info already
-    if(this.exactTime || this.loading) return false;
+    if(this.extraMatchInfoLoaded === true || this.loading === true) return false;
 
     this.loading = true;
     this.fetchMatchPage(function(response) {
@@ -273,6 +274,7 @@ Match.prototype.loadExtraMatchInfo = function() {
         _this.cacheMatchExtraInfo();
         _this.appendExtraMatchInfo(_this.matchElement);
         _this.loading = false;
+        _this.extraMatchInfoLoaded = true;
     });
 
     return this;
