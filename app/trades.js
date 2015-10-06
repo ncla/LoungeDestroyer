@@ -345,7 +345,7 @@ Trade.prototype.filterBySteamData = function() {
         return this.hide();
     }
 
-    if(this.steamUser.vacBannedCount > LoungeUser.userSettings.maxVacBans) {
+    if(this.steamUser.vacBannedCount > parseInt(LoungeUser.userSettings.maxVacBans)) {
         console.log('TRADES :: Hiding trade #' + this.tradeID + ' because user has VAC bans');
         return this.hide();
     }
