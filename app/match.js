@@ -257,6 +257,7 @@ Match.prototype.addCachedMatchInfo = function() {
         $.each(matchInfoCachev2[appID][this.matchID], function(i, v) {
             _this[i] = v;
         });
+        _this.extraMatchInfoLoaded = true;
     }
 
     return this;
