@@ -21,7 +21,6 @@ Themes.prototype.init = function() {
 
     chrome.storage.local.get('themes', function(result) {
         themes = result.themes || {};
-
         // If we have a selected theme, add theme CSS to the variable
         if (LoungeUser.userSettings.currentTheme) {
             var name = LoungeUser.userSettings.currentTheme;
@@ -45,7 +44,7 @@ Themes.prototype.checkForMissingThemes = function(callback) {
         console.log('THEMES :: Resetting to bundled themes!');
 
         // add bundled themes
-        themes = themeListOriginal;
+        themes = jQuery.extend(true, {}, themeListOriginal);
     } else {
         _this.addNewBundledThemes();
     }
@@ -57,7 +56,6 @@ Themes.prototype.checkForMissingThemes = function(callback) {
 
 Themes.prototype.addNewBundledThemes = function() {
     console.log('THEMES :: Checking if any missing bundled themes in themes storage');
-    console.log(themes);
     for(bundledTheme in themeListOriginal) {
         if (!themes.hasOwnProperty(bundledTheme)) {
             console.log('THEMES :: Theme', bundledTheme, 'missing from themes storage, adding..');
@@ -69,8 +67,6 @@ Themes.prototype.addNewBundledThemes = function() {
             themes[bundledTheme].url = themeListOriginal[bundledTheme].url;
         }
     }
-
-    console.log(themes);
 };
 
 Themes.prototype.updateThemes = function(callback) {
@@ -151,7 +147,7 @@ Themes.prototype.updateThemes = function(callback) {
         console.log('THEMES :: data.json fetching completed');
 
         console.log('THEMES :: Fetching CSS for all themes');
-        
+
         $.each(themesVersionChanged, function(theme, themeIndex) {
 
             if(!themes[themeIndex].hasOwnProperty('css')) {
@@ -239,6 +235,14 @@ Themes.prototype.syncThemesObject = function(callback) {
     return this;
 };
 
+Themes.prototype.resetAndUpdateThemes = function(callback) {
+    var _this = this;
+    themes = null;
+    _this.syncThemesObject(function() {
+        _this.init();
+    });
+};
+
 var themesBg = new Themes();
 themesBg.init();
 
@@ -288,7 +292,7 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
     }
 
     if (request.hasOwnProperty('updateThemes')) {
-        themesBg.updateThemes(sendResponse);
+        themesBg.resetAndUpdateThemes();
         if (sendResponse) {
             return true;
         }
