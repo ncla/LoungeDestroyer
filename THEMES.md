@@ -129,7 +129,7 @@ An example JSON file for a remote theme is below:
   "title": "Example theme",
   "description": "To showcase an example JSON structure - this should be a maximum of 140 characters long",
   "bg": "http://example.com/carousel_img.png",
-  "disableCss": true
+  "disableCss": true,
   "options": {
     "class1": {
       "description": "If selected, .body.class1 will match body",
