@@ -4,11 +4,11 @@ LoungeDestroyer
 A must have Chrome extension for any CS:GOLounge / Dota2Lounge user, here is a [video demonstration](http://youtu.be/JT2a4h35o90) of our old user-script that would spam the 'Place bet' button.
 
 ## Installation
-1. Stable, non-development
+##### Stable, non-development
 
 Visit Chrome App store [here](https://chrome.google.com/webstore/detail/loungedestroyer/ghahcnmfjfckcedfajbhekgknjdplfcl) and just add it to your Chrome extensions.
 
-2. Developer version, cutting edge
+##### Developer version, cutting edge
 
 1. Download the project by clicking 'Download ZIP' on repository home page and extract the contents in some folder, or just clone the repository with `git clone`
 2. (optional) Make your desired changes to the code
