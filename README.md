@@ -1,7 +1,7 @@
 LoungeDestroyer
 ==============
 
-A must have Chrome extension for any CS:GOLounge / Dota2Lounge user, here is a [video demonstration](http://youtu.be/JT2a4h35o90) of our old user-script that would spam the 'Place bet' button.
+A must have Chrome extension for any CS:GOLounge / Dota2Lounge user.
 
 ## Installation
 ##### Stable, non-development
