@@ -23,10 +23,14 @@ body {
 }
 ```
 
-## Remote themes
-LoungeDestroyer supports themes loaded from a URL. Remote themes index their structure and basic information in a JSON file, which is then loaded and parsed by LoungeDestroyer. The following details the structure of said JSON file, which must adhere to it for LoungeDestroyer to succesfully load the theme.
+Alternatively you can style the site from scratch by disabling the sites stylesheet completely. To do that you have to set `disableCss` property in the data.json file.
 
-In addition to this, the server on which the JSON and theme CSS is hosted, must allow cross-origin `GET` requests - this means returning the `Access-Control-Allow-Origin: *` and, optionally, `Access-Control-Allow-Methods: GET` headers.
+## Adding themes in extension for testing
+To load a custom theme in LoungeDestroyer, first you will need to host all necessary files somewhere. You will also need to download LoungeDestroyer source code and edit `app/bg/themes.js` file, and append your theme data.json URL in object `themeListOriginal`. After that you reload the extension for the object changes to take effect. After that, you edit your theme CSS file, and when you are ready to try it out, go in the settings and press 'Reset & Update themes' button to reload your theme.
+
+In addition to this, the server on which the JSON and theme CSS is hosted, must allow cross-origin `GET` requests - this means returning the `Access-Control-Allow-Origin: *` and, optionally, `Access-Control-Allow-Methods: GET` headers. Alternatively you can just add your domain to manifest.json under `permissions` section. You can host the theme files on your PC as well through some web server (WAMP etc.)
+
+Remote themes index their structure and basic information in a JSON file, which is then loaded and parsed by LoungeDestroyer. The structure of said JSON file must adhere to the one in section **JSON structure** for LoungeDestroyer to successfully load the theme.
 
 And finally, all images (background, icon) are hotlinked - as such, they must be embedable through the `img` HTML tag.
 
@@ -76,6 +80,10 @@ The following JSON structure is understood by the theme parser. Note that, when 
       <td>An absolute URL of the changelog of the theme. Optional.</td>
     </tr>
     <tr>
+      <td>disableCss</td>
+      <td>true/false, will disable the site stylesheets on CSGOLounge/DOTA2Lounge</td>
+    </tr>
+    <tr>
       <td>options</td>
       <td>
         <p>Optional options for theme. Currently only supports checkboxes.</p>
@@ -121,6 +129,7 @@ An example JSON file for a remote theme is below:
   "title": "Example theme",
   "description": "To showcase an example JSON structure - this should be a maximum of 140 characters long",
   "bg": "http://example.com/carousel_img.png",
+  "disableCss": true
   "options": {
     "class1": {
       "description": "If selected, .body.class1 will match body",
