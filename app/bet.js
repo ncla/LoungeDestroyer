@@ -7,157 +7,124 @@ var betStatus = {
     rebetDelay: 5000
 };
 
-function enableAuto(match, tries, error) {
-    betStatus.enabled = true;
+// On page refresh, check immediately if we have auto-betting in progress
+chrome.runtime.sendMessage({autoBet: 'status'}, function(data) {
+    console.log('AUTOBET :: status', data);
+    betStatus = data;
+    if (betStatus.autoBetting === true) {
+        $(document).ready(function() {
+            updateAutobetInfo();
+        });
+    }
+});
 
-    var ordinalEnding = ((tries || 0) + '').slice(-1);
-
-    // if a 'teen' number, end in th
-    // TODO: Remove duplicate code
-    ordinalEnding = (tries % 100 < 20 &&
-                    tries % 100 > 10) ? 'th' :
-                        ordinalEnding === '1' ? 'st' :
-                            ordinalEnding === '2' ? 'nd' :
-                                ordinalEnding === '3' ? 'rd' :
-                                    'th';
-
-    var isBetStatusTypeValid = false;
-    var typeSpansTextContent = '';
-    var worthContainerClass = 'worth-container';
-    var destroyerInfoButtonText = 'Disable auto-';
-
-    if (betStatus.type === 'autoBet') {
-        isBetStatusTypeValid = true;
-        typeSpansTextContent = 'betting';
-        destroyerInfoButtonText += 'bet';
-        document.querySelector('.destroyer.auto-info .match-link').textContent = match;
-        document.querySelector('.destroyer.auto-info .match-link').href = 'match?m=' + match;
-
-    } else if (betStatus.type === 'autoReturn') {
-        isBetStatusTypeValid = true;
-        typeSpansTextContent = 'returning';
-        worthContainerClass += ' hidden';
-        destroyerInfoButtonText += 'return';
+// listen for auto-betting updates
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+    if (!request.hasOwnProperty('autoBet')) {
+        console.log('AUTOBET :: IS NOT AUTOBET onMessage');
+        return;
     }
 
-    if (isBetStatusTypeValid) {
-        document.querySelector('.destroyer.auto-info .worth-container').className = worthContainerClass;
-        document.querySelector('.destroyer.auto-info button').textContent = destroyerInfoButtonText;
-        var typeSpans = document.querySelectorAll('.destroyer.auto-info .type');
-        for (var i = 0; i < typeSpans.length; ++i) {
-            typeSpans[i].textContent = typeSpansTextContent;
+    var autoBetData = request.autoBet;
+
+    betStatus = autoBetData;
+
+    // If auto-betting has been stopped by user / successful bet
+    if (autoBetData.autoBetting === false && autoBetData.hasOwnProperty('action') && autoBetData.action.hasOwnProperty('disableAuto')) {
+        betStatus.autoBetting = false;
+
+        // TODO: true and false has same logic almost, rewrite so it is less DRY
+        if (autoBetData.action.disableAuto === true || autoBetData.action.disableAuto === false) {
+            console.log('AUTOBET :: Successful');
+            $(document).ready(function() {
+                var delay = (betStatus.type === 'autoAccept' ? 15 : 0);
+                setTimeout(function() {
+                    $autoBox = $('.destroyer.auto-info');
+                    if ($autoBox.is(":visible")) {
+                        $autoBox.fadeOut(350, function() {
+                            $(this).addClass('hidden');
+                        });
+                    }
+
+                }, (delay * 1000));
+            });
+        }
+
+        if (autoBetData.action.disableAuto === false) {
+            console.log('AUTOBET :: Failure, cancelled by user');
+            if (betStatus.type === 'autoBet') {
+                $(document).ready(function() {
+                    $('#placebut').show();
+                });
+            }
         }
     }
 
-    // update info-box in top-right
-    document.querySelector('.destroyer.auto-info').className = 'destroyer auto-info';
-    document.querySelector('.destroyer.auto-info .num-tries').textContent = (tries || 0) + ordinalEnding;
-    document.querySelector('.destroyer.auto-info .error-text').textContent = error;
-    document.getElementById('bet-time').valueAsNumber = betStatus.rebetDelay / 1000;
+    // TODO: If not betting and message does not have action disableAuto
 
-    // update timer
+    if (betStatus.autoBetting === true) {
+        $('.destroyer.auto-info').removeClass('hidden');
+    }
+
+
+    // Started autobetting / update autobetting
+    // NOTE: Don't really need to limit this to just autoBetting true property I think
+    $(document).ready(function() {
+        updateAutobetInfo();
+    });
+
+    console.log('AUTOBET :: Update received', autoBetData);
+});
+
+/**
+ * Updates the auto-betting box with information
+ */
+function updateAutobetInfo() {
+    //betStatus.autoBetting = true;
+
+    $('.destroyer.auto-info').removeClass('ld-autobet ld-autoreturn ld-autofreeze ld-autoaccept').addClass('ld-' + betStatus.type.toLowerCase());
+
+    var ordinalEnding = determineOrdinalEnding(betStatus.numTries);
+
+    if (betStatus.type === 'autoBet') {
+        $('.destroyer.auto-info .match-link').text(betStatus.matchNum).attr('href', 'match?m=' + betStatus.matchNum);
+    }
+
+    // Update info-box
+    $('.destroyer.auto-info .num-tries').text((betStatus.numTries || 0) + ordinalEnding);
+    $('.destroyer.auto-info .error-text').text(betStatus.lastError);
+
+    // Update timer
     (function timerLoop() {
-        if (!betStatus.enabled) {
+        if (!betStatus.autoBetting) {
             return;
         }
 
-        if (!betStatus.betTime) {
+        var betTime = (betStatus.type === 'autoAccept' ? betStatus.acceptStart : betStatus.lastBetTime);
+
+        if (betTime === 0) {
+            return;
+        }
+
+        if (!betStatus.lastBetTime) {
             setTimeout(timerLoop, 250);
             return;
         }
 
-        var span = document.querySelector('.destroyer.auto-info .time-since');
-        span.textContent = ((Date.now() - betStatus.betTime) / 1000).toFixed(2) + 's';
+        $('.destroyer.auto-info .time-since').text(((Date.now() - betTime) / 1000).toFixed(2) + 's');
 
         requestAnimationFrame(timerLoop);
     })();
 }
 
-// load data if auto-betting
-chrome.runtime.sendMessage({get: 'autoBet'}, function(data) {
-    if (!data.enabled) {
-        return;
-    }
 
-    betStatus.betTime = data.time;
-    betStatus.rebetDelay = data.rebetDelay;
-    betStatus.enabled = true;
-    betStatus.type = data.type;
+function determineOrdinalEnding(number) {
+    var ordinalEnding = ((number || 0) + '').slice(-1);
 
-    $(document).ready(function() {
-        enableAuto(data.matchId, data.numTries, data.error);
-    });
-});
-
-// listen for auto-betting updates
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-    var data = request[request.hasOwnProperty('autoBet') ? 'autoBet' :
-        'autoReturn'];
-
-    /*console.log('Received message:');
-     console.log(request);
-     console.log(data);*/
-
-    if (data === false) { // autobetting has stopped
-        betStatus.enabled = false;
-        $(document).ready(function() {
-            document.querySelector('.destroyer.auto-info').className = 'destroyer auto-info hidden';
-            $('#placebut').show();
-        });
-
-        return;
-    }
-
-    if (data === true) { // bet succeeded
-        console.log('Success.');
-        betStatus.enabled = false;
-        $(document).ready(function() {
-            document.querySelector('.destroyer.auto-info').className = 'destroyer auto-info hidden';
-        });
-
-        if (!streamPlaying) {
-            localStorage.playedbet = false;
-            localStorage.playedreturn = false;
-        }
-
-        return;
-    }
-
-    if (data) {
-        betStatus.type = request.autoBet ? 'autoBet' :
-            request.autoReturn ? 'autoReturn' :
-                '';
-
-        // autobetting has started
-        if (data.time && data.rebetDelay) {
-            betStatus.enabled = true;
-            betStatus.time = data.time;
-            betStatus.rebetDelay = data.rebetDelay;
-            $(document).ready(function() {
-                enableAuto(data.matchId, data.numTries, data.error);
-            });
-
-            return;
-        }
-
-        // autobetting has received an error from Lounge
-        if (data.time && data.error) {
-            $(document).ready(function() {
-                document.querySelector('.destroyer.auto-info .error-text').textContent = data.error;
-
-                var ordinalEnding = ((data.numTries || 0) + '').slice(-1);
-                ordinalEnding = (data.numTries % 100 < 20 &&
-                data.numTries % 100 > 10) ? 'th' :
-                    ordinalEnding === '1' ? 'st' :
-                        ordinalEnding === '2' ? 'nd' :
-                            ordinalEnding === '3' ? 'rd' :
-                                'th';
-                document.querySelector('.destroyer.auto-info .num-tries').textContent = (data.numTries || 0) + ordinalEnding;
-
-                betStatus.betTime = data.time;
-            });
-
-            return;
-        }
-    }
-});
+    return (number % 100 < 20 &&
+        number % 100 > 10) ? 'th' :
+            ordinalEnding === '1' ? 'st' :
+                ordinalEnding === '2' ? 'nd' :
+                    ordinalEnding === '3' ? 'rd' :
+                        'th';
+}

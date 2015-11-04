@@ -7,7 +7,6 @@ var storageMarketItems;
 var currencies = {};
 var themes = {};
 var matchInfoCachev2 = {};
-var streamPlaying = false;
 var inventory = new Inventory();
 var lastAccept = 0;
 var blacklistedItemList = {};
@@ -21,8 +20,10 @@ var tradesFiltered = 0;
 var isHomepage;
 var hideFilteredTrades = true;
 var hideFilteredMatches = true;
+var siteAjaxReqObj = [];
+var freezingItems = false;
 
-var container = document.createElement('div');
+var $ldContainer;
 
 chrome.storage.local.get(['marketPriceList', 'currencyConversionRates', 'themes', 'matchInfoCachev2', 'lastAutoAccept', 'blacklistedItemList', 'csglBettingValues', 'userSettings'], function(result) {
     blacklistedItemList = result.blacklistedItemList || {};
@@ -70,12 +71,19 @@ chrome.extension.onMessage.addListener(function(msg, sender, sendResponse) {
     }
 
     if (msg.hasOwnProperty('serialize')) {
-        console.log('Serializing: ', msg);
         args.serialize = $(msg.serialize).serialize();
     }
 
     if (msg.hasOwnProperty('cookies')) {
         args.cookies = document.cookie;
+    }
+
+    if (msg.hasOwnProperty('windowUrl')) {
+        args.windowUrl = window.location.href;
+    }
+
+    if (msg.hasOwnProperty('ajaxObjects')) {
+        args.ajaxObjects = siteAjaxReqObj;
     }
 
     if (msg.tradesNotification) {
@@ -224,44 +232,6 @@ function init() {
             $('body').addClass('mytrades');
         }
 
-        // cannot check if actually playing, unfortunately
-        // only if it's been clicked while on the page
-        (function() {
-            var container = document.getElementById('mainstream');
-            var flash = document.getElementById('live_embed_player_flash');
-
-            if (!flash) { // it's a hitbox stream
-                flash = document.querySelector('#mainstream iframe:first-child');
-                if (!flash) {
-                    return;
-                }
-
-                flash.contentWindow.document.addEventListener('click', function() {
-                    streamPlaying = true
-                });
-
-                return
-            }
-
-            if (!container) {
-                return;
-            }
-
-            flash = flash.document || flash;
-
-            if (!flash) {
-                return;
-            }
-
-            // onclick/onmousedown doesn't fire on flash objects
-            container.addEventListener('mousedown', function() {
-                streamPlaying = true;
-            });
-
-            // onmousedown won't fire unless wmode=transparent, don't ask me why
-            flash.setAttribute('wmode', 'transparent');
-        })();
-
         if (document.URL.indexOf('/mybets') != -1) {
             // reload page if draft page
             if (LoungeUser.userSettings.redirect === '1') {
@@ -305,7 +275,11 @@ function init() {
                     // inject own
                     btn.addEventListener('click', function() {
                         if (this.textContent !== 'Are you sure') {
-                            $(this).text('Are you sure').on('click', newFreezeReturn);
+                            $(this).text('Are you sure').on('click', function() {
+                                if(freezingItems === false) {
+                                    newFreezeReturn();
+                                }
+                            });
                         }
                     });
                 }
@@ -434,7 +408,8 @@ function init() {
             });
         }
 
-        container.querySelector('input').value = LoungeUser.userSettings.autoDelay || 5;
+        $ldContainer.find('#bet-time').val(LoungeUser.userSettings.autoDelay || 5);
+        $ldContainer.find('#accept-time').val(LoungeUser.userSettings.acceptDelay || 10);
 
         if (LoungeUser.userSettings.showExtraMatchInfo === '2') {
             $('.matchmain').each(function(i, v) {
@@ -446,6 +421,36 @@ function init() {
         }
 
         initiateItemObjectForElementList();
+
+        var eventId = generateUUID();
+
+        document.addEventListener(eventId, function(event) {
+            if(typeof event.detail === 'object') {
+                siteAjaxReqObj.push(event.detail);
+            }
+
+            if (event.detail.hasOwnProperty('url') && ['ajax/postBetOffer.php', 'ajax/postBet.php'].indexOf(event.detail.url) !== -1) {
+                console.log('AUTOBET :: THIS IS COMPLETELY NORMAL THAT THIS REQUEST GETS CANCELLED, THAT\'S HOW THE EXTENSION WORKS');
+            }
+        });
+
+        var injFunc = function() {
+            $.ajaxPrefilter(function(UNIQUE_LD_OPT_ARG, UNIQUE_LD_ORIGOPT_ARG) {
+                document.dispatchEvent(new CustomEvent('UNIQUE_LD_EVENT_ID', {'detail': JSON.parse(JSON.stringify(UNIQUE_LD_ORIGOPT_ARG))}));
+            });
+        };
+
+        var injectedScript = document.createElement('script');
+        injectedScript.type = 'text/javascript';
+        var scriptText = '('+injFunc+')();';
+        scriptText = scriptText.replace(/UNIQUE_LD_EVENT_ID/g, eventId)
+            .replace(/UNIQUE_LD_OPT_ARG/g, generateArgName)
+            .replace(/UNIQUE_LD_ORIGOPT_ARG/g, generateArgName());
+
+        injectedScript.text = scriptText;
+        (document.body || document.head).appendChild(injectedScript);
+        injectedScript.parentNode.removeChild(injectedScript);
+
     });
 }
 /*
@@ -459,34 +464,51 @@ $(document).ready(function() {
         subtree: true
     });
 
-    // create info box in top-right
-    container.className = 'destroyer auto-info hidden';
-    container.innerHTML = '<p>Auto-<span class="type">betting</span> items<span class="worth-container"> on match <a class="match-link"></a></span>. <span class="type capitalize">Betting</span> for the <span class="num-tries">0th</span> time.</p>' +
-    '<button class="red">Disable auto-bet</button>' +
-    '<p class="destroyer error-title">Last error (<span class="destroyer time-since">0s</span>):</p><p class="destroyer error-text"></p>' +
-    '<label>Seconds between retries:</label><input id="bet-time" type="number" min="2" max="60" step="1">' +
-    '<hr><p class="support">Support LoungeDestroyer development <br/><b style="color: red;">by donating</b></p> <a href="https://www.patreon.com/loungedestroyer" target="_blank" class="patreon"><button>Patreon support</button></a>' +
-    '<a href="https://steamcommunity.com/tradeoffer/new/?partner=106750833&token=eYnKX2Un" target="_blank" class="steam"><button>Steam donations</button></a>';
+    $ldContainer = $('<div class="destroyer auto-info hidden">' +
+        '<p class="ld-autobet-info">Auto-betting</span> items on match <a class="match-link"></a>. ' +
+        '<span class="type capitalize">Betting</span> for the <span class="num-tries">0th</span> time.</p>' +
 
-    container.querySelector('button').addEventListener('click', function() {
-        chrome.runtime.sendMessage({type: 'autoBet', autoBet: false});
+        '<p class="ld-autoreturn-info">Auto-returning</span> items for the <span class="num-tries">0th</span> time.</p>' +
+
+        '<p class="ld-autofreeze-info">Auto-freezing</span> items for the <span class="num-tries">0th</span> time.</p>' +
+
+        '<p class="ld-autoaccept-info">Auto-accepting</span> trade offer.</p>' +
+
+        '<button class="red ld-disable-auto">Disable</button>' +
+
+        '<p class="destroyer error-title">Last message (<span class="destroyer time-since">0s</span>):</p><p class="destroyer error-text"></p>' +
+
+        '<label class="ld-autobetreturn-label">Seconds between retries:</label><input id="bet-time" type="number" min="2" max="60" step="1">' +
+        '<label class="ld-autoaccept-label">Delay before accepting:</label><input id="accept-time" type="number" min="0" max="60" step="1">' +
+
+        '<hr><p class="support">Support LoungeDestroyer development <br/><b style="color: red;">by donating</b></p> <a href="https://www.patreon.com/loungedestroyer" target="_blank" class="patreon"><button>Patreon support</button></a>' +
+        '<a href="https://steamcommunity.com/tradeoffer/new/?partner=106750833&token=eYnKX2Un" target="_blank" class="steam"><button>Steam donations</button></a></div>');
+
+    $ldContainer.find('button.ld-disable-auto').click(function() {
+        chrome.runtime.sendMessage({autoBet: 'disable'});
+        $('.destroyer.auto-info').addClass('hidden');
     });
 
-    container.querySelector('input').addEventListener('blur', function() {
+    $ldContainer.find('#bet-time').change(function() {
         var newVal = Math.max(2, this.valueAsNumber);
         if (newVal) {
             this.valueAsNumber = newVal;
-            chrome.runtime.sendMessage({'set': {bet: {autoDelay: newVal * 1000}},
-                'saveSetting': {autoDelay: newVal}});
+            LoungeUser.saveSetting('autoDelay', newVal);
         }
     });
 
-    document.body.appendChild(container);
+    $ldContainer.find('#accept-time').change(function() {
+        LoungeUser.saveSetting('acceptDelay', this.valueAsNumber);
+    });
 
-    $('.destroyer.auto-info a.steam').on('click', function() {
+
+    $ldContainer.find('a.steam').click(function() {
         return confirm('You are about to open a trade with LoungeDestroyer donation account. \n\nTHIS TRADE OFFER IS NOT RELATED TO CSGOLOUNGE.COM NOR DOTA2LOUNGE.COM IN ANY WAY. \n\nAre you sure?');
     });
 
+    $('body').append($ldContainer);
+
+    // TODO: Check if this is relevant
     document.addEventListener('click', function(ev) {
         if (ev.srcElement) {
             if (ev.srcElement.id !== 'preview' && !$('#preview').find(ev.srcElement).length) {
@@ -511,70 +533,61 @@ function newFreezeReturn(tries) {
         tries = 1;
     }
 
+    freezingItems = true;
+
+    if (tries == 1) {
+        betStatus.type = 'autoFreeze';
+        betStatus.autoBetting = true;
+        betStatus.lastError = 'No response received yet.';
+        betStatus.lastBetTime = Date.now();
+
+        updateAutobetInfo();
+
+        $('.destroyer.auto-info').removeClass('hidden');
+    }
+
     // Be aware, this was changed from ['toreturn'] to .toreturn
     var toreturn = retrieveWindowVariables('toreturn').toreturn;
     if (toreturn === 'true') {
-        // hacky hacky UI stuff
-        var toHide = document.querySelectorAll('.destroyer.auto-info > *:not(:first-child)');
-        for (var i = 0, j = toHide.length; i < j; ++i) {
-            if (toHide[i].classList)
-                toHide[i].classList.remove('hidden');
-        }
-
-        // The reason why this should never happen is because we cancel out this request from bg/bet.js
+        freezingItems = false;
         $.ajax({
             url: 'ajax/postToReturn.php',
             success: function(data) {
-                if (data) {
-                    console.error('Whoops, this shouldn\'t happen: ', data);
-                    alert(data);
-                } else {
-                    console.error('This shouldn\'t happen.');
-                }
+                // The reason why this should never happen is because we cancel out this request from bg/bet.js
+                console.error('Whoops, this shouldn\'t happen: ', data);
+            },
+            error: function() {
+                console.log('AUTOBET :: THIS IS COMPLETELY NORMAL THAT THIS REQUEST GETS CANCELLED, THAT\'S HOW THE EXTENSION WORKS');
             }
         });
     } else {
-        // hacky hacky UI stuff
-        document.querySelector('.destroyer.auto-info').classList.remove('hidden');
-        var ordinalEnding = ((tries || 0) + '').slice(-1);
-        ordinalEnding = (tries % 100 < 20 &&
-                        tries % 100 > 10) ? 'th' :
-                        ordinalEnding === '1' ? 'st' :
-                        ordinalEnding === '2' ? 'nd' :
-                        ordinalEnding === '3' ? 'rd' :
-                        'th';
-        document.querySelector('.destroyer.auto-info .num-tries').textContent = (tries || 0) + ordinalEnding;
-        var toHide = document.querySelectorAll('.destroyer.auto-info > *:not(:first-child):not(.error-text)');
-        for (var i = 0, j = toHide.length; i < j; ++i) {
-            if (toHide[i].classList) {
-                toHide[i].classList.add('hidden');
-            }
-        }
-
-        var typeSpans = document.querySelectorAll('.destroyer.auto-info .type');
-        for (var i = 0, j = typeSpans.length; i < j; ++i) {
-            typeSpans[i].textContent = 'freezing';
-        }
-
-        // end hacky hacky UI stuff
-
         $.ajax({
             url: 'ajax/postToFreeze.php',
             data: $('#freeze').serialize(),
             type: 'POST',
             success: function(data) {
+                betStatus.lastError = data;
+
                 if (data) {
-                    console.error(data);
-                    document.querySelector('.destroyer.auto-info .error-text').textContent = data;
-                    setTimeout(function() {
-                        console.log('Retrying freeze for the ', tries, '. time - ', data);
-                        newFreezeReturn(tries + 1);
-                    }, 2000);
+                    console.log('AUTOBET :: Retrying freeze for the ', tries, '. time - ', data);
                 } else {
+                    // TODO: Update autofreeze with success messages
+                    betStatus.lastError = 'Item freezing was successful, starting auto-returning..';
                     setWindowVariables({toreturn: true});
-                    newFreezeReturn(tries + 1);
                 }
-            }
+            },
+            error: function(xhr) {
+                betStatus.lastError = 'HTTP Error (#' + xhr.status + ') while autoing. Retrying';
+            },
+            timeout: 10000
+        }).always(function(data) {
+            console.log('ALWAYS');
+            betStatus.lastBetTime = Date.now();
+            betStatus.numTries = tries;
+            updateAutobetInfo();
+            setTimeout(function() {
+                newFreezeReturn(tries + 1);
+            }, 5000);
         });
     }
 }

@@ -3,7 +3,7 @@ var currencyFallback = {'USDAUD':1.1503, 'USDCAD': 1.1359, 'USDEUR': 0.8006, 'US
 
 LoungeUser.loadUserSettings(function() {
     console.log('Settings for background.js have loaded!');
-    bet.autoDelay = parseInt(LoungeUser.userSettings.autoDelay) * 1000 || 5000;
+    autoDelay = parseInt(LoungeUser.userSettings.autoDelay) * 1000 || 5000;
 });
 
 var lastTimeUserVisited = null;

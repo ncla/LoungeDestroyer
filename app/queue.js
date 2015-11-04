@@ -13,6 +13,10 @@ var queue = {
     tabOpened: false
 };
 
+/**
+ * Listen here for any changes in auto-accepting
+ */
+
 // init
 $(document).ready(function() {
     var queueElm = document.getElementById('queue');

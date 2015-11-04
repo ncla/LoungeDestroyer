@@ -251,3 +251,36 @@ function isScrolledIntoView(elem) {
         });
     }
 })(jQuery);
+
+function generateUUID() {
+    var d = new Date().getTime();
+    var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        var r = (d + Math.random()*16)%16 | 0;
+        d = Math.floor(d/16);
+        return (c=='x' ? r : (r&0x3|0x8)).toString(16);
+    });
+    return uuid;
+}
+
+function generateArgName() {
+    var text = "";
+    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+
+    var randomLength = Math.floor(Math.random() * 16) + 3;
+
+    for(var i=0; i < randomLength; i++) {
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+    }
+
+    return text;
+}
+/**
+ * Determines game type
+ * @param url string
+ * @returns {number} -1 if no game, 0 if CSGOLounge, 1 if DOTA2Lounge
+ */
+function determineGameByURL(url) {
+    return url.indexOf('://csgolounge.com/') !== -1 ? 0 :
+        url.indexOf('://dota2lounge.com/') !== -1 ? 1 :
+            -1;
+}

@@ -106,7 +106,6 @@ Item.prototype.getMarketPrice = function(cachedOnly) {
     }
 
     if (this.marketPriced) {
-        console.log('Item ' + this.itemName + ' already marketed, not marketing it again');
         return this;
     }
 
@@ -349,7 +348,6 @@ Item.prototype.blacklistItem = function() {
 Item.prototype.appendHoverElements = function() {
     var _this = this;
     if (!_this.extraAppended) {
-        console.log('No extra elements appended to hover elm.');
         if (nonMarketItems.indexOf(_this.itemName) === -1) {
             if ($('a:contains("Market")', _this.item).length) {
                 $('a:contains("Market")', _this.item).html('Market Listings');

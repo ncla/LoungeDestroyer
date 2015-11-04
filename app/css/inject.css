@@ -161,10 +161,37 @@ http://codepen.io/larrygeams/pen/nhgze
 
     z-index: 100;
 }
+
+.destroyer.auto-info .ld-autobet-info,
+.destroyer.auto-info .ld-autoreturn-info,
+.destroyer.auto-info .ld-autofreeze-info,
+.destroyer.auto-info .ld-autoaccept-info,
+.destroyer.auto-info #accept-time,
+.destroyer.auto-info #bet-time,
+.destroyer.auto-info label.ld-autobetreturn-label,
+.destroyer.auto-info label.ld-autoaccept-label,
+.destroyer.auto-info.ld-autofreeze .ld-disable-auto,
+.destroyer.auto-info.ld-autofreeze label {
+    display: none;
+}
+
+.destroyer.auto-info.ld-autobet .ld-autobet-info,
+.destroyer.auto-info.ld-autoreturn .ld-autoreturn-info,
+.destroyer.auto-info.ld-autoaccept .ld-autoaccept-info,
+.destroyer.auto-info.ld-autofreeze .ld-autofreeze-info,
+.destroyer.auto-info.ld-autobet #bet-time,
+.destroyer.auto-info.ld-autoreturn #bet-time,
+.destroyer.auto-info.ld-autobet label.ld-autobetreturn-label,
+.destroyer.auto-info.ld-autoreturn label.ld-autobetreturn-label,
+.destroyer.auto-info.ld-autoaccept #accept-time,
+.destroyer.auto-info.ld-autoaccept label.ld-autoaccept-label {
+    display: initial;
+}
+
 .destroyer.auto-info button { margin: 10px 0; width: 100%; }
 .destroyer.auto-info .worth, .destroyer.auto-info .num-tries, .destroyer.auto-info .match-link { font-weight: 700; }
 .destroyer.auto-info .error-title { margin-bottom: 0; }
-.destroyer.auto-info .error-text { padding-left: 10px; white-space: pre-wrap; }
+.destroyer.auto-info .error-text { min-height: 30px; padding-left: 10px; white-space: pre-wrap; }
 .destroyer.auto-info label { margin-right: 10px; }
 .destroyer.auto-info input { margin-top: 10px; }
 

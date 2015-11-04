@@ -1,6 +1,6 @@
 {
     "name": "LoungeDestroyer",
-    "version": "0.9.0.1",
+    "version": "0.9.1.0",
     "manifest_version": 2,
     "description": "Improves the experience of CS:GO Lounge and DOTA2 Lounge",
     "homepage_url": "http://github.com/ncla/LoungeDestroyer",
@@ -38,7 +38,8 @@
         "webRequest",
         "webRequestBlocking",
         "alarms",
-        "unlimitedStorage"
+        "unlimitedStorage",
+        "cookies"
     ],
     "content_scripts": [
         {
@@ -66,17 +67,6 @@
                 "app/css/inject.css"
             ],
             "run_at": "document_start"
-        },
-        {
-        	"matches": [
-        		"*://steamcommunity.com/tradeoffer/*"
-        	],
-        	"js": [
-        		"app/steam/accept.js"
-        	],
-        	"css": [
-        		"app/steam/steam.css"
-        	]
         },
         {
             "matches": [

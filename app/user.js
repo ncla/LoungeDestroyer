@@ -179,7 +179,6 @@ User.prototype.restoreDefaults = function() {
  */
 User.prototype.restrictOptions = function() {
     this.userSettings.autoDelay = Math.max(2, this.userSettings.autoDelay);
-    this.userSettings.acceptDelay = Math.max(10, this.userSettings.acceptDelay);
 
     return this;
 };
