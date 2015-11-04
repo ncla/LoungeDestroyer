@@ -61,6 +61,40 @@
                             </select>
                         </div>
                         <div class="group col-grid-6 ld-setting">
+                            <span>Show total value won/lost in bet history <b data-tooltip="Requires for you to have enabled cached item price list for market prices or 'Add betting values for CS:GO Lounge items' enabled">(?)</b>:</span>
+                            <select id="betHistoryTotalColumn">
+                                <option value="2">Show total market value</option>
+                                <option value="1">Show total bet value</option>
+                                <option value="0">Disabled</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <br class="margin">
+
+                    <div class="row">
+                        <div class="group col-grid-6 ld-setting">
+                            <span>Item groups in inventory:</span>
+                            <select id="groupInventory">
+                                <option value="1">Enabled</option>
+                                <option value="0">Disabled</option>
+                            </select>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <!-- # /Features -->
+
+        <!-- # Auto-betting -->
+        <div class="col-grid-12">
+            <div class="card">
+                <h2>Auto-betting</h2>
+
+                <div class="pad-vert">
+                    <div class="row">
+                        <div class="group col-grid-6 ld-setting">
                             <span>Enable auto-betting/-returning/-accept:</span>
                             <select id="enableAuto">
                                 <option value="3">Auto-accept only</option>
@@ -75,28 +109,18 @@
 
                     <div class="row">
                         <div class="group col-grid-6 ld-setting">
-                            <span>Show total value won/lost in bet history <b data-tooltip="Requires for you to have enabled cached item price list for market prices or 'Add betting values for CS:GO Lounge items' enabled">(?)</b>:</span>
-                            <select id="betHistoryTotalColumn">
-                                <option value="2">Show total market value</option>
-                                <option value="1">Show total bet value</option>
-                                <option value="0">Disabled</option>
-                            </select>
+                            <span>Auto-betting/-returning request delay:</span>
+                            <input type="number" min="2" max="100" id="autoDelay">
                         </div>
-
                         <div class="group col-grid-6 ld-setting">
-                            <span>Item groups in inventory:</span>
-                            <select id="groupInventory">
-                                <option value="1">Enabled</option>
-                                <option value="0">Disabled</option>
-                            </select>
+                            <span>Auto-accepting trade offer delay:</span>
+                            <input type="number" min="0" max="100" id="acceptDelay">
                         </div>
-
                     </div>
-
                 </div>
             </div>
         </div>
-        <!-- # /Features -->
+        <!-- # /Auto-betting -->
 
         <!-- # Items -->
         <div class="col-grid-12">
@@ -773,14 +797,6 @@
 
                 <div class="row pad-vert">
                     <div class="row">
-                        <div class="group col-grid-6 ld-setting">
-                            <span>Focus on trade offer tabs when auto-betting receives offer:</span>
-                            <select id="focusOnTradeofferTab">
-                                <option value="1">Enabled</option>
-                                <option value="0">Disabled</option>
-                            </select>
-                        </div>
-
                         <div class="group col-grid-6 ld-setting">
                             <span>Show OPSKINS.com links in item pop-up:</span>
                             <select id="opskins">
