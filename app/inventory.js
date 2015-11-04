@@ -660,7 +660,7 @@ Inventory.prototype.makeItemsSortable = function() {
         }
 
         // if we moved it to an existing group (and not default)
-        if (thisGroupName) {
+        if (thisGroupName && thisGroupName !== 'default') {
             _this.groups[thisGroupName].items.push(name);
             if (_this.itemToGroup[name]) {
                 _this.itemToGroup[name].push(thisGroupName);
