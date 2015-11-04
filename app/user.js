@@ -50,6 +50,7 @@ User.prototype.defaultSettings =
     opskins: '1',
     bettingValuesCsgo: '0',
     betHistoryTotalColumn: '2',
+    convertToFloatValue: '1',
 
     globalMatchFilters: '1',
     showMatchFilterBox: '1',

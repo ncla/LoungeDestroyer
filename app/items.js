@@ -360,10 +360,25 @@ Item.prototype.appendHoverElements = function() {
             '<a href="' + _this.generateMarketSearchURL() + '" target="_blank">Market Search</a>' +
             '<br/><br/><small><a class="refreshPriceMarket">Show Steam market price</a></small>');
 
-            if(appID == '730' && LoungeUser.userSettings.opskins == '1') {
+            if(appID === '730' && LoungeUser.userSettings.opskins === '1') {
                 var isStattrak = (_this.itemName.indexOf('StatTrak™ ') !== -1) ? 1 : 0;
                 $('.name', _this.item).append('<br/><p class="opskins-aff"><a href="' + _this.generateOPSkinsURL(_this.itemName, isStattrak) +'" target="_blank">Buy on OPSKINS.com</a>' +
                 '<small title="This affiliate link is added by LoungeDestroyer and supports the developers, you can remove this affiliate link in the settings if you wish."> (?)</small></p>');
+            }
+
+            if (appID === '730' && LoungeUser.userSettings.convertToFloatValue === '1') {
+                var nameContents = $('.name', _this.item).contents();
+                $(nameContents).each(function(contentsIndex, contentValue) {
+                    if ($(contentValue).text().indexOf('Condition') !== -1 && $(contentValue).text().indexOf('%') !== -1) {
+                        var condition = $(contentValue).text().match(new RegExp('[-+]?\\d*\\.\\d+|\\d+', 'g'));
+                        if (condition !== null) {
+                            var floatValue = Math.abs((parseFloat(condition[0]) - 100) / 100).toFixed(5);
+                            $(contentValue)[0].textContent = 'Float value: ' + floatValue;
+                        }
+
+                        return false;
+                    }
+                });
             }
         }
         _this.extraAppended = true;
