@@ -342,6 +342,10 @@ function theme_create_element(name, obj, active) {
 
     $(item).find('.theme-info .icon.left').attr('src', themeIcon);
 
+    if (obj.donationUrl) {
+        $(item).find('.donation-btn-theme').attr('href', obj.donationUrl).show();
+    }
+
     // Add settings related shit
     if (obj.options || obj.custom) {
 
