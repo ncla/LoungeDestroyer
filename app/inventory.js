@@ -205,6 +205,7 @@ Inventory.prototype.onInventoryLoaded = function(requestData) {
     } else {
         console.log('Assuming the backpack has loaded!');
         $('#loading', this.backpackElement).hide();
+        this.determineBackpackType();
         if (document.URL.indexOf('/match?m=') !== -1) {
             // We only need to cache the betting inventories
             if (this.bettingInventoryType == 'inventory') {
