@@ -43,7 +43,8 @@ chrome.storage.local.get(['marketPriceList', 'currencyConversionRates', 'themes'
 });
 
 // Inject theme as quickly as possible
-if(window.location.href.indexOf('/api/') === -1) {
+// TODO: Requesting background script from content script to inject CSS might not that really faster
+if(window.location.href.indexOf('/api/') === -1 && window.location.href.indexOf('view-source:') !== 0) {
     chrome.runtime.sendMessage({injectCSSTheme: true});
 }
 
