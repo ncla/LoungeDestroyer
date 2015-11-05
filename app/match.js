@@ -124,7 +124,7 @@ Match.prototype.testMatchFilters = function() {
 
     var maxOdds = parseInt(LoungeUser.userSettings.matchFilterMaxOdds) || 100;
 
-    if(this.teamOddsA >= maxOdds || this.teamOddsB >= maxOdds) {
+    if(this.teamOddsA > maxOdds || this.teamOddsB > maxOdds) {
         console.log('MATCHES :: Hiding match #' + this.matchID + ' because heavy favorite');
         return this.hide();
     }
