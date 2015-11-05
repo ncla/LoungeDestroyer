@@ -1700,7 +1700,7 @@ code {
     position: absolute;
     top: 10px;
     right: 10px;
-    padding: 0 16px; }
+    padding: 0 16px 0 13px; }
   .theme-preview.theme-no-image {
     background: #333; }
     .theme-preview.theme-no-image img {
