@@ -22,6 +22,9 @@ var baseUrls = ['//csgolounge.com/', '//dota2lounge.com/'];
  * acceptStart - epoch time when the trade accepting was started
  * acceptLoop - same as loopTimer, but for trade accepting, but does not loop
  *
+ * chrome.extension.onMessage.addListener
+ * Is where we listen for any user interactions with auto-betting window, status update requests, queue updates,
+ * and react accordingly.
  *
  *
  */
@@ -107,12 +110,9 @@ bet.enableAuto = function(game, ajaxObject) {
 
     bet[game].autoBetting = bet.autoLoop(game);
 
-    console.log('Enabling for ' + game + ': ' + bet[game].autoBetting);
+    console.log('AUTOBET :: Enabling for ' + game + ': ' + bet[game].autoBetting);
     if (bet[game].autoBetting) {
-        // send event to all lounge tabs
-        var msg = {autoBet: bet[game]};
-
-        sendMessageToContentScript(msg, -1 - game);
+        sendMessageToContentScript({autoBet: bet[game]}, -1 - game);
     }
 
     return bet[game].autoBetting;
@@ -125,7 +125,7 @@ bet.enableAuto = function(game, ajaxObject) {
  * @param game Game ID, -1 = None, 0 = CSGO, 1 = DOTA2
  */
 bet.disableAuto = function(success, game) {
-    console.log('Disabling auto-bet');
+    console.log('AUTOBET :: Disabling auto-bet');
 
     bet[game].autoBetting = false;
 
@@ -133,6 +133,8 @@ bet.disableAuto = function(success, game) {
     var msg = $.extend({}, bet[game]);
     msg.action = {disableAuto: false};
     msg = {autoBet: msg};
+
+    sendMessageToContentScript(msg, -1 - game);
 
     if (success) {
         // Refreshing tab where the auto-betting was initiated from, if tab no longer exists, we create one
@@ -150,8 +152,6 @@ bet.disableAuto = function(success, game) {
             }
         });
     }
-
-    sendMessageToContentScript(msg, -1 - game);
 };
 
 /**
@@ -183,8 +183,7 @@ bet.autoLoop = function(game) {
 
                 var extraDelay = Math.random() * 1750 - 450;
 
-                var msg = {autoBet: bet[game]};
-                sendMessageToContentScript(msg, -1 - game);
+                sendMessageToContentScript({autoBet: bet[game]}, -1 - game);
 
                 clearTimeout(bet[game].loopTimer);
 
@@ -209,8 +208,7 @@ bet.autoLoop = function(game) {
 
             console.log('AUTOBET :: Error received response:', err);
 
-            var msg = {autoBet: bet[game]};
-            sendMessageToContentScript(msg, -1 - game);
+            sendMessageToContentScript({autoBet: bet[game]}, -1 - game);
 
             clearTimeout(bet[game].loopTimer);
 
@@ -449,8 +447,7 @@ function handleQueue(data, game) {
             bet[game].autoBetting = true;
             bet[game].lastError = 'Nothing has happened yet';
 
-            var msg = {autoBet: bet[game]};
-            sendMessageToContentScript(msg, -1 - game);
+            sendMessageToContentScript({autoBet: bet[game]}, -1 - game);
 
             var id = data.offer.replace(/\D/g, '');
 
@@ -461,26 +458,22 @@ function handleQueue(data, game) {
 
                     return;
                 }
-
-                console.log('AUTOBET :: Steam cookie session', details.value);
-
+                
                 bet[game].acceptStart = Date.now();
                 var delay = LoungeUser.userSettings.acceptDelay;
                 bet[game].lastError = (delay == 0 ? 'Accepting trade offer instantly' : 'Accepting trade offer in ' + delay + ' seconds');
-                var msg = {autoBet: bet[game]};
-                sendMessageToContentScript(msg, -1 - game);
+                sendMessageToContentScript({autoBet: bet[game]}, -1 - game);
 
                 bet[game].acceptLoop = setTimeout(function() {
 
                     bet[game].lastError = 'Accepting trade offer..';
-                    var msg = {autoBet: bet[game]};
-                    sendMessageToContentScript(msg, -1 - game);
+                    sendMessageToContentScript({autoBet: bet[game]}, -1 - game);
 
                     $.ajax({
                         url: 'https://steamcommunity.com/tradeoffer/' + id + '/accept',
                         type: 'POST',
                         data: {
-                            sessionid: details.value,
+                            sessionid: decodeURIComponent(details.value),
                             serverid: 1,
                             tradeofferid: id
                         },
@@ -523,8 +516,7 @@ function handleQueue(data, game) {
 
                             // 403 status code gets returned if you are logged out
                             if (jqXHR.status === 403) {
-                                bet[game].lastError += ' Make sure that you are logged in on Steam with the same account you are using '
-                                    + (appID === '730' ? 'CSGOLounge' : 'DOTA2Lounge') + ' with.';
+                                bet[game].lastError += ' Make sure that you are logged in on Steam with the same account you are using CS:GOLounge/DOTA2Lounge with.';
                             }
 
                             disableAutoAccept(game, false);

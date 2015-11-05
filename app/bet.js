@@ -21,7 +21,6 @@ chrome.runtime.sendMessage({autoBet: 'status'}, function(data) {
 // listen for auto-betting updates
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     if (!request.hasOwnProperty('autoBet')) {
-        console.log('AUTOBET :: IS NOT AUTOBET onMessage');
         return;
     }
 
