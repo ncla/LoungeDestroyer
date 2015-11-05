@@ -45,7 +45,7 @@ $(document).ready(function() {
         });
 
         $.each(Settings, function(index, value) {
-            if (value) {
+            if (value !== undefined && value !== null) {
                 $("#" + index).val(value);
             }
         });

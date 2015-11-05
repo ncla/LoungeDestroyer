@@ -409,8 +409,8 @@ function init() {
             });
         }
 
-        $ldContainer.find('#bet-time').val(LoungeUser.userSettings.autoDelay || 5);
-        $ldContainer.find('#accept-time').val(LoungeUser.userSettings.acceptDelay || 10);
+        $ldContainer.find('#bet-time').val(LoungeUser.userSettings.autoDelay);
+        $ldContainer.find('#accept-time').val(LoungeUser.userSettings.acceptDelay);
 
         if (LoungeUser.userSettings.showExtraMatchInfo === '2') {
             $('.matchmain').each(function(i, v) {
