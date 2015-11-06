@@ -64,6 +64,7 @@ User.prototype.defaultSettings =
     showExtraMatchInfo: '2',
     showValueForOneIndicator: '0',
     underlineTeamUserBetOn: '1',
+    displayAmountsPlaced: '1',
 
     globalTradeFilters: '1',
     showTradeFilterBox: '1',

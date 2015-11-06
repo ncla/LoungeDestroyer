@@ -34,9 +34,6 @@ Match.prototype.fetchMatchPage = function(callback, game) {
         url: _this.generateMatchURL(appID),
         type: 'GET',
         success: function(data) {
-            //var doc = document.implementation.createHTMLDocument('');
-            //doc.body.innerHTML = data;
-            //_this.matchPage = data;
             callback(data);
         }
     });
@@ -79,7 +76,22 @@ Match.prototype.parseMatchPage = function(response) {
     this.matchFormat = $('.half:eq(1)', matchHeader).text().trim();
     this.exactTime = $('.half:eq(2)', matchHeader).text().trim();
     this.userBetted = !!$('.box-shiny-alt .winsorloses', doc).length;
-    this.amountOfBetsPlaced = parseFloat($('section.box:eq(1) .box-shiny-alt .full', doc).text()) || 0;
+
+    this.amountOfBetsPlaced = 0;
+    this.amountOfItemsPlaced = 0;
+
+    if (LoungeUser.userSettings.displayAmountsPlaced !== '0') {
+        var matchStats = $('section.box:eq(1) .box-shiny-alt .full', doc);
+        var matchStatsRegex = $(matchStats).text().match(/\d+/g);
+
+        if (matchStatsRegex !== null) {
+            this.amountOfBetsPlaced = parseFloat(matchStatsRegex[0]) || 0;
+
+            if (matchStatsRegex[1]) {
+                this.amountOfItemsPlaced = parseFloat(matchStatsRegex[1]) || 0;
+            }
+        }
+    }
 
     this.teamBetOn = -1;
 
@@ -103,7 +115,6 @@ Match.prototype.parseMatchPage = function(response) {
     var textValueForOneA = $($('div[style="float: left; margin: 0.25em 2%;"]', doc).contents()[2]).text().replace(',', '.');
     var textValueForOneB = $($('div[style="float: right; margin: 0.25em 2%;"]', doc).contents()[2]).text().replace(',', '.');
 
-    // http://stackoverflow.com/a/4703409
     var regexValueTeamA = textValueForOneA.match(new RegExp('[-+]?\\d*\\.\\d+|\\d+', 'g'));
     var regexValueTeamB = textValueForOneB.match(new RegExp('[-+]?\\d*\\.\\d+|\\d+', 'g'));
 
@@ -116,7 +127,6 @@ Match.prototype.parseMatchPage = function(response) {
 };
 
 Match.prototype.testMatchFilters = function() {
-    // FIXME: This is wrong, drafted/closed matches will be hidden as well
     if(LoungeUser.userSettings.matchHideLive === '1' && this.timeFromNow.indexOf('ago') !== -1 && !this.closedMatch) {
         console.log('MATCHES :: Hiding match #' + this.matchID + ' because it has already started');
         return this.hide();
@@ -140,12 +150,6 @@ Match.prototype.testMatchFilters = function() {
         console.log('MATCHES :: Hiding match #' + this.matchID + ' because team is blacklisted');
         return this.hide();
     }
-
-    //if((teamsOddsMoreThan.hasOwnProperty(this.teamA) && this.teamOddsA >=teamsOddsMoreThan[this.teamA])
-    //    || (teamsOddsMoreThan.hasOwnProperty(this.teamB) && this.teamOddsB >=teamsOddsMoreThan[this.teamB])) {
-    //    console.log('Hiding because selected team has more than x odds');
-    //    return this.hide();
-    //}
 };
 
 Match.prototype.hide = function() {
@@ -196,8 +200,14 @@ Match.prototype.appendExtraMatchInfo = function(targetElement) {
         $(matchHeaderBlock).append(' <span class="seperator">|</span> <span class="bestoftype">' + this.matchFormat + '</span>');
     }
 
-    if (this.amountOfBetsPlaced) {
-        $(matchHeaderBlock).append(' <span class="seperator">|</span> <span class="ld-totalbets">' + this.amountOfBetsPlaced + ' bets placed</span>');
+    if (LoungeUser.userSettings.displayAmountsPlaced !== '0') {
+        if (LoungeUser.userSettings.displayAmountsPlaced === '1' && this.amountOfItemsPlaced) {
+            $(matchHeaderBlock).append(' <span class="seperator">|</span> <span class="ld-totalbets">' + this.amountOfItemsPlaced + ' items placed</span>');
+        }
+
+        if (LoungeUser.userSettings.displayAmountsPlaced === '2' && this.amountOfBetsPlaced) {
+            $(matchHeaderBlock).append(' <span class="seperator">|</span> <span class="ld-totalitems">' + this.amountOfBetsPlaced + ' bets placed</span>');
+        }
     }
 
     if (LoungeUser.userSettings.showValueForOneIndicator === '1' && this.valueForOneTeamA && this.valueForOneTeamB) {
@@ -240,6 +250,7 @@ Match.prototype.cacheMatchExtraInfo = function() {
         valueForOneTeamA: this.valueForOneTeamA,
         valueForOneTeamB: this.valueForOneTeamB,
         amountOfBetsPlaced: this.amountOfBetsPlaced,
+        amountOfItemsPlaced: this.amountOfItemsPlaced,
         teamBetOn: this.teamBetOn,
         totalBet: this.totalBet
     };
