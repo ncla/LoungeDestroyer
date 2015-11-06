@@ -329,7 +329,7 @@ function init() {
 
             var loadExtraOpt = LoungeUser.userSettings.tradeLoadExtra;
 
-            $('.tradepoll:not(.notavailable)').each(function(index, value) {
+            $('.tradepoll:not(.notavailable):visible').each(function(index, value) {
                 var trade = tradeObject(value);
 
                 if (loadExtraOpt === '3' || (loadExtraOpt === '4' && !isHomepage)) {
