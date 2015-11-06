@@ -241,6 +241,10 @@ Trade.prototype.appendSteamData = function() {
 
     var $steamExtra = $('.ld-steam-extra', _this.tradeElement);
 
+    if (_this.steamUser.onlineState) {
+        $steamExtra.addClass('ld-online-status-' + _this.steamUser.onlineState);
+    }
+
     $steamExtra.append(
         '<div class="ld-steam-info">' +
         '<a class="ld-steam-img" href="https://steamcommunity.com/profiles/' + _this.profileId + '"><img src="' + _this.avatarMediumUrl + '"/></a>' +
