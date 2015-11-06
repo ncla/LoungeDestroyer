@@ -22,6 +22,7 @@ var hideFilteredTrades = true;
 var hideFilteredMatches = true;
 var siteAjaxReqObj = [];
 var freezingItems = false;
+var uniqueUserTrades = [];
 
 var $ldContainer;
 

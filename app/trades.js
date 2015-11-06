@@ -338,6 +338,15 @@ Trade.prototype.filterByTradeDescription = function() {
 Trade.prototype.filterByExtendedTradeData = function() {
     this.filterByTradeDescription();
 
+    if (LoungeUser.userSettings.tradesOnePerUser === '1' && this.profileId) {
+        if (uniqueUserTrades.indexOf(this.profileId) === -1) {
+            uniqueUserTrades.push(this.profileId);
+        } else {
+            console.log('TRADES :: Hiding trade #' + this.tradeID + ' because only one trade per user allowed');
+            return this.hide();
+        }
+    }
+
     if (LoungeUser.userSettings.tradeFilterRep === '1' && this.userReputation !== undefined &&
         (this.userReputation < LoungeUser.userSettings.minUserRep || this.userReputation > LoungeUser.userSettings.maxUserRep)) {
         console.log('TRADES :: Hiding trade #' + this.tradeID + ' because user reputation [' + this.userReputation + '] does not match settings');

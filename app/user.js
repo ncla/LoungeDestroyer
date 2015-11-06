@@ -81,7 +81,8 @@ User.prototype.defaultSettings =
     minAlltimePlaytime: '0',
     tradeFilterRep: '0',
     minUserRep: '-1000',
-    maxUserRep: '1000'
+    maxUserRep: '1000',
+    tradesOnePerUser: '0'
 };
 
 // defaultSettings get modified when changing settings?

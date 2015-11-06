@@ -495,20 +495,27 @@
                     <br class="margin">
 
                     <div class="row">
-                        <div class="group col-grid-4 ld-setting">
-                            <span>Filter trades by reputation:</span>
+                        <div class="group col-grid-3 ld-setting">
+                            <span>Hide trades by reputation:</span>
                             <select id="tradeFilterRep">
                                 <option value="1">Enable</option>
                                 <option value="0">Disable</option>
                             </select>
                         </div>
-                        <div class="group col-grid-4 ld-setting">
+                        <div class="group col-grid-3 ld-setting">
                             <span>Minimum user reputation:</span>
                             <input type="number" min="-1000" max="1000" id="minUserRep">
                         </div>
-                        <div class="group col-grid-4 ld-setting">
+                        <div class="group col-grid-3 ld-setting">
                             <span>Maximum user reputation:</span>
                             <input type="number" min="-1000" max="1000" id="maxUserRep">
+                        </div>
+                        <div class="group col-grid-3 ld-setting">
+                            <span>Show one trade per user:</span>
+                            <select id="tradesOnePerUser">
+                                <option value="1">Enable</option>
+                                <option value="0">Disable</option>
+                            </select>
                         </div>
                     </div>
 
