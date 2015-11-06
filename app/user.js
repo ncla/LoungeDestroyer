@@ -77,7 +77,10 @@ User.prototype.defaultSettings =
     maxVacBans: '5',
     minSteamLevel: '0',
     minAccAgeDays: '0',
-    minAlltimePlaytime: '0'
+    minAlltimePlaytime: '0',
+    tradeFilterRep: '0',
+    minUserRep: '-1000',
+    maxUserRep: '1000'
 };
 
 // defaultSettings get modified when changing settings?

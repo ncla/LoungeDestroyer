@@ -94,7 +94,27 @@ Trade.prototype.fetchTradeData = function(successCallback, errorCallback) {
             if ($profileLink.length) {
                 _this.profileId = $profileLink.attr('href').match(/\d+/)[0];
             } else {
-                this.profileId = null;
+                _this.profileId = null;
+            }
+
+            _this.userReputation = undefined;
+
+            // Don't bother with this crap if we don't need to
+            if (LoungeUser.userSettings.tradeFilterRep !== '0') {
+                $(doc).find('.profilesmallheader').contents().filter(function() {
+                    return this.nodeType == 3;
+                }).each(function(textNodeIndex, textNodeValue) {
+                    var text = $(textNodeValue).text();
+
+                    // Testing against word `Reputation` in five different languages. Kill me.
+                    if(/(\u0420\u0435\u043F\u0443\u0442\u0430\u0446\u0438\u044F)|(\u58F0\u671B)|(Reputa\u00E7\u00E3o)|(Reputaci\u00F3n)|(Reputation)/.test(text)) {
+                        var regexRepCount = text.match(/-?[0-9]+(\.[0-9]+)?/g);
+                        if (regexRepCount !== null) {
+                            _this.userReputation = parseFloat(regexRepCount[0]);
+                            return false;
+                        }
+                    }
+                });
             }
 
             _this.avatarMediumUrl = $('.profilesmall img:eq(0)', doc).attr('src') || null;
@@ -313,6 +333,12 @@ Trade.prototype.filterByTradeDescription = function() {
 
 Trade.prototype.filterByExtendedTradeData = function() {
     this.filterByTradeDescription();
+
+    if (LoungeUser.userSettings.tradeFilterRep === '1' && this.userReputation !== undefined &&
+        (this.userReputation < LoungeUser.userSettings.minUserRep || this.userReputation > LoungeUser.userSettings.maxUserRep)) {
+        console.log('TRADES :: Hiding trade #' + this.tradeID + ' because user reputation [' + this.userReputation + '] does not match settings');
+        return this.hide();
+    }
 
     if(this.steamlevel !== null && this.steamlevel < parseInt(LoungeUser.userSettings.minSteamLevel)) {
         console.log('TRADES :: Hiding trade #' + this.tradeID + ' because Steam level did not match');
