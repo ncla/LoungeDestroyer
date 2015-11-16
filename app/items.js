@@ -208,12 +208,17 @@ Item.prototype.fetchSteamMarketPrice = function() {
             var pricehistoryRegex = data.match(/var line1=(.*?);/);
 
             if (pricehistoryRegex !== null && pricehistoryRegex[1]) {
-                var history = JSON.parse(pricehistoryRegex[1]);
-                var lastPoint = history[history.length - 1];
-                var lowestPrice = lastPoint[1];
+                // For unexpected shit like failed JSON parsing
+                try {
+                    var history = JSON.parse(pricehistoryRegex[1]);
+                    var lastPoint = history[history.length - 1];
+                    var lowestPrice = lastPoint[1];
 
-                marketedItems[_this.itemName] = lowestPrice;
-                _this.insertMarketValue(lowestPrice);
+                    marketedItems[_this.itemName] = lowestPrice;
+                    _this.insertMarketValue(lowestPrice);
+                } catch (e) {
+                    $(_this.item).find('.rarity').html('Not Found');
+                }
             } else {
                 $(_this.item).find('.rarity').html('Not Found');
             }
