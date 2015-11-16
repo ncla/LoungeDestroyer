@@ -80,7 +80,7 @@ div.trade-description {
 /*
 http://codepen.io/larrygeams/pen/nhgze
 */
-#LDloading {
+#LDloading, .ld-loading-spinner {
     background-color: rgba(0,0,0,0);
     opacity: .8;
     border-radius: 50px;
@@ -90,7 +90,7 @@ http://codepen.io/larrygeams/pen/nhgze
     -webkit-animation: loading .7s infinite linear;
 }
 
-.spin-1{
+.spin-1 {
     border: 5px solid #fff;
     border-top: 5px solid rgba(0,0,0,0);
     border-left: 5px solid rgba(0,0,0,0);
