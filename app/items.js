@@ -201,20 +201,33 @@ Item.prototype.fetchSteamMarketPrice = function() {
     var _this = this;
     loadingItems[this.itemName] = true;
     $.ajax({
-        url: this.generateMarketApiURL(),
+        //url: this.generateMarketApiURL(),
+        url: this.generateMarketURL(),
         type: 'GET',
         success: function(data) {
-            if (data.success === true && data.hasOwnProperty('lowest_price')) {
-                // jscs: disable
-                var lowestPrice = parseFloat(data.lowest_price.replace('&#36;', '').match(/[0-9.]+/));
-                // jscs: enable
+            var pricehistoryRegex = data.match(/var line1=(.*?);/);
+
+            if (pricehistoryRegex !== null && pricehistoryRegex[1]) {
+                var history = JSON.parse(pricehistoryRegex[1]);
+                var lastPoint = history[history.length - 1];
+                var lowestPrice = lastPoint[1];
+
                 marketedItems[_this.itemName] = lowestPrice;
                 _this.insertMarketValue(lowestPrice);
-            }
-            else {
-                // TODO: Rewrite insertMarketValue method to handle no market price values
+            } else {
                 $(_this.item).find('.rarity').html('Not Found');
             }
+            //if (data.success === true && data.hasOwnProperty('lowest_price')) {
+            //    // jscs: disable
+            //    var lowestPrice = parseFloat(data.lowest_price.replace('&#36;', '').match(/[0-9.]+/));
+            //    // jscs: enable
+            //    marketedItems[_this.itemName] = lowestPrice;
+            //    _this.insertMarketValue(lowestPrice);
+            //}
+            //else {
+            //    // TODO: Rewrite insertMarketValue method to handle no market price values
+            //    $(_this.item).find('.rarity').html('Not Found');
+            //}
         },
 
         error: function(jqXHR) {
@@ -222,6 +235,8 @@ Item.prototype.fetchSteamMarketPrice = function() {
                 console.log('Error getting response for item ' + _this.itemName);
                 _this.blacklistItem();
             }
+
+            $(_this.item).find('.rarity').html('STEAM ERR');
         }
     }).done(function() {
             delete loadingItems[_this.itemName];
