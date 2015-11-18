@@ -402,6 +402,26 @@ function init() {
                     });
                 });
             }
+
+            var matchID = window.location.href.match(/\d+/);
+
+            if (matchID !== null && appID === '730') {
+                var $wrapper = $('<div class="box-shiny-alt ld-match-info"></div>');
+                $('section.box:eq(1) .box-shiny-alt:eq(0)').after($wrapper);
+
+                $wrapper.html('<div class="ld-loading-spinner spin-1"></div>');
+
+                $.ajax({
+                    url: 'http://api.ncla.me/match/' + matchID[0],
+                    success: function(data) {
+                        $wrapper.html(data);
+                    },
+                    error: function() {
+                        $wrapper.html('<div class="ld-match-info-error"><span class="ld-btn-icon"></span> LoungeDestroyer failed to load information for this match. <b>Try again later.</b></div>');
+                    }
+                });
+            }
+
         }
 
         if (document.URL.indexOf('/addtrade') != -1) {

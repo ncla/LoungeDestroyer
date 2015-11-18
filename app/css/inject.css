@@ -98,6 +98,46 @@ http://codepen.io/larrygeams/pen/nhgze
     height: 24px;
 }
 
+.ld-match-info {
+    margin-top: 12px;
+    position: relative;
+}
+.ld-match-info:empty {
+    display: none;
+}
+
+.ld-match-info-error {
+    margin: 10px;
+    font-size: 14px;
+    text-align: center;
+    padding: 9px;
+    text-shadow: 0 1px 0 rgba(0,0,0,0.35);
+    color: rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(255, 76, 76, 0.4);
+    background: rgba(181, 37, 37, 0.4);
+    border-radius: 3px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+}
+.ld-match-info-error span.ld-btn-icon {
+    margin: -4px 0 0 0;
+}
+.ld-match-info-error .button {
+    float: none;
+    margin: 7px 0 0 0;
+    display: inline-block;
+    background: linear-gradient(to top,rgba(251,174,174,0.14),rgba(251,174,174,0.3));
+    text-shadow: 0 1px 0 rgba(0,0,0,0.45) !important;
+    padding: 5px 7px;
+    color: rgba(255, 255, 255, 0.9) !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.25) !important;
+}
+.ld-match-info-error .button:hover {
+    background: linear-gradient(to top,rgba(251,174,174,0.24),rgba(251,174,174,0.44));
+}
+.ld-match-info-error .button:active {
+    background: rgba(251,174,174,0.18);
+}
+
 .destroyer { box-sizing: border-box; } /* TO-DO: add class to all extension-specific elements
 /* Error messages */
 .destroyer.error-container {
