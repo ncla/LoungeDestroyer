@@ -14,6 +14,7 @@ chrome.runtime.sendMessage({autoBet: 'status'}, function(data) {
     if (betStatus.autoBetting === true) {
         $(document).ready(function() {
             updateAutobetInfo();
+            $('.destroyer.auto-info').removeClass('hidden');
         });
     }
 });
