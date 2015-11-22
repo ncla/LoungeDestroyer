@@ -257,7 +257,6 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
 
     // Inject CSS code to specific tab
     if (request.hasOwnProperty('injectCSSCode')) {
-        // put !important on *everything* because Chrome is fucking retarded
         console.log('Injected CSS code into tab ' + sender.tab.id);
         chrome.tabs.insertCSS(sender.tab.id, {
             code: importantifyCSS(request.injectCSSCode),
@@ -269,6 +268,8 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
 
     // Inject theme CSS (in bg for speed purposes)
     if (request.hasOwnProperty('injectCSSTheme')) {
+        sendResponse((themeCSS.length == 0));
+
         (function loop(id, tries) {
             if (tries > 200) {
                 return;
@@ -316,7 +317,7 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
 chrome.webRequest.onBeforeRequest.addListener(function(details) {
         console.log('Stylesheet blocker', details);
         var name = LoungeUser.userSettings.currentTheme;
-        if (themes.hasOwnProperty(name) && themes[name].hasOwnProperty('disableCss') && themes[name].disableCss == true) {
+        if (themes.hasOwnProperty(name) && themes[name].hasOwnProperty('disableCss') && themes[name].disableCss == true && themeCSS.length > 0) {
             console.log('THEMES :: Disabling sites stylesheet');
             return {cancel: true}
         }

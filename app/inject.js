@@ -23,6 +23,7 @@ var hideFilteredMatches = true;
 var siteAjaxReqObj = [];
 var freezingItems = false;
 var uniqueUserTrades = [];
+var themeCssIsEmpty = true;
 
 var $ldContainer;
 
@@ -46,7 +47,10 @@ chrome.storage.local.get(['marketPriceList', 'currencyConversionRates', 'themes'
 // Inject theme as quickly as possible
 // TODO: Requesting background script from content script to inject CSS might not that really faster
 if(window.location.href.indexOf('/api/') === -1 && window.location.href.indexOf('view-source:') !== 0) {
-    chrome.runtime.sendMessage({injectCSSTheme: true});
+    chrome.runtime.sendMessage({injectCSSTheme: true}, function (response) {
+        console.log('THEMES :: Theme CSS string is empty', response);
+        themeCssIsEmpty = response;
+    });
 }
 
 chrome.extension.onMessage.addListener(function(msg, sender, sendResponse) {
@@ -160,27 +164,30 @@ function init() {
                 if (theme.disableCss === true) {
                     console.log('THEME :: Theme requires to have site stylesheet to be disabled');
 
-                    var styles = document.styleSheets;
-                    for (var i = 0; i < styles.length; i++) {
-                        // Look if the stylesheet is remote by checking the URL attribute
-                        if (styles[i].href && (styles[i].href.indexOf("/css/bright") !== -1 || styles[i].href.indexOf("/css/gray") !== -1)) {
-                            // Check stylesheet rules, if there are any then it is likely stylesheet was not blocked
-                            if (styles[i].cssRules !== null && styles[i].cssRules.length > 0) {
-                                console.log('THEMES :: Stylsheet is loaded, hard refreshing..');
+                    // Don't do anything if we don't have theme CSS injected
+                    if (themeCssIsEmpty === false) {
+                        var styles = document.styleSheets;
+                        for (var i = 0; i < styles.length; i++) {
+                            // Look if the stylesheet is remote by checking the URL attribute
+                            if (styles[i].href && (styles[i].href.indexOf("/css/bright") !== -1 || styles[i].href.indexOf("/css/gray") !== -1)) {
+                                // Check stylesheet rules, if there are any then it is likely stylesheet was not blocked
+                                if (styles[i].cssRules !== null && styles[i].cssRules.length > 0) {
+                                    console.log('THEMES :: Stylsheet is loaded, hard refreshing..');
 
-                                chrome.runtime.sendMessage({hardRefresh: true}, function(data) {
-                                    console.log('THEMES :: Request to hard refresh was sent');
-                                });
+                                    chrome.runtime.sendMessage({hardRefresh: true}, function(data) {
+                                        console.log('THEMES :: Request to hard refresh was sent');
+                                    });
 
-                                break;
-                            }
+                                    break;
+                                }
 
-                            // Stylesheets from cross domains do not allow to read their CSS properties, and we cannot block
-                            // them without requesting new permissions from the user
-                            if (styles[i].href.indexOf("://cdn.") !== -1 && styles[i].cssRules === null) {
-                                console.log('THEMES :: Stylsheet is loaded from cross domain, manually removing..');
-                                $(styles[i].ownerNode).remove();
-                                break;
+                                // Stylesheets from cross domains do not allow to read their CSS properties, and we cannot block
+                                // them without requesting new permissions from the user
+                                if (styles[i].href.indexOf("://cdn.") !== -1 && styles[i].cssRules === null) {
+                                    console.log('THEMES :: Stylsheet is loaded from cross domain, manually removing..');
+                                    $(styles[i].ownerNode).remove();
+                                    break;
+                                }
                             }
                         }
                     }
