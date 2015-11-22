@@ -412,7 +412,7 @@ function init() {
 
             var matchID = window.location.href.match(/\d+/);
 
-            if (matchID !== null && appID === '730') {
+            if (matchID !== null && appID === '730' && LoungeUser.userSettings.matchInformation === '1') {
                 var $wrapper = $('<div class="box-shiny-alt ld-match-info"></div>');
                 $('section.box:eq(1) .box-shiny-alt:eq(0)').after($wrapper);
 
