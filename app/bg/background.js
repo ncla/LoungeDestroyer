@@ -515,7 +515,7 @@ function updateMarketPriceList(callback) {
         console.log('Error getting response for item price list API');
     };
 
-    oReq.open('get', 'http://api.ncla.me/itemlist.php', true);
+    oReq.open('get', 'https://api.ncla.me/itemlist.php', true);
     oReq.send();
 }
 
@@ -551,7 +551,7 @@ function updateCurrencyConversion(callback) {
         chrome.storage.local.set({'currencyConversionRates': currencyFallback});
     };
 
-    oReq.open('get', 'http://api.ncla.me/destroyer/currencies', true);
+    oReq.open('get', 'https://api.ncla.me/destroyer/currencies', true);
     oReq.send();
 }
 

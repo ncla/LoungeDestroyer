@@ -93,7 +93,7 @@ navAnchor.click( function(e) {
 	if(page === 'page-donate') {
 		if(!patreonsRequested) {
 			$('#page-donate .preloader.loading').show();
-			$.ajax('http://api.ncla.me/destroyer/patreonlist', {
+			$.ajax('https://api.ncla.me/destroyer/patreonlist', {
 				type: 'GET',
 				success: function(data) {
 					if(data.length) {

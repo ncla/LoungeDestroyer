@@ -419,7 +419,7 @@ function init() {
                 $wrapper.html('<div class="ld-loading-spinner spin-1"></div>');
 
                 $.ajax({
-                    url: 'http://api.ncla.me/match/' + matchID[0],
+                    url: 'https://api.ncla.me/match/' + matchID[0],
                     success: function(data) {
                         $wrapper.html(data);
                     },

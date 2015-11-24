@@ -2,11 +2,11 @@ var themes = {};
 var themeCSS = '';
 var themeListOriginal = {
     cleanlounge: {
-        url: 'http://api.ncla.me/themes/CleanLounge2/data.json',
+        url: 'https://api.ncla.me/themes/CleanLounge2/data.json',
         remote: true
     }
     , glasstheme: {
-        url: 'http://api.ncla.me/themes/GlassLounge/data.json',
+        url: 'https://api.ncla.me/themes/GlassLounge/data.json',
         remote: true
     }
 };
