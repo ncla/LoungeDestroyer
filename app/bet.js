@@ -48,6 +48,15 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 
                 }, (delay * 1000));
             });
+
+            if (autoBetData.action.disableAuto === false) {
+                if (betStatus.type === 'autoBet') {
+                    localStorage.playedbet = false;
+                }
+                if (betStatus.type === 'autoReturn') {
+                    localStorage.playedreturn = false;
+                }
+            }
         }
 
         if (autoBetData.action.disableAuto === false) {
