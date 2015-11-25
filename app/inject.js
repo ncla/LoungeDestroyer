@@ -731,14 +731,14 @@ var itemObs = new MutationObserver(function(records) {
                     // Won items
                     $(v).next().next().find('.oitm').each(function(itemId, itemValue) {
                         var item = itemObject(itemValue);
-                        total = total + ((betHistoryColSett === '1') ? (item.loungeValue || 0) : (item.marketValue || 0));
+                        total = total + parseFloat((betHistoryColSett === '1') ? (item.loungeValue || 0) : (item.marketValue || 0));
                     });
 
                     if(total === 0 && $('.lost', v).length) {
                         // Placed items, deduct from Total if there were no items won
                         $(v).next().find('.oitm').each(function(itemId, itemValue) {
                             var item = itemObject(itemValue);
-                            total = total - ((betHistoryColSett === '1') ? (item.loungeValue || 0) : (item.marketValue || 0));
+                            total = total - parseFloat((betHistoryColSett === '1') ? (item.loungeValue || 0) : (item.marketValue || 0));
                         });
                     }
 
