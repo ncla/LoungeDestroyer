@@ -200,12 +200,17 @@ Item.prototype.unloadMarketPrice = function() {
 Item.prototype.fetchSteamMarketPrice = function() {
     var _this = this;
     loadingItems[this.itemName] = true;
-    $.ajax({
-        //url: this.generateMarketApiURL(),
-        url: this.generateMarketURL(),
-        type: 'GET',
-        success: function(data) {
-            var pricehistoryRegex = data.match(/var line1=(.*?);/);
+
+    fetch(this.generateMarketURL()).then(function(response) {
+        if (response.ok && response.status === 200) {
+            return response.text();
+        } else {
+            return null;
+        }
+
+    }).then(function(response) {
+        if (response !== null) {
+            var pricehistoryRegex = response.match(/var line1=(.*?);/);
 
             if (pricehistoryRegex !== null && pricehistoryRegex[1]) {
                 // For unexpected shit like failed JSON parsing
@@ -222,30 +227,17 @@ Item.prototype.fetchSteamMarketPrice = function() {
             } else {
                 $(_this.item).find('.rarity').html('Not Found');
             }
-            //if (data.success === true && data.hasOwnProperty('lowest_price')) {
-            //    // jscs: disable
-            //    var lowestPrice = parseFloat(data.lowest_price.replace('&#36;', '').match(/[0-9.]+/));
-            //    // jscs: enable
-            //    marketedItems[_this.itemName] = lowestPrice;
-            //    _this.insertMarketValue(lowestPrice);
-            //}
-            //else {
-            //    // TODO: Rewrite insertMarketValue method to handle no market price values
-            //    $(_this.item).find('.rarity').html('Not Found');
-            //}
-        },
-
-        error: function(jqXHR) {
-            if (LoungeUser.userSettings.blacklistNonExistingItems === '1' && jqXHR.status === 500) {
+        } else {
+            if (LoungeUser.userSettings.blacklistNonExistingItems === '1') {
                 console.log('Error getting response for item ' + _this.itemName);
                 _this.blacklistItem();
             }
 
             $(_this.item).find('.rarity').html('STEAM ERR');
         }
-    }).done(function() {
-            delete loadingItems[_this.itemName];
-        });
+
+        delete loadingItems[_this.itemName];
+    });
 };
 
 Item.prototype.fetchLoungeValueFromAPI = function(success, error) {
