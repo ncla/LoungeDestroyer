@@ -453,7 +453,7 @@ function handleQueue(data, game) {
 
             impregnateSteamSession(data.offer, function(details) {
                 if(details === null) {
-                    bet[game].lastError = 'Session ID cookie was not found, trying to get one..';
+                    bet[game].lastError = 'Session ID cookie was not found, cancelling auto-accepting..';
                     disableAutoAccept(game, false);
 
                     return;
