@@ -445,20 +445,20 @@ function handleQueue(data, game) {
         if (['0', '2'].indexOf(LoungeUser.userSettings.enableAuto) === -1) {
             bet[game].type = 'autoAccept';
             bet[game].autoBetting = true;
-            bet[game].lastError = 'Nothing has happened yet';
+            bet[game].lastError = 'Nothing has happened yet, fetching Session ID cookie now.';
 
             sendMessageToContentScript({autoBet: bet[game]}, -1 - game);
 
             var id = data.offer.replace(/\D/g, '');
 
-            chrome.cookies.get({url: 'https://steamcommunity.com', name: 'sessionid'}, function(details) {
+            impregnateSteamSession(data.offer, function(details) {
                 if(details === null) {
-                    bet[game].lastError = 'Session ID cookie was not found, not accepting';
+                    bet[game].lastError = 'Session ID cookie was not found, trying to get one..';
                     disableAutoAccept(game, false);
 
                     return;
                 }
-                
+
                 bet[game].acceptStart = Date.now();
                 var delay = LoungeUser.userSettings.acceptDelay;
                 bet[game].lastError = (delay == 0 ? 'Accepting trade offer instantly' : 'Accepting trade offer in ' + delay + ' seconds');
@@ -540,4 +540,32 @@ function disableAutoAccept(game, success) {
     msg = {autoBet: msg};
 
     sendMessageToContentScript(msg, -1 - game);
+}
+
+function getSteamSessionCookie(callback) {
+    chrome.cookies.get({url: 'https://steamcommunity.com', name: 'sessionid'}, function(details) {
+        callback(details);
+    });
+}
+
+function impregnateSteamSession(url, callback) {
+    getSteamSessionCookie(function(details) {
+        if (details !== null) {
+            console.log('AUTOBET :: sessionID cookie found');
+            callback(details);
+            return;
+        }
+
+        console.log('AUTOBET :: sessionID cookie missing');
+
+        $.ajax({
+            url: url,
+            type: 'GET'
+        }).done(function() {
+            getSteamSessionCookie(function(details) {
+                console.log('AUTOBET :: sessionID cookie after fetching Steam page', details);
+                callback(details);
+            });
+        });
+    });
 }
