@@ -219,6 +219,37 @@ function init() {
     tradeShowFilter = createKeywordRegexp(tradeShowArr);
     tradeHideFilter = createKeywordRegexp(tradeHideArr);
 
+    if (LoungeUser.userSettings.enableAuto === '1' && document.URL.indexOf('/mybets') !== -1) {
+        function overrideAlert() {
+            var oldAlert = window.alert;
+            window.alert = function(msg) {
+                if (msg === 'Looks like the bot couldn\'t send you an offer. Please make make sure that:\r- your trading' +
+                    ' URL is correct,\r- your armory is not full,\r- your profile is set to public,\r- you are not trade' +
+                    ' banned.\rOnce you are sure that you can receive offers via your trading URL try again. You can change the URL in my profile') {
+                    document.dispatchEvent(new CustomEvent('overrideAlert', {'detail': true}));
+                } else {
+                    oldAlert(msg);
+                }
+            }
+        }
+
+        document.addEventListener('overrideAlert', function(event) {
+            if(event.detail === true) {
+                chrome.runtime.sendMessage({notification: {
+                    title: 'Lounge couldn\'t send you a trade offer',
+                    message: 'Make sure that your Steam account is able to receive and/or send trade offers.',
+                    messageType: 'basic',
+                    buttons: null,
+                    buttonUrl: null
+                }});
+            }
+        });
+
+        addScript({
+            textContent: overrideAlert.toString() + " overrideAlert()"
+        }, true);
+    }
+
     // the following requires DOM
     $(document).ready(function() {
         // add describing classes to body

@@ -39,6 +39,28 @@ function addJS_Node(text, s_URL, funcToRun, funcName, local) {
 	    targ.appendChild(scriptNode);
 	});
 }
+
+function addScript(template, silent) {
+    if (silent === undefined) {
+        silent = false;
+    }
+
+    var s = document.createElement("script");
+    if (template.src) {
+        s.src = template.src;
+    }
+
+    if (template.textContent) {
+        s.textContent = template.textContent;
+    }
+
+    document.documentElement.appendChild(s);
+
+    if (silent) {
+        document.documentElement.removeChild(s);
+    }
+}
+
 /*
     CSGL horribleness, not mine
  */
