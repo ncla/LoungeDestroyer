@@ -16,6 +16,24 @@ chrome.runtime.sendMessage({autoBet: 'status'}, function(data) {
             updateAutobetInfo();
             $('.destroyer.auto-info').removeClass('hidden');
         });
+    } else {
+        if (document.URL.indexOf('/mybets') !== -1) {
+            // return items if we've enabled auto-accept
+            if (LoungeUser.userSettings.enableAuto === '1') {
+                // and if we have frozen items
+                $(document).ready(function() {
+                    if ($('#freeze .item').length && $('#queue').length === 0) {
+                        chrome.runtime.sendMessage({autoBet: 'continueAutoReturn'}, function(data) {
+                            console.log('AUTOBET :: Continuing auto-returning', data);
+
+                            if (data === true) {
+                                newFreezeReturn();
+                            }
+                        });
+                    }
+                });
+            }
+        }
     }
 });
 

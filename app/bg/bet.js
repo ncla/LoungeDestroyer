@@ -17,6 +17,7 @@ var baseUrls = ['//csgolounge.com/', '//dota2lounge.com/'];
  * numTries - number of re-tries, used for auto-betting/-returning
  * loopTimer - setTimeout gets stored in this attribute for auto-betting/-returning
  * tabId - tabId from where the initial betting request was initiated
+ * navigatedAway - used by autoReturning, if it is false, and user left tab on /mybets the whole time, it will continue to auto-return seamlessly
  *
  * lastOffer - string of trade offer URL, used for not accepting same trade multiple times
  * acceptStart - epoch time when the trade accepting was started
@@ -40,6 +41,7 @@ bet[0] = {
     numTries: 0,
     loopTimer: null,
     tabId: -1,
+    navigatedAway: true,
 
     lastOffer: '',
     acceptStart: 0,
@@ -69,11 +71,20 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
             if (bet[game].type === 'autoAccept') {
                 disableAutoAccept(game, false);
             }
+
+            console.log('AUTOBET :: Forcefully setting navigatedAway true');
+            bet[game].navigatedAway = true;
         }
 
         // Return current state of auto-betting, usually happens when a tab is refreshed and we need to display the auto-betting window
         if (request.autoBet === 'status') {
             sendResponse(bet[game]);
+        }
+
+        if (request.autoBet === 'continueAutoReturn') {
+            var continueAuto = sender.tab && bet[game].navigatedAway === false && bet[game].tabId === sender.tab.id;
+            console.log('AUTOBET :: Continuing auto-returning:', continueAuto);
+            sendResponse(continueAuto);
         }
     }
 
@@ -105,6 +116,10 @@ bet.enableAuto = function(game, ajaxObject) {
 
     bet[game].betData = ajaxObject;
 
+    bet[game].navigatedAway = bet[game].type !== 'autoReturn';
+
+    console.log('AUTOBET :: navigatedAway set', bet[game].navigatedAway);
+
     console.log('AUTOBET :: betData in enableAuto');
     console.log(bet[game].betData);
 
@@ -121,7 +136,7 @@ bet.enableAuto = function(game, ajaxObject) {
 /**
  * Disables auto-betting, and depending if it was a successful autobet, it will reload the tab (sites default behaviour)
  *
- * @param success
+ * @param success true if disabled by auto-betting (or successful), false if disabled by user (unsuccessful)
  * @param game Game ID, -1 = None, 0 = CSGO, 1 = DOTA2
  */
 bet.disableAuto = function(success, game) {
@@ -136,7 +151,7 @@ bet.disableAuto = function(success, game) {
 
     sendMessageToContentScript(msg, -1 - game);
 
-    if (success) {
+    if (success === true) {
         // Refreshing tab where the auto-betting was initiated from, if tab no longer exists, we create one
         // The reason we do this is because we need to read queue / trade offer related data from the site
         chrome.tabs.reload(bet[game].tabId, function() {
@@ -363,6 +378,30 @@ chrome.webRequest.onBeforeRequest.addListener(function requestListener(details) 
         types: ['xmlhttprequest']
     },
     ['requestBody', 'blocking']
+);
+
+chrome.webRequest.onBeforeRequest.addListener(function requestListener(details) {
+        var urlPath = pathRegexp.exec(details.url);
+
+        if (urlPath === null) {
+            return;
+        }
+
+        urlPath = urlPath[1];
+
+        var game = determineGameByURL(details.url);
+
+        if (urlPath !== 'mybets' && details.method === 'GET' && bet[game].tabId === details.tabId && bet[game].navigatedAway === false) {
+            console.log('AUTOBET :: User navigated away from /mybets');
+            bet[game].navigatedAway = true;
+        }
+    },
+
+    {
+        urls: ['*://csgolounge.com/*', '*://dota2lounge.com/*'],
+        types: ['main_frame']
+    },
+    []
 );
 
 chrome.webRequest.onBeforeSendHeaders.addListener(function(details) {

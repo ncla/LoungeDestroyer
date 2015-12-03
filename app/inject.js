@@ -162,7 +162,7 @@ function init() {
                 }
 
                 if (theme.disableCss === true) {
-                    console.log('THEME :: Theme requires to have site stylesheet to be disabled');
+                    console.log('THEMES :: Theme requires to have site stylesheet to be disabled');
 
                     // Don't do anything if we don't have theme CSS injected
                     if (themeCssIsEmpty === false) {
@@ -291,19 +291,6 @@ function init() {
                             });
                         }
                     });
-                }
-
-                // return items if we've enabled auto-accept
-                if (LoungeUser.userSettings.enableAuto === '1') {
-                    // and if we have frozen items
-                    if (document.querySelector('#freeze .item') && !document.getElementById('queue')) {
-                        // and if we've just accepted an earlier offer
-                        if (Date.now() - lastAccept < 60000) {
-                            chrome.storage.local.set({lastAutoAccept: 0});
-                            console.log('Returning items');
-                            newFreezeReturn();
-                        }
-                    }
                 }
             }
 

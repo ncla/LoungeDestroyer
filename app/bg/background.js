@@ -165,13 +165,6 @@ function sendMessageToContentScript(message, tabId) {
     }
 }
 
-/*
- http://stackoverflow.com/questions/15891827/chrome-api-responseheaders
- http://stackoverflow.com/questions/16928912/url-forwarding-using-chrome-webrequest-after-response-is-received
- */
-
-// Error in event handler for webRequest.onHeadersReceived/1: Invalid value for argument 1. Value must not be less than 0.
-// if bot status update is redirected
 chrome.webRequest.onHeadersReceived.addListener(function(details) {
         // Used for price list updating, be careful if the URL list gets a new domain though
         lastTimeUserVisited = new Date().getTime();
