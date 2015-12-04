@@ -29,8 +29,8 @@ $(document).ready(function() {
     themesSelect = $('#themes').selectize(optionsSelectizeThemeDropdown);
     themesSelectSelectize = themesSelect[0].selectize;
 
-    $.each(currencyData, function(i, v) {
-        $("#marketCurrency").append('<option value="' + i + '">' + v["naming"] + '</option>');
+    $.each(g_rgCurrencyData, function(i, v) {
+        $("#marketCurrency").append('<option value="' + i + '">' + v["strCode"] + '</option>');
     });
 
     $.each(moment.tz.names(), function(i, v) {

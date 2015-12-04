@@ -53,6 +53,7 @@
                 "lib/js/moment.min.js",
                 "lib/js/moment-timezone-with-data.min.js",
                 "lib/js/jstz-1.0.4.min.js",
+                "lib/js/ajaxq.js",
                 "app/helpers.js",
                 "app/user.js",
                 "app/match.js",

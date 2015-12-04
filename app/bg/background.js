@@ -513,12 +513,6 @@ function updateMarketPriceList(callback) {
 }
 
 function updateCurrencyConversion(callback) {
-    var currencyList = [];
-    $.each(currencyData, function(i, v) {
-        currencyList.push('"USD' + v.naming + '"');
-    });
-
-    currencyList = currencyList.join();
     var oReq = new XMLHttpRequest();
     oReq.onload = function() {
         var parsed = JSON.parse(this.responseText);

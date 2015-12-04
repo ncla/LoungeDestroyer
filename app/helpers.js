@@ -214,29 +214,249 @@ function setWindowVariables(variables) {
 
     $("#tmpScript").remove();
 }
-// Based on Steam available currencies
-var currencyData = {
-    1: { naming: "USD", decimal: '.', id: 1, symbol: "$", symbolBefore: true },
-    2: { naming: "GBP", decimal: '.', id: 2, symbol: "£", symbolBefore: true },
-    3: { naming: "EUR", decimal: ',', id: 3, symbol: "€", symbolBefore: false },
-    5: { naming: "RUB", decimal: ',', id: 5, symbol: "pуб.", symbolBefore: false },
-    7: { naming: "BRL", decimal: ',', id: 7, symbol: "R$", symbolBefore: true },
-    8: { naming: "JPY", decimal: '.', id: 8, symbol: "¥", symbolBefore: true },
-    9: { naming: "NOK", decimal: ',', id: 9, symbol: "kr", symbolBefore: false },
-    10: { naming: "IDR", decimal: '.', id: 10, symbol: "Rp", symbolBefore: true },
-    11: { naming: "MYR", decimal: '.', id: 11, symbol: "RM", symbolBefore: true },
-    12: { naming: "PHP", decimal: '.', id: 12, symbol: "P", symbolBefore: true },
-    13: { naming: "SGD", decimal: '.', id: 13, symbol: "S$", symbolBefore: true },
-    14: { naming: "THB", decimal: '.', id: 14, symbol: "฿", symbolBefore: true },
-    15: { naming: "VND", decimal: '.', id: 15, symbol: "₫", symbolBefore: false },
-    16: { naming: "KRW", decimal: '.', id: 16, symbol: "₩", symbolBefore: true },
-    17: { naming: "TRY", decimal: ',', id: 17, symbol: "TL", symbolBefore: false },
-    18: { naming: "UAH", decimal: ',', id: 18, symbol: "₴", symbolBefore: false },
-    19: { naming: "MXN", decimal: '.', id: 19, symbol: "Mex$", symbolBefore: true },
-    20: { naming: "CAD", decimal: '.', id: 20, symbol: "C$", symbolBefore: true },
-    21: { naming: "AUD", decimal: '.', id: 21, symbol: "A$", symbolBefore: true },
-    22: { naming: "NZD", decimal: '.', id: 22, symbol: "NZ$", symbolBefore: true }
+
+var g_rgCurrencyData = {
+    "1": {
+        "strCode": "USD",
+        "eCurrencyCode": 1,
+        "strSymbol": "$",
+        "bSymbolIsPrefix": true,
+        "bWholeUnitsOnly": false
+    },
+    "2": {
+        "strCode": "GBP",
+        "eCurrencyCode": 2,
+        "strSymbol": "\u00a3",
+        "bSymbolIsPrefix": true,
+        "bWholeUnitsOnly": false
+    },
+    "3": {
+        "strCode": "EUR",
+        "eCurrencyCode": 3,
+        "strSymbol": "\u20ac",
+        "bSymbolIsPrefix": false,
+        "bWholeUnitsOnly": false
+    },
+    "4": {
+        "strCode": "CHF", //
+        "eCurrencyCode": 4,
+        "strSymbol": "CHF",
+        "bSymbolIsPrefix": true,
+        "bWholeUnitsOnly": false
+    },
+    "5": {
+        "strCode": "RUB",
+        "eCurrencyCode": 5,
+        "strSymbol": "p\u0443\u0431.",
+        "bSymbolIsPrefix": false,
+        "bWholeUnitsOnly": true
+    },
+    "7": {
+        "strCode": "BRL",
+        "eCurrencyCode": 7,
+        "strSymbol": "R$",
+        "bSymbolIsPrefix": true,
+        "bWholeUnitsOnly": false
+    },
+    "8": {
+        "strCode": "JPY",
+        "eCurrencyCode": 8,
+        "strSymbol": "\u00a5",
+        "bSymbolIsPrefix": true,
+        "bWholeUnitsOnly": true
+    },
+    "9": {
+        "strCode": "NOK",
+        "eCurrencyCode": 9,
+        "strSymbol": "kr",
+        "bSymbolIsPrefix": false,
+        "bWholeUnitsOnly": false
+    },
+    "10": {
+        "strCode": "IDR",
+        "eCurrencyCode": 10,
+        "strSymbol": "Rp",
+        "bSymbolIsPrefix": true,
+        "bWholeUnitsOnly": true
+    },
+    "11": {
+        "strCode": "MYR",
+        "eCurrencyCode": 11,
+        "strSymbol": "RM",
+        "bSymbolIsPrefix": true,
+        "bWholeUnitsOnly": false
+    },
+    "12": {
+        "strCode": "PHP",
+        "eCurrencyCode": 12,
+        "strSymbol": "P",
+        "bSymbolIsPrefix": true,
+        "bWholeUnitsOnly": false
+    },
+    "13": {
+        "strCode": "SGD",
+        "eCurrencyCode": 13,
+        "strSymbol": "S$",
+        "bSymbolIsPrefix": true,
+        "bWholeUnitsOnly": false
+    },
+    "14": {
+        "strCode": "THB",
+        "eCurrencyCode": 14,
+        "strSymbol": "\u0e3f",
+        "bSymbolIsPrefix": true,
+        "bWholeUnitsOnly": false
+    },
+    "15": {
+        "strCode": "VND",
+        "eCurrencyCode": 15,
+        "strSymbol": "\u20ab",
+        "bSymbolIsPrefix": false,
+        "bWholeUnitsOnly": true
+    },
+    "16": {
+        "strCode": "KRW",
+        "eCurrencyCode": 16,
+        "strSymbol": "\u20a9",
+        "bSymbolIsPrefix": true,
+        "bWholeUnitsOnly": true
+    },
+    "17": {
+        "strCode": "TRY",
+        "eCurrencyCode": 17,
+        "strSymbol": "TL",
+        "bSymbolIsPrefix": false,
+        "bWholeUnitsOnly": false
+    },
+    "18": {
+        "strCode": "UAH",
+        "eCurrencyCode": 18,
+        "strSymbol": "\u20b4",
+        "bSymbolIsPrefix": false,
+        "bWholeUnitsOnly": true
+    },
+    "19": {
+        "strCode": "MXN",
+        "eCurrencyCode": 19,
+        "strSymbol": "Mex$",
+        "bSymbolIsPrefix": true,
+        "bWholeUnitsOnly": false
+    },
+    "20": {
+        "strCode": "CAD",
+        "eCurrencyCode": 20,
+        "strSymbol": "CDN$",
+        "bSymbolIsPrefix": true,
+        "bWholeUnitsOnly": false
+    },
+    "21": {
+        "strCode": "AUD",
+        "eCurrencyCode": 21,
+        "strSymbol": "A$",
+        "bSymbolIsPrefix": true,
+        "bWholeUnitsOnly": false
+    },
+    "22": {
+        "strCode": "NZD",
+        "eCurrencyCode": 22,
+        "strSymbol": "NZ$",
+        "bSymbolIsPrefix": true,
+        "bWholeUnitsOnly": false
+    },
+    "6": {
+        "strCode": "PLN", //
+        "eCurrencyCode": 6,
+        "strSymbol": "z\u0142",
+        "bSymbolIsPrefix": false,
+        "bWholeUnitsOnly": false
+    },
+    "23": {
+        "strCode": "CNY", //
+        "eCurrencyCode": 23,
+        "strSymbol": "\u00a5",
+        "bSymbolIsPrefix": true,
+        "bWholeUnitsOnly": true
+    },
+    "24": {
+        "strCode": "INR", //
+        "eCurrencyCode": 24,
+        "strSymbol": "\u20b9",
+        "bSymbolIsPrefix": true,
+        "bWholeUnitsOnly": true
+    },
+    "25": {
+        "strCode": "CLP", //
+        "eCurrencyCode": 25,
+        "strSymbol": "CLP$",
+        "bSymbolIsPrefix": true,
+        "bWholeUnitsOnly": true
+    },
+    "26": {
+        "strCode": "PEN", //
+        "eCurrencyCode": 26,
+        "strSymbol": "S\/.",
+        "bSymbolIsPrefix": true,
+        "bWholeUnitsOnly": false
+    },
+    "27": {
+        "strCode": "COP", //
+        "eCurrencyCode": 27,
+        "strSymbol": "COL$",
+        "bSymbolIsPrefix": true,
+        "bWholeUnitsOnly": true
+    },
+    "28": {
+        "strCode": "ZAR", //
+        "eCurrencyCode": 28,
+        "strSymbol": "R",
+        "bSymbolIsPrefix": true,
+        "bWholeUnitsOnly": false
+    },
+    "29": {
+        "strCode": "HKD", //
+        "eCurrencyCode": 29,
+        "strSymbol": "HK$",
+        "bSymbolIsPrefix": true,
+        "bWholeUnitsOnly": false
+    },
+    "30": {
+        "strCode": "TWD", //
+        "eCurrencyCode": 30,
+        "strSymbol": "NT$",
+        "bSymbolIsPrefix": true,
+        "bWholeUnitsOnly": true
+    },
+    "31": {
+        "strCode": "SAR", //
+        "eCurrencyCode": 31,
+        "strSymbol": "SR",
+        "bSymbolIsPrefix": false,
+        "bWholeUnitsOnly": false
+    },
+    "32": {
+        "strCode": "AED", //
+        "eCurrencyCode": 32,
+        "strSymbol": "AED",
+        "bSymbolIsPrefix": false,
+        "bWholeUnitsOnly": false
+    }
+    //, // UNSUPPORTED CURRENCIES
+    //"9000": {
+    //    "strCode": "RMB", //
+    //    "eCurrencyCode": 9000,
+    //    "strSymbol": "\u5200\u5e01",
+    //    "bSymbolIsPrefix": false,
+    //    "bWholeUnitsOnly": true
+    //},
+    //"9001": {
+    //    "strCode": "NXP", //
+    //    "eCurrencyCode": 9001,
+    //    "strSymbol": "\uc6d0",
+    //    "bSymbolIsPrefix": false,
+    //    "bWholeUnitsOnly": true
+    //}
 };
+
 // http://stackoverflow.com/a/488073
 function isScrolledIntoView(elem) {
     var $elem = $(elem);

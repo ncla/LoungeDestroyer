@@ -201,43 +201,73 @@ Item.prototype.fetchSteamMarketPrice = function() {
     var _this = this;
     loadingItems[this.itemName] = true;
 
-    fetch(this.generateMarketURL()).then(function(response) {
-        if (response.ok && response.status === 200) {
-            return response.text();
-        } else {
-            return null;
-        }
+    var ajaxOptions =  {
+        url: _this.generateMarketSearchRender(),
+        method: 'GET',
+        success: function(data) {
+            if (data.success === true && data.total_count > 0 && data.results_html) {
+                var doc = document.implementation.createHTMLDocument('');
+                doc.body.innerHTML = data.results_html;
 
-    }).then(function(response) {
-        if (response !== null) {
-            var pricehistoryRegex = response.match(/var line1=(.*?);/);
+                var priceString = null;
 
-            if (pricehistoryRegex !== null && pricehistoryRegex[1]) {
-                // For unexpected shit like failed JSON parsing
-                try {
-                    var history = JSON.parse(pricehistoryRegex[1]);
-                    var lastPoint = history[history.length - 1];
-                    var lowestPrice = lastPoint[1];
+                if (data.total_count === 1) {
+                    // Much easier to got after first and only market result
+                    priceString = $(doc).find('.market_listing_row_link:eq(0) .market_listing_their_price .market_table_value span:eq(0)').text();
+                } else {
+                    $(doc).find('.market_listing_row_link').each(function(listingIndex, listingValue) {
+                        // Extract item name from the URL, because this is only thing that does not get translated if user is using different language on Steam
+                        var itemNameFromURL = decodeURI($(listingValue)[0].pathname.replace('/market/listings/730/', ''));
 
-                    marketedItems[_this.itemName] = lowestPrice;
-                    _this.insertMarketValue(lowestPrice);
-                } catch (e) {
-                    $(_this.item).find('.rarity').html('Not Found');
+                        var listingItemNameHtml = $(listingValue).find('.market_listing_item_name').text();
+
+                        // Compare if the item name matches with item name on Lounge
+                        if (listingItemNameHtml === _this.itemName || itemNameFromURL === _this.itemName) {
+                            var priceTxt = $(listingValue).find('.market_listing_their_price .market_table_value span:eq(0)').text();
+
+                            if (priceTxt) {
+                                priceString = priceTxt;
+                                return false;
+                            }
+                        }
+                    });
+                }
+
+                // If no price was not found, we assume there are no listings for the item
+                if (priceString === null) {
+                    $(_this.item).find('.rarity').html('Not found');
+                    return false;
+                }
+
+                var detectedCurrId = detectCurrencyFromString(priceString);
+
+                // This might fail if we don't support the currency
+                if (detectedCurrId !== null) {
+                    // Here we pray, hoping that nothing will fail
+                    var fromUsdConv = currencies['USD' + g_rgCurrencyData[detectedCurrId].strCode];
+                    var fromDetectedCurrToUsd = 1 / fromUsdConv;
+                    var priceFloated = parseFloat(priceString.replace(',', '.').match(/[0-9.]+/));
+                    var priceInUsd = priceFloated * fromDetectedCurrToUsd;
+
+                    marketedItems[_this.itemName] = priceInUsd;
+                    _this.insertMarketValue(priceInUsd);
+
+                } else {
+                    $(_this.item).find('.rarity').html('CURRENCY ERR');
                 }
             } else {
-                $(_this.item).find('.rarity').html('Not Found');
-            }
-        } else {
-            if (LoungeUser.userSettings.blacklistNonExistingItems === '1') {
-                console.log('Error getting response for item ' + _this.itemName);
-                _this.blacklistItem();
+                $(_this.item).find('.rarity').html('Not found');
             }
 
+            delete loadingItems[_this.itemName];
+        },
+        error: function () {
             $(_this.item).find('.rarity').html('STEAM ERR');
+            delete loadingItems[_this.itemName];
         }
+    };
 
-        delete loadingItems[_this.itemName];
-    });
+    (LoungeUser.userSettings.itemMarketPricesv2 === '2' ? $.ajaxq('fuckoffsteam', ajaxOptions) : $.ajax(ajaxOptions));
 };
 
 Item.prototype.fetchLoungeValueFromAPI = function(success, error) {
@@ -275,6 +305,14 @@ Item.prototype.generateMarketURL = function() {
     }
 
     return window.location.protocol + '//steamcommunity.com/market/listings/' + appID + '/' + this.itemName;
+};
+
+Item.prototype.generateMarketSearchRender = function() {
+    if (!(this instanceof Item)) {
+        throw new TypeError('\'this\' must be instance of Item');
+    }
+
+    return window.location.protocol + '//steamcommunity.com/market/search/render/?query=' + this.itemName + '&start=0&count=100&search_descriptions=0&sort_column=default&appid=' + appID;
 };
 
 Item.prototype.generateMarketSearchURL = function() {
@@ -443,20 +481,34 @@ function initiateItemObjectForElementList(elmList, cachedOnly) {
  * @param {boolean} toString - true if you want the function to return the value in string
  */
 function convertPrice(usd, toString) {
-    var currData = currencyData[LoungeUser.userSettings.marketCurrency];
-    var conversionRate = currencies[('USD' + currData.naming)];
+    var currData = g_rgCurrencyData[LoungeUser.userSettings.marketCurrency];
+    var conversionRate = currencies[('USD' + currData.strCode)];
     var convertedPrice = (usd * conversionRate).toFixed(2);
 
     if (isNaN(convertedPrice)) return NaN;
 
     if (!toString) return convertedPrice;
 
-    if (currData.symbolBefore) {
-        return currData.symbol + ' ' + convertedPrice;
+    if (currData.bSymbolIsPrefix) {
+        return currData.strSymbol + ' ' + convertedPrice;
     } else {
-        return convertedPrice + ' ' + currData.symbol;
+        return convertedPrice + ' ' + currData.strSymbol;
     }
 }
+
+function detectCurrencyFromString(str) {
+    var currencyName = null;
+
+    $.each(g_rgCurrencyData, function(currId, currInfo) {
+        if (str.indexOf(currInfo.strSymbol) !== -1) {
+            currencyName = currId;
+            return false;
+        }
+    });
+
+    return currencyName;
+}
+
 /**
  * Gets Items object for an .oitm element, if the object is not appended, it will append a new one instead
  * @param {object} domObj - .oitm element
