@@ -223,9 +223,9 @@ function init() {
         function overrideAlert() {
             var oldAlert = window.alert;
             window.alert = function(msg) {
-                if (msg === 'Looks like the bot couldn\'t send you an offer. Please make make sure that:\r- your trading' +
-                    ' URL is correct,\r- your armory is not full,\r- your profile is set to public,\r- you are not trade' +
-                    ' banned.\rOnce you are sure that you can receive offers via your trading URL try again. You can change the URL in my profile') {
+                if (msg === 'Looks like the bot couldn\'t send you an offer. Please make sure that:\r- your Steam Guard Mobile Authenticator is active,\r- ' +
+                    'your trading URL is correct,\r- your armory is not full,\r- your profile is set to public,\r- ' +
+                    'you are not trade banned.\rOnce you are sure that you can receive offers via your trading URL try again. You can change the URL in my profile') {
                     document.dispatchEvent(new CustomEvent('overrideAlert', {'detail': true}));
                 } else {
                     oldAlert(msg);
