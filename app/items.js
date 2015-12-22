@@ -239,14 +239,14 @@ Item.prototype.fetchSteamMarketPrice = function() {
                     return false;
                 }
 
-                var detectedCurrId = detectCurrencyFromString(priceString);
+                var extractedData = detectCurrencyAndValueFromString(priceString);
 
                 // This might fail if we don't support the currency
-                if (detectedCurrId !== null) {
+                if (extractedData.currencyId !== null) {
                     // Here we pray, hoping that nothing will fail
-                    var fromUsdConv = currencies['USD' + g_rgCurrencyData[detectedCurrId].strCode];
+                    var fromUsdConv = currencies['USD' + g_rgCurrencyData[extractedData.currencyId].strCode];
                     var fromDetectedCurrToUsd = 1 / fromUsdConv;
-                    var priceFloated = parseFloat(priceString.replace(',', '.').match(/[0-9.]+/));
+                    var priceFloated = extractedData.value;
                     var priceInUsd = priceFloated * fromDetectedCurrToUsd;
 
                     marketedItems[_this.itemName] = priceInUsd;
@@ -496,17 +496,53 @@ function convertPrice(usd, toString) {
     }
 }
 
-function detectCurrencyFromString(str) {
+function detectCurrencyAndValueFromString(str) {
     var currencyName = null;
+    var value = null;
 
-    $.each(g_rgCurrencyData, function(currId, currInfo) {
-        if (str.indexOf(currInfo.strSymbol) !== -1) {
-            currencyName = currId;
-            return false;
+    // http://www.regexr.com/3cf69
+    var valueAlmostRemoved = str.replace(/\d{1,3}(?:[.,]\d{3})*(?:[.,]\d{2})?/g, '').trim();
+    var valueExtracted = str.replace('--', '00').replace(',', '.').match(/\d{1,3}(?:[.,]\d{3})*(?:[.,]\d{2})?/g);
+
+    if (valueAlmostRemoved.length > 0) {
+        var currSymb = valueAlmostRemoved.split(' ');
+
+        $.each(g_rgCurrencyData, function(currId, currInfo) {
+            // Check against each split
+            for (var i = 0; i < currSymb.length; i++) {
+                if (currSymb[i] === currInfo.strSymbol) {
+                    currencyName = currId;
+                    break;
+                }
+            }
+
+            if (currencyName !== null) {
+                return false;
+            }
+        });
+    }
+
+    if (valueExtracted !== null) {
+        var combinedValue = '';
+        for (var i = 0; i < valueExtracted.length; i++) {
+            combinedValue = combinedValue + valueExtracted[i];
         }
-    });
 
-    return currencyName;
+        var last = combinedValue.lastIndexOf('.');
+        var butLast = combinedValue.substring(0, last).replace(/\./g, '');
+        var valueWithLastDot = butLast + combinedValue.substring(last);
+
+        var priceFloatParsed = parseFloat(valueWithLastDot);
+
+        if (!isNaN(priceFloatParsed)) {
+            value = priceFloatParsed;
+        }
+    }
+
+    return {
+        currencyId: currencyName,
+        value: value
+    };
 }
 
 /**
