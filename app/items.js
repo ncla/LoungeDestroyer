@@ -501,7 +501,7 @@ function detectCurrencyAndValueFromString(str) {
     var value = null;
 
     // http://www.regexr.com/3cf69
-    var valueAlmostRemoved = str.replace(/\d{1,3}(?:[.,]\d{3})*(?:[.,]\d{2})?/g, '').trim();
+    var valueAlmostRemoved = str.replace('--', '00').replace(/\d{1,3}(?:[.,]\d{3})*(?:[.,]\d{2})?/g, '').trim();
     var valueExtracted = str.replace('--', '00').replace(',', '.').match(/\d{1,3}(?:[.,]\d{3})*(?:[.,]\d{2})?/g);
 
     if (valueAlmostRemoved.length > 0) {
