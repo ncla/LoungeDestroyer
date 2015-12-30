@@ -600,7 +600,7 @@ function impregnateSteamSession(url, callback) {
         $.ajax({
             url: url,
             type: 'GET'
-        }).done(function() {
+        }).always(function() {
             getSteamSessionCookie(function(details) {
                 console.log('AUTOBET :: sessionID cookie after fetching Steam page', details);
                 callback(details);
