@@ -7,7 +7,9 @@
     "test": "tests"
   },
   "dependencies": {
-    "marked": "^0.3.5"
+    "chai": "^3.4.1",
+    "marked": "^0.3.5",
+    "mocha": "^2.3.4"
   },
   "devDependencies": {
     "gulp": "^3.9.0",

@@ -1,2 +1,5 @@
 node_modules/*
 .idea/*
+.sass-cache/*
+build/*
+settings/assets/stylesheets/main.css.map
