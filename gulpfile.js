@@ -14,9 +14,6 @@ gulp.task('default', function () {
 var requiredStuff = [
     'app/**/*.{js,css}',
     'icons/*',
-    'lib/css/bootstrap.min.css',
-    'lib/css/ld.css',
-    'lib/css/font-awesome.min.css',
     'lib/fonts/*',
     'lib/js/*',
     'popup/*',

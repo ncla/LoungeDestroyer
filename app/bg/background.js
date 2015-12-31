@@ -129,14 +129,7 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
     }
 
     if (request.hasOwnProperty('openSettings')) {
-        var optionsUrl = chrome.extension.getURL('settings/index.html');
-        chrome.tabs.query({url: optionsUrl}, function(tabs) {
-            if (tabs.length) {
-                chrome.tabs.update(tabs[0].id, {active: true});
-            } else {
-                chrome.tabs.create({url: optionsUrl});
-            }
-        });
+        openSettingsTab();
     }
 });
 
@@ -163,6 +156,17 @@ function sendMessageToContentScript(message, tabId) {
             }
         });
     }
+}
+
+function openSettingsTab() {
+    var optionsUrl = chrome.extension.getURL('settings/index.html');
+    chrome.tabs.query({url: optionsUrl}, function(tabs) {
+        if (tabs.length) {
+            chrome.tabs.update(tabs[0].id, {active: true});
+        } else {
+            chrome.tabs.create({url: optionsUrl});
+        }
+    });
 }
 
 chrome.webRequest.onHeadersReceived.addListener(function(details) {
@@ -753,4 +757,8 @@ chrome.runtime.onInstalled.addListener(function(details) {
     if(LoungeUser.userSettings.useCachedPriceList === '1') {
         updateMarketPriceList();
     }
+});
+
+chrome.browserAction.onClicked.addListener(function(tab) {
+    openSettingsTab();
 });

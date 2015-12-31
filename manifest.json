@@ -24,8 +24,7 @@
     },
     "browser_action": {
         "default_icon": "icons/32x32.png",
-        "default_title": "LoungeDestroyer settings",
-        "default_popup": "popup/popup.html"
+        "default_title": "LoungeDestroyer"
     },
     "options_page": "settings/index.html",
     "permissions": [
