@@ -112,16 +112,6 @@ Inventory.prototype.loadInventory = function() {
 };
 
 /*
-    Performance friendly version of loading market prices on huge backpacks
-    @param onlyForBackpack true or false, either load market prices for the backpack or the whole page
- */
-Inventory.prototype.getMarketPrices = function() {
-    // TODO: PHPStorm keeps screaming about ineffiecient jQuery selector usage :(
-    initiateItemObjectForElementList($('#backpack .oitm:not(.marketPriced)'));
-    //getMarketPricesForElementList($('#backpack .oitm:not(.marketPriced)'));
-};
-
-/*
     Used for caching betting inventories
     @param type This is backpack cache identifier, usually it is combination of profileID and inventory type
     @param backpackHTML Backpack's HTML code
@@ -215,7 +205,7 @@ Inventory.prototype.onInventoryLoaded = function(requestData) {
             this.grouped = false;
             this.group();
 
-            initiateItemObjectForElementList($('#backpack .oitm'));
+            initiateItemObjectForElementList($('#backpack .oitm'), useCachedPricesOnly);
 
             // limit the inventory statistics to the groups the user has chosen
             var statsSetting = LoungeUser.userSettings.inventoryStatisticsGroup[appID];
@@ -267,9 +257,9 @@ Inventory.prototype.onInventoryLoaded = function(requestData) {
                     addInventoryStatistics();
                 }
             }
+        } else {
+            initiateItemObjectForElementList($('#backpack .oitm'), useCachedPricesOnly);
         }
-        initiateItemObjectForElementList($('#backpack .oitm'));
-
 
         if (document.URL.indexOf('/myprofile') !== -1) {
             if(LoungeUser.userSettings.bettingValuesCsgo === '1' || (LoungeUser.userSettings.itemMarketPricesv2 === '2' && LoungeUser.userSettings.useCachedPriceList === '1')) {

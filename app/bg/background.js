@@ -6,6 +6,15 @@ LoungeUser.loadUserSettings(function() {
     autoDelay = parseInt(LoungeUser.userSettings.autoDelay) * 1000 || 5000;
 });
 
+
+var marketPriceListUpdatedEpoch;
+var bettingItemListUpdatedEpoch;
+
+chrome.storage.local.get(['marketPriceListUpdatedEpoch', 'bettingItemListUpdatedEpoch'], function(result) {
+    marketPriceListUpdatedEpoch = result.marketPriceListUpdatedEpoch || 0;
+    bettingItemListUpdatedEpoch = result.bettingItemListUpdatedEpoch || 0;
+});
+
 var lastTimeUserVisited = null;
 var baseURLs = {
     730: 'http://csgolounge.com/',
@@ -173,12 +182,22 @@ chrome.webRequest.onHeadersReceived.addListener(function(details) {
         // Used for price list updating, be careful if the URL list gets a new domain though
         lastTimeUserVisited = new Date().getTime();
 
+        if ((+new Date() - marketPriceListUpdatedEpoch) > (1000 * 60 * 60 * 24)) {
+            console.log('Updating market price list, last update was more than 24 hours ago');
+            updateMarketPriceList();
+        }
+
+        if ((+new Date() - bettingItemListUpdatedEpoch) > (1000 * 60 * 60 * 24 * 7)) {
+            console.log('Updating betting item list, last update was more than 7 days ago');
+            updateCsgoloungeItemValues();
+        }
+
         var headers = details.responseHeaders;
         var blockingResponse = {};
         var originalURL = details.url;
         var newHeaders = [];
         var isWaitRedirect = false;
-        console.log('Old headers: ', headers);
+
         for (var i = 0, l = headers.length; i < l; ++i) {
             if (headers[i].name == 'Location' && headers[i].value.indexOf('/wait.html') != -1 && LoungeUser.userSettings.redirect == '1') {
                 isWaitRedirect = true;
@@ -187,7 +206,6 @@ chrome.webRequest.onHeadersReceived.addListener(function(details) {
             }
         }
 
-        console.log('New headers: ', newHeaders);
         if (isWaitRedirect) {
             var errHtml = '<h1>LoungeDestroyer</h1><p>LoungeDestroyer is redirecting you away from wait.html redirect page to the page you intended to visit. ' +
                 'You can disable this feature in extension settings.</p>';
@@ -498,18 +516,32 @@ setInterval(function() {
 
 function updateMarketPriceList(callback) {
     var oReq = new XMLHttpRequest();
+    var currentTimestamp = +new Date();
     oReq.onload = function() {
-        console.log(JSON.parse(this.responseText));
-        chrome.storage.local.set({'marketPriceList': JSON.parse(this.responseText)});
-        console.log(new Date() + ' -- Item price list has been updated!');
+        var marketPrices = JSON.parse(this.responseText);
+
+        console.log('Market price list', marketPrices, currentTimestamp);
+
+        marketPriceListUpdatedEpoch = currentTimestamp;
+
+        chrome.storage.local.set({
+            'marketPriceList': marketPrices,
+            'marketPriceListUpdatedEpoch': currentTimestamp
+        });
+        console.log('Item price list has been updated!');
+
         if (callback) {
-            console.log('Callback:', callback);
             callback();
         }
     };
 
     oReq.onerror = function() {
         console.log('Error getting response for item price list API');
+        // Just in case so it doesn't send overwhelmingly many requests
+        marketPriceListUpdatedEpoch = currentTimestamp;
+        chrome.storage.local.set({
+            'marketPriceListUpdatedEpoch': currentTimestamp
+        });
     };
 
     oReq.open('get', 'https://api.ncla.me/itemlist.php', true);
@@ -548,6 +580,7 @@ function updateCurrencyConversion(callback) {
 
 function updateCsgoloungeItemValues(callback) {
     console.log('Updating CS:GO Lounge item betting values!');
+    var currentTimestamp = +new Date();
 
     $.ajax({
         url: 'http://csgolounge.com/api/schema.php',
@@ -561,12 +594,22 @@ function updateCsgoloungeItemValues(callback) {
                 }
             });
 
-            chrome.storage.local.set({'csglBettingValues': valueStorage});
+            bettingItemListUpdatedEpoch = currentTimestamp;
+
+            chrome.storage.local.set({
+                'csglBettingValues': valueStorage,
+                'bettingItemListUpdatedEpoch': currentTimestamp
+            });
+
             if(callback) callback();
             console.log('CS:GO Lounge item betting values updated.');
         },
         error: function(error) {
             console.log('Error getting betting values from API', error);
+            bettingItemListUpdatedEpoch = currentTimestamp;
+            chrome.storage.local.set({
+                'bettingItemListUpdatedEpoch': currentTimestamp
+            });
         }
     });
 }
@@ -690,7 +733,7 @@ chrome.alarms.onAlarm.addListener(function(alarm) {
         if (msSinceLastVisit < 7200000 && LoungeUser.userSettings.useCachedPriceList === '1') {
             updateMarketPriceList();
         } else {
-            console.log('Updating conditions were not met: user has not visited site recently and cached price list is disabled');
+            console.log('Hourly updating conditions were not met: user has not visited site recently and cached price list is disabled');
         }
     }
 

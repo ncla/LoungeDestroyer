@@ -466,6 +466,11 @@ http://codepen.io/larrygeams/pen/nhgze
     font-size: 10px;
     cursor: help;
 }
+
+.ld-info-market-last-updated, .ld-info-bet-last-updated {
+    font-size: 11px;
+}
+
 .tradepoll.ld-filtered, .matchmain.ld-filtered {
     opacity: 0.65;
     transition: opacity 0.3s ease-in-out;

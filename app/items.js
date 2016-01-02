@@ -1,5 +1,6 @@
 var marketedItems = [];
 var loadingItems = [];
+var notFoundListings = [];
 var nonMarketItems = ['Dota Items', 'Any Offers', 'Any Knife', 'Knife', 'Gift', 'TF2 Items', 'Real Money', 'Offers',
     'Any Common', 'Any Uncommon', 'Any Rare', 'Any Mythical', 'Any Legendary', 'Any Ancient', 'Any Immortal',
     'Real Money', '+ More', 'Any Set', 'Any Key', 'Undefined / Not Tradeable', 'Card', 'Background',
@@ -18,12 +19,14 @@ var Item = function(item) {
         this.itemName = $('.smallimg', this.item).attr('alt').trim();
 
         this.loungeValue = null;
+        this.loungeValueFromSite = false;
 
         var $valElm = $('.value', this.item);
         if($valElm.length) {
             var bettingValue = parseFloat($valElm.text().match(/[0-9.]+/));
             if (!isNaN(bettingValue)) {
                 this.loungeValue = bettingValue;
+                this.loungeValueFromSite = true;
             }
         }
 
@@ -115,15 +118,6 @@ Item.prototype.getMarketPrice = function(cachedOnly) {
 
     var _this = this;
 
-    // Check if we can append a cached item price
-    if (LoungeUser.userSettings.useCachedPriceList === '1') {
-        if (storageMarketItems.hasOwnProperty(appID)) {
-            if (storageMarketItems[appID].hasOwnProperty(this.itemName)) {
-                return this.insertMarketValue(storageMarketItems[appID][this.itemName].value);
-            }
-        }
-    }
-
     // Check if we even have to fetch a price
     if (blacklistedItemList.hasOwnProperty(this.itemName)) {
         console.log('Item ' + _this.itemName.trim() + ' is blacklisted, not fetching market price');
@@ -138,14 +132,21 @@ Item.prototype.getMarketPrice = function(cachedOnly) {
         return this.insertMarketValue(marketedItems[this.itemName]);
     }
 
+    // Check if we can append a cached item price
+    if (LoungeUser.userSettings.useCachedPriceList === '1') {
+        if (storageMarketItems.hasOwnProperty(appID) && storageMarketItems[appID].hasOwnProperty(this.itemName)) {
+            return this.insertMarketValue(storageMarketItems[appID][this.itemName].value);
+        }
+    }
+
     if (cachedOnly) {
         return this;
     }
-
+    
     if (nonMarketItems.indexOf(_this.itemName) === -1 && nonMarketItems.indexOf($('.rarity', this.item).text()) === -1 &&
-        !loadingItems.hasOwnProperty(this.itemName)) {
+        !loadingItems.hasOwnProperty(this.itemName) && notFoundListings.indexOf(_this.itemName) === -1) {
 
-        if(isScrolledIntoView(this.item)) {
+        if (isScrolledIntoView(this.item)) {
             this.fetchSteamMarketPrice();
         }
 
@@ -257,6 +258,7 @@ Item.prototype.fetchSteamMarketPrice = function() {
                 }
             } else {
                 $(_this.item).find('.rarity').html('Not found');
+                notFoundListings.push(_this.itemName);
             }
 
             delete loadingItems[_this.itemName];
@@ -399,25 +401,10 @@ Item.prototype.appendHoverElements = function() {
     var _this = this;
     if (!_this.extraAppended) {
         if (nonMarketItems.indexOf(_this.itemName) === -1) {
-            if ($('a:contains("Market")', _this.item).length) {
-                $('a:contains("Market")', _this.item).html('Market Listings');
-            } else {
-                $('.name', _this.item).append('<br/>' +
-                '<a href="' + _this.generateMarketURL() + '" target="_blank">Market Listings</a>');
-            }
-
-            $('.name', _this.item).append('<br/>' +
-            '<a href="' + _this.generateMarketSearchURL() + '" target="_blank">Market Search</a>' +
-            '<br/><br/><small><a class="refreshPriceMarket">Show Steam market price</a></small>');
-
-            if(appID === '730' && LoungeUser.userSettings.opskins === '1') {
-                var isStattrak = (_this.itemName.indexOf('StatTrak™ ') !== -1) ? 1 : 0;
-                $('.name', _this.item).append('<br/><p class="opskins-aff"><a href="' + _this.generateOPSkinsURL(_this.itemName, isStattrak) +'" target="_blank">Buy on OPSKINS.com</a>' +
-                '<small title="This affiliate link is added by LoungeDestroyer and supports the developers, you can remove this affiliate link in the settings if you wish."> (?)</small></p>');
-            }
+            $nameContainer = $('.name', _this.item);
 
             if (appID === '730' && LoungeUser.userSettings.convertToFloatValue === '1') {
-                var nameContents = $('.name', _this.item).contents();
+                var nameContents = $nameContainer.contents();
                 $(nameContents).each(function(contentsIndex, contentValue) {
                     if ($(contentValue).text().indexOf('Condition') !== -1 && $(contentValue).text().indexOf('%') !== -1) {
                         var condition = $(contentValue).text().match(new RegExp('[-+]?\\d*\\.\\d+|\\d+', 'g'));
@@ -429,6 +416,33 @@ Item.prototype.appendHoverElements = function() {
                         return false;
                     }
                 });
+            }
+
+            if ($('a:contains("Market")', _this.item).length) {
+                $('a:contains("Market")', _this.item).html('Market Listings');
+            } else {
+                $nameContainer.append('<br/>' +
+                    '<a href="' + _this.generateMarketURL() + '" target="_blank">Market Listings</a>');
+            }
+
+            $nameContainer.append('<br/>' +
+                '<a href="' + _this.generateMarketSearchURL() + '" target="_blank">Market Search</a>' +
+                '<br/><br/><small><a class="refreshPriceMarket">Show Steam market price</a></small>');
+
+            if(appID === '730' && LoungeUser.userSettings.opskins === '1') {
+                var isStattrak = (_this.itemName.indexOf('StatTrak™ ') !== -1) ? 1 : 0;
+                $nameContainer.append('<br/><p class="opskins-aff"><a href="' + _this.generateOPSkinsURL(_this.itemName, isStattrak) +'" target="_blank">Buy on OPSKINS.com</a>' +
+                    '<small title="This affiliate link is added by LoungeDestroyer and supports the developers, you can remove this affiliate link in the settings if you wish."> (?)</small></p>');
+            }
+
+            if (LoungeUser.userSettings.useCachedPriceList === '1' && marketPriceListUpdatedEpoch !== 0 && this.marketValue > 0) {
+                var lastListUpdatedString = moment(marketPriceListUpdatedEpoch).format('L LT');
+                $nameContainer.append('<br/><p class="ld-info-market-last-updated"><small>Market price last updated: ' + lastListUpdatedString + '</small></p>');
+            }
+
+            if (LoungeUser.userSettings.bettingValuesCsgo === '1' && bettingItemListUpdatedEpoch !== 0 && this.loungeValueFromSite === false && this.loungeValueConverted === true) {
+                var lastBetValuesUpdatedString = moment(bettingItemListUpdatedEpoch).format('L LT');
+                $nameContainer.append('<br/><p class="ld-info-bet-last-updated"><small>Bet value last updated: ' + lastBetValuesUpdatedString + '</small></p>');
             }
         }
         _this.extraAppended = true;

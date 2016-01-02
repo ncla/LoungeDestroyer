@@ -24,12 +24,18 @@ var siteAjaxReqObj = [];
 var freezingItems = false;
 var uniqueUserTrades = [];
 var themeCssIsEmpty = true;
+var marketPriceListUpdatedEpoch;
+var bettingItemListUpdatedEpoch;
+var useCachedPricesOnly = true;
 
 var $ldContainer;
 
-chrome.storage.local.get(['marketPriceList', 'currencyConversionRates', 'themes', 'matchInfoCachev2', 'lastAutoAccept', 'blacklistedItemList', 'csglBettingValues', 'userSettings'], function(result) {
+chrome.storage.local.get(['marketPriceList', 'currencyConversionRates', 'themes', 'matchInfoCachev2', 'lastAutoAccept',
+    'blacklistedItemList', 'csglBettingValues', 'userSettings', 'marketPriceListUpdatedEpoch', 'bettingItemListUpdatedEpoch'], function(result) {
     blacklistedItemList = result.blacklistedItemList || {};
     storageMarketItems = result.marketPriceList || {};
+    marketPriceListUpdatedEpoch = result.marketPriceListUpdatedEpoch || 0;
+    bettingItemListUpdatedEpoch = result.bettingItemListUpdatedEpoch || 0;
     currencies = result.currencyConversionRates || {};
     matchInfoCachev2 = result.matchInfoCachev2 || {'730': {}, '570': {}};
     themes = result.themes || {};
@@ -129,6 +135,9 @@ function init() {
     }
 
     timezoneName = (LoungeUser.userSettings.timezone == 'auto' ? jstz.determine().name() : LoungeUser.userSettings.timezone);
+
+    useCachedPricesOnly = (LoungeUser.userSettings.useCachedPriceList === '1' && LoungeUser.userSettings.itemMarketPricesv2 === '2'
+    && ((+new Date() - marketPriceListUpdatedEpoch) < (1000 * 60 * 60 * 24)));
 
     // do theme-related stuff
     if (LoungeUser.userSettings.currentTheme) {
@@ -467,7 +476,7 @@ function init() {
             });
         }
 
-        initiateItemObjectForElementList();
+        initiateItemObjectForElementList($('body .oitm'), useCachedPricesOnly);
 
         var eventId = generateUUID();
 
@@ -734,7 +743,7 @@ var itemObs = new MutationObserver(function(records) {
 
             if (hasTradeNodes) {
                 if (LoungeUser.userSettings.itemMarketPricesv2 === '2') {
-                    initiateItemObjectForElementList($(records[i].addedNodes).find('.oitm'));
+                    initiateItemObjectForElementList($(records[i].addedNodes).find('.oitm'), useCachedPricesOnly);
                 }
             }
         }
