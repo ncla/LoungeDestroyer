@@ -539,9 +539,6 @@ function updateMarketPriceList(callback) {
         console.log('Error getting response for item price list API');
         // Just in case so it doesn't send overwhelmingly many requests
         marketPriceListUpdatedEpoch = currentTimestamp;
-        chrome.storage.local.set({
-            'marketPriceListUpdatedEpoch': currentTimestamp
-        });
     };
 
     oReq.open('get', 'https://api.ncla.me/itemlist.php', true);
@@ -607,9 +604,6 @@ function updateCsgoloungeItemValues(callback) {
         error: function(error) {
             console.log('Error getting betting values from API', error);
             bettingItemListUpdatedEpoch = currentTimestamp;
-            chrome.storage.local.set({
-                'bettingItemListUpdatedEpoch': currentTimestamp
-            });
         }
     });
 }

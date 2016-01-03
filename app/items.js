@@ -142,7 +142,7 @@ Item.prototype.getMarketPrice = function(cachedOnly) {
     if (cachedOnly) {
         return this;
     }
-    
+
     if (nonMarketItems.indexOf(_this.itemName) === -1 && nonMarketItems.indexOf($('.rarity', this.item).text()) === -1 &&
         !loadingItems.hasOwnProperty(this.itemName) && notFoundListings.indexOf(_this.itemName) === -1) {
 
