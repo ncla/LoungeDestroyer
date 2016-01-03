@@ -435,14 +435,18 @@ Item.prototype.appendHoverElements = function() {
                     '<small title="This affiliate link is added by LoungeDestroyer and supports the developers, you can remove this affiliate link in the settings if you wish."> (?)</small></p>');
             }
 
-            if (LoungeUser.userSettings.useCachedPriceList === '1' && marketPriceListUpdatedEpoch !== 0 && this.marketValue > 0) {
-                var lastListUpdatedString = moment(marketPriceListUpdatedEpoch).format('L LT');
-                $nameContainer.append('<br/><p class="ld-info-market-last-updated"><small>Market price last updated: ' + lastListUpdatedString + '</small></p>');
-            }
+            if (LoungeUser.userSettings.showItemTimeCache === '1') {
+                if (LoungeUser.userSettings.useCachedPriceList === '1' && marketPriceListUpdatedEpoch !== 0 && this.marketValue > 0) {
+                    var lastListUpdatedString = moment(marketPriceListUpdatedEpoch).format('L LT');
+                    $nameContainer.append('<br/><p class="ld-info-market-last-updated" title="The time shown indicates when was the last time ' +
+                        'LoungeDestroyer updated it\'s cached market price list"><small><span class="ld-label-market-date">Market price:</span> ' + lastListUpdatedString + '</small></p>');
+                }
 
-            if (LoungeUser.userSettings.bettingValuesCsgo === '1' && bettingItemListUpdatedEpoch !== 0 && this.loungeValueFromSite === false && this.loungeValueConverted === true) {
-                var lastBetValuesUpdatedString = moment(bettingItemListUpdatedEpoch).format('L LT');
-                $nameContainer.append('<br/><p class="ld-info-bet-last-updated"><small>Bet value last updated: ' + lastBetValuesUpdatedString + '</small></p>');
+                if (LoungeUser.userSettings.bettingValuesCsgo === '1' && bettingItemListUpdatedEpoch !== 0 && this.loungeValueFromSite === false && this.loungeValueConverted === true) {
+                    var lastBetValuesUpdatedString = moment(bettingItemListUpdatedEpoch).format('L LT');
+                    $nameContainer.append('<br/><p class="ld-info-bet-last-updated" title="The time shown indicates when was the last time LoungeDestroyer ' +
+                        'updated the betting values for CSGOLounge items"><small><span class="ld-label-betting-date">Betting value:</span> ' + lastBetValuesUpdatedString + '</small></p>');
+                }
             }
         }
         _this.extraAppended = true;

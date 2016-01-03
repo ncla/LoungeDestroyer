@@ -52,6 +52,7 @@ User.prototype.defaultSettings =
     bettingValuesCsgo: '0',
     betHistoryTotalColumn: '2',
     convertToFloatValue: '1',
+    showItemTimeCache: '1',
 
     globalMatchFilters: '1',
     showMatchFilterBox: '1',
