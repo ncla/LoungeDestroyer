@@ -108,7 +108,7 @@ navAnchor.click( function(e) {
 
                 $('.preloader.loading', $betItems).show();
 
-                $.ajax('http://csgolounge.com/apif/schema.php', {
+                $.ajax('http://csgolounge.com/api/schema.php', {
                     type: 'GET',
                     success: function(data) {
                         console.time('Parsing CSGL item list');
