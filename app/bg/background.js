@@ -16,6 +16,7 @@ chrome.storage.local.get(['marketPriceListUpdatedEpoch', 'bettingItemListUpdated
 });
 
 var lastTimeUserVisited = null;
+var lastTimeStorageFail = 0;
 var baseURLs = {
     730: 'http://csgolounge.com/',
     570: 'http://dota2lounge.com/'
@@ -371,7 +372,16 @@ function checkNewMatches(ajaxResponse, appID) {
         tempObj[storageName] = newMatchStorageObject;
 
         // Setting newly discovered matches in the storage
-        chrome.storage.local.set(tempObj);
+        chrome.storage.local.set(tempObj, function() {
+            if (chrome.runtime.lastError) {
+                if ((+new Date() - lastTimeStorageFail) > (1000 * 60 * 60)) {
+                    lastTimeStorageFail = +new Date();
+                    createNotification('Storage failure', 'Please check if the drive on which this extension is installed on is not full', 'regular', null, false);
+                }
+
+                return;
+            }
+        });
 
         // We do not want to overwhelm user with many new matches
         if (newMatchesCount <= 3) {
