@@ -1757,34 +1757,44 @@ code {
   background-position: right 138px center;
   background-repeat: no-repeat; }
 
-#page-donate .card:nth-child(2) {
+#page-donate .card:nth-child(2), #page-bettableitems .card:nth-child(2) {
   min-height: 500px; }
-#page-donate table {
+#page-donate table, #page-bettableitems table {
   width: 100%;
   margin-top: 20px; }
-  #page-donate table thead {
+  #page-donate table thead, #page-bettableitems table thead {
     font-size: 12px;
     color: #363636; }
-  #page-donate table tbody {
+  #page-donate table tbody, #page-bettableitems table tbody {
     font-size: 13px;
     color: #575757; }
-  #page-donate table tr {
+  #page-donate table tr, #page-bettableitems table tr {
     height: 35px;
     line-height: 35px;
     border-bottom: 1px solid #e4e4e4; }
-  #page-donate table tbody tr:hover {
+  #page-donate table tbody tr:hover, #page-bettableitems table tbody tr:hover {
     background-color: #EEEEEE; }
-  #page-donate table thead tr:first-child {
+  #page-donate table thead tr:first-child, #page-bettableitems table thead tr:first-child {
     border-bottom: 2px solid #e4e4e4; }
-  #page-donate table thead tr th:first-child {
-    width: 50px; }
-  #page-donate table tbody tr:last-child {
+  #page-donate table tbody tr:last-child, #page-bettableitems table tbody tr:last-child {
     border-bottom: 0; }
-  #page-donate table tr th, #page-donate table tr td {
+  #page-donate table tr th, #page-donate table tr td, #page-bettableitems table tr th, #page-bettableitems table tr td {
     text-align: right;
     padding: 0 10px; }
-  #page-donate table thead tr th:nth-child(2), #page-donate table tbody tr td:nth-child(2) {
+
+#page-donate table thead tr th:nth-child(2), #page-donate table tbody tr td:nth-child(2) {
+  text-align: left; }
+
+#page-bettableitems table {
+  margin-top: 5px; }
+  #page-bettableitems table tr th {
     text-align: left; }
+  #page-bettableitems table thead tr th:not(.sorter-false), #page-bettableitems table thead tr td:not(.sorter-false) {
+    cursor: pointer; }
+  #page-bettableitems table tbody td, #page-bettableitems table thead td {
+    text-align: center; }
+#page-bettableitems table.table-sorting-loading tbody {
+  opacity: 0.6; }
 
 #page-settings .keywordsContainer .keyword {
   display: inline-block;

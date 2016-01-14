@@ -471,6 +471,10 @@ http://codepen.io/larrygeams/pen/nhgze
     font-size: 11px;
 }
 
+.ld-label-market-date, .ld-label-betting-date {
+    cursor: help;
+}
+
 .tradepoll.ld-filtered, .matchmain.ld-filtered {
     opacity: 0.65;
     transition: opacity 0.3s ease-in-out;

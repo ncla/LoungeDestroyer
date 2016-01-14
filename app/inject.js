@@ -1,4 +1,5 @@
 console.log('LoungeDestroyer content script has started..', +new Date());
+
 var appID = (window.location.hostname == 'dota2lounge.com' ? '570' : '730');
 
 var LoungeUser = new User();

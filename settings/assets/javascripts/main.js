@@ -24,6 +24,9 @@ navAnchor.each( function() {
 
 var changelogRequested = false;
 var patreonsRequested = false;
+var bettableListInitiated = false;
+
+var currencies = {};
 
 // -----------------------------------------
 // Page switcher
@@ -62,7 +65,9 @@ navAnchor.click( function(e) {
 		var $changelogContent = $('#changelog-content');
 
 		if(!changelogRequested) {
-			$('.preloader.loading', $changelog).show();
+            changelogRequested = true;
+
+            $('.preloader.loading', $changelog).show();
 			$.ajax('https://api.github.com/repos/ncla/LoungeDestroyer/releases?per_page=15', {
 				type: 'GET',
 				success: function(data) {
@@ -74,7 +79,6 @@ navAnchor.click( function(e) {
 						$changelogContent.append('<br class="margin"/>');
 					});
 					$changelogContent.find('ul').addClass('list');
-					changelogRequested = true;
 					$('.preloader.loading', $changelog).fadeOut(function() {
 						$changelogContent.fadeIn();
 					});
@@ -84,15 +88,135 @@ navAnchor.click( function(e) {
 						$changelogContent.fadeIn();
 					});
 					$changelogContent.append('<p>Failed to load changelog.. :(</p>');
-					changelogRequested = true;
 				}
 			});
 		}
 	}
 
+	if(page === 'page-bettableitems') {
+		if(!bettableListInitiated) {
+			var $betItems = $('#page-bettableitems .pad-full');
+			var $betItemsContent = $('#bettable-items-content');
+            var $tableBody = document.getElementById('bet-list-tbody');
+
+            bettableListInitiated = true;
+
+            chrome.storage.local.get(['marketPriceList', 'currencyConversionRates'], function(result) {
+                var pricelist = result.marketPriceList || {};
+                currencies = result.currencyConversionRates || {};
+                var csgoPricelist = pricelist['730'] || {};
+
+                $('.preloader.loading', $betItems).show();
+
+                $.ajax('http://csgolounge.com/apif/schema.php', {
+                    type: 'GET',
+                    success: function(data) {
+                        console.time('Parsing CSGL item list');
+
+                        var htmlToAppend = '';
+
+                        $.each(data, function(i, v) {
+                            var floatValue = parseFloat(v.worth);
+
+                            if(floatValue > 0) {
+                                var marketPriceStr = '-';
+                                var diffStr = '-';
+                                var overpriceStr = '-';
+								var bettingValStr = convertPrice(floatValue, true);
+
+                                var item = new Item();
+                                item.itemName = v.name;
+
+                                if (csgoPricelist.hasOwnProperty(v.name)) {
+                                    marketPriceStr = convertPrice(csgoPricelist[v.name]['value'], true);
+
+                                    item.loungeValue = floatValue;
+                                    item.marketValue = csgoPricelist[v.name]['value'];
+
+                                    item.calculateMarketDifference().calculateMarketOverprice();
+
+                                    diffStr = (item.marketDifference ? convertPrice(item.marketDifference, true) : '-');
+                                    overpriceStr = (item.marketOverprice ? item.marketOverprice + '%' : '-');
+                                }
+
+                                var steamUrl = item.generateMarketURL(730);
+                                var opskinsUrl = item.generateOPSkinsURL();
+                                var bitskinsUrl = item.generateBitskinsURL();
+
+                                htmlToAppend += '<tr><th scope="row">' + v.name + '</th><td>' + bettingValStr + '</td> <td>' + marketPriceStr + '</td>' +
+                                    '<td data-diff="' + (item.marketDifference || 0) + '">'+diffStr+'</td> <td data-op="'+(item.marketOverprice || 100)+'">'+overpriceStr+'</td> <td><a href="' + steamUrl + '" target="_blank">STEAM</a></td>' +
+                                    '<td><a href="' + opskinsUrl + '" target="_blank">OPSKINS</a></td> <td><a href="' + bitskinsUrl + '" target="_blank">BITSKINS</a></td></tr>';
+
+                            }
+                        });
+                        console.timeEnd('Parsing CSGL item list');
+
+                        console.time('Appending table into DOM');
+                        $tableBody.innerHTML += htmlToAppend;
+                        console.timeEnd('Appending table into DOM');
+
+                        console.time('Tablesort initiated');
+						$table = $('#bettable-items-content table');
+
+                        $.tablesorter.addParser({
+                            id: 'data',
+                            is: function(s, table, cell, $cell) {
+                                // return false so this parser is not auto detected
+                                return false;
+                            },
+                            format: function(s, table, cell, cellIndex) {
+                                var $cell = $(cell);
+
+                                if (cellIndex === 3) {
+                                    return $cell.attr('data-diff') || s;
+                                }
+
+                                if (cellIndex === 4) {
+                                    return $cell.attr('data-op') || s;
+                                }
+
+                                return s;
+                            },
+                            parsed: false,
+                            type: 'numeric'
+                        });
+
+                        $table.tablesorter({
+                            showProcessing: true,
+							cssProcessing: 'table-sorting-loading',
+                            headers: {
+                                3: {sorter: 'data'},
+                                4: {sorter: 'data'},
+                                5: {sorter: false},
+                                6: {sorter: false},
+                                7: {sorter: false}
+                            },
+                            emptyTo: 'bottom'
+                        }).bind('sortBegin sortEnd', function(event, table) {
+							$.tablesorter.isProcessing( this, event.type === 'sortBegin' );
+						});
+
+                        console.timeEnd('Tablesort initiated');
+
+                        $('.preloader.loading', $betItems).fadeOut(function() {
+                            $betItemsContent.fadeIn();
+                        });
+                    },
+                    error: function(jqXHR) {
+                        $('.preloader.loading', $betItems).fadeOut(function() {
+                            $('.error-loading-bet-list').fadeIn();
+                        });
+                    }
+                });
+            });
+		}
+	}
+
 	if(page === 'page-donate') {
 		if(!patreonsRequested) {
-			$('#page-donate .preloader.loading').show();
+            patreonsRequested = true;
+
+            $('#page-donate .preloader.loading').show();
 			$.ajax('https://api.ncla.me/destroyer/patreonlist', {
 				type: 'GET',
 				success: function(data) {
@@ -115,16 +239,12 @@ navAnchor.click( function(e) {
 							$('#page-donate .patreon-list').fadeIn();
 						}, 1000);
 					});
-
-					patreonsRequested = true;
-				},
+                },
 				error: function(jqXHR) {
 					$('.not-loaded-patreons').removeClass('hidden');
-					patreonsRequested = true;
 				}
 			});
 		}
-
 	}
 
 	if(page === 'page-themes') {

@@ -39,9 +39,10 @@ chrome.storage.local.get(['currencyConversionRates', 'ajaxCache', 'userSettings'
             '</span>');
 
             if(LoungeUser.userSettings.opskins == '1') {
-                var isStattrak = (itemObj.itemName.indexOf('StatTrak™ ') !== -1) ? 1 : 0;
+                var item = new Item();
+                item.itemName = itemObj.itemName;
 
-                $('#largeiteminfo_item_actions').append('<a href="' + itemObj.generateOPSkinsURL(itemObj.itemName, isStattrak) + '" class="btn_small btn_grey_white_innerfade" id="buyOnOpskins" target="_blank">' +
+                $('#largeiteminfo_item_actions').append('<a href="' + itemObj.generateOPSkinsURL() + '" class="btn_small btn_grey_white_innerfade" id="buyOnOpskins" target="_blank">' +
                 '<span>Buy on OPSKINS.com without 7 day trade ban <small title="This affiliate link is added by LoungeDestroyer and ' +
                 'supports the developers, you can remove this affiliate link in the settings if you wish."> (?)</small></span></a>');
             }

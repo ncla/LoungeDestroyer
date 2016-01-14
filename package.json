@@ -9,7 +9,8 @@
   "dependencies": {
     "chai": "^3.4.1",
     "marked": "^0.3.5",
-    "mocha": "^2.3.4"
+    "mocha": "^2.3.4",
+    "tablesorter": "^2.25.0"
   },
   "devDependencies": {
     "gulp": "^3.9.0",

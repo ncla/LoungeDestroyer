@@ -23,6 +23,7 @@
         <li><a href="#page-settings" role="button">Settings</a></li>
         <li><a href="#page-themes" role="button">Themes</a></li>
         <li><a href="#page-changelog" role="button">Changelog</a></li>
+        <li><a href="#page-bettableitems" role="button">Bettable items</a></li>
 
         <li class="right">
             <a href="#page-donate" class="btn" role="button">Donate</a>
@@ -994,7 +995,7 @@
                         <table>
                             <thead>
                             <tr>
-                                <th>#</th>
+                                <th width="50px">#</th>
                                 <th>Name</th>
                                 <th>Amount</th>
                             </tr>
@@ -1014,6 +1015,58 @@
         </div>
     </section>
     <!-- # /Page: "Donate" -->
+
+    <!-- # Page: "Changelog" -->
+    <section id="page-bettableitems" class="hidden">
+        <div class="col-grid-12">
+            <div class="card">
+                <h2>Bettable items</h2>
+
+                <div class="pad-full">
+
+                    <div class="preloader loading" style="display: none;">
+                        <span class="slice"></span>
+                        <span class="slice"></span>
+                        <span class="slice"></span>
+                        <span class="slice"></span>
+                        <span class="slice"></span>
+                        <span class="slice"></span>
+                    </div>
+
+                    <div class="error-loading-bet-list" style="display: none;">There was an error loading bettable items list</div>
+
+                    <div id="bettable-items-content" style="display: none;">
+                        <table>
+                            <thead>
+                            <tr>
+                                <th width="45%">Item name</th>
+                                <td width="12%">Betting value</td>
+                                <td width="13%">Market price</td>
+                                <td width="10%">Difference</td>
+                                <td width="10%">Overprice</td>
+                                <td width="5%"></td>
+                                <td width="5%"></td>
+                                <td width="5%"></td>
+                            </tr>
+                            </thead>
+                            <tbody id="bet-list-tbody">
+                                <tr class="placeholder hidden">
+                                    <th scope="row">DRAGON LORE</th>
+                                    <td></td>
+                                    <td></td>
+                                    <td>+13.37</td>
+                                    <td>112</td>
+                                    <td>STEAM</td>
+                                    <td>OPSKINS</td>
+                                    <td>BITSKINS</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
 </main>
 <!-- # /Wrapper -->
@@ -1159,6 +1212,7 @@
 </div>
 
 <script src="../lib/js/jquery-2.1.4.min.js"></script>
+<script src="../node_modules/tablesorter/dist/js/jquery.tablesorter.min.js"></script>
 <script src="../lib/js/marked.min.js"></script>
 <script src="../lib/js/moment.min.js"></script>
 <script src="../lib/js/moment-timezone-with-data.min.js"></script>
@@ -1166,6 +1220,7 @@
 
 <script src="../app/helpers.js"></script>
 <script src="../app/user.js"></script>
+<script src="../app/items.js"></script>
 
 <script src="assets/javascripts/main.js"></script>
 <script src="assets/javascripts/options.js"></script>

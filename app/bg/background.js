@@ -182,12 +182,12 @@ chrome.webRequest.onHeadersReceived.addListener(function(details) {
         // Used for price list updating, be careful if the URL list gets a new domain though
         lastTimeUserVisited = new Date().getTime();
 
-        if ((+new Date() - marketPriceListUpdatedEpoch) > (1000 * 60 * 60 * 24)) {
+        if ((+new Date() - marketPriceListUpdatedEpoch) > (1000 * 60 * 60 * 12)) {
             console.log('Updating market price list, last update was more than 24 hours ago');
             updateMarketPriceList();
         }
 
-        if ((+new Date() - bettingItemListUpdatedEpoch) > (1000 * 60 * 60 * 24 * 7)) {
+        if ((+new Date() - bettingItemListUpdatedEpoch) > (1000 * 60 * 60 * 24 * 4)) {
             console.log('Updating betting item list, last update was more than 7 days ago');
             updateCsgoloungeItemValues();
         }

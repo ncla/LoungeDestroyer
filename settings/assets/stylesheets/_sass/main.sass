@@ -1217,15 +1217,12 @@ $slider-height: 551px
 // # Footer
 // #
 
-#page-donate
+#page-donate, #page-bettableitems
 	.card:nth-child(2)
 		min-height: 500px
 	table
 		width: 100%
 		margin-top: 20px
-
-		//border-collapse: separate
-		//border-spacing: 5em
 
 		thead
 			font-size: 12px
@@ -1246,9 +1243,6 @@ $slider-height: 551px
 		thead tr:first-child
 			border-bottom: 2px solid #e4e4e4
 
-		thead tr th:first-child
-			width: 50px
-
 		tbody tr:last-child
 			border-bottom: 0
 
@@ -1256,11 +1250,25 @@ $slider-height: 551px
 			text-align: right
 			padding: 0 10px
 
+#page-donate
+	table
 		thead tr th:nth-child(2), tbody tr td:nth-child(2)
 			text-align: left
 
-		//thead th:nth-child(2), tbody tr:nth-child(1)
-		//	text-align: left
+#page-bettableitems
+	table
+		margin-top: 5px
+
+		tr th
+			text-align: left
+		thead
+			tr th:not(.sorter-false), tr td:not(.sorter-false)
+				cursor: pointer
+		tbody td, thead td
+			text-align: center
+
+	table.table-sorting-loading tbody
+		opacity: 0.6
 
 #page-settings .keywordsContainer
 	.keyword

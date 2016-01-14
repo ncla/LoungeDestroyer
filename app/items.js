@@ -301,12 +301,16 @@ Item.prototype.fetchLoungeValueFromAPI = function(success, error) {
     return this;
 };
 
-Item.prototype.generateMarketURL = function() {
+Item.prototype.generateMarketURL = function(app) {
     if (!(this instanceof Item)) {
         throw new TypeError('\'this\' must be instance of Item');
     }
 
-    return window.location.protocol + '//steamcommunity.com/market/listings/' + appID + '/' + this.itemName;
+    if (app !== undefined) {
+        appID = app;
+    }
+
+    return 'https://steamcommunity.com/market/listings/' + appID + '/' + this.itemName;
 };
 
 Item.prototype.generateMarketSearchRender = function() {
@@ -314,7 +318,7 @@ Item.prototype.generateMarketSearchRender = function() {
         throw new TypeError('\'this\' must be instance of Item');
     }
 
-    return window.location.protocol + '//steamcommunity.com/market/search/render/?query=' + this.itemName + '&start=0&count=100&search_descriptions=0&sort_column=default&appid=' + appID;
+    return 'https://steamcommunity.com/market/search/render/?query=' + this.itemName + '&start=0&count=100&search_descriptions=0&sort_column=default&appid=' + appID;
 };
 
 Item.prototype.generateMarketSearchURL = function() {
@@ -322,7 +326,7 @@ Item.prototype.generateMarketSearchURL = function() {
         throw new TypeError('\'this\' must be instance of Item');
     }
 
-    return window.location.protocol + '//steamcommunity.com/market/search?q=' + this.itemName;
+    return 'https://steamcommunity.com/market/search?q=' + this.itemName;
 };
 
 Item.prototype.generateMarketApiURL = function() {
@@ -330,7 +334,7 @@ Item.prototype.generateMarketApiURL = function() {
         throw new TypeError('\'this\' must be instance of Item');
     }
 
-    return window.location.protocol + '//steamcommunity.com/market/priceoverview/?country=US&currency=1&appid=' +
+    return 'https://steamcommunity.com/market/priceoverview/?country=US&currency=1&appid=' +
         appID + '&market_hash_name=' + encodeURI(this.itemName);
 };
 
@@ -339,20 +343,28 @@ Item.prototype.generateSteamStoreURL = function() {
         throw new TypeError('\'this\' must be instance of Item');
     }
 
-    return window.location.protocol + '//store.steampowered.com/search/?term=' + encodeURI(this.itemName);
+    return 'https://store.steampowered.com/search/?term=' + encodeURI(this.itemName);
 };
 
-Item.prototype.generateOPSkinsURL = function(itemName, stattrak) {
+Item.prototype.generateOPSkinsURL = function() {
     if (!(this instanceof Item)) {
         throw new TypeError('\'this\' must be instance of Item');
     }
 
-    if(stattrak === undefined) {
-        stattrak = 0;
+    var stattrak = (this.itemName.indexOf('StatTrak™ ') !== -1) ? 1 : 0;
+
+    return 'https://opskins.com/index.php?loc=shop_search&ref=destroyer&aid=91&search_item=' + encodeURI(this.itemName) +
+        '&min=&max=&StatTrak=' + stattrak + '&inline=&grade=&inline=&type=&inline=&sort=lh';
+};
+
+Item.prototype.generateBitskinsURL = function() {
+    if (!(this instanceof Item)) {
+        throw new TypeError('\'this\' must be instance of Item');
     }
 
-    return window.location.protocol + '//opskins.com/index.php?loc=shop_search&ref=destroyer&aid=91&search_item=' + encodeURI(itemName) +
-        '&min=&max=&StatTrak=' + stattrak + '&inline=&grade=&inline=&type=&inline=&sort=lh';
+    var stattrak = (this.itemName.indexOf('StatTrak™ ') !== -1) ? 1 : 0;
+
+    return 'https://bitskins.com/?referred_by=76561198043770492&market_hash_name=' + encodeURI(this.itemName) + '&is_stattrak=' + stattrak + '&sort_by=price&order=asc';
 };
 
 Item.prototype.convertLoungeValue = function() {
@@ -431,7 +443,7 @@ Item.prototype.appendHoverElements = function() {
 
             if(appID === '730' && LoungeUser.userSettings.opskins === '1') {
                 var isStattrak = (_this.itemName.indexOf('StatTrak™ ') !== -1) ? 1 : 0;
-                $nameContainer.append('<br/><p class="opskins-aff"><a href="' + _this.generateOPSkinsURL(_this.itemName, isStattrak) +'" target="_blank">Buy on OPSKINS.com</a>' +
+                $nameContainer.append('<br/><p class="opskins-aff"><a href="' + _this.generateOPSkinsURL() +'" target="_blank">Buy on OPSKINS.com</a>' +
                     '<small title="This affiliate link is added by LoungeDestroyer and supports the developers, you can remove this affiliate link in the settings if you wish."> (?)</small></p>');
             }
 

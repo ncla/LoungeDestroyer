@@ -1,7 +1,7 @@
 // JavaScript only related to tying settings with DOM
 
-var defaultUser = new User();
-var Settings = defaultUser.defaultSettings;
+var LoungeUser = new User();
+var Settings = LoungeUser.defaultSettings;
 
 var optionsSelectize = {
     closeAfterSelect: false,
@@ -131,7 +131,7 @@ $(document).ready(function() {
             });
     });
     $("#restoreDefaults").click(function() {
-        defaultUser.restoreDefaults();
+        LoungeUser.restoreDefaults();
         document.location.reload();
     });
     $("#refetchcsglvalues").click(function() {
@@ -150,7 +150,7 @@ $(document).ready(function() {
     $("#showTradesFilter, #hideTradesFilter, #hideTradesItemsHave, #hideTradesItemsWant, #matchTeamFilters, #matchTournamentFilters").on("change", function(){
         var outp = parseAndDisplayKeywords.apply(this);
 
-        defaultUser.saveSetting(this.id + "Array", outp);
+        LoungeUser.saveSetting(this.id + "Array", outp);
     });
 
     //// handles extracting and displaying keywords. Should be used as event handler for input
@@ -241,7 +241,7 @@ $("select, input").on('change', function() {
             }
         }
 
-        defaultUser.saveSetting(this.id, outp);
+        LoungeUser.saveSetting(this.id, outp);
         return;
     }
 
@@ -287,7 +287,7 @@ $("select, input").on('change', function() {
     }
 
     // save setting
-    defaultUser.saveSetting(this.id, this.value);
+    LoungeUser.saveSetting(this.id, this.value);
 });
 
 // THEMES
