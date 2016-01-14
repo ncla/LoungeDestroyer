@@ -1,9 +1,5 @@
 var gulp = require('gulp');
 var jscs = require('gulp-jscs');
-var gulpFilter = require('gulp-filter');
-var uglify = require('gulp-uglify');
-var minifyCss = require('gulp-minify-css');
-var minifyHTML = require('gulp-minify-html');
 var zip = require('gulp-zip');
 
 gulp.task('default', function () {
@@ -18,24 +14,17 @@ var requiredStuff = [
     'lib/js/*',
     'popup/*',
     'settings/**/*',
-    'manifest.json'
+    'manifest.json',
+    'node_modules/tablesorter/dist/js/jquery.tablesorter.min.js',
+    'node_modules/jquery/dist/jquery.min.js',
+    'node_modules/moment/min/moment.min.js',
+    'node_modules/moment-timezone/builds/moment-timezone-with-data.min.js',
+    'node_modules/jstz/dist/jstz.min.js',
+    'node_modules/marked/marked.min.js'
 ];
 
 gulp.task('build', function () {
-    var jsFilter = gulpFilter(['**/*.js']);
-    var cssFilter = gulpFilter(['**/*.css']);
-    var htmlFilter = gulpFilter(['**/*.html']);
-
     return gulp.src(requiredStuff, {base: '.'})
-        //.pipe(jsFilter)
-        //.pipe(uglify())
-        //.pipe(jsFilter.restore())
-        //.pipe(cssFilter)
-        //.pipe(minifyCss())
-        //.pipe(cssFilter.restore())
-        //.pipe(htmlFilter)
-        //.pipe(minifyHTML())
-        //.pipe(htmlFilter.restore())
         .pipe(zip('ld_build.zip'))
         .pipe(gulp.dest('build/'));
 });

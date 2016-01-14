@@ -11,7 +11,7 @@
     },
     "background": {
         "scripts": [
-            "lib/js/jquery-2.1.4.min.js",
+            "node_modules/jquery/dist/jquery.min.js",
             "lib/js/css-lib.js",
             "app/helpers.js",
             "app/user.js",
@@ -47,11 +47,11 @@
                 "*://dota2lounge.com/*"
             ],
             "js": [
-                "lib/js/jquery-2.1.4.min.js",
+                "node_modules/jquery/dist/jquery.min.js",
                 "lib/js/jquery-ui-1.11.2.min.js",
-                "lib/js/moment.min.js",
-                "lib/js/moment-timezone-with-data.min.js",
-                "lib/js/jstz-1.0.4.min.js",
+                "node_modules/moment/min/moment.min.js",
+                "node_modules/moment-timezone/builds/moment-timezone-with-data.min.js",
+                "node_modules/jstz/dist/jstz.min.js",
                 "lib/js/ajaxq.js",
                 "app/helpers.js",
                 "app/user.js",
@@ -73,7 +73,7 @@
                 "*://steamcommunity.com/market/listings/730/*"
             ],
             "js": [
-                "lib/js/jquery-2.1.4.min.js",
+                "node_modules/jquery/dist/jquery.min.js",
                 "app/helpers.js",
                 "app/user.js",
                 "app/items.js",
