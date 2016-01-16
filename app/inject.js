@@ -243,7 +243,7 @@ function init() {
         document.addEventListener('overrideAlert', function(event) {
             if(event.detail === true) {
                 chrome.runtime.sendMessage({notification: {
-                    title: 'Lounge couldn\'t send you a trade offer',
+                    title: (appID === '730' ? 'CS:GO' : 'DOTA2') + ' Lounge bots were not able to send you a trade offer',
                     message: 'Make sure that your Steam account is able to receive and/or send trade offers.',
                     messageType: 'basic',
                     buttons: null,
