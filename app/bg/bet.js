@@ -546,10 +546,16 @@ function handleQueue(data, game) {
                             disableAutoAccept(game, true);
                         },
                         error: function(jqXHR, textStatus) {
+                            var data;
+
                             console.log('AUTOACCEPT :: Error accepting trade', jqXHR.status, textStatus);
                             bet[game].lastError = 'There was an error when accepting trade offer, HTTP Status code #' + jqXHR.status + '.';
 
-                            var data = $.parseJSON(jqXHR.responseText);
+                            try {
+                                data = $.parseJSON(jqXHR.responseText);
+                            } catch (e) {
+                                console.error(e);
+                            }
 
                             if (data && data.strError) {
                                 bet[game].lastError += ' ' + data.strError;
