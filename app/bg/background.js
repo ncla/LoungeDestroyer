@@ -476,13 +476,8 @@ function checkForNewTradeOffers(data, appID) {
 }
 
 setInterval(function() {
-    /*
-        Somebody please slap me for this DRY'ness
-     */
-    var checkDotoPage = (LoungeUser.userSettings.notifyMatches == '1' || LoungeUser.userSettings.notifyMatches == '2'
-        || LoungeUser.userSettings.notifyTrades == '1' || LoungeUser.userSettings.notifyTrades == '2');
-    var checkCSGOPage = (LoungeUser.userSettings.notifyMatches == '1' || LoungeUser.userSettings.notifyMatches == '3'
-        || LoungeUser.userSettings.notifyTrades == '1' || LoungeUser.userSettings.notifyTrades == '3');
+    var checkDotoPage = ['1', '2'].indexOf(LoungeUser.userSettings.notifyMatches) !== -1 || ['1', '2'].indexOf(LoungeUser.userSettings.notifyTrades) !== -1;
+    var checkCSGOPage = ['1', '3'].indexOf(LoungeUser.userSettings.notifyMatches) !== -1 || ['1', '3'].indexOf(LoungeUser.userSettings.notifyTrades) !== -1;
 
     if (checkDotoPage) {
         console.log('Checking DOTA2 matches');

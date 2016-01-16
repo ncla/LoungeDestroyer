@@ -127,10 +127,6 @@ chrome.extension.onMessage.addListener(function(msg, sender, sendResponse) {
  Wrap the init code here, because for this to function properly, we need user settings to be loaded first
  */
 function init() {
-    /*
-     When bot status changes (detected by background.js), a message gets send from background script to content script (here).
-     TODO: Pass bot status through listener.
-     */
     if (earlyBackpackLoad) {
         inventory.onInventoryLoaded(earlyBackpackLoad);
     }
