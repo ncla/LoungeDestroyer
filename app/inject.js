@@ -477,7 +477,7 @@ function init() {
 
             $bettableItemsLink.click(function() {
                 chrome.runtime.sendMessage({tab: chrome.extension.getURL('settings/index.html#bettableitems')}, function(data) {
-                    console.log('Opened tab for bettable items);
+                    console.log('Opened tab for bettable items');
                 })
             });
 
