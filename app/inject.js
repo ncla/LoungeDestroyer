@@ -472,6 +472,18 @@ function init() {
 
         initiateItemObjectForElementList($('body .oitm'), useCachedPricesOnly);
 
+        if (appID === '730') {
+            $bettableItemsLink = $('<a href="#">Bettable items</a>');
+
+            $bettableItemsLink.click(function() {
+                chrome.runtime.sendMessage({tab: chrome.extension.getURL('settings/index.html#bettableitems')}, function(data) {
+                    console.log('Opened tab for bettable items);
+                })
+            });
+
+            $('#submenu nav').append($bettableItemsLink);
+        }
+
         var eventId = generateUUID();
 
         document.addEventListener(eventId, function(event) {

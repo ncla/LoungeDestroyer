@@ -188,6 +188,11 @@ $(document).ready(function() {
         $('nav[role="navigation"] ul a[href="#page-changelog"]').click();
         window.location.hash = '';
     }
+
+    if(window.location.hash === '#bettableitems') {
+        $('nav[role="navigation"] ul a[href="#page-bettableitems"]').click();
+        window.location.hash = '';
+    }
 });
 
 $("select, input").on('change', function() {
