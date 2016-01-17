@@ -225,10 +225,12 @@ Match.prototype.appendExtraMatchInfo = function(targetElement) {
     }
 
     // trim the unneeded spaces
-    var redInfo = matchHeaderBlock[0].querySelector('span[style*="#D12121"]');
-    if (redInfo) {
-        if (!redInfo.textContent.trim().length) {
-            matchHeaderBlock[0].removeChild(redInfo);
+    if (matchHeaderBlock.length) {
+        var redInfo = $('span[style*="#D12121"]', matchHeaderBlock);
+        if (redInfo.length) {
+            if (!redInfo.text().trim().length) {
+                redInfo.remove();
+            }
         }
     }
 

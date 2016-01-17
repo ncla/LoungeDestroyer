@@ -219,6 +219,5 @@ $(document).ready(function() {
 });
 
 window.onfocus = function() {
-    console.log('BET :: Updating auto-betting box');
     updateAutobetInfo();
 };
