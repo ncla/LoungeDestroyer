@@ -243,9 +243,7 @@ function init() {
                 chrome.runtime.sendMessage({notification: {
                     title: (appID === '730' ? 'CS:GO' : 'DOTA2') + ' Lounge bots were not able to send you a trade offer',
                     message: 'Make sure that your Steam account is able to receive and/or send trade offers.',
-                    messageType: 'basic',
-                    buttons: null,
-                    buttonUrl: null
+                    buttons: null
                 }});
             }
         });

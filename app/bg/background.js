@@ -54,16 +54,7 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
     // Open new tab if none exists
     if (request.hasOwnProperty('tab')) {
         console.log('Opening tab', request, sender);
-        chrome.tabs.query({url: request.tab}, function(tabs) {
-            if (tabs.length !== 0) {
-                return;
-            }
-
-            chrome.tabs.create({
-                url: request.tab,
-                windowId: sender.tab.windowId
-            });
-        });
+        openTabIfNotExist(request.tab, true, sender.tab.windowId);
     }
 
     // Get content of file
@@ -100,7 +91,7 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
     // Create notification
     if (request.hasOwnProperty('notification')) {
         var data = request.notification;
-        createNotification(data.title, data.message, data.messageType, data.buttons, data.buttonUrl);
+        createNotification(data.title, data.message, data.buttons);
     }
 
     // Overwrite variable in format {set: {variable: {key: newValue}}}
@@ -169,13 +160,26 @@ function sendMessageToContentScript(message, tabId) {
 }
 
 function openSettingsTab() {
-    var optionsUrl = chrome.extension.getURL('settings/index.html');
-    chrome.tabs.query({url: optionsUrl}, function(tabs) {
-        if (tabs.length) {
-            chrome.tabs.update(tabs[0].id, {active: true});
-        } else {
-            chrome.tabs.create({url: optionsUrl});
+    openTabIfNotExist(chrome.extension.getURL('settings/index.html'), true);
+}
+
+function openTabIfNotExist(url, focus, windowId) {
+    chrome.tabs.query({url: url}, function(tabs) {
+        if (tabs.length !== 0) {
+            if (focus === true) {
+                chrome.tabs.update(tabs[0].id, {active: true});
+            }
+
+            return;
         }
+
+        var tabsObject = { url: url };
+
+        if (windowId !== undefined) {
+            tabsObject['windowId'] = windowId;
+        }
+
+        chrome.tabs.create(tabsObject);
     });
 }
 
@@ -292,46 +296,39 @@ chrome.webRequest.onBeforeRequest.addListener(function requestListener(details) 
 var notificationID = 0;
 var notifications = {};
 
-chrome.notifications.onButtonClicked.addListener(function(notificationID) {
-    if (notificationID.indexOf('_taburl') !== -1) {
-        chrome.tabs.create({url: notifications[notificationID]});
-    }
-
-    if (notificationID.indexOf('_changelog') !== -1) {
-        var optionsUrl = chrome.extension.getURL('settings/index.html#openchangelog');
-        chrome.tabs.query({url: optionsUrl}, function(tabs) {
-            if (tabs.length) {
-                chrome.tabs.update(tabs[0].id, {active: true});
-            } else {
-                chrome.tabs.create({url: optionsUrl});
-            }
-        });
+chrome.notifications.onButtonClicked.addListener(function(notificationID, buttonIndex) {
+    if (notifications.hasOwnProperty(notificationID) && notifications[notificationID]['buttons'].hasOwnProperty(buttonIndex)) {
+        notifications[notificationID]['buttons'][buttonIndex]['callback']();
     }
 });
-/*
-    A function to easily create a notification
 
-    @param title - Notification title
-    @param message - Notification message
-    @param messageType - This is used to determine what kind of notification that is for buttons when onButtonClicked triggers
-    @param buttons - Object containing Chrome notification buttons
-    @param buttonUrl - What page should it open when clicked on the button (currently only one URL for all buttons)
- */
-function createNotification(title, message, messageType, buttons, buttonUrl) {
-    notificationID++;
-    notifications[notificationID + '_' + messageType] = buttonUrl;
+function createNotification(title, message, buttons) {
+    notifications[notificationID] = {
+        title: title,
+        message: message,
+        buttons: buttons
+    };
+
+    // Get buttons array with necessary data only
     var tempButtons = [];
-    if (buttons !== null) {
-        tempButtons.push(buttons);
+
+    if (buttons !== undefined && buttons !== null) {
+        for (var i = 0; i < buttons.length; i++) {
+            if (buttons[i].hasOwnProperty('title')) {
+                tempButtons.push({title: buttons[i]['title']});
+            }
+        }
     }
 
-    chrome.notifications.create(notificationID + '_' + messageType, {
+    chrome.notifications.create(notificationID.toString(), {
         type: 'basic',
         iconUrl: '../../icons/128x128.png',
         title: title,
         message: message,
         buttons: tempButtons
-    }, function() {});
+    });
+
+    notificationID++;
 }
 
 function checkNewMatches(ajaxResponse, appID) {
@@ -376,7 +373,7 @@ function checkNewMatches(ajaxResponse, appID) {
             if (chrome.runtime.lastError) {
                 if ((+new Date() - lastTimeStorageFail) > (1000 * 60 * 60)) {
                     lastTimeStorageFail = +new Date();
-                    createNotification('Storage failure', 'Please check if the drive on which this extension is installed on is not full', 'regular', null, false);
+                    createNotification('Storage failure', 'Please check if the drive on which this extension is installed on is not full');
                 }
 
                 return;
@@ -391,11 +388,14 @@ function checkNewMatches(ajaxResponse, appID) {
                     (value.tournamentName + '\nMatch begins ' + value.timeFromNow);
 
                 createNotification(
-                    'A new ' + (appID == 730 ? 'CS:GO' : 'DOTA2') + ' match has been added!',
-                    msg,
-                    'taburl',
-                    {title: 'Open match page'},
-                    baseURLs[appID] + 'match?m=' + value.matchID
+                    'A new ' + (appID == 730 ? 'CS:GO' : 'DOTA2') + ' match has been added!', msg, [
+                        {
+                            title: 'Open match page',
+                            callback: function() {
+                                openTabIfNotExist((baseURLs[appID] + 'match?m=' + value.matchID), true);
+                            }
+                        }
+                    ]
                 );
             });
         }
@@ -436,9 +436,13 @@ function checkForNewTradeOffers(data, appID) {
                         createNotification(
                             'Trade update on ' + (appID == 730 ? 'CS:GO Lounge' : 'DOTA2 Lounge'),
                             notifyAmount == 1 ? 'You have 1 new comment on your trade #' + tradeID : 'You have ' + notifyAmount + ' new comments on your trade # ' + tradeID,
-                            'taburl',
-                            {title: 'Open trade page'},
-                            tradeURL
+                            [{
+                                title: 'Open trade page',
+                                callback: function() {
+                                    console.log('ebin callback');
+                                    openTabIfNotExist(tradeURL, true);
+                                }
+                            }]
                         );
                     }
                 });
@@ -464,9 +468,12 @@ function checkForNewTradeOffers(data, appID) {
                         createNotification(
                             'Trade update for your offer on ' + (appID == 730 ? 'CS:GO Lounge' : 'DOTA2 Lounge'),
                             'A user has replied to your offer',
-                            'taburl',
-                            {title: 'Open offer page'},
-                            offerURL
+                            [{
+                                title: 'Open offer page',
+                                callback: function() {
+                                    openTabIfNotExist(offerURL, true);
+                                }
+                            }]
                         );
                     }
                 });
@@ -622,7 +629,7 @@ function checkForExpiredItems(appID) {
         doc.body.innerHTML = this.responseText;
         var items = $(doc).find('.item.Warning');
         if (items.length) {
-            createNotification('Items expiring soon', 'There are ' + items.length + ' items on ' + (appID == 730 ? 'CS:GO Lounge' : 'DOTA2 Lounge') + ' about to expire.\nRequest them back if you don\'t want to lose them.', 'regular', null, false);
+            createNotification('Items expiring soon', 'There are ' + items.length + ' items on ' + (appID == 730 ? 'CS:GO Lounge' : 'DOTA2 Lounge') + ' about to expire.\nRequest them back if you don\'t want to lose them.');
         }
     });
 }
@@ -779,9 +786,12 @@ chrome.runtime.onInstalled.addListener(function(details) {
             createNotification(
                 'LoungeDestroyer ' + thisVersion + ' update',
                 'LoungeDestroyer has updated to ' + thisVersion + ' version, bringing bug fixes and possibly new stuff. You can read about the changes by pressing button bellow',
-                'changelog',
-                {title: 'Open changelog'},
-                ''
+                [{
+                    title: 'Open changelog',
+                    callback: function() {
+                        openTabIfNotExist(chrome.extension.getURL('settings/index.html#openchangelog'), true);
+                    }
+                }]
             );
             // Migration forcing setting change for users that have cached item list and hover only market prices
             if(details.previousVersion == '0.8.3.0' && thisVersion == '0.8.3.1') {
