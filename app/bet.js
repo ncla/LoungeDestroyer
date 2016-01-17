@@ -63,7 +63,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
         if (autoBetData.action.disableAuto === true || autoBetData.action.disableAuto === false) {
             console.log('AUTOBET :: Successful');
             $(document).ready(function() {
-                var delay = (betStatus.type === 'autoAccept' ? 15 : 0);
+                var delay = (betStatus.type === 'autoAccept' ? 30 : 0);
                 setTimeout(function() {
                     if ($ldContainer.is(":visible")) {
                         $ldContainer.fadeOut(350, function() {

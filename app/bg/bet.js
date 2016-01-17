@@ -473,12 +473,16 @@ function handleQueue(data, game) {
     console.log('AUTOACCEPT :: gameid', game);
     // Check if the trade offer link we are receiving does not match the last one
     if (data.offer !== bet[game].lastOffer) {
-        if (LoungeUser.userSettings.notifyTradeOffer == '1') {
+        if (LoungeUser.userSettings.notifyTradeOffer === '1') {
             createNotification('Queue trade offer received',
                 (['CSGO', 'Dota2'])[game] + 'Lounge has sent you a trade offer',
-                'taburl',
-                {title: 'Open trade offer'},
-                data.offer);
+                [{
+                    title: 'Open trade offer',
+                    callback: function() {
+                        openTabIfNotExist(data.offer, true);
+                    }
+                }]
+            );
         }
 
         if (['0', '2'].indexOf(LoungeUser.userSettings.enableAuto) === -1) {
@@ -550,6 +554,17 @@ function handleQueue(data, game) {
 
                             console.log('AUTOACCEPT :: Error accepting trade', jqXHR.status, textStatus);
                             bet[game].lastError = 'There was an error when accepting trade offer, HTTP Status code #' + jqXHR.status + '.';
+
+                            createNotification(
+                                'Error accepting trade offer',
+                                'LoungeDestroyer encountered a Steam error when accepting trade offer. Try to accept the trade offer manually.',
+                                [{
+                                    title: 'Open trade offer',
+                                    callback: function() {
+                                        openTabIfNotExist(data.offer, true);
+                                    }
+                                }]
+                            );
 
                             try {
                                 data = $.parseJSON(jqXHR.responseText);
