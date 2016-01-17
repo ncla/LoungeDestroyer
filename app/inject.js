@@ -29,8 +29,6 @@ var marketPriceListUpdatedEpoch;
 var bettingItemListUpdatedEpoch;
 var useCachedPricesOnly = true;
 
-var $ldContainer;
-
 chrome.storage.local.get(['marketPriceList', 'currencyConversionRates', 'themes', 'matchInfoCachev2', 'lastAutoAccept',
     'blacklistedItemList', 'csglBettingValues', 'userSettings', 'marketPriceListUpdatedEpoch', 'bettingItemListUpdatedEpoch'], function(result) {
     blacklistedItemList = result.blacklistedItemList || {};
@@ -517,50 +515,6 @@ $(document).ready(function() {
         childList: true,
         subtree: true
     });
-
-    $ldContainer = $('<div class="destroyer auto-info hidden">' +
-        '<p class="ld-autobet-info">Auto-betting</span> items on match <a class="match-link"></a>. ' +
-        '<span class="type capitalize">Betting</span> for the <span class="num-tries">0th</span> time.</p>' +
-
-        '<p class="ld-autoreturn-info">Auto-returning</span> items for the <span class="num-tries">0th</span> time.</p>' +
-
-        '<p class="ld-autofreeze-info">Auto-freezing</span> items for the <span class="num-tries">0th</span> time.</p>' +
-
-        '<p class="ld-autoaccept-info">Auto-accepting</span> trade offer.</p>' +
-
-        '<button class="red ld-disable-auto">Disable</button>' +
-
-        '<p class="destroyer error-title">Last message (<span class="destroyer time-since">0s</span>):</p><p class="destroyer error-text"></p>' +
-
-        '<label class="ld-autobetreturn-label">Seconds between retries:</label><input id="bet-time" type="number" min="2" max="60" step="1">' +
-        '<label class="ld-autoaccept-label">Delay before accepting:</label><input id="accept-time" type="number" min="0" max="60" step="1">' +
-
-        '<hr><p class="support">Support LoungeDestroyer development <br/><b style="color: red;">by donating</b></p> <a href="https://www.patreon.com/loungedestroyer" target="_blank" class="patreon"><button>Patreon support</button></a>' +
-        '<a href="https://steamcommunity.com/tradeoffer/new/?partner=106750833&token=eYnKX2Un" target="_blank" class="steam"><button>Steam donations</button></a></div>');
-
-    $ldContainer.find('button.ld-disable-auto').click(function() {
-        chrome.runtime.sendMessage({autoBet: 'disable'});
-        $('.destroyer.auto-info').addClass('hidden');
-    });
-
-    $ldContainer.find('#bet-time').change(function() {
-        var newVal = Math.max(2, this.valueAsNumber);
-        if (newVal) {
-            this.valueAsNumber = newVal;
-            LoungeUser.saveSetting('autoDelay', newVal);
-        }
-    });
-
-    $ldContainer.find('#accept-time').change(function() {
-        LoungeUser.saveSetting('acceptDelay', this.valueAsNumber);
-    });
-
-
-    $ldContainer.find('a.steam').click(function() {
-        return confirm('You are about to open a trade with LoungeDestroyer donation account. \n\nTHIS TRADE OFFER IS NOT RELATED TO CSGOLOUNGE.COM NOR DOTA2LOUNGE.COM IN ANY WAY. \n\nAre you sure?');
-    });
-
-    $('body').append($ldContainer);
 
     // TODO: Check if this is relevant
     document.addEventListener('click', function(ev) {

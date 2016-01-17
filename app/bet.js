@@ -1,3 +1,11 @@
+var $ldContainer;
+var $ldContainerMatchLink;
+var $ldContainerNumTries;
+var $ldContainerErrText;
+var $ldContainerTimeSince;
+
+var timeoutStore;
+
 var betStatus = {
     enabled: false,
 
@@ -14,7 +22,7 @@ chrome.runtime.sendMessage({autoBet: 'status'}, function(data) {
     if (betStatus.autoBetting === true) {
         $(document).ready(function() {
             updateAutobetInfo();
-            $('.destroyer.auto-info').removeClass('hidden');
+            $ldContainer.removeClass('hidden');
         });
     } else {
         if (document.URL.indexOf('/mybets') !== -1) {
@@ -57,9 +65,8 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
             $(document).ready(function() {
                 var delay = (betStatus.type === 'autoAccept' ? 15 : 0);
                 setTimeout(function() {
-                    $autoBox = $('.destroyer.auto-info');
-                    if ($autoBox.is(":visible")) {
-                        $autoBox.fadeOut(350, function() {
+                    if ($ldContainer.is(":visible")) {
+                        $ldContainer.fadeOut(350, function() {
                             $(this).addClass('hidden');
                         });
                     }
@@ -90,7 +97,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     // TODO: If not betting and message does not have action disableAuto
 
     if (betStatus.autoBetting === true) {
-        $('.destroyer.auto-info').removeClass('hidden');
+        $ldContainer.removeClass('hidden');
     }
 
 
@@ -107,19 +114,20 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
  * Updates the auto-betting box with information
  */
 function updateAutobetInfo() {
-    //betStatus.autoBetting = true;
+    if (!document.hidden) {
 
-    $('.destroyer.auto-info').removeClass('ld-autobet ld-autoreturn ld-autofreeze ld-autoaccept').addClass('ld-' + betStatus.type.toLowerCase());
+        $ldContainer.removeClass('ld-autobet ld-autoreturn ld-autofreeze ld-autoaccept').addClass('ld-' + betStatus.type.toLowerCase());
 
-    var ordinalEnding = determineOrdinalEnding(betStatus.numTries);
+        var ordinalEnding = determineOrdinalEnding(betStatus.numTries);
 
-    if (betStatus.type === 'autoBet') {
-        $('.destroyer.auto-info .match-link').text(betStatus.matchNum).attr('href', 'match?m=' + betStatus.matchNum);
+        if (betStatus.type === 'autoBet') {
+            $ldContainerMatchLink.text(betStatus.matchNum).attr('href', 'match?m=' + betStatus.matchNum);
+        }
+
+        // Update info-box
+        $ldContainerNumTries.text((betStatus.numTries || 0) + ordinalEnding);
+        $ldContainerErrText.text(betStatus.lastError);
     }
-
-    // Update info-box
-    $('.destroyer.auto-info .num-tries').text((betStatus.numTries || 0) + ordinalEnding);
-    $('.destroyer.auto-info .error-text').text(betStatus.lastError);
 
     // Update timer
     (function timerLoop() {
@@ -134,13 +142,16 @@ function updateAutobetInfo() {
         }
 
         if (!betStatus.lastBetTime) {
-            setTimeout(timerLoop, 250);
+            setTimeout(timerLoop, 500);
             return;
         }
 
-        $('.destroyer.auto-info .time-since').text(((Date.now() - betTime) / 1000).toFixed(2) + 's');
+        if (!document.hidden) {
+            $ldContainerTimeSince.text(((Date.now() - betTime) / 1000).toFixed(2) + 's');
+        }
 
-        requestAnimationFrame(timerLoop);
+        clearTimeout(timeoutStore);
+        timeoutStore = setTimeout(timerLoop, 66);
     })();
 }
 
@@ -155,3 +166,59 @@ function determineOrdinalEnding(number) {
                     ordinalEnding === '3' ? 'rd' :
                         'th';
 }
+
+$(document).ready(function() {
+    $ldContainer = $('<div class="destroyer auto-info hidden">' +
+        '<p class="ld-autobet-info">Auto-betting</span> items on match <a class="match-link"></a>. ' +
+        '<span class="type capitalize">Betting</span> for the <span class="num-tries">0th</span> time.</p>' +
+
+        '<p class="ld-autoreturn-info">Auto-returning</span> items for the <span class="num-tries">0th</span> time.</p>' +
+
+        '<p class="ld-autofreeze-info">Auto-freezing</span> items for the <span class="num-tries">0th</span> time.</p>' +
+
+        '<p class="ld-autoaccept-info">Auto-accepting</span> trade offer.</p>' +
+
+        '<button class="red ld-disable-auto">Disable</button>' +
+
+        '<p class="destroyer error-title">Last message (<span class="destroyer time-since">0s</span>):</p><p class="destroyer error-text"></p>' +
+
+        '<label class="ld-autobetreturn-label">Seconds between retries:</label><input id="bet-time" type="number" min="2" max="60" step="1">' +
+        '<label class="ld-autoaccept-label">Delay before accepting:</label><input id="accept-time" type="number" min="0" max="60" step="1">' +
+
+        '<hr><p class="support">Support LoungeDestroyer development <br/><b style="color: red;">by donating</b></p> <a href="https://www.patreon.com/loungedestroyer" target="_blank" class="patreon"><button>Patreon support</button></a>' +
+        '<a href="https://steamcommunity.com/tradeoffer/new/?partner=106750833&token=eYnKX2Un" target="_blank" class="steam"><button>Steam donations</button></a></div>');
+
+    $ldContainer.find('button.ld-disable-auto').click(function() {
+        chrome.runtime.sendMessage({autoBet: 'disable'});
+        $('.destroyer.auto-info').addClass('hidden');
+    });
+
+    $ldContainer.find('#bet-time').change(function() {
+        var newVal = Math.max(2, this.valueAsNumber);
+        if (newVal) {
+            this.valueAsNumber = newVal;
+            LoungeUser.saveSetting('autoDelay', newVal);
+        }
+    });
+
+    $ldContainer.find('#accept-time').change(function() {
+        LoungeUser.saveSetting('acceptDelay', this.valueAsNumber);
+    });
+
+
+    $ldContainer.find('a.steam').click(function() {
+        return confirm('You are about to open a trade with LoungeDestroyer donation account. \n\nTHIS TRADE OFFER IS NOT RELATED TO CSGOLOUNGE.COM NOR DOTA2LOUNGE.COM IN ANY WAY. \n\nAre you sure?');
+    });
+
+    $('body').append($ldContainer);
+
+    $ldContainerMatchLink = $('.destroyer.auto-info .match-link');
+    $ldContainerNumTries = $('.destroyer.auto-info .num-tries');
+    $ldContainerErrText = $('.destroyer.auto-info .error-text');
+    $ldContainerTimeSince = $('.destroyer.auto-info .time-since');
+});
+
+window.onfocus = function() {
+    console.log('BET :: Updating auto-betting box');
+    updateAutobetInfo();
+};
