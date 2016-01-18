@@ -211,7 +211,8 @@ http://codepen.io/larrygeams/pen/nhgze
 .destroyer.auto-info label.ld-autobetreturn-label,
 .destroyer.auto-info label.ld-autoaccept-label,
 .destroyer.auto-info.ld-autofreeze .ld-disable-auto,
-.destroyer.auto-info.ld-autofreeze label {
+.destroyer.auto-info.ld-autofreeze label,
+.destroyer.auto-info .ld-accept-warning {
     display: none;
 }
 
@@ -234,6 +235,13 @@ http://codepen.io/larrygeams/pen/nhgze
 .destroyer.auto-info .error-text { min-height: 30px; padding-left: 10px; white-space: pre-wrap; }
 .destroyer.auto-info label { margin-right: 10px; }
 .destroyer.auto-info input { margin-top: 10px; }
+.destroyer.auto-info.ld-accept-issue.ld-autoaccept .ld-accept-warning { display: inline-block; margin-top: 6px; }
+
+.ld-accept-warning span.warning-symbol {
+    font-weight: bold;
+    color: red;
+    padding-right: 3px;
+}
 
 /* Queue */
 .destroyer.queue {

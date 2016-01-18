@@ -124,6 +124,10 @@ function updateAutobetInfo() {
             $ldContainerMatchLink.text(betStatus.matchNum).attr('href', 'match?m=' + betStatus.matchNum);
         }
 
+        if (betStatus.type === 'autoAccept') {
+            determineIfShowAcceptWarning();
+        }
+
         // Update info-box
         $ldContainerNumTries.text((betStatus.numTries || 0) + ordinalEnding);
         $ldContainerErrText.text(betStatus.lastError);
@@ -167,6 +171,14 @@ function determineOrdinalEnding(number) {
                         'th';
 }
 
+function determineIfShowAcceptWarning() {
+    if (parseFloat(LoungeUser.userSettings.acceptDelayv2) < 10) {
+        $ldContainer.addClass('ld-accept-issue');
+    } else {
+        $ldContainer.removeClass('ld-accept-issue');
+    }
+}
+
 $(document).ready(function() {
     $ldContainer = $('<div class="destroyer auto-info hidden">' +
         '<p class="ld-autobet-info">Auto-betting</span> items on match <a class="match-link"></a>. ' +
@@ -184,6 +196,7 @@ $(document).ready(function() {
 
         '<label class="ld-autobetreturn-label">Seconds between retries:</label><input id="bet-time" type="number" min="2" max="60" step="1">' +
         '<label class="ld-autoaccept-label">Delay before accepting:</label><input id="accept-time" type="number" min="0" max="60" step="1">' +
+        '<p class="ld-accept-warning"><span class="warning-symbol">!</span>Delay less than 10 seconds may cause issues accepting trade offers.</p>' +
 
         '<hr><p class="support">Support LoungeDestroyer development <br/><b style="color: red;">by donating</b></p> <a href="https://www.patreon.com/loungedestroyer" target="_blank" class="patreon"><button>Patreon support</button></a>' +
         '<a href="https://steamcommunity.com/tradeoffer/new/?partner=106750833&token=eYnKX2Un" target="_blank" class="steam"><button>Steam donations</button></a></div>');
@@ -203,6 +216,7 @@ $(document).ready(function() {
 
     $ldContainer.find('#accept-time').change(function() {
         LoungeUser.saveSetting('acceptDelay', this.valueAsNumber);
+        determineIfShowAcceptWarning();
     });
 
 

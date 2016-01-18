@@ -503,11 +503,10 @@ function handleQueue(data, game) {
                 }
 
                 bet[game].acceptStart = Date.now();
-                var delay = LoungeUser.userSettings.acceptDelay;
+                var delay = (isNaN(parseInt(LoungeUser.userSettings.acceptDelayv2)) === false ? parseInt(LoungeUser.userSettings.acceptDelayv2) : 10);
+
                 bet[game].lastError = (delay == 0 ? 'Accepting trade offer instantly' : 'Accepting trade offer in ' + delay + ' seconds');
                 sendMessageToContentScript({autoBet: bet[game]}, -1 - game);
-
-                var acceptDelay = (isNaN(parseInt(LoungeUser.userSettings.acceptDelay)) ? parseInt(LoungeUser.userSettings.acceptDelay) : 10);
 
                 bet[game].acceptLoop = setTimeout(function() {
 
@@ -584,7 +583,7 @@ function handleQueue(data, game) {
                             disableAutoAccept(game, false);
                         }
                     });
-                }, acceptDelay);
+                }, (delay * 1000));
             });
         }
         // Store this trade offer within queue object

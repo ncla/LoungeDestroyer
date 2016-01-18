@@ -459,7 +459,7 @@ function init() {
         }
 
         $ldContainer.find('#bet-time').val(LoungeUser.userSettings.autoDelay);
-        $ldContainer.find('#accept-time').val(LoungeUser.userSettings.acceptDelay);
+        $ldContainer.find('#accept-time').val(LoungeUser.userSettings.acceptDelayv2);
 
         if (LoungeUser.userSettings.showExtraMatchInfo === '2') {
             $('.matchmain').each(function(i, v) {

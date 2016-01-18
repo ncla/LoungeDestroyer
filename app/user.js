@@ -27,7 +27,7 @@ User.prototype.defaultSettings =
     notifyTradeOffer: '1',
     currentTheme: '',
     autoBump: '0',
-    acceptDelay: 10,
+    acceptDelayv2: 10,
     changeTimeToLocal: '1',
     timezone: 'auto',
     americanosTime: '0',
