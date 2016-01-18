@@ -97,7 +97,9 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     // TODO: If not betting and message does not have action disableAuto
 
     if (betStatus.autoBetting === true) {
-        $ldContainer.removeClass('hidden');
+        $(document).ready(function() {
+            $ldContainer.removeClass('hidden');
+        });
     }
 
 
@@ -116,12 +118,16 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 function updateAutobetInfo() {
     if (!document.hidden) {
 
-        $ldContainer.removeClass('ld-autobet ld-autoreturn ld-autofreeze ld-autoaccept').addClass('ld-' + betStatus.type.toLowerCase());
+        $(document).ready(function() {
+            $ldContainer.removeClass('ld-autobet ld-autoreturn ld-autofreeze ld-autoaccept').addClass('ld-' + betStatus.type.toLowerCase());
+        });
 
         var ordinalEnding = determineOrdinalEnding(betStatus.numTries);
 
         if (betStatus.type === 'autoBet') {
-            $ldContainerMatchLink.text(betStatus.matchNum).attr('href', 'match?m=' + betStatus.matchNum);
+            $(document).ready(function() {
+                $ldContainerMatchLink.text(betStatus.matchNum).attr('href', 'match?m=' + betStatus.matchNum);
+            });
         }
 
         if (betStatus.type === 'autoAccept') {
@@ -129,8 +135,10 @@ function updateAutobetInfo() {
         }
 
         // Update info-box
-        $ldContainerNumTries.text((betStatus.numTries || 0) + ordinalEnding);
-        $ldContainerErrText.text(betStatus.lastError);
+        $(document).ready(function() {
+            $ldContainerNumTries.text((betStatus.numTries || 0) + ordinalEnding);
+            $ldContainerErrText.text(betStatus.lastError);
+        });
     }
 
     // Update timer
@@ -151,7 +159,9 @@ function updateAutobetInfo() {
         }
 
         if (!document.hidden) {
-            $ldContainerTimeSince.text(((Date.now() - betTime) / 1000).toFixed(2) + 's');
+            $(document).ready(function() {
+                $ldContainerTimeSince.text(((Date.now() - betTime) / 1000).toFixed(2) + 's');
+            });
         }
 
         clearTimeout(timeoutStore);
@@ -172,11 +182,13 @@ function determineOrdinalEnding(number) {
 }
 
 function determineIfShowAcceptWarning() {
-    if (parseFloat(LoungeUser.userSettings.acceptDelayv2) < 10) {
-        $ldContainer.addClass('ld-accept-issue');
-    } else {
-        $ldContainer.removeClass('ld-accept-issue');
-    }
+    $(document).ready(function() {
+        if (parseFloat(LoungeUser.userSettings.acceptDelayv2) < 10) {
+            $ldContainer.addClass('ld-accept-issue');
+        } else {
+            $ldContainer.removeClass('ld-accept-issue');
+        }
+    });
 }
 
 $(document).ready(function() {
@@ -215,7 +227,7 @@ $(document).ready(function() {
     });
 
     $ldContainer.find('#accept-time').change(function() {
-        LoungeUser.saveSetting('acceptDelay', this.valueAsNumber);
+        LoungeUser.saveSetting('acceptDelayv2', this.valueAsNumber);
         determineIfShowAcceptWarning();
     });
 

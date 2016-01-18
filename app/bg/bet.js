@@ -549,7 +549,7 @@ function handleQueue(data, game) {
                             disableAutoAccept(game, true);
                         },
                         error: function(jqXHR, textStatus) {
-                            var data;
+                            var jsonData;
 
                             console.log('AUTOACCEPT :: Error accepting trade', jqXHR.status, textStatus);
                             bet[game].lastError = 'There was an error when accepting trade offer, HTTP Status code #' + jqXHR.status + '.';
@@ -566,13 +566,13 @@ function handleQueue(data, game) {
                             );
 
                             try {
-                                data = $.parseJSON(jqXHR.responseText);
+                                jsonData = $.parseJSON(jqXHR.responseText);
                             } catch (e) {
                                 console.error(e);
                             }
 
-                            if (data && data.strError) {
-                                bet[game].lastError += ' ' + data.strError;
+                            if (jsonData && jsonData.strError) {
+                                bet[game].lastError += ' ' + jsonData.strError;
                             }
 
                             // 403 status code gets returned if you are logged out
