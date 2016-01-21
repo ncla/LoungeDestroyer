@@ -680,6 +680,11 @@ Inventory.prototype.removeBackpackElements = function() {
  Originally created by /u/ekim43, code cleaned up by us
  */
 function addInventoryStatistics(targetItems, targetBackpack, groupName) {
+    // TODO: Not really liking how settings are within the function
+    if (LoungeUser.userSettings.showInventoryStats === '0') {
+        return;
+    }
+
     if (!targetItems) {
         targetItems = targetBackpack = $('#backpack');
     }
@@ -747,9 +752,12 @@ function addInventoryStatistics(targetItems, targetBackpack, groupName) {
             '<span>Large bet: ' + convertPrice(((LoungeUser.userSettings.largeBetPercentage / 100) * total), true) + '</span>' +
             '</div>' +
             '</div>');
-        $.each(itemValues, function(i, v) {
-            $('#rarityValues').append('<div class="rarityContainer"><div><span class="' + i + '">' + capitaliseFirstLetter(i) + '</span>: ' + convertPrice(v, true) + '</div></div>');
-        });
+
+        if (LoungeUser.userSettings.showInventoryStats === '1') {
+            $.each(itemValues, function(i, v) {
+                $('#rarityValues').append('<div class="rarityContainer"><div><span class="' + i + '">' + capitaliseFirstLetter(i) + '</span>: ' + convertPrice(v, true) + '</div></div>');
+            });
+        }
     } else {
         $(targetBackpack).prepend('<div class="inventoryStatisticsBox">' +
             '<div id="totalInvValue">No items ' + groupString + 'to add statistics for.</div></div>');

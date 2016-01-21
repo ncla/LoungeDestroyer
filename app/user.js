@@ -39,6 +39,7 @@ User.prototype.defaultSettings =
     displayCsgoWeaponQuality: '1',
     matchInformation: '1',
 
+    showInventoryStats: '1',
     inventoryStatisticsGroup: {730: ['1'], 570: ['1']},
     smallBetPercentage: '5',
     mediumBetPercentage: '10',
