@@ -458,8 +458,8 @@ function init() {
             });
         }
 
-        if (document.URL.indexOf('/search') !== -1) {
-            //disable post on /search input field
+        if (document.URL.indexOf('/search') !== -1 || document.URL.indexOf('/addtrade') !== -1) {
+            //disable post on /search and /addtrade input fields
             $('#itemfilter').keypress(function(e) {
                 if (e.which === 13) { 
                     e.preventDefault();
