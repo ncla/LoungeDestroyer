@@ -616,7 +616,8 @@ function updateCsgoloungeItemValues(callback) {
         error: function(error) {
             console.log('Error getting betting values from API', error);
             bettingItemListUpdatedEpoch = currentTimestamp;
-        }
+        },
+        cache: false
     });
 }
 

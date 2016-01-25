@@ -206,7 +206,8 @@ navAnchor.click( function(e) {
                         $('.preloader.loading', $betItems).fadeOut(function() {
                             $('.error-loading-bet-list').fadeIn();
                         });
-                    }
+                    },
+                    cache: false
                 });
             });
 		}
