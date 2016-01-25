@@ -458,12 +458,12 @@ function init() {
             });
         }
 
-		if (document.URL.indexOf('/search') != -1) {
-			//disable post on /search input field
-			$('#itemfilter').keypress(function(e){
-				if ( e.which == 13 ) e.preventDefault();
-			});
-		}
+        if (document.URL.indexOf('/search') != -1) {
+            //disable post on /search input field
+            $('#itemfilter').keypress(function(e){
+                if ( e.which == 13 ) e.preventDefault();
+            });
+        }
 
         $ldContainer.find('#bet-time').val(LoungeUser.userSettings.autoDelay);
         $ldContainer.find('#accept-time').val(LoungeUser.userSettings.acceptDelayv2);
