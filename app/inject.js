@@ -458,10 +458,12 @@ function init() {
             });
         }
 
-        if (document.URL.indexOf('/search') != -1) {
+        if (document.URL.indexOf('/search') !== -1) {
             //disable post on /search input field
-            $('#itemfilter').keypress(function(e){
-                if ( e.which == 13 ) e.preventDefault();
+            $('#itemfilter').keypress(function(e) {
+                if (e.which === 13) { 
+                    e.preventDefault();
+                }
             });
         }
 
