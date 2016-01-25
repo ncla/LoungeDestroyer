@@ -110,8 +110,27 @@ navAnchor.click( function(e) {
 
                 $.ajax('http://csgolounge.com/api/schema.php', {
                     type: 'GET',
+                    dataType: 'text',
                     success: function(data) {
                         console.time('Parsing CSGL item list');
+
+                        // Sometimes the response is `false` and obviously that isn't JSON parsable
+                        try {
+                            data = $.parseJSON(data);
+                        } catch (e) {
+                            console.error(e);
+
+                            $('.preloader.loading', $betItems).fadeOut(function() {
+                                $('.error-loading-bet-list').fadeIn();
+                            });
+
+                            data = false;
+                        }
+
+                        if (data === false) {
+                            return;
+                        }
+
 
                         var htmlToAppend = '';
 

@@ -296,7 +296,8 @@ Item.prototype.fetchLoungeValueFromAPI = function(success, error) {
             if (!itemFound) {
                 error(_this.itemName + ' was not found in CSGOLounge.com database');
             }
-        }
+        },
+        cache: false
     });
     return this;
 };
