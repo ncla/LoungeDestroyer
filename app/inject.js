@@ -722,8 +722,12 @@ var itemObs = new MutationObserver(function(records) {
             initiateItemObjectForElementList($('#ajaxCont.full .oitm'), true);
 
             var betHistoryColSett = LoungeUser.userSettings.betHistoryTotalColumn;
+            var currentDate       = null;
+            var totalByDate       = 0;
+            var format            = 'YYYY-MM-DD';
             if(['1', '2'].indexOf(betHistoryColSett) !== -1) {
-                $('table tbody tr:visible').each(function(i, v) {
+                var $table = $('table tbody tr:visible');
+                $table.each(function(i, v) {
                     var total = 0;
 
                     // Won items
@@ -740,13 +744,7 @@ var itemObs = new MutationObserver(function(records) {
                         });
                     }
 
-                    if(total > 0) {
-                        text = '+ ' + convertPrice(total, true);
-                    } else if(total < 0) {
-                        text = '- ' + convertPrice(Math.abs(total), true);
-                    } else {
-                        text = convertPrice(0, true);
-                    }
+                    var text = convertTextPrice(total);
 
                     var newTd = $('<td></td>').text(text);
 
@@ -756,7 +754,24 @@ var itemObs = new MutationObserver(function(records) {
                             'both enabled, then it might be possible that the item does not have a betting/market value."> (?)</small>');
                     }
 
+
                     $('td:eq(5)', v).after(newTd);
+
+                    // Add total profit line
+                    var date   = moment($('td:last-child', v).text());
+
+                    if (currentDate == null || (currentDate.format(format) == date.format(format))) {
+                        totalByDate += total;
+                    } else {
+                        $(v).before(buildTotalLine(currentDate.format(format), totalByDate));
+                        totalByDate = total;
+                    }
+
+                    if ($table.length == i+1) {
+                        $(v).after(buildTotalLine(currentDate.format(format), totalByDate));
+                    }
+
+                    currentDate = date;
                 });
 
                 // Adjust the column width because we added another column
@@ -783,3 +798,24 @@ function convertLoungeTime(loungeTimeString) {
 
     return loungeTimeString;
 }
+
+function convertTextPrice(total) {
+    if(total > 0) {
+        return '+ ' + convertPrice(total, true);
+    } else if(total < 0) {
+        return '- ' + convertPrice(Math.abs(total), true);
+    } else {
+        return convertPrice(0, true);
+    }
+}
+
+function buildTotalLine(date, total) {
+    var textTotal = '<td colspan="2"></td>' +
+        '<td colspan="3">Total on ' + date + '</td>' +
+        '<td colspan="1"></td>' +
+        '<td class="' + (total < 0 ? 'lost' : 'won') + '">' + convertTextPrice(total) + '</td><td></td>';
+    var totalLine = $('<tr class="ld-total"></tr>').append(textTotal);
+
+    return totalLine;
+}
+
