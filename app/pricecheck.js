@@ -1,4 +1,5 @@
 var itemName = false;
+var priceIsLoading = false;
 
 // This is basically to get original item name from g_rgAssets variable, if all goes well the itemName should be appended
 // to the body element with attribute 'data-itemname-ld'
@@ -49,6 +50,10 @@ chrome.storage.local.get(['currencyConversionRates', 'ajaxCache', 'userSettings'
         }
 
         var successCallback = errorCallback = function(response) {
+            priceIsLoading = false;
+
+            $('#csglpricecheck').removeClass('btn_disabled');
+
             if (!isNaN(response)) {
                 alert(itemObj.itemName + ' is worth ' + convertPrice(response, true) + ' on CSGOLounge.com');
             } else {
@@ -57,6 +62,12 @@ chrome.storage.local.get(['currencyConversionRates', 'ajaxCache', 'userSettings'
         };
 
         $('#csglpricecheck').click(function() {
+            if (priceIsLoading) {
+                return false;
+            }
+
+            priceIsLoading = true;
+            $(this).addClass('btn_disabled');
             itemObj.fetchLoungeValueFromAPI(successCallback, errorCallback);
         });
     }, userSettings);
