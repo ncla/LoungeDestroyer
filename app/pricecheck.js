@@ -1,5 +1,6 @@
 var itemName = false;
 var priceIsLoading = false;
+var appID = parseInt(window.location.pathname.replace('/market/listings/', '')) || undefined;
 
 // This is basically to get original item name from g_rgAssets variable, if all goes well the itemName should be appended
 // to the body element with attribute 'data-itemname-ld'
@@ -12,18 +13,27 @@ function scriptInject() {
 
         if (assetProp.hasOwnProperty('market_hash_name')) {
             var marketHashName = assetProp.market_hash_name;
+            var contextId = assetProp.contextid || '';
             document.body.setAttribute('data-itemname-ld', marketHashName);
+            document.body.setAttribute('data-contextid-ld', contextId);
         }
     } catch (e) {
+        console.error(e);
     }
 }
 
-// Injecting script
-addJS_Node(null, null, scriptInject, null);
 // jscs: enable
 
 function getItemName() {
+    if (appID === 753) {
+        return $('div.market_listing_nav:eq(0) a:last-child').text() || false;
+    }
+
     return $('body').attr('data-itemname-ld') || $('div.market_listing_nav:eq(0) a:last-child').text() || false;
+}
+
+function getContextId() {
+    return $('body').attr('data-contextid-ld') || undefined;
 }
 
 var LoungeUser = new User();
@@ -32,43 +42,53 @@ chrome.storage.local.get(['currencyConversionRates', 'ajaxCache', 'userSettings'
     ajaxCache = result.ajaxCache || {};
     userSettings = result.userSettings || null;
     LoungeUser.loadUserSettings(function() {
-        var itemObj = new Item();
-        itemObj.itemName = getItemName();
-        if (itemObj.hasOwnProperty('itemName')) {
-            $('#largeiteminfo_item_actions').show().append('<span class="btn_small btn_grey_white_innerfade" id="csglpricecheck">' +
-            '<span>Check CSGOLounge.com item betting value</span>' +
-            '</span>');
+        $(document).ready(function() {
+            // Injecting script
+            addJS_Node(null, null, scriptInject, null);
 
-            if(LoungeUser.userSettings.opskins == '1') {
-                var item = new Item();
-                item.itemName = itemObj.itemName;
+            // TODO: Ugly, need a timeout because of the addJSNode and script timings
+            setTimeout(function() {
+                var itemObj = new Item();
+                itemObj.itemName = getItemName();
+                if (itemObj.itemName !== false) {
+                    if (appID === 730) {
+                        $('#largeiteminfo_item_actions').show().append('<span class="btn_small btn_grey_white_innerfade" id="csglpricecheck">' +
+                            '<span>Check CSGOLounge.com item betting value</span>' +
+                            '</span>');
+                    }
 
-                $('#largeiteminfo_item_actions').append('<a href="' + itemObj.generateOPSkinsURL() + '" class="btn_small btn_grey_white_innerfade" id="buyOnOpskins" target="_blank">' +
-                '<span>Buy on OPSKINS.com without 7 day trade ban <small title="This affiliate link is added by LoungeDestroyer and ' +
-                'supports the developers, you can remove this affiliate link in the settings if you wish."> (?)</small></span></a>');
-            }
-        }
+                    if(LoungeUser.userSettings.opskins === '1' && appID !== undefined && appIDcontextIDs.hasOwnProperty(appID)) {
+                        var item = new Item();
+                        item.itemName = itemObj.itemName;
 
-        var successCallback = errorCallback = function(response) {
-            priceIsLoading = false;
+                        $('#largeiteminfo_item_actions').show().append('<a href="' + itemObj.generateOPSkinsURL(appID, getContextId()) + '" class="btn_small btn_grey_white_innerfade" id="buyOnOpskins" target="_blank">' +
+                            '<span>Buy on OPSKINS.com <small title="This affiliate link is added by LoungeDestroyer and ' +
+                            'supports the developers, you can remove this affiliate link in the settings if you wish."> (?)</small></span></a>');
+                    }
+                }
 
-            $('#csglpricecheck').removeClass('btn_disabled');
+                var successCallback = errorCallback = function(response) {
+                    priceIsLoading = false;
 
-            if (!isNaN(response)) {
-                alert(itemObj.itemName + ' is worth ' + convertPrice(response, true) + ' on CSGOLounge.com');
-            } else {
-                alert(response);
-            }
-        };
+                    $('#csglpricecheck').removeClass('btn_disabled');
 
-        $('#csglpricecheck').click(function() {
-            if (priceIsLoading) {
-                return false;
-            }
+                    if (!isNaN(response)) {
+                        alert(itemObj.itemName + ' is worth ' + convertPrice(response, true) + ' on CSGOLounge.com');
+                    } else {
+                        alert(response);
+                    }
+                };
 
-            priceIsLoading = true;
-            $(this).addClass('btn_disabled');
-            itemObj.fetchLoungeValueFromAPI(successCallback, errorCallback);
+                $('#csglpricecheck').click(function() {
+                    if (priceIsLoading) {
+                        return false;
+                    }
+
+                    priceIsLoading = true;
+                    $(this).addClass('btn_disabled');
+                    itemObj.fetchLoungeValueFromAPI(successCallback, errorCallback);
+                });
+            }, 250);
         });
     }, userSettings);
 });

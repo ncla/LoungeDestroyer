@@ -159,7 +159,7 @@ navAnchor.click( function(e) {
                                 }
 
                                 var steamUrl = item.generateMarketURL(730);
-                                var opskinsUrl = item.generateOPSkinsURL();
+                                var opskinsUrl = item.generateOPSkinsURL(730);
                                 var bitskinsUrl = item.generateBitskinsURL();
 
                                 htmlToAppend += '<tr><th scope="row">' + v.name + '</th><td>' + bettingValStr + '</td> <td>' + marketPriceStr + '</td>' +

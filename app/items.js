@@ -8,6 +8,7 @@ var nonMarketItems = ['Dota Items', 'Any Offers', 'Any Knife', 'Knife', 'Gift', 
 var skinQualities = {'Factory New': 'FN', 'Minimal Wear': 'MW', 'Well-Worn': 'WW', 'Battle-Scarred': 'BS',
     'Field-Tested': 'FT', 'Common': 'C', 'Uncommon': 'UC', 'Rare': 'R', 'Mythical': 'M', 'Legendary': 'L',
     'Ancient': 'AN', 'Immortal': 'I', 'Arcana': 'AR'};
+var appIDcontextIDs = {730: 2, 440: 2, 570: 2, 295110: 1, 753: 6};
 
 var Item = function(item) {
     var _this = this;
@@ -347,15 +348,27 @@ Item.prototype.generateSteamStoreURL = function() {
     return 'https://store.steampowered.com/search/?term=' + encodeURI(this.itemName);
 };
 
-Item.prototype.generateOPSkinsURL = function() {
+/**
+ * Generates link to OPSkins market place
+ * @param appID int required
+ * @param contextId optional
+ * @returns {string} URL to OPSkins marketplace
+ */
+Item.prototype.generateOPSkinsURL = function(appID, contextId) {
     if (!(this instanceof Item)) {
         throw new TypeError('\'this\' must be instance of Item');
     }
 
-    var stattrak = (this.itemName.indexOf('StatTrak™ ') !== -1) ? 1 : 0;
+    appID = parseInt(appID);
 
-    return 'https://opskins.com/index.php?loc=shop_search&ref=destroyer&aid=91&search_item=' + encodeURI(this.itemName) +
-        '&min=&max=&StatTrak=' + stattrak + '&inline=&grade=&inline=&type=&inline=&sort=lh';
+    if (contextId === undefined) {
+        contextId = (appIDcontextIDs.hasOwnProperty(appID) ? appIDcontextIDs[appID] : undefined);
+    }
+
+    var appIDUrl = (appID !== undefined && contextId !== undefined && appIDcontextIDs.hasOwnProperty(appID)
+        ? ('&app=' + appID + '_' + appIDcontextIDs[appID]) : '');
+
+    return 'https://opskins.com/?loc=shop_search&ref=destroyer&aid=91' + appIDUrl + '&search_item=' + encodeURI(this.itemName) + '&sort=lh';
 };
 
 Item.prototype.generateBitskinsURL = function() {
@@ -442,9 +455,8 @@ Item.prototype.appendHoverElements = function() {
                 '<a href="' + _this.generateMarketSearchURL() + '" target="_blank">Market Search</a>' +
                 '<br/><br/><small><a class="refreshPriceMarket">Show Steam market price</a></small>');
 
-            if(appID === '730' && LoungeUser.userSettings.opskins === '1') {
-                var isStattrak = (_this.itemName.indexOf('StatTrak™ ') !== -1) ? 1 : 0;
-                $nameContainer.append('<br/><p class="opskins-aff"><a href="' + _this.generateOPSkinsURL() +'" target="_blank">Buy on OPSKINS.com</a>' +
+            if(LoungeUser.userSettings.opskins === '1') {
+                $nameContainer.append('<br/><p class="opskins-aff"><a href="' + _this.generateOPSkinsURL(appID) +'" target="_blank">Buy on OPSKINS.com</a>' +
                     '<small title="This affiliate link is added by LoungeDestroyer and supports the developers, you can remove this affiliate link in the settings if you wish."> (?)</small></p>');
             }
 

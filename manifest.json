@@ -70,7 +70,7 @@
         },
         {
             "matches": [
-                "*://steamcommunity.com/market/listings/730/*"
+                "*://steamcommunity.com/market/listings/*/*"
             ],
             "js": [
                 "node_modules/jquery/dist/jquery.min.js",
@@ -78,7 +78,8 @@
                 "app/user.js",
                 "app/items.js",
                 "app/pricecheck.js"
-            ]
+            ],
+            "run_at": "document_start"
         }
     ],
     "web_accessible_resources": ["icons/32x32.png"]
