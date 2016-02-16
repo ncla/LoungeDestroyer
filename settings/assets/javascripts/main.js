@@ -70,6 +70,7 @@ navAnchor.click( function(e) {
             $('.preloader.loading', $changelog).show();
 			$.ajax('https://api.github.com/repos/ncla/LoungeDestroyer/releases?per_page=15', {
 				type: 'GET',
+				dataType: 'json',
 				success: function(data) {
 					$.each(data, function(i, release) {
 						var releaseVersion = release.tag_name;
@@ -239,6 +240,7 @@ navAnchor.click( function(e) {
             $('#page-donate .preloader.loading').show();
 			$.ajax('https://api.ncla.me/destroyer/patreonlist', {
 				type: 'GET',
+                dataType: 'json',
 				success: function(data) {
 					if(data.length) {
 						//$('.patreon-list').removeClass('hidden');
@@ -376,55 +378,6 @@ var validators = {
 	// Validates a number
 	number:  function(str) {
 		return !isNaN(parseInt(str));
-	},
-
-	// Validates an image URL
-	image:  function(str, callback) {
-		// if the string isn't a valid URL, fail
-		if (!validators.url(str)) { callback(false); return; }
-
-		// load the website, make sure the MIME type is supported
-		$.ajax({
-			type: "GET",
-			url: str,
-			success:  function(data,ev,xmlhttp){
-				var mime = xmlhttp.getResponseHeader("content-type");
-
-				/* if you only want to support a few image types
-				var supported = ["image/png", "image/jpeg"];
-				if (supported.indexOf(mime) === -1) { callback(false;) }
-				*/
-
-				// if you want to support all image types
-				if (mime.indexOf("image/") !== 0) { callback(false); return; }
-				callback(true);
-			},
-			error:  function(){
-				callback(false);
-			}
-		});
-	},
-	// Validates a JSON URL
-	json:  function(str, callback) {
-		if (!validators.url(str)) { callback(false); return; }
-
-		// load the website, make sure the response can be parsed as JSON
-		$.ajax({
-			type: "GET",
-			url: str,
-			success:  function(data,ev,xmlhttp){
-				try {
-					var x = JSON.parse(xmlhttp.responseText);
-					callback(true);
-				} catch (e) {
-					// JSON failed to parse
-					callback(false);
-				}
-			},
-			error:  function(){
-				callback(false);
-			}
-		});
 	}
 };
  

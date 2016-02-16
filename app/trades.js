@@ -81,6 +81,7 @@ Trade.prototype.fetchTradeData = function(successCallback, errorCallback) {
 
     $.ajax({
         url: _this.generateTradeURL(appID),
+        dataType: 'html',
         type: 'GET',
         success: function(data) {
             var doc = document.implementation.createHTMLDocument('');
@@ -148,6 +149,7 @@ Trade.prototype.getExtraSteamData = function(profileId, successCallback, errorCa
 
     $.ajax({
         url: (window.location.protocol + '//steamcommunity.com/profiles/' + profileId + '?xml=1'),
+        dataType: 'xml',
         type: 'GET',
         success: function(data) {
             _this.steamUser.isPublicProfile = $(data).find('privacyState').text() !== 'private';

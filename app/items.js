@@ -206,6 +206,7 @@ Item.prototype.fetchSteamMarketPrice = function() {
     var ajaxOptions =  {
         url: _this.generateMarketSearchRender(),
         method: 'GET',
+        dataType: 'json',
         success: function(data) {
             if (data.success === true && data.total_count > 0 && data.results_html) {
                 var doc = document.implementation.createHTMLDocument('');
@@ -278,6 +279,7 @@ Item.prototype.fetchLoungeValueFromAPI = function(success, error) {
     $.ajax({
         url: 'http://csgolounge.com/api/schema.php',
         type: 'GET',
+        dataType: 'json',
         success: function(data) {
             var itemFound = false;
             $.each(data, function(itemID, item) {

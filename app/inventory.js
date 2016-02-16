@@ -66,6 +66,10 @@ Inventory.prototype.loadInventory = function() {
     var ajaxDetails = {
         url: theURL,
         type: _this.backpackAjaxData.method,
+        dataType: 'html',
+        headers: {
+            'Accept': '*/*'
+        },
         success: function(data) {
             // All inventory requests usually throw this string if the backpack loading was successful, or return nothing at all
             if ($(data).text().indexOf('Can\'t get items.') == -1 && data.length != 0) {

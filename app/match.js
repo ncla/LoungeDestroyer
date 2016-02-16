@@ -32,6 +32,7 @@ Match.prototype.fetchMatchPage = function(callback, game) {
     var _this = this;
     $.ajax({
         url: _this.generateMatchURL(appID),
+        dataType: 'html',
         type: 'GET',
         success: function(data) {
             callback(data);

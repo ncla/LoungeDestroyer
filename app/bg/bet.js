@@ -294,7 +294,8 @@ chrome.webRequest.onBeforeRequest.addListener(function requestListener(details) 
             ajaxObject['url'] = details.url;
             ajaxObject['type'] = details.method || 'GET';
             ajaxObject['timeout'] = 10000;
-            ajaxObject['headers'] = {};
+            ajaxObject['headers'] = {'Accept': '*/*'};
+            ajaxObject['dataType'] = 'text';
 
             if (details.type === 'xmlhttprequest') {
                 ajaxObject.headers['X-Requested-With'] = 'XMLHttpRequest';
@@ -516,6 +517,7 @@ function handleQueue(data, game) {
                     $.ajax({
                         url: 'https://steamcommunity.com/tradeoffer/' + id + '/accept',
                         type: 'POST',
+                        dataType: 'json',
                         data: {
                             sessionid: decodeURIComponent(details.value),
                             serverid: 1,
@@ -548,10 +550,10 @@ function handleQueue(data, game) {
 
                             disableAutoAccept(game, true);
                         },
-                        error: function(jqXHR, textStatus) {
+                        error: function(jqXHR, textStatus, errorThrown) {
                             var jsonData;
 
-                            console.log('AUTOACCEPT :: Error accepting trade', jqXHR.status, textStatus);
+                            console.log('AUTOACCEPT :: Error accepting trade', jqXHR.status, textStatus, errorThrown);
                             bet[game].lastError = 'There was an error when accepting trade offer, HTTP Status code #' + jqXHR.status + '.';
 
                             createNotification(
@@ -578,6 +580,10 @@ function handleQueue(data, game) {
                             // 403 status code gets returned if you are logged out
                             if (jqXHR.status === 403) {
                                 bet[game].lastError += ' Make sure that you are logged in on Steam with the same account you are using CS:GOLounge/DOTA2Lounge with.';
+                            }
+
+                            if (textStatus === 'parsererror') {
+                                bet[game].lastError += ' Unexpected response type received from Steam.';
                             }
 
                             disableAutoAccept(game, false);
@@ -621,6 +627,7 @@ function impregnateSteamSession(url, callback) {
 
         $.ajax({
             url: url,
+            dataType: 'html',
             type: 'GET'
         }).always(function() {
             getSteamSessionCookie(function(details) {

@@ -441,6 +441,7 @@ function init() {
 
                 $.ajax({
                     url: 'https://api.ncla.me/match/' + matchID[0],
+                    dataType: 'html',
                     success: function(data) {
                         $wrapper.html(data);
                     },
@@ -579,6 +580,10 @@ function newFreezeReturn(tries) {
         freezingItems = false;
         $.ajax({
             url: 'ajax/postToReturn.php',
+            dataType: 'text',
+            headers: {
+                'Accept': '*/*'
+            },
             success: function(data) {
                 // The reason why this should never happen is because we cancel out this request from bg/bet.js
                 console.error('Whoops, this shouldn\'t happen: ', data);
@@ -591,6 +596,10 @@ function newFreezeReturn(tries) {
         $.ajax({
             url: 'ajax/postToFreeze.php',
             data: $('#freeze').serialize(),
+            dataType: 'text',
+            headers: {
+                'Accept': '*/*'
+            },
             type: 'POST',
             success: function(data) {
                 betStatus.lastError = data;

@@ -89,6 +89,7 @@ Themes.prototype.updateThemes = function(callback) {
             $.ajax({
                 url: theme.url,
                 cache: false,
+                dataType: 'json',
                 success: function(data, textStatus, jqXHR) {
                     try {
                         var json = data;
@@ -159,6 +160,7 @@ Themes.prototype.updateThemes = function(callback) {
 
                 $.ajax({
                     url: themes[themeIndex].css,
+                    dataType: 'text',
                     cache: false,
                     success: function(data, textStatus, jqXHR) {
                         // If theme doesn't need to be importantified, in which case we will be disabling Lounge site stylesheets

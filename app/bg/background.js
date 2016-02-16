@@ -419,6 +419,7 @@ function checkForNewTradeOffers(data, appID) {
         var url = urlStart + 'mytrades';
         $.ajax({
             url: url,
+            dataType: 'html',
             type: 'GET',
             success: function(data) {
                 var doc = document.implementation.createHTMLDocument('');
@@ -454,6 +455,7 @@ function checkForNewTradeOffers(data, appID) {
         var url = urlStart + 'myoffers';
         $.ajax({
             url: url,
+            dataType: 'html',
             type: 'GET',
             success: function(data) {
                 var doc = document.implementation.createHTMLDocument('');
@@ -593,6 +595,7 @@ function updateCsgoloungeItemValues(callback) {
 
     $.ajax({
         url: 'http://csgolounge.com/api/schema.php',
+        dataType: 'json',
         success: function(response) {
             var valueStorage = {};
 
@@ -622,15 +625,31 @@ function updateCsgoloungeItemValues(callback) {
 }
 
 function checkForExpiredItems(appID) {
-    console.log('Checking for expired items on ' + appID);
-    var urlStart = baseURLs[appID];
+    if (!baseURLs.hasOwnProperty(appID)) {
+        throw new Error('Invalid appID specified');
+    }
 
-    get(urlStart + 'mybets', function() {
-        var doc = document.implementation.createHTMLDocument('');
-        doc.body.innerHTML = this.responseText;
-        var items = $(doc).find('.item.Warning');
-        if (items.length) {
-            createNotification('Items expiring soon', 'There are ' + items.length + ' items on ' + (appID == 730 ? 'CS:GO Lounge' : 'DOTA2 Lounge') + ' about to expire.\nRequest them back if you don\'t want to lose them.');
+    var url =  baseURLs[appID] + 'mybets';
+
+    console.log('Checking for expired items on ' + url);
+
+    $.ajax({
+        url: url,
+        dataType: 'html',
+        success: function(data) {
+            var doc = document.implementation.createHTMLDocument('');
+            doc.body.innerHTML = data;
+
+            var items = $(doc).find('.item.Warning');
+
+            if (items.length) {
+                createNotification('Items expiring soon', 'There are ' + items.length + ' items on ' + (appID == 730 ? 'CS:GO Lounge' : 'DOTA2 Lounge') + ' about to expire.\nRequest them back if you don\'t want to lose them.');
+            }
+
+            console.log('Expired items count on', appID, 'is', items.length);
+        },
+        error: function() {
+            console.error('Error fetching /mybets page for expired items');
         }
     });
 }
@@ -647,6 +666,7 @@ function autoBumpTrades() {
                 console.log('Checking ', url, ' for bumpable trades');
                 $.ajax({
                     url: url + 'mytrades',
+                    dataType: 'html',
                     success: function(resp, txt, xhr) {
                         var doc = document.implementation.createHTMLDocument('');
                         doc.body.innerHTML = resp;
@@ -671,6 +691,10 @@ function autoBumpTrades() {
                             $.ajax({
                                 type: 'POST',
                                 url: url + 'ajax/bumpTrade.php',
+                                dataType: 'text',
+                                headers: {
+                                    'Accept': '*/*'
+                                },
                                 data: data,
                                 success: function() {
                                     console.log('Bumped ', params, ' from ', url);
