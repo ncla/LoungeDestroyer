@@ -443,7 +443,7 @@ function init() {
                     url: 'https://api.ncla.me/match/' + matchID[0],
                     dataType: 'html',
                     success: function(data) {
-                        $wrapper.html(data);
+                        $wrapper.html(safeResponse.cleanDomString(data));
                     },
                     error: function() {
                         $wrapper.html('<div class="ld-match-info-error"><span class="ld-btn-icon"></span> LoungeDestroyer failed to load information for this match. <b>Try again later.</b></div>');

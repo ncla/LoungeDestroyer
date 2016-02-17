@@ -76,7 +76,7 @@ navAnchor.click( function(e) {
 						var releaseVersion = release.tag_name;
 						var releaseDate = moment(release.published_at).format('MMMM Do, YYYY').toLowerCase();
 						$changelogContent.append('<h3>' + releaseVersion + ' <small>released on ' + releaseDate + '</small></h3>');
-						$changelogContent.append(marked(release.body));
+						$changelogContent.append(safeResponse.cleanDomString(marked(release.body)));
 						$changelogContent.append('<br class="margin"/>');
 					});
 					$changelogContent.find('ul').addClass('list');
