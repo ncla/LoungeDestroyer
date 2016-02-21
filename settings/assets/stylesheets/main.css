@@ -1784,6 +1784,8 @@ code {
 
 #page-donate table thead tr th:nth-child(2), #page-donate table tbody tr td:nth-child(2) {
   text-align: left; }
+#page-donate .card:nth-child(2) {
+  min-height: 200px; }
 
 #page-bettableitems table {
   margin-top: 5px; }

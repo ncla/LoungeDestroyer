@@ -208,10 +208,7 @@ $(document).ready(function() {
 
         '<label class="ld-autobetreturn-label">Seconds between retries:</label><input id="bet-time" type="number" min="2" max="60" step="1">' +
         '<label class="ld-autoaccept-label">Delay before accepting:</label><input id="accept-time" type="number" min="0" max="60" step="1">' +
-        '<p class="ld-accept-warning"><span class="warning-symbol">!</span>Delay less than 10 seconds may cause issues accepting trade offers.</p>' +
-
-        '<hr><p class="support">Support LoungeDestroyer development <br/><b style="color: red;">by donating</b></p> <a href="https://www.patreon.com/loungedestroyer" target="_blank" class="patreon"><button>Patreon support</button></a>' +
-        '<a href="https://steamcommunity.com/tradeoffer/new/?partner=106750833&token=eYnKX2Un" target="_blank" class="steam"><button>Steam donations</button></a></div>');
+        '<p class="ld-accept-warning"><span class="warning-symbol">!</span>Delay less than 10 seconds may cause issues accepting trade offers.</p>');
 
     $ldContainer.find('button.ld-disable-auto').click(function() {
         chrome.runtime.sendMessage({autoBet: 'disable'});

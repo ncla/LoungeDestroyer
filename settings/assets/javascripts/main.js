@@ -233,42 +233,6 @@ navAnchor.click( function(e) {
 		}
 	}
 
-	if(page === 'page-donate') {
-		if(!patreonsRequested) {
-            patreonsRequested = true;
-
-            $('#page-donate .preloader.loading').show();
-			$.ajax('https://api.ncla.me/destroyer/patreonlist', {
-				type: 'GET',
-                dataType: 'json',
-				success: function(data) {
-					if(data.length) {
-						//$('.patreon-list').removeClass('hidden');
-						var placeHolder = $('.patreon-list .placeholder');
-						$.each(data, function(i, v) {
-							var newRow = $(placeHolder).clone().removeClass('hidden');
-							$(newRow).find('th:eq(0)').text(i + 1);
-							$(newRow).find('td:eq(0)').text(v.name);
-							$(newRow).find('td:eq(1)').text('$' + v.amount);
-							$('.patreon-list tbody').append($(newRow));
-						})
-					} else {
-						$('.no-patreons').removeClass('hidden');
-					}
-
-					$('.preloader.loading', $changelog).fadeOut(function() {
-						setTimeout(function() {
-							$('#page-donate .patreon-list').fadeIn();
-						}, 1000);
-					});
-                },
-				error: function(jqXHR) {
-					$('.not-loaded-patreons').removeClass('hidden');
-				}
-			});
-		}
-	}
-
 	if(page === 'page-themes') {
 		initSlider();
 	}
