@@ -355,21 +355,7 @@ function init() {
                 });
             }
 
-            var loadExtraOpt = LoungeUser.userSettings.tradeLoadExtra;
-
-            $('.tradepoll:not(.notavailable):visible').each(function(index, value) {
-                var trade = tradeObject(value);
-
-                if (loadExtraOpt === '3' || (loadExtraOpt === '4' && !isHomepage)) {
-                    if (isScrolledIntoView(trade.tradeElement)) {
-                        trade.getExtraData();
-                    }
-                }
-
-                if (loadExtraOpt === '2' || (loadExtraOpt === '1' && !isHomepage)) {
-                    trade.getExtraData();
-                }
-            });
+            initiateTradeObjectForElementList('body');
 
         }
 
@@ -658,21 +644,16 @@ $(document).on('mouseover', '.matchmain', function() {
     }
 });
 
-$(document).on('mouseover', '.tradepoll:not(.notavailable)', function() {
-    if (LoungeUser.userSettings.tradeLoadExtra === '5' || (isHomepage && ['1', '4'].indexOf(LoungeUser.userSettings.tradeLoadExtra) !== -1)) {
+$(document).on('mouseover', generateSelectorForTrades(), function() {
+    if(determineLoadingTradeInfoByType('hover') === true) {
         var trade = tradeObject(this);
         trade.getExtraData();
     }
 });
 
 $(window).scrolled(function() {
-    if (LoungeUser.userSettings.tradeLoadExtra === '3' || (LoungeUser.userSettings.tradeLoadExtra === '4' && !isHomepage)) {
-        $('.tradepoll:not(.notavailable)').each(function(index, value) {
-            var trade = tradeObject(value);
-            if (isScrolledIntoView(trade.tradeElement)) {
-                trade.getExtraData();
-            }
-        });
+    if (determineLoadingTradeInfoByType('view')) {
+        initiateTradeObjectForElementList();
     }
 
     if (LoungeUser.userSettings.showExtraMatchInfo === '2') {
@@ -696,37 +677,32 @@ $(window).scrolled(function() {
     }
 });
 
-// auto-magically add market prices to newly added items, currently only for trade list
 var itemObs = new MutationObserver(function(records) {
     for (var i = 0, j = records.length; i < j; ++i) {
-        if (records[i].addedNodes && records[i].addedNodes.length && records[i].target.id == 'tradelist') {
+        if (records[i].addedNodes && records[i].addedNodes.length && (records[i].target.id === 'tradelist' || records[i].target.id === 'matches')) {
             var hasTradeNodes = false;
-            for (var k = 0, l = records[i].addedNodes.length; k < l; ++k) {
-                var elm = records[i].addedNodes[k];
-                if (elm.classList) {
-                    if (elm.classList.contains('tradepoll') && !elm.classList.contains('notavailable')) {
-                        hasTradeNodes = true;
-                        var trade = tradeObject(elm);
-                        
-                        if (LoungeUser.userSettings.tradeLoadExtra === '3' || (LoungeUser.userSettings.tradeLoadExtra === '4' && !isHomepage)) {
-                            if (isScrolledIntoView(trade.tradeElement)) {
-                                trade.getExtraData();
-                            }
-                        }
 
-                        if (LoungeUser.userSettings.tradeLoadExtra === '2' || (LoungeUser.userSettings.tradeLoadExtra === '1' && !isHomepage)) {
-                            trade.getExtraData();
-                        }
-                    }
-                }
+            if (records[i].target.id === 'matches' && records[i].addedNodes.length > 0) {
+                console.log('Adding click event to the pagination links');
+                $('#matches .simplePagerNav a').click(function(e) {
+                    console.log('TRADES :: Changed page, initiating trade objects for this page');
+                    initiateTradeObjectForElementList('#matches');
+                });
             }
+
+            if ($(('#' + records[i].target.id)).find('.tradepoll:not("notavailable"):visible').length) {
+                hasTradeNodes = true;
+            }
+
+            initiateTradeObjectForElementList();
 
             if (hasTradeNodes) {
                 if (LoungeUser.userSettings.itemMarketPricesv2 === '2') {
-                    initiateItemObjectForElementList($(records[i].addedNodes).find('.oitm'), useCachedPricesOnly);
+                    initiateItemObjectForElementList($('#' + records[i].target.id).find('.oitm'), useCachedPricesOnly);
                 }
             }
         }
+
         if(records[i].addedNodes && records[i].addedNodes.length && records[i].target.id == 'ajaxCont' && records[i].target.className == 'full') {
             initiateItemObjectForElementList($('#ajaxCont.full .oitm'), true);
 

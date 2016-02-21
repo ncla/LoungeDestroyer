@@ -457,19 +457,18 @@ var g_rgCurrencyData = {
     //}
 };
 
-// http://stackoverflow.com/a/488073
-function isScrolledIntoView(elem) {
-    var $elem = $(elem);
-    var $window = $(window);
+// http://stackoverflow.com/a/22480938/757587
+function isScrolledIntoView(el) {
+    // Checks if the element is being passed as jQuery object
+    var el = (el instanceof jQuery ? el[0] : el);
 
-    var docViewTop = $window.scrollTop();
-    var docViewBottom = docViewTop + ($window.height() * 1.5);
+    var elemTop = el.getBoundingClientRect().top;
+    var elemBottom = el.getBoundingClientRect().bottom;
 
-    var elemTop = $elem.offset().top;
-    var elemBottom = elemTop + $elem.height();
-
-    return ((elemBottom <= docViewBottom) && (elemTop >= docViewTop));
+    var isVisible = (elemTop >= 0) && (elemBottom <= window.innerHeight);
+    return isVisible;
 }
+
 // http://stackoverflow.com/a/7392655
 (function($) {
     var uniqueCntr = 0;

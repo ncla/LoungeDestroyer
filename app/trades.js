@@ -433,6 +433,59 @@ function tradeObject(domObj) {
     return $trade.data('trade-data');
 }
 
+function determineLoadingTradeInfoByType(type) {
+    var setting = LoungeUser.userSettings.tradeLoadExtra;
+
+    if (setting === '0') {
+        return false;
+    }
+
+    if (type === 'hover') {
+        if (setting === '5' || (isHomepage && ['1', '4'].indexOf(setting) !== -1)) {
+            return true;
+        }
+    }
+
+    if (type === 'auto') {
+        if (setting === '2' || (setting === '1' && !isHomepage)) {
+            return true;
+        }
+    }
+
+    if (type === 'view') {
+        if (setting === '3' || (setting === '4' && !isHomepage)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+function initiateTradeObjectForElementList(whereAt, findWhat) {
+    if (whereAt === undefined) {
+        whereAt = 'body';
+    }
+
+    if (findWhat === undefined) {
+        findWhat = generateSelectorForTrades();
+    }
+
+    $(whereAt).find(findWhat).each(function(i, v) {
+        var trade = tradeObject(v);
+
+        if (determineLoadingTradeInfoByType('auto') === true) {
+            trade.getExtraData();
+        }
+
+        if (determineLoadingTradeInfoByType('view') === true && !trade.extraDataFetched && isScrolledIntoView(trade.tradeElement)) {
+            trade.getExtraData();
+        }
+    });
+}
+
+function generateSelectorForTrades() {
+    return (window.location.pathname === '/mytrades' ? 'section.box:eq(1)' : '') + ' .tradepoll:not(.notavailable):visible';
+}
 
 function updateFilteredTradeCount() {
     tradesFiltered++;
@@ -445,12 +498,7 @@ function updateFilteredTradeCount() {
         console.log('TRADES :: A trade was filtered, checking new trades in view');
 
         $(document).ready(function() {
-            $('.tradepoll:not(.notavailable)').each(function(index, value) {
-                var trade = tradeObject(value);
-                if(isScrolledIntoView(trade.tradeElement)) {
-                    trade.getExtraData();
-                }
-            });
+            initiateTradeObjectForElementList();
         });
     }
 }

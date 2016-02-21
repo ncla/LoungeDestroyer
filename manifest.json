@@ -59,10 +59,10 @@
                 "app/match.js",
                 "app/items.js",
                 "app/inventory.js",
-                "app/inject.js",
                 "app/bet.js",
                 "app/queue.js",
-                "app/trades.js"
+                "app/trades.js",
+                "app/inject.js"
             ],
             "css": [
                 "app/css/inject.css"
