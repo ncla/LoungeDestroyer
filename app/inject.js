@@ -344,15 +344,17 @@ function init() {
 
         if (isHomepage || document.URL.indexOf('/result?') !== -1 || document.URL.indexOf('/trades') !== -1) {
             if(LoungeUser.userSettings.showTradeFilterBox === '1') {
-                $('#tradelist').before('<div class="ld-trade-filters">' +
-                    '<div class="ld-trade-filters-buttons">' +
-                    '<a href="#" class="buttonright ld-trades-show" style="display: none;">Show filtered trades</a></div>' +
-                    '<div class="ld-trade-filters-info"><span class="ld-filtered-amount">0 trades were</span> filtered <br>by your <a href="#"><b>trade filter settings</b></a>' +
-                    '</div> </div>');
+                if ($('section.box:eq(0) #tradelist').length) {
+                    $('section.box:eq(0)').prepend('<div class="ld-trade-filters">' +
+                        '<div class="ld-trade-filters-buttons">' +
+                        '<a href="#" class="buttonright ld-trades-show" style="display: none;">Show filtered trades</a></div>' +
+                        '<div class="ld-trade-filters-info"><span class="ld-filtered-amount">0 trades were</span> filtered <br>by your <a href="#"><b>trade filter settings</b></a>' +
+                        '</div> </div>');
 
-                $('.ld-trade-filters .ld-trades-show').click(function() {
-                    toggleFilteredTrades(this);
-                });
+                    $('.ld-trade-filters .ld-trades-show').click(function() {
+                        toggleFilteredTrades(this);
+                    });
+                }
             }
 
             initiateTradeObjectForElementList('body');

@@ -227,11 +227,7 @@ $(document).ready(function() {
         LoungeUser.saveSetting('acceptDelayv2', this.valueAsNumber);
         determineIfShowAcceptWarning();
     });
-
-
-    $ldContainer.find('a.steam').click(function() {
-        return confirm('You are about to open a trade with LoungeDestroyer donation account. \n\nTHIS TRADE OFFER IS NOT RELATED TO CSGOLOUNGE.COM NOR DOTA2LOUNGE.COM IN ANY WAY. \n\nAre you sure?');
-    });
+    
 
     $('body').append($ldContainer);
 
