@@ -703,6 +703,7 @@ function addInventoryStatistics(targetItems, targetBackpack, groupName) {
         730: ['exotic', 'remarkable', 'contraband', 'high', 'covert', 'classified', 'restricted', 'industrial', 'mil-spec', 'consumer', 'base'],
         570: ['arcana', 'immortal', 'legendary', 'mythical', 'rare', 'uncommon', 'common', 'base']
     };
+    var valueList = [];
 
     $('.oitm', targetItems).each(function() {
         // Lounge provides item rarities in the classnames
@@ -731,6 +732,8 @@ function addInventoryStatistics(targetItems, targetBackpack, groupName) {
             }
 
             total += itemValue;
+
+            valueList.push(itemValue);
         }
     });
 
@@ -746,6 +749,21 @@ function addInventoryStatistics(targetItems, targetBackpack, groupName) {
     var itemValues = itemValuesTemp;
     var groupString = groupName ? 'in <span class="stats-group-names">' + groupName + '</span> ' : '';
 
+    var maxBet = 0;
+    valueList.sort(function(a, b) {
+        return b - a;
+    });
+
+    var maxItemBetCount = (appID === '730' ? 4 : 6);
+
+    for (var i = 0; i < valueList.length; i++) {
+        maxBet = maxBet + valueList[i];
+
+        if (i === (maxItemBetCount - 1)) {
+            break;
+        }
+    }
+
     if (total > 0) {
         $(targetBackpack).prepend('<div class="inventoryStatisticsBox">' +
             '<div id="totalInvValue">Your items ' + groupString + 'are worth: <span>' + convertPrice(total, true) + '</span></div>' +
@@ -754,6 +772,7 @@ function addInventoryStatistics(targetItems, targetBackpack, groupName) {
             '<span>Small bet: ' + convertPrice(((LoungeUser.userSettings.smallBetPercentage / 100) * total), true) + '</span>' +
             '<span>Medium bet: ' + convertPrice(((LoungeUser.userSettings.mediumBetPercentage / 100) * total), true) + '</span>' +
             '<span>Large bet: ' + convertPrice(((LoungeUser.userSettings.largeBetPercentage / 100) * total), true) + '</span>' +
+            '<span>Max bet: ' + convertPrice(maxBet, true) + '</span>' +
             '</div>' +
             '</div>');
 

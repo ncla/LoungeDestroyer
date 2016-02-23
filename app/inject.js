@@ -263,7 +263,7 @@ function init() {
         if (themeChangeElm = document.querySelector('.ddbtn a:nth-of-type(2)')) {
             var theme = /skin=([0-9])/.exec(themeChangeElm.href);
             
-            if (theme.length===2) {
+            if (theme.length === 2) {
                 document.body.classList.add(['ld-dark', 'ld-light'][theme[1]]);
             }
         }
@@ -340,6 +340,10 @@ function init() {
                 '<span style="float: left; margin-right: 0.5em">Total value bet:</span>' +
                 '<div class="potwin Value"><b>' + total.toFixed(2) + '</b> Value</div></div>');
             });
+
+            if (LoungeUser.userSettings.displayInvStatsOnMyBets === '1') {
+                addInventoryStatistics($('main'), $('section.box:eq(0) article.standard:eq(0)'));
+            }
         }
 
         if (isHomepage || document.URL.indexOf('/result?') !== -1 || document.URL.indexOf('/trades') !== -1) {

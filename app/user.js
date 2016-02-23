@@ -45,6 +45,7 @@ User.prototype.defaultSettings =
     mediumBetPercentage: '10',
     largeBetPercentage: '20',
     invStatsUseValue: '3',
+    displayInvStatsOnMyBets: '0',
 
     showBettedIndicatorv2: '3',
     beepSoundDisable: '0',
