@@ -165,7 +165,7 @@ function openSettingsTab() {
 
 function openTabIfNotExist(url, focus, windowId) {
     chrome.tabs.query({url: url}, function(tabs) {
-        if (tabs.length !== 0) {
+        if (tabs.length !== 0 && getChromeVersion() !== 49) {
             if (focus === true) {
                 chrome.tabs.update(tabs[0].id, {active: true});
             }
