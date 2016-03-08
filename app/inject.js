@@ -276,6 +276,10 @@ function init() {
             $('body').addClass('mytrades');
         }
 
+        if ($('section.box:eq(0) div.title:eq(0)').length === 0) {
+            $('body').addClass('no-trade-title')
+        }
+
         if (document.URL.indexOf('/mybets') != -1) {
             // reload page if draft page
             if (LoungeUser.userSettings.redirect === '1') {
@@ -350,11 +354,17 @@ function init() {
         if (isHomepage || document.URL.indexOf('/result?') !== -1 || document.URL.indexOf('/trades') !== -1) {
             if(LoungeUser.userSettings.showTradeFilterBox === '1') {
                 if ($('section.box:eq(0) #tradelist').length) {
-                    $('section.box:eq(0)').prepend('<div class="ld-trade-filters">' +
+                    var html = '<div class="ld-trade-filters">' +
                         '<div class="ld-trade-filters-buttons">' +
                         '<a href="#" class="buttonright ld-trades-show" style="display: none;">Show filtered trades</a></div>' +
                         '<div class="ld-trade-filters-info"><span class="ld-filtered-amount">0 trades were</span> filtered <br>by your <a href="#"><b>trade filter settings</b></a>' +
-                        '</div> </div>');
+                        '</div> </div>';
+
+                    if ($('section.box:eq(0) div.title:eq(0)').length) {
+                        $('section.box:eq(0) div.title:eq(0)').after(html);
+                    } else {
+                        $('section.box:eq(0)').prepend(html);
+                    }
 
                     $('.ld-trade-filters .ld-trades-show').click(function() {
                         toggleFilteredTrades(this);

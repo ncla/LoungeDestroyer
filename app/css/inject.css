@@ -641,6 +641,10 @@ http://codepen.io/larrygeams/pen/nhgze
     box-sizing: border-box;
 }
 
+body.no-trade-title .ld-trade-filters {
+    margin: 35px 0px 10px;
+}
+
 .ld-trade-filters:before, .ld-match-filters:before {
     content: "";
     display: inline-block;
