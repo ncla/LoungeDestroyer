@@ -833,7 +833,7 @@ chrome.runtime.onInstalled.addListener(function(details) {
             console.log('Updated from ' + details.previousVersion + ' to ' + thisVersion + '!');
             createNotification(
                 'LoungeDestroyer ' + thisVersion + ' update',
-                'LoungeDestroyer has updated to ' + thisVersion + ' version, bringing bug fixes and possibly new stuff. You can read about the changes by pressing button bellow',
+                'LoungeDestroyer has updated to ' + thisVersion + ' version, bringing bug fixes and possibly new stuff. You can read about the changes by pressing button below',
                 [{
                     title: 'Open changelog',
                     callback: function() {
