@@ -132,6 +132,29 @@ chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
     if (request.hasOwnProperty('openSettings')) {
         openSettingsTab();
     }
+
+    if (request.hasOwnProperty('doAjaxRequest')) {
+        console.log('Sending a request to', request['doAjaxRequest']['url']);
+        var ajax = request['doAjaxRequest'];
+        ajax['dataType'] = 'text';
+        ajax['success'] = function(data) {
+            sendResponse({
+                success: true,
+                data: data
+            });
+        };
+
+        ajax['error'] = function(jqXHR) {
+            sendResponse({
+                success: false,
+                data: jqXHR
+            });
+        };
+
+        $.ajax(ajax);
+
+        return true;
+    }
 });
 
 /**

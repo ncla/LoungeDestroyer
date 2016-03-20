@@ -147,11 +147,16 @@ Trade.prototype.getExtraSteamData = function(profileId, successCallback, errorCa
 
     this.steamUser = {};
 
-    $.ajax({
-        url: (window.location.protocol + '//steamcommunity.com/profiles/' + profileId + '?xml=1'),
-        dataType: 'xml',
-        type: 'GET',
-        success: function(data) {
+    var ajaxObject = {
+        url:  'http://steamcommunity.com/profiles/' + profileId + '?xml=1',
+        type: 'GET'
+    };
+
+    // Since Steam is a very special place, for some fucking reason it redirects back to HTTP when requesting to HTTPS XML API
+    chrome.runtime.sendMessage({doAjaxRequest: ajaxObject}, function(response) {
+        if (response.success === true) {
+            var data = $.parseXML(response.data);
+
             _this.steamUser.isPublicProfile = $(data).find('privacyState').text() !== 'private';
 
             _this.steamUser.vacBannedCount = parseInt($(data).find('vacBanned').text());
@@ -188,8 +193,9 @@ Trade.prototype.getExtraSteamData = function(profileId, successCallback, errorCa
             _this.steamUser.hoursPlayedTotal = hoursPlayedTotal;
 
             successCallback();
-        },
-        error: function() {
+        }
+
+        if (response.success === false) {
             errorCallback();
         }
     });
