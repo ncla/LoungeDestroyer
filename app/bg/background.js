@@ -507,49 +507,60 @@ function checkForNewTradeOffers(data, appID) {
     }
 }
 
-setInterval(function() {
+function checkHomepages() {
     var checkDotoPage = ['1', '2'].indexOf(LoungeUser.userSettings.notifyMatches) !== -1 || ['1', '2'].indexOf(LoungeUser.userSettings.notifyTrades) !== -1;
     var checkCSGOPage = ['1', '3'].indexOf(LoungeUser.userSettings.notifyMatches) !== -1 || ['1', '3'].indexOf(LoungeUser.userSettings.notifyTrades) !== -1;
 
     if (checkDotoPage) {
-        console.log('Checking DOTA2 matches');
-        var oReq = new XMLHttpRequest();
-        oReq.onload = function() {
-            var doc = document.implementation.createHTMLDocument('');
-            doc.body.innerHTML = this.responseText;
-            if ((LoungeUser.userSettings.notifyMatches == '1' || LoungeUser.userSettings.notifyMatches == '2')) {
-                checkNewMatches(doc, 570);
+        console.log('Checking DOTA2 home page');
+        $.ajax({
+            'url': 'http://dota2lounge.com/',
+            'type': 'GET',
+            'dataType': 'text',
+            success: function(data) {
+                var doc = document.implementation.createHTMLDocument('');
+                doc.body.innerHTML = data;
+
+                if (['1', '2'].indexOf(LoungeUser.userSettings.notifyMatches) !== -1) {
+                    checkNewMatches(doc, 570);
+                }
+
+                if (['1', '2'].indexOf(LoungeUser.userSettings.notifyTrades) !== -1) {
+                    checkForNewTradeOffers(doc, 570);
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.error('Error fetching DOTA2Lounge home page', textStatus, errorThrown);
             }
 
-            if (LoungeUser.userSettings.notifyTrades == '1' || LoungeUser.userSettings.notifyTrades == '2') {
-                checkForNewTradeOffers(doc, 570);
-            }
-        };
-
-        oReq.open('get', 'http://dota2lounge.com/', true);
-        oReq.send();
+        });
     }
 
     if (checkCSGOPage) {
-        console.log('Checking CS:GO matches');
+        console.log('Checking CS:GO home page');
+        $.ajax({
+            'url': 'http://csgolounge.com/',
+            'type': 'GET',
+            'dataType': 'text',
+            success: function(data) {
+                var doc = document.implementation.createHTMLDocument('');
+                doc.body.innerHTML = data;
 
-        var oReq = new XMLHttpRequest();
-        oReq.onload = function() {
-            var doc = document.implementation.createHTMLDocument('');
-            doc.body.innerHTML = this.responseText;
-            if ((LoungeUser.userSettings.notifyMatches == '1' || LoungeUser.userSettings.notifyMatches == '3')) {
-                checkNewMatches(doc, 730);
+                if (['1', '3'].indexOf(LoungeUser.userSettings.notifyMatches) !== -1) {
+                    checkNewMatches(doc, 730);
+                }
+
+                if (['1', '3'].indexOf(LoungeUser.userSettings.notifyTrades) !== -1) {
+                    checkForNewTradeOffers(doc, 730);
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.error('Error fetching CSGOLounge home page', textStatus, errorThrown);
             }
 
-            if (LoungeUser.userSettings.notifyTrades == '1' || LoungeUser.userSettings.notifyTrades == '3') {
-                checkForNewTradeOffers(doc, 730);
-            }
-        };
-
-        oReq.open('get', 'http://csgolounge.com/', true);
-        oReq.send();
+        });
     }
-}, 20000);
+}
 
 function updateMarketPriceList(callback) {
     var oReq = new XMLHttpRequest();
@@ -747,7 +758,8 @@ var alarms = {
     expiredReturnsChecking: 360,
     remoteThemesUpdate: 1440,
     autoBump: 10,
-    csglBettingValues: 1440
+    csglBettingValues: 1440,
+    checkHomepages: 1
 };
 
 // make sure we don't create alarms that already exist
@@ -778,7 +790,7 @@ chrome.alarms.getAll(function(a) {
 });
 
 chrome.alarms.onAlarm.addListener(function(alarm) {
-    if (alarm.name == 'itemListUpdate') {
+    if (alarm.name === 'itemListUpdate') {
         console.log('Checking if user has visited CS:GO Lounge recently..');
         var msSinceLastVisit = (new Date().getTime() - lastTimeUserVisited);
         console.log('Since last visit on CS:GL has passed: ' + msSinceLastVisit);
@@ -791,12 +803,12 @@ chrome.alarms.onAlarm.addListener(function(alarm) {
         }
     }
 
-    if (alarm.name == 'currencyUpdate') {
+    if (alarm.name === 'currencyUpdate') {
         console.log('Currency update!');
         updateCurrencyConversion();
     }
 
-    if (alarm.name == 'expiredReturnsChecking') {
+    if (alarm.name === 'expiredReturnsChecking') {
         if (['1', '2'].indexOf(LoungeUser.userSettings.notifyExpiredItems) !== -1) {
             checkForExpiredItems(570);
         }
@@ -806,16 +818,20 @@ chrome.alarms.onAlarm.addListener(function(alarm) {
         }
     }
     
-    if (alarm.name == 'autoBump') {
+    if (alarm.name === 'autoBump') {
         if (['1', '730', '570'].indexOf(LoungeUser.userSettings.autoBump) !== -1) {
             autoBumpTrades();
         }
     }
 
-    if (alarm.name == 'csglBettingValues') {
+    if (alarm.name === 'csglBettingValues') {
         if (LoungeUser.userSettings.csglBettingValues === '1') {
             updateCsgoloungeItemValues();
         }
+    }
+
+    if (alarm.name === 'checkHomepages') {
+        checkHomepages();
     }
 });
 
