@@ -837,7 +837,6 @@ chrome.runtime.onInstalled.addListener(function(details) {
             console.log('Updated from ' + details.previousVersion + ' to ' + thisVersion + '!');
 
             // Don't bother notifying about meaningless updates
-            console.log(meaninglessUpdates.indexOf(thisVersion));
             if (meaninglessUpdates.indexOf(thisVersion) === -1) {
                 createNotification(
                     'LoungeDestroyer ' + thisVersion + ' update',
