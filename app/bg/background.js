@@ -819,6 +819,10 @@ chrome.alarms.onAlarm.addListener(function(alarm) {
     }
 });
 
+var meaninglessUpdates = [
+    '0.9.3.7'
+];
+
 /*
  Fired when the extension is first installed, when the extension is updated to a new version, and when Chrome is updated to a new version.
  https://developer.chrome.com/extensions/runtime#event-onInstalled
@@ -831,16 +835,22 @@ chrome.runtime.onInstalled.addListener(function(details) {
         var thisVersion = chrome.runtime.getManifest().version;
         if (thisVersion != details.previousVersion) {
             console.log('Updated from ' + details.previousVersion + ' to ' + thisVersion + '!');
-            createNotification(
-                'LoungeDestroyer ' + thisVersion + ' update',
-                'LoungeDestroyer has updated to ' + thisVersion + ' version, bringing bug fixes and possibly new stuff. You can read about the changes by pressing button below',
-                [{
-                    title: 'Open changelog',
-                    callback: function() {
-                        openTabIfNotExist(chrome.extension.getURL('settings/index.html#openchangelog'), true);
-                    }
-                }]
-            );
+
+            // Don't bother notifying about meaningless updates
+            console.log(meaninglessUpdates.indexOf(thisVersion));
+            if (meaninglessUpdates.indexOf(thisVersion) === -1) {
+                createNotification(
+                    'LoungeDestroyer ' + thisVersion + ' update',
+                    'LoungeDestroyer has updated to ' + thisVersion + ' version, bringing bug fixes and possibly new stuff. You can read about the changes by pressing button below',
+                    [{
+                        title: 'Open changelog',
+                        callback: function() {
+                            openTabIfNotExist(chrome.extension.getURL('settings/index.html#openchangelog'), true);
+                        }
+                    }]
+                );
+            }
+
             // Migration forcing setting change for users that have cached item list and hover only market prices
             if(details.previousVersion == '0.8.3.0' && thisVersion == '0.8.3.1') {
                 console.log('Migration 0.8.3.0 => 0.8.3.1');
