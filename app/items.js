@@ -318,8 +318,6 @@ Item.prototype.fetchSteamMarketPriceFromSE = function(successCallback, notFoundC
         success: function(data) {
             if (data.hasOwnProperty('data') && data.data.hasOwnProperty('price') && !isNaN(data.data.price)) {
                 var priceInUsd = parseFloat(data.data.price);
-                //marketedItems[_this.itemName] = priceInUsd;
-                //_this.insertMarketValue(priceInUsd);
                 successCallback(priceInUsd);
             } else {
                 notFoundCallback();
