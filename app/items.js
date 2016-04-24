@@ -224,7 +224,6 @@ Item.prototype.fetchSteamMarketPrice = function(steamOnly) {
     };
 
     if (steamOnly === true) {
-        console.log('test');
         fetchFromSteam();
         return;
     }
