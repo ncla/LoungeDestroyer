@@ -196,12 +196,51 @@ Item.prototype.unloadMarketPrice = function() {
 
     return this;
 };
+
+Item.prototype.fetchSteamMarketPrice = function(steamOnly) {
+    var _this = this;
+
+    loadingItems[this.itemName] = true;
+
+    var successHandling = function (priceInUsd) {
+        marketedItems[_this.itemName] = priceInUsd;
+        _this.insertMarketValue(priceInUsd);
+        delete loadingItems[_this.itemName];
+    };
+
+    var notFoundHandling = function () {
+        $(_this.item).find('.rarity').html('Not found');
+        notFoundListings.push(_this.itemName);
+        delete loadingItems[_this.itemName];
+    };
+
+    var fetchFromSteam = function () {
+        _this.fetchSteamMarketPriceFromSteam(function(priceInUsd) {
+            successHandling(priceInUsd);
+        }, function(errorMessage) {
+            $(_this.item).find('.rarity').html(errorMessage);
+            delete loadingItems[_this.itemName];
+        }, notFoundHandling);
+    };
+
+    if (steamOnly === true) {
+        console.log('test');
+        fetchFromSteam();
+        return;
+    }
+
+    _this.fetchSteamMarketPriceFromSE(function(priceInUsd) {
+        successHandling(priceInUsd);
+    }, notFoundHandling, function() {
+       fetchFromSteam();
+    });
+};
+
 /**
  * Fetches Steam market price from unofficial Steam API in USD currency (converts if necessary)
  */
-Item.prototype.fetchSteamMarketPrice = function() {
+Item.prototype.fetchSteamMarketPriceFromSteam = function(successCallback, errorCallback, notFoundCallback) {
     var _this = this;
-    loadingItems[this.itemName] = true;
 
     var ajaxOptions =  {
         url: _this.generateMarketSearchRender(),
@@ -238,7 +277,7 @@ Item.prototype.fetchSteamMarketPrice = function() {
 
                 // If no price was not found, we assume there are no listings for the item
                 if (priceString === null) {
-                    $(_this.item).find('.rarity').html('Not found');
+                    notFoundCallback();
                     return false;
                 }
 
@@ -252,26 +291,48 @@ Item.prototype.fetchSteamMarketPrice = function() {
                     var priceFloated = extractedData.value;
                     var priceInUsd = priceFloated * fromDetectedCurrToUsd;
 
-                    marketedItems[_this.itemName] = priceInUsd;
-                    _this.insertMarketValue(priceInUsd);
+                    successCallback(priceInUsd);
 
                 } else {
-                    $(_this.item).find('.rarity').html('CURRENCY ERR');
+                    errorCallback('CURRENCY ERR');
                 }
             } else {
-                $(_this.item).find('.rarity').html('Not found');
-                notFoundListings.push(_this.itemName);
+                notFoundCallback();
             }
-
-            delete loadingItems[_this.itemName];
         },
         error: function () {
-            $(_this.item).find('.rarity').html('STEAM ERR');
-            delete loadingItems[_this.itemName];
+            errorCallback('STEAM ERR');
         }
     };
 
     (LoungeUser.userSettings.itemMarketPricesv2 === '2' ? $.ajaxq('fuckoffsteam', ajaxOptions) : $.ajax(ajaxOptions));
+};
+
+Item.prototype.fetchSteamMarketPriceFromSE = function(successCallback, notFoundCallback, everythingIsBadCallback) {
+    var _this = this;
+
+    $.ajax({
+        url: 'https://steam.expert/api/items/name/' + encodeURI(this.itemName) + '/price?appid=' + appID,
+        type: 'GET',
+        dataType: 'json',
+        success: function(data) {
+            if (data.hasOwnProperty('data') && data.data.hasOwnProperty('price') && !isNaN(data.data.price)) {
+                var priceInUsd = parseFloat(data.data.price);
+                //marketedItems[_this.itemName] = priceInUsd;
+                //_this.insertMarketValue(priceInUsd);
+                successCallback(priceInUsd);
+            } else {
+                notFoundCallback();
+            }
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            if (jqXHR.status === 404) {
+                notFoundCallback();
+            } else {
+                everythingIsBadCallback();
+            }
+        }
+    });
 };
 
 Item.prototype.fetchLoungeValueFromAPI = function(success, error) {

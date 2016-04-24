@@ -651,7 +651,7 @@ $(document).on('click', 'a.refreshPriceMarket', function(e) {
     var LoungeItem = itemObject($(this).parents('.oitm'));
     LoungeItem.unloadMarketPrice();
     $(LoungeItem.item).find('.rarity').html('');
-    LoungeItem.fetchSteamMarketPrice();
+    LoungeItem.fetchSteamMarketPrice(true);
 });
 
 $(document).on('mouseover', '.matchmain', function() {
