@@ -719,3 +719,13 @@ span.ld-btn-icon {
     font-weight: bold;
     cursor: help;
 }
+
+.ld-market-max-warning {
+    display: none;
+}
+
+.oitm.ld-price-max .ld-market-max-warning {
+    display: inline;
+    white-space: normal;
+    font-size: 11px;
+}

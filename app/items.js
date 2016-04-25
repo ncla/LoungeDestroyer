@@ -63,7 +63,7 @@ Item.prototype.insertMarketValue = function(marketValue) {
             _this.myFriends[index].marketPriced = true;
             _this.myFriends[index].marketValue = marketValue;
             $myLittleItem.addClass('marketPriced').find('.rarity').html(marketValueHTML);
-            _this.myFriends[index].displayWeaponQuality().calculateMarketDifference().calculateMarketOverprice();
+            _this.myFriends[index].displayWeaponQuality().displayMaxPriceWarning().calculateMarketDifference().calculateMarketOverprice();
         }
     }
     else {
@@ -80,7 +80,7 @@ Item.prototype.insertMarketValue = function(marketValue) {
                 $(itemObj.item).addClass('marketPriced').find('.rarity').html(marketValueHTML);
                 itemObj.marketPriced = true;
                 itemObj.marketValue = marketValue;
-                itemObj.displayWeaponQuality().calculateMarketDifference().calculateMarketOverprice();
+                itemObj.displayWeaponQuality().displayMaxPriceWarning().calculateMarketDifference().calculateMarketOverprice();
             }
         });
     }
@@ -98,6 +98,17 @@ Item.prototype.displayWeaponQuality = function() {
 
     return this;
 };
+
+Item.prototype.displayMaxPriceWarning = function() {
+    if (this.marketValue > 375) {
+        $(this.item).addClass('ld-price-max');
+    } else {
+        $(this.item).removeClass('ld-price-max');
+    }
+
+    return this;
+};
+
 /**
  * Gets market price for the item, it goes through our cached item list, blacklisted item list, already marketed items
  * list, and then finally if price still hasn't been found, request it via Steam API
@@ -545,6 +556,9 @@ Item.prototype.appendHoverElements = function() {
                         'updated the betting values for CSGOLounge items"><span class="ld-label-betting-date">Betting value:</span> ' + lastBetValuesUpdatedString + '</p>');
                 }
             }
+
+            $nameContainer.append('<p class="ld-market-max-warning"><br/>Any item prices that are above the maximum Steam market selling ' +
+                'limit are estimates and should not be used as accurate price in trading.</p>')
         }
         _this.extraAppended = true;
     }
