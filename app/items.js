@@ -136,7 +136,12 @@ Item.prototype.getMarketPrice = function(cachedOnly) {
     // Check if we can append a cached item price
     if (LoungeUser.userSettings.useCachedPriceList === '1') {
         if (storageMarketItems.hasOwnProperty(appID) && storageMarketItems[appID].hasOwnProperty(this.itemName)) {
-            return this.insertMarketValue(storageMarketItems[appID][this.itemName].value);
+            // Backwards compability with old api.ncla.me response, just in case the user still has old price list
+            if (storageMarketItems[appID][this.itemName].hasOwnProperty('value')) {
+                return this.insertMarketValue(storageMarketItems[appID][this.itemName].value);
+            } else {
+                return this.insertMarketValue(storageMarketItems[appID][this.itemName]);
+            }
         }
     }
 

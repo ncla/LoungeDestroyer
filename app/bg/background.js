@@ -563,34 +563,35 @@ function checkHomepages() {
 }
 
 function updateMarketPriceList(callback) {
-    var oReq = new XMLHttpRequest();
     var currentTimestamp = +new Date();
-    oReq.onload = function() {
-        var marketPrices = JSON.parse(this.responseText);
 
-        console.log('Market price list', marketPrices, currentTimestamp);
+    $.ajax({
+        url: 'https://steam.expert/api/items/all/730,570/compact',
+        type: 'GET',
+        dataType: 'json',
+        success: function(response) {
+            var marketPrices = response.data;
 
-        marketPriceListUpdatedEpoch = currentTimestamp;
+            console.log('Market price list', marketPrices, currentTimestamp);
 
-        chrome.storage.local.set({
-            'marketPriceList': marketPrices,
-            'marketPriceListUpdatedEpoch': currentTimestamp
-        });
-        console.log('Item price list has been updated!');
+            marketPriceListUpdatedEpoch = currentTimestamp;
 
-        if (callback) {
-            callback();
+            chrome.storage.local.set({
+                'marketPriceList': marketPrices,
+                'marketPriceListUpdatedEpoch': currentTimestamp
+            });
+            console.log('Item price list has been updated!');
+
+            if (callback) {
+                callback();
+            }
+        },
+        error: function(error) {
+            console.log('Error getting response for item price list API');
+            // Just in case so it doesn't send overwhelmingly many requests
+            marketPriceListUpdatedEpoch = currentTimestamp;
         }
-    };
-
-    oReq.onerror = function() {
-        console.log('Error getting response for item price list API');
-        // Just in case so it doesn't send overwhelmingly many requests
-        marketPriceListUpdatedEpoch = currentTimestamp;
-    };
-
-    oReq.open('get', 'https://api.ncla.me/itemlist.php', true);
-    oReq.send();
+    });
 }
 
 function updateCurrencyConversion(callback) {
