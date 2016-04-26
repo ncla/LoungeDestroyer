@@ -71,7 +71,7 @@ Item.prototype.insertMarketValue = function(marketValue) {
         this.marketPriced = true;
         this.marketValue = marketValue;
         $(this.item).addClass('marketPriced').find('.rarity').html(marketValueHTML);
-        this.displayWeaponQuality().calculateMarketDifference().calculateMarketOverprice();
+        this.displayWeaponQuality().displayMaxPriceWarning().calculateMarketDifference().calculateMarketOverprice();
 
         // All other items
         $('.oitm:not(.marketPriced)').each(function() {
