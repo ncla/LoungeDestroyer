@@ -838,7 +838,8 @@ chrome.alarms.onAlarm.addListener(function(alarm) {
 
 var meaninglessUpdates = [
     '0.9.3.7',
-    '0.9.3.8'
+    '0.9.3.8',
+    '0.9.3.9'
 ];
 
 /*
