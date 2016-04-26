@@ -148,10 +148,10 @@ navAnchor.click( function(e) {
                                 item.itemName = v.name;
 
                                 if (csgoPricelist.hasOwnProperty(v.name)) {
-                                    marketPriceStr = convertPrice(csgoPricelist[v.name]['value'], true);
+									item.loungeValue = floatValue;
+									item.marketValue = (csgoPricelist[v.name].hasOwnProperty('value') ? csgoPricelist[v.name]['value'] : csgoPricelist[v.name]);
 
-                                    item.loungeValue = floatValue;
-                                    item.marketValue = csgoPricelist[v.name]['value'];
+                                    marketPriceStr = convertPrice(item.marketValue, true);
 
                                     item.calculateMarketDifference().calculateMarketOverprice();
 
