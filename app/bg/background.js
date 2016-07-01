@@ -325,11 +325,19 @@ chrome.notifications.onButtonClicked.addListener(function(notificationID, button
     }
 });
 
+chrome.notifications.onClosed.addListener(function(notificationId, wasClosedByUser) {
+    console.log('Notification #' + notificationId + ' closed by user: ' + wasClosedByUser);
+
+    notifications[notificationId]['cleared'] = true;
+});
+
 function createNotification(title, message, buttons) {
     notifications[notificationID] = {
         title: title,
         message: message,
-        buttons: buttons
+        buttons: buttons,
+        cleared: false,
+        creationTime: +new Date()
     };
 
     // Get buttons array with necessary data only
@@ -349,10 +357,28 @@ function createNotification(title, message, buttons) {
         title: title,
         message: message,
         buttons: tempButtons
+    }, function(chromeNotifyId) {
+        console.log('Notification #' + chromeNotifyId + ' created!');
     });
 
     notificationID++;
 }
+
+function clearStuckNotifications() {
+    $.each(notifications, function(id, notificationObj) {
+        if (notificationObj.cleared === false && (+new Date() - notificationObj.creationTime) > 1000 * 60 * 3) {
+            console.log('Notification #' + id + ' still not closed after 180 seconds');
+
+            chrome.notifications.clear(id, function(wasCleared) {
+                console.log('Notification #' + id + ' cleared: ' + wasCleared);
+            });
+        }
+    });
+}
+
+setInterval(function () {
+    clearStuckNotifications();
+}, 20000);
 
 function checkNewMatches(ajaxResponse, appID) {
     var activeMatches = {};
