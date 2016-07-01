@@ -248,7 +248,7 @@ Themes.prototype.resetAndUpdateThemes = function(callback) {
 var themesBg = new Themes();
 themesBg.init();
 
-chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     // Inject CSS file to specific tab
     if (request.hasOwnProperty('injectCSS')) {
         console.log('Injecting CSS (' + request.injectCSS + ') into tab ' + sender.tab.id);

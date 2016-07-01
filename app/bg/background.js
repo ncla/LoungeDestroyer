@@ -22,7 +22,7 @@ var baseURLs = {
     570: 'http://dota2lounge.com/'
 };
 
-chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     // Make changes to LoungeUser user settings once the settings are changed from extension pop-up
     if (request.hasOwnProperty('changeSetting')) {
         for (var name in request.changeSetting) {

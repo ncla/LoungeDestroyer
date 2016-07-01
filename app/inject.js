@@ -58,7 +58,7 @@ if(window.location.href.indexOf('/api/') === -1 && window.location.href.indexOf(
     });
 }
 
-chrome.extension.onMessage.addListener(function(msg, sender, sendResponse) {
+chrome.runtime.onMessage.addListener(function(msg, sender, sendResponse) {
     // if non-empty, calls sendResponse with arguments at end
     var args = {};
 

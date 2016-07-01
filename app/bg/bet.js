@@ -23,7 +23,7 @@ var baseUrls = ['//csgolounge.com/', '//dota2lounge.com/'];
  * acceptStart - epoch time when the trade accepting was started
  * acceptLoop - same as loopTimer, but for trade accepting, but does not loop
  *
- * chrome.extension.onMessage.addListener
+ * chrome.runtime.onMessage.addListener
  * Is where we listen for any user interactions with auto-betting window, status update requests, queue updates,
  * and react accordingly.
  *
@@ -52,7 +52,7 @@ bet[1] = $.extend({}, bet[0]);
 /**
  * Listens for any messages sent from content pages and reacts accordingly
  */
-chrome.extension.onMessage.addListener(function(request, sender, sendResponse) {
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     // We need URL from the tab
     if (!sender.url) {
         return;
