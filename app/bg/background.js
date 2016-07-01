@@ -380,8 +380,15 @@ setInterval(function () {
     clearStuckNotifications();
 }, 20000);
 
+var lastTimeCheckedMatches = {
+    730: 0,
+    570: 0
+};
+
 function checkNewMatches(ajaxResponse, appID) {
     var activeMatches = {};
+
+    lastTimeCheckedMatches[appID] = +new Date();
 
     $('.matchmain', ajaxResponse).each(function(index, value) {
         if (!$('.match', value).hasClass('notaviable')) {
@@ -429,7 +436,7 @@ function checkNewMatches(ajaxResponse, appID) {
             }
         });
 
-        // We do not want to overwhelm user with many new matches
+        // We do not want to overwhelm user with individual match notifications
         if (newMatchesCount <= 3) {
             $.each(matchesToNotificate, function(index, value) {
                 var msg = (value.teamA.length > 0) ?
@@ -447,6 +454,20 @@ function checkNewMatches(ajaxResponse, appID) {
                     ]
                 );
             });
+        }
+
+        // Do notify about matches added in batch, only if the last matches check was recent (< 30 mins)
+        if (newMatchesCount > 3 && (+new Date() - lastTimeCheckedMatches[appID]) < 1000 * 60 * 30) {
+            createNotification(
+                'New ' + (appID == 730 ? 'CS:GO' : 'DOTA2') + ' matches have been added!', newMatchesCount + ' new ' + (appID == 730 ? 'CS:GO' : 'DOTA2') + ' matches have been added', [
+                    {
+                        title: 'Open home page',
+                        callback: function() {
+                            openTabIfNotExist(baseURLs[appID], true);
+                        }
+                    }
+                ]
+            );
         }
     });
 }
