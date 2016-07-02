@@ -20,7 +20,8 @@ var requiredStuff = [
     'node_modules/moment/min/moment.min.js',
     'node_modules/moment-timezone/builds/moment-timezone-with-data.min.js',
     'node_modules/jstz/dist/jstz.min.js',
-    'node_modules/marked/marked.min.js'
+    'node_modules/marked/marked.min.js',
+    'node_modules/dompurify/src/purify.js'
 ];
 
 gulp.task('build', function () {

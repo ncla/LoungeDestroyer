@@ -136,7 +136,11 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     if (request.hasOwnProperty('doAjaxRequest')) {
         console.log('Sending a request to', request['doAjaxRequest']['url']);
         var ajax = request['doAjaxRequest'];
-        ajax['dataType'] = 'text';
+
+        if (!ajax.hasOwnProperty('dataType')) {
+            ajax['dataType'] = 'text';
+        }
+
         ajax['success'] = function(data) {
             sendResponse({
                 success: true,
@@ -865,7 +869,7 @@ chrome.alarms.onAlarm.addListener(function(alarm) {
             checkForExpiredItems(730);
         }
     }
-    
+
     if (alarm.name === 'autoBump') {
         if (['1', '730', '570'].indexOf(LoungeUser.userSettings.autoBump) !== -1) {
             autoBumpTrades();

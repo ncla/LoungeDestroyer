@@ -48,11 +48,11 @@
             ],
             "js": [
                 "node_modules/jquery/dist/jquery.min.js",
+                "node_modules/dompurify/src/purify.js",
                 "lib/js/jquery-ui-1.11.2.min.js",
                 "node_modules/moment/min/moment.min.js",
                 "node_modules/moment-timezone/builds/moment-timezone-with-data.min.js",
                 "node_modules/jstz/dist/jstz.min.js",
-                "lib/js/safeResponse.js",
                 "lib/js/ajaxq.js",
                 "app/helpers.js",
                 "app/user.js",

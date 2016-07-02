@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "chai": "^3.4.1",
+    "dompurify": "^0.8.2",
     "jquery": "^2.2.0",
     "jstz": "^1.0.7",
     "marked": "^0.3.5",
