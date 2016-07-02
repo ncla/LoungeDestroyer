@@ -336,14 +336,6 @@ chrome.notifications.onClosed.addListener(function(notificationId, wasClosedByUs
 });
 
 function createNotification(title, message, buttons) {
-    notifications[notificationID] = {
-        title: title,
-        message: message,
-        buttons: buttons,
-        cleared: false,
-        creationTime: +new Date()
-    };
-
     // Get buttons array with necessary data only
     var tempButtons = [];
 
@@ -363,9 +355,17 @@ function createNotification(title, message, buttons) {
         buttons: tempButtons
     }, function(chromeNotifyId) {
         console.log('Notification #' + chromeNotifyId + ' created!');
-    });
 
-    notificationID++;
+        notifications[notificationID] = {
+            title: title,
+            message: message,
+            buttons: buttons,
+            cleared: false,
+            creationTime: +new Date()
+        };
+
+        notificationID++;
+    });
 }
 
 function clearStuckNotifications() {
