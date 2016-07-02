@@ -889,50 +889,62 @@ var meaninglessUpdates = [
     '0.9.3.9'
 ];
 
-/*
- Fired when the extension is first installed, when the extension is updated to a new version, and when Chrome is updated to a new version.
- https://developer.chrome.com/extensions/runtime#event-onInstalled
- */
-chrome.runtime.onInstalled.addListener(function(details) {
-    console.log('chrome.runtime.onInstalled event');
-    if (details.reason == 'install') {
-        console.log('This is a first install!');
-    } else if (details.reason == 'update') {
-        var thisVersion = chrome.runtime.getManifest().version;
-        if (thisVersion != details.previousVersion) {
-            console.log('Updated from ' + details.previousVersion + ' to ' + thisVersion + '!');
-
-            // Don't bother notifying about meaningless updates
-            if (meaninglessUpdates.indexOf(thisVersion) === -1) {
-                createNotification(
-                    'LoungeDestroyer ' + thisVersion + ' update',
-                    'LoungeDestroyer has updated to ' + thisVersion + ' version, bringing bug fixes and possibly new stuff. You can read about the changes by pressing button below',
-                    [{
-                        title: 'Open changelog',
-                        callback: function() {
-                            openTabIfNotExist(chrome.extension.getURL('settings/index.html#openchangelog'), true);
-                        }
-                    }]
-                );
-            }
-
-            // Migration forcing setting change for users that have cached item list and hover only market prices
-            if(details.previousVersion == '0.8.3.0' && thisVersion == '0.8.3.1') {
-                console.log('Migration 0.8.3.0 => 0.8.3.1');
-                if(LoungeUser.userSettings.useCachedPriceList === '1' && LoungeUser.userSettings.itemMarketPricesv2 !== '2') {
-                    console.log('Disabling cached market price list');
-                    LoungeUser.saveSetting('useCachedPriceList', '0');
-                }
-            }
-        }
-    }
-
+function onInstallOrUpdate() {
     updateCurrencyConversion();
 
     if(LoungeUser.userSettings.useCachedPriceList === '1') {
         updateMarketPriceList();
     }
-});
+}
+
+/*
+ Fired when the extension is first installed, when the extension is updated to a new version, and when Chrome is updated to a new version.
+ https://developer.chrome.com/extensions/runtime#event-onInstalled
+ */
+
+if (chrome.runtime.onInstalled === undefined) {
+    console.log('chrome.runtime.onInstalled is not supported! Running bare minimum tasks.');
+    onInstallOrUpdate();
+} else {
+    console.log('chrome.runtime.onInstalled is supported!');
+
+    chrome.runtime.onInstalled.addListener(function(details) {
+        console.log('chrome.runtime.onInstalled event');
+        if (details.reason == 'install') {
+            console.log('This is a first install!');
+        } else if (details.reason == 'update') {
+            var thisVersion = chrome.runtime.getManifest().version;
+            if (thisVersion != details.previousVersion) {
+                console.log('Updated from ' + details.previousVersion + ' to ' + thisVersion + '!');
+
+                // Don't bother notifying about meaningless updates
+                if (meaninglessUpdates.indexOf(thisVersion) === -1) {
+                    createNotification(
+                        'LoungeDestroyer ' + thisVersion + ' update',
+                        'LoungeDestroyer has updated to ' + thisVersion + ' version, bringing bug fixes and possibly new stuff. You can read about the changes by pressing button below',
+                        [{
+                            title: 'Open changelog',
+                            callback: function() {
+                                openTabIfNotExist(chrome.extension.getURL('settings/index.html#openchangelog'), true);
+                            }
+                        }]
+                    );
+                }
+
+                // Migration forcing setting change for users that have cached item list and hover only market prices
+                if(details.previousVersion == '0.8.3.0' && thisVersion == '0.8.3.1') {
+                    console.log('Migration 0.8.3.0 => 0.8.3.1');
+                    if(LoungeUser.userSettings.useCachedPriceList === '1' && LoungeUser.userSettings.itemMarketPricesv2 !== '2') {
+                        console.log('Disabling cached market price list');
+                        LoungeUser.saveSetting('useCachedPriceList', '0');
+                    }
+                }
+            }
+        }
+
+        onInstallOrUpdate();
+    });
+}
 
 chrome.runtime.setUninstallURL('http://goo.gl/forms/FFT1sTZpKJ', function() {
     if (chrome.runtime.lastError) {
