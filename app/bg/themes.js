@@ -337,10 +337,6 @@ chrome.alarms.onAlarm.addListener(function(alarm) {
     }
 });
 
-chrome.runtime.onInstalled.addListener(function(details) {
-    //themesBg.updateThemes();
-});
-
 /**
  * Function to parse and minify CSS, instead of feeding direct CSS response from the server (security)
  * @param css {string} CSS stylesheet contents
