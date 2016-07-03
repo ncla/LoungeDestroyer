@@ -6,6 +6,7 @@ LoungeUser.loadUserSettings(function() {
     autoDelay = parseInt(LoungeUser.userSettings.autoDelay) * 1000 || 5000;
 });
 
+var isFirefox = typeof InstallTrigger !== 'undefined';
 
 var marketPriceListUpdatedEpoch;
 var bettingItemListUpdatedEpoch;
@@ -339,21 +340,26 @@ function createNotification(title, message, buttons) {
     // Get buttons array with necessary data only
     var tempButtons = [];
 
-    if (buttons !== undefined && buttons !== null) {
-        for (var i = 0; i < buttons.length; i++) {
-            if (buttons[i].hasOwnProperty('title')) {
-                tempButtons.push({title: buttons[i]['title']});
-            }
-        }
-    }
-
-    chrome.notifications.create(notificationID.toString(), {
+    var notificationOptions = {
         type: 'basic',
         iconUrl: '../../icons/128x128.png',
         title: title,
-        message: message,
-        buttons: tempButtons
-    }, function(chromeNotifyId) {
+        message: message
+    };
+
+    if (!isFirefox) {
+        if (buttons !== undefined && buttons !== null) {
+            for (var i = 0; i < buttons.length; i++) {
+                if (buttons[i].hasOwnProperty('title')) {
+                    tempButtons.push({title: buttons[i]['title']});
+                }
+            }
+        }
+
+        notificationOptions['buttons'] = tempButtons;
+    }
+
+    chrome.notifications.create(notificationID.toString(), notificationOptions, function(chromeNotifyId) {
         console.log('Notification #' + chromeNotifyId + ' created!');
 
         notifications[notificationID] = {
