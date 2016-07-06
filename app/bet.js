@@ -153,7 +153,7 @@ function updateAutobetInfo() {
             return;
         }
 
-        if (!betStatus.lastBetTime) {
+        if (!betTime) {
             setTimeout(timerLoop, 500);
             return;
         }

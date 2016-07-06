@@ -102,7 +102,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
  * @param ajaxObject Final jQuery AJAX object that will be passed to bet.autoLoop
  */
 bet.enableAuto = function(game, ajaxObject) {
-    console.log('Auto-betting');
+    console.log('Auto-betting enabled');
 
     if (bet[game].autoBetting) {
         console.log('Already auto-betting');
@@ -111,6 +111,7 @@ bet.enableAuto = function(game, ajaxObject) {
 
     bet[game].autoBetting = true;
     bet[game].lastBetTime = Date.now();
+
     bet[game].numTries = 0;
     bet[game].lastError = 'No response received yet.';
 
@@ -245,6 +246,9 @@ var pathRegexp = new RegExp('https?://.*?/(.*)');
  * background we have to do various things: we cancel the request sent from the tab, gather all the information to restore
  * the authenticity of the request. After that is done, we send the request and initiate the loop which is handled by bet.autoLoop
  */
+
+// There is a bug if you conditionally make webRequest options, Chrome will not make a listener. FF does.
+
 chrome.webRequest.onBeforeRequest.addListener(function requestListener(details) {
         if (['0', '3'].indexOf(LoungeUser.userSettings.enableAuto) !== -1) {
             return;
@@ -265,14 +269,14 @@ chrome.webRequest.onBeforeRequest.addListener(function requestListener(details) 
         }
 
         // POST data should contain POST data
-        if (details.method === 'POST') {
-            if (!details.requestBody || !details.requestBody.formData) {
-                return;
-            }
-
-            // Store form data
-            data = details.requestBody.formData;
-        }
+        //if (details.method === 'POST' && !isFirefox) {
+        //    if ((!details.requestBody || !details.requestBody.formData)) {
+        //        return;
+        //    }
+        //
+        //    // Store form data
+        //    data = details.requestBody.formData;
+        //}
 
         var urlPath = pathRegexp.exec(details.url);
 
@@ -284,8 +288,11 @@ chrome.webRequest.onBeforeRequest.addListener(function requestListener(details) 
 
         var ajaxObject = {};
 
-        var isBet = (data !== undefined && data.on !== undefined && data['lquality[]'] !== undefined);
+        var isBet;
         var isReturn = (details.method === 'GET' && urlPath === 'ajax/postToReturn.php');
+
+        isBet = (details.method === 'POST' && (urlPath === 'ajax/postBetOffer.php' || urlPath === 'ajax/postBet.php'));
+        // isBet = (data !== undefined && data.on !== undefined && data['lquality[]'] !== undefined);
 
         if (isBet || isReturn) {
             console.log('AUTOBET :: ', urlPath);
@@ -360,7 +367,16 @@ chrome.webRequest.onBeforeRequest.addListener(function requestListener(details) 
                     console.error('AUTOBET :: WHAT THE FUUUUUUUUUUUUUUUUUUUUUUUUK');
                 }
 
-                bet[game].matchNum = (isBet && data.match && data.match.length > 0 && data.match[0]) ? parseInt(data.match[0]) : '';
+                var windowUrlPath = pathRegexp.exec(details.url);
+
+                if (windowUrlPath === null) {
+                    return;
+                }
+
+                windowUrlPath = windowUrlPath[1];
+
+                //bet[game].matchNum = (isBet && data.match && data.match.length > 0 && data.match[0]) ? parseInt(data.match[0]) : '';
+                bet[game].matchNum = (isBet && (windowUrlPath.indexOf('match') !== -1 || windowUrlPath.indexOf('predict') !== -1) ? parseInt(windowUrlPath.replace( /^\D+/g, '')) : '');
                 bet[game].tabId = details.tabId;
 
                 console.log('AUTOBET :: Match number', bet[game].matchNum);
@@ -378,7 +394,7 @@ chrome.webRequest.onBeforeRequest.addListener(function requestListener(details) 
         urls: ['*://csgolounge.com/*', '*://dota2lounge.com/*'],
         types: ['xmlhttprequest']
     },
-    ['requestBody', 'blocking']
+    ['blocking']
 );
 
 chrome.webRequest.onBeforeRequest.addListener(function requestListener(details) {
@@ -504,6 +520,7 @@ function handleQueue(data, game) {
                 }
 
                 bet[game].acceptStart = Date.now();
+
                 var delay = (isNaN(parseInt(LoungeUser.userSettings.acceptDelayv2)) === false ? parseInt(LoungeUser.userSettings.acceptDelayv2) : 10);
 
                 bet[game].lastError = (delay == 0 ? 'Accepting trade offer instantly' : 'Accepting trade offer in ' + delay + ' seconds');

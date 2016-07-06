@@ -16,8 +16,8 @@
             "app/helpers.js",
             "app/user.js",
             "app/match.js",
-            "app/bg/bet.js",
             "app/bg/background.js",
+            "app/bg/bet.js",
             "app/bg/themes.js"
         ],
         "persistent": true
