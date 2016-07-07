@@ -298,7 +298,7 @@ chrome.webRequest.onCompleted.addListener(function(details) {
 );
 
 chrome.webRequest.onBeforeRequest.addListener(function requestListener(details) {
-        if (['1', '2'].indexOf(LoungeUser.userSettings.beepSoundDisable) != -1 && details.url.indexOf('/audio/notif.mp3') != -1) {
+        if (['1', '2'].indexOf(LoungeUser.userSettings.beepSoundDisable) != -1) {
             console.log('Detected notif.mp3 sound request..');
             if (LoungeUser.userSettings.beepSoundDisable == '2' && LoungeUser.userSettings.customTradeOfferSound.length > 0) {
                 console.log('Applying custom trade offer audio...');
@@ -315,8 +315,8 @@ chrome.webRequest.onBeforeRequest.addListener(function requestListener(details) 
     },
 
     {
-        urls: ['*://csgolounge.com/audio/*', '*://dota2lounge.com/audio/*'],
-        types: ['other']
+        urls: ['*://csgolounge.com/audio/notif*', '*://dota2lounge.com/audio/notif*'],
+        types: ['media', 'other']
     },
     ['blocking']
 );
