@@ -297,6 +297,8 @@ chrome.webRequest.onCompleted.addListener(function(details) {
     }
 );
 
+var resourceTypesAudio = (isFirefox ? ['media', 'other'] : ['other']);
+
 chrome.webRequest.onBeforeRequest.addListener(function requestListener(details) {
         if (['1', '2'].indexOf(LoungeUser.userSettings.beepSoundDisable) != -1) {
             console.log('Detected notif.mp3 sound request..');
@@ -316,7 +318,7 @@ chrome.webRequest.onBeforeRequest.addListener(function requestListener(details) 
 
     {
         urls: ['*://csgolounge.com/audio/notif*', '*://dota2lounge.com/audio/notif*'],
-        types: ['media', 'other']
+        types: resourceTypesAudio
     },
     ['blocking']
 );
