@@ -369,6 +369,7 @@ function createNotification(title, message, buttons) {
             message: message,
             buttons: buttons,
             cleared: false,
+            clearedAmount: 0,
             creationTime: +new Date()
         };
 
@@ -378,11 +379,13 @@ function createNotification(title, message, buttons) {
 
 function clearStuckNotifications() {
     $.each(notifications, function(id, notificationObj) {
-        if (notificationObj.cleared === false && (+new Date() - notificationObj.creationTime) > 1000 * 60 * 3) {
+        if (notificationObj.cleared === false && notificationObj.clearedAmount < 3 && (+new Date() - notificationObj.creationTime) > 1000 * 60 * 3) {
             console.log('Notification #' + id + ' still not closed after 180 seconds');
 
             chrome.notifications.clear(id, function(wasCleared) {
                 console.log('Notification #' + id + ' cleared: ' + wasCleared);
+
+                notifications['clearedAmount']++;
             });
         }
     });
