@@ -257,70 +257,139 @@ Item.prototype.fetchSteamMarketPrice = function(steamOnly) {
 Item.prototype.fetchSteamMarketPriceFromSteam = function(successCallback, errorCallback, notFoundCallback) {
     var _this = this;
 
-    var ajaxOptions =  {
-        url: _this.generateMarketSearchRender(),
-        method: 'GET',
-        dataType: 'json',
-        success: function(data) {
-            if (data.success === true && data.total_count > 0 && data.results_html) {
-                var doc = document.implementation.createHTMLDocument('');
-                doc.body.innerHTML = data.results_html;
+    var xmlhttp = new XMLHttpRequest();
 
-                var priceString = null;
+    // https://bugzilla.mozilla.org/show_bug.cgi?id=1205886
+    xmlhttp.onreadystatechange = function () {
+        if (xmlhttp.readyState == XMLHttpRequest.DONE) {
+            if (xmlhttp.status == 200) {
+                var data = JSON.parse(xmlhttp.responseText);
 
-                if (data.total_count === 1) {
-                    // Much easier to got after first and only market result
-                    priceString = $(doc).find('.market_listing_row_link:eq(0) .market_listing_their_price .market_table_value span:eq(0)').text();
-                } else {
-                    $(doc).find('.market_listing_row_link').each(function(listingIndex, listingValue) {
-                        // Extract item name from the URL, because this is only thing that does not get translated if user is using different language on Steam
-                        var itemNameFromURL = decodeURI($(listingValue)[0].pathname.replace('/market/listings/730/', ''));
+                if (data.success === true && data.total_count > 0 && data.results_html) {
+                    var doc = document.implementation.createHTMLDocument('');
+                    doc.body.innerHTML = data.results_html;
 
-                        var listingItemNameHtml = $(listingValue).find('.market_listing_item_name').text();
+                    var priceString = null;
 
-                        // Compare if the item name matches with item name on Lounge
-                        if (listingItemNameHtml === _this.itemName || itemNameFromURL === _this.itemName) {
-                            var priceTxt = $(listingValue).find('.market_listing_their_price .market_table_value span:eq(0)').text();
+                    if (data.total_count === 1) {
+                        // Much easier to got after first and only market result
+                        priceString = $(doc).find('.market_listing_row_link:eq(0) .market_listing_their_price .market_table_value span:eq(0)').text();
+                    } else {
+                        $(doc).find('.market_listing_row_link').each(function(listingIndex, listingValue) {
+                            // Extract item name from the URL, because this is only thing that does not get translated if user is using different language on Steam
+                            var itemNameFromURL = decodeURI($(listingValue)[0].pathname.replace('/market/listings/730/', ''));
 
-                            if (priceTxt) {
-                                priceString = priceTxt;
-                                return false;
+                            var listingItemNameHtml = $(listingValue).find('.market_listing_item_name').text();
+
+                            // Compare if the item name matches with item name on Lounge
+                            if (listingItemNameHtml === _this.itemName || itemNameFromURL === _this.itemName) {
+                                var priceTxt = $(listingValue).find('.market_listing_their_price .market_table_value span:eq(0)').text();
+
+                                if (priceTxt) {
+                                    priceString = priceTxt;
+                                    return false;
+                                }
                             }
-                        }
-                    });
-                }
+                        });
+                    }
 
-                // If no price was not found, we assume there are no listings for the item
-                if (priceString === null) {
-                    notFoundCallback();
-                    return false;
-                }
+                    // If no price was not found, we assume there are no listings for the item
+                    if (priceString === null) {
+                        notFoundCallback();
+                        return false;
+                    }
 
-                var extractedData = detectCurrencyAndValueFromString(priceString);
+                    var extractedData = detectCurrencyAndValueFromString(priceString);
 
-                // This might fail if we don't support the currency
-                if (extractedData.currencyId !== null) {
-                    // Here we pray, hoping that nothing will fail
-                    var fromUsdConv = currencies['USD' + g_rgCurrencyData[extractedData.currencyId].strCode];
-                    var fromDetectedCurrToUsd = 1 / fromUsdConv;
-                    var priceFloated = extractedData.value;
-                    var priceInUsd = priceFloated * fromDetectedCurrToUsd;
+                    // This might fail if we don't support the currency
+                    if (extractedData.currencyId !== null) {
+                        // Here we pray, hoping that nothing will fail
+                        var fromUsdConv = currencies['USD' + g_rgCurrencyData[extractedData.currencyId].strCode];
+                        var fromDetectedCurrToUsd = 1 / fromUsdConv;
+                        var priceFloated = extractedData.value;
+                        var priceInUsd = priceFloated * fromDetectedCurrToUsd;
 
-                    successCallback(priceInUsd);
+                        successCallback(priceInUsd);
 
+                    } else {
+                        errorCallback('CURRENCY ERR');
+                    }
                 } else {
-                    errorCallback('CURRENCY ERR');
+                    notFoundCallback();
                 }
             } else {
-                notFoundCallback();
+                errorCallback('STEAM ERR');
             }
-        },
-        error: function () {
-            errorCallback('STEAM ERR');
         }
     };
 
-    (LoungeUser.userSettings.itemMarketPricesv2 === '2' ? $.ajaxq('fuckoffsteam', ajaxOptions) : $.ajax(ajaxOptions));
+    xmlhttp.open('GET', _this.generateMarketSearchRender(), true);
+    xmlhttp.send();
+
+    //var ajaxOptions =  {
+    //    url: _this.generateMarketSearchRender(),
+    //    method: 'GET',
+    //    dataType: 'json',
+    //    success: function(data) {
+    //        if (data.success === true && data.total_count > 0 && data.results_html) {
+    //            var doc = document.implementation.createHTMLDocument('');
+    //            doc.body.innerHTML = data.results_html;
+    //
+    //            var priceString = null;
+    //
+    //            if (data.total_count === 1) {
+    //                // Much easier to got after first and only market result
+    //                priceString = $(doc).find('.market_listing_row_link:eq(0) .market_listing_their_price .market_table_value span:eq(0)').text();
+    //            } else {
+    //                $(doc).find('.market_listing_row_link').each(function(listingIndex, listingValue) {
+    //                    // Extract item name from the URL, because this is only thing that does not get translated if user is using different language on Steam
+    //                    var itemNameFromURL = decodeURI($(listingValue)[0].pathname.replace('/market/listings/730/', ''));
+    //
+    //                    var listingItemNameHtml = $(listingValue).find('.market_listing_item_name').text();
+    //
+    //                    // Compare if the item name matches with item name on Lounge
+    //                    if (listingItemNameHtml === _this.itemName || itemNameFromURL === _this.itemName) {
+    //                        var priceTxt = $(listingValue).find('.market_listing_their_price .market_table_value span:eq(0)').text();
+    //
+    //                        if (priceTxt) {
+    //                            priceString = priceTxt;
+    //                            return false;
+    //                        }
+    //                    }
+    //                });
+    //            }
+    //
+    //            // If no price was not found, we assume there are no listings for the item
+    //            if (priceString === null) {
+    //                notFoundCallback();
+    //                return false;
+    //            }
+    //
+    //            var extractedData = detectCurrencyAndValueFromString(priceString);
+    //
+    //            // This might fail if we don't support the currency
+    //            if (extractedData.currencyId !== null) {
+    //                // Here we pray, hoping that nothing will fail
+    //                var fromUsdConv = currencies['USD' + g_rgCurrencyData[extractedData.currencyId].strCode];
+    //                var fromDetectedCurrToUsd = 1 / fromUsdConv;
+    //                var priceFloated = extractedData.value;
+    //                var priceInUsd = priceFloated * fromDetectedCurrToUsd;
+    //
+    //                successCallback(priceInUsd);
+    //
+    //            } else {
+    //                errorCallback('CURRENCY ERR');
+    //            }
+    //        } else {
+    //            notFoundCallback();
+    //        }
+    //    },
+    //    error: function () {
+    //        errorCallback('STEAM ERR');
+    //    }
+    //};
+    //
+    //(LoungeUser.userSettings.itemMarketPricesv2 === '2' ? $.ajaxq('fuckoffsteam', ajaxOptions) : $.ajax(ajaxOptions));
 };
 
 Item.prototype.fetchSteamMarketPriceFromSE = function(successCallback, notFoundCallback, everythingIsBadCallback) {
@@ -350,32 +419,70 @@ Item.prototype.fetchSteamMarketPriceFromSE = function(successCallback, notFoundC
 
 Item.prototype.fetchLoungeValueFromAPI = function(success, error) {
     var _this = this;
-    $.ajax({
-        url: 'http://csgolounge.com/api/schema.php',
-        type: 'GET',
-        dataType: 'json',
-        success: function(data) {
-            var itemFound = false;
-            $.each(data, function(itemID, item) {
-                if (item.name == _this.itemName) {
-                    itemFound = true;
-                    var worth = parseFloat(item.worth).toFixed(2);
-                    if (worth > 0) {
-                        success(worth);
-                    } else {
-                        error(_this.itemName + ' is not available for betting on CSGOLounge.com');
+
+    var xmlhttp = new XMLHttpRequest();
+
+    // https://bugzilla.mozilla.org/show_bug.cgi?id=1205886
+    xmlhttp.onreadystatechange = function () {
+        if (xmlhttp.readyState == XMLHttpRequest.DONE) {
+            if (xmlhttp.status == 200) {
+                var itemFound = false;
+
+                var data = JSON.parse(xmlhttp.responseText);
+
+                $.each(data, function(itemID, item) {
+                    if (item.name == _this.itemName) {
+                        itemFound = true;
+                        var worth = parseFloat(item.worth).toFixed(2);
+                        if (worth > 0) {
+                            success(worth);
+                        } else {
+                            error(_this.itemName + ' is not available for betting on CSGOLounge.com');
+                        }
+
+                        return false;
                     }
+                });
 
-                    return false;
+                if (!itemFound) {
+                    error(_this.itemName + ' was not found in CSGOLounge.com database');
                 }
-            });
-
-            if (!itemFound) {
-                error(_this.itemName + ' was not found in CSGOLounge.com database');
+            } else {
+                error('Could not fetch CSGOLounge betting price, HTTP error #' + xmlhttp.status);
             }
-        },
-        cache: false
-    });
+        }
+    };
+
+    xmlhttp.open('GET', 'http://csgolounge.com/api/schema.php?_=' + new Date().getTime(), true);
+    xmlhttp.send();
+
+    //$.ajax({
+    //    url: 'http://csgolounge.com/api/schema.php',
+    //    type: 'GET',
+    //    dataType: 'json',
+    //    success: function(data) {
+    //        var itemFound = false;
+    //        $.each(data, function(itemID, item) {
+    //            if (item.name == _this.itemName) {
+    //                itemFound = true;
+    //                var worth = parseFloat(item.worth).toFixed(2);
+    //                if (worth > 0) {
+    //                    success(worth);
+    //                } else {
+    //                    error(_this.itemName + ' is not available for betting on CSGOLounge.com');
+    //                }
+    //
+    //                return false;
+    //            }
+    //        });
+    //
+    //        if (!itemFound) {
+    //            error(_this.itemName + ' was not found in CSGOLounge.com database');
+    //        }
+    //    },
+    //    cache: false
+    //});
+
     return this;
 };
 
