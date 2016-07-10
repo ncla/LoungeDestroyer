@@ -117,11 +117,11 @@
                     <div class="row">
                         <div class="group col-grid-6 ld-setting">
                             <span>Auto-betting/-returning request delay:</span>
-                            <input type="number" min="2" max="100" id="autoDelay">
+                            <input type="number" min="2" max="120" id="autoDelay">
                         </div>
                         <div class="group col-grid-6 ld-setting">
                             <span>Auto-accepting trade offer delay <b data-tooltip="Auto-accepting delay that is less than 10 seconds may cause Steam error when accepting trade offer. To be safe and to achieve more consistency for auto-accepting, it is recommended to leave this value at 10 seconds.">(?)</b>:</span>
-                            <input type="number" min="0" max="100" id="acceptDelayv2">
+                            <input type="number" min="0" max="60" id="acceptDelayv2">
                         </div>
                     </div>
                 </div>
@@ -270,7 +270,7 @@
                         </div>
                         <div class="group col-grid-6 ld-setting">
                             <span>Cache time for extra match info (minutes):</span>
-                            <input type="number" min="2" max="60" id="cacheTimeMatchExtra">
+                            <input type="number" min="1" max="60" id="cacheTimeMatchExtra">
                         </div>
                     </div>
 
@@ -500,15 +500,15 @@
                         </div>
                         <div class="group col-grid-3 ld-setting">
                             <span>Min. Steam level:</span>
-                            <input type="number" min="0" max="100" id="minSteamLevel">
+                            <input type="number" min="0" max="1000" id="minSteamLevel">
                         </div>
                         <div class="group col-grid-3 ld-setting">
                             <span>Min. account age in days:</span>
-                            <input type="number" min="0" max="100" id="minAccAgeDays">
+                            <input type="number" min="0" max="1000000" id="minAccAgeDays">
                         </div>
                         <div class="group col-grid-3 ld-setting">
                             <span>Min. all time play time:</span>
-                            <input type="number" min="0" max="100" id="minAlltimePlaytime">
+                            <input type="number" min="0" max="1000000" id="minAlltimePlaytime">
                         </div>
                     </div>
 
