@@ -8,7 +8,15 @@ var nonMarketItems = ['Dota Items', 'Any Offers', 'Any Knife', 'Knife', 'Gift', 
 var skinQualities = {'Factory New': 'FN', 'Minimal Wear': 'MW', 'Well-Worn': 'WW', 'Battle-Scarred': 'BS',
     'Field-Tested': 'FT', 'Common': 'C', 'Uncommon': 'UC', 'Rare': 'R', 'Mythical': 'M', 'Legendary': 'L',
     'Ancient': 'AN', 'Immortal': 'I', 'Arcana': 'AR'};
-var appIDcontextIDs = {730: 2, 440: 2, 570: 2, 295110: 1, 753: 6};
+var appIDcontextIDs = {
+    730: 2,
+    440: 2,
+    570: 2,
+    295110: 1, // H1Z1:JS
+    433850: 1, // H1Z1:KOTK
+    218620: 2, // Payday 2
+    753: 6
+};
 
 var Item = function(item) {
     var _this = this;
