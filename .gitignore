@@ -2,4 +2,5 @@ node_modules/*
 .idea/*
 .sass-cache/*
 build/*
+dist/*
 settings/assets/stylesheets/main.css.map
