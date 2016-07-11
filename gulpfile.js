@@ -45,7 +45,7 @@ gulp.task('build', function () {
             json.applications = {
                 'gecko': {
                     'id': 'loungedestroyer@ncla.me',
-                    'strict_min_version': '50a1',
+                    'strict_min_version': '50.0a1',
                     'strict_max_version': '*'
                 }
             };
