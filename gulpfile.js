@@ -53,7 +53,8 @@ gulp.task('build', function () {
             var removePermissions = [
                 '*://csgolounge.com/*',
                 '*://steamcommunity.com/*',
-                '*://dota2lounge.com/*'
+                '*://dota2lounge.com/*',
+                'unlimitedStorage'
             ];
 
             for (var i = 0; i < removePermissions.length; i++) {
@@ -66,6 +67,11 @@ gulp.task('build', function () {
 
             json.permissions.push('*://*.csgolounge.com/*', '*://*.steamcommunity.com/*', '*://*.dota2lounge.com/*');
             json.permissions.push('tabs');
+
+            delete json.background.persistent;
+            delete json.options_page;
+
+            json.browser_action['browser_style'] = false;
 
             return json;
         }))
