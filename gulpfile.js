@@ -86,11 +86,11 @@ gulp.task('build', function () {
 gulp.task('package', ['build'], function() {
     var epoch = +new Date();
 
-    var chrome = gulp.src('build/chrome/*')
+    var chrome = gulp.src('build/chrome/**/*.*')
         .pipe(zip('loungedestroyer-chrome-' + epoch + '.zip'))
         .pipe(gulp.dest('dist/'));
 
-    var firefox = gulp.src('build/firefox/*')
+    var firefox = gulp.src('build/firefox/**/*.*')
         .pipe(zip('loungedestroyer-firefox-' + epoch + '.zip'))
         .pipe(gulp.dest('dist/'));
 
