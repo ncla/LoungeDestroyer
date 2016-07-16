@@ -253,7 +253,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     if (request.hasOwnProperty('injectCSS')) {
         console.log('Injecting CSS (' + request.injectCSS + ') into tab ' + sender.tab.id);
         chrome.tabs.insertCSS(sender.tab.id, {file: request.injectCSS, runAt: 'document_start'}, function(x) {
-            console.log(x)
+            console.log(x);
         });
     }
 
@@ -264,7 +264,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
             code: importantifyCSS(request.injectCSSCode),
             runAt: 'document_start'
         }, function(x) {
-            console.log(x)
+            console.log(x);
         });
     }
 

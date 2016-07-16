@@ -3,6 +3,10 @@ var jscs = require('gulp-jscs');
 var zip = require('gulp-zip');
 var merge = require('merge-stream');
 var jeditor = require('gulp-json-editor');
+var gulpif = require('gulp-if');
+var argv = require('yargs').argv;
+var filter = require('gulp-filter');
+var change = require('gulp-change');
 
 var requiredStuff = [
     'app/**/*.{js,css}',
@@ -16,7 +20,8 @@ var requiredStuff = [
     'node_modules/moment-timezone/builds/moment-timezone-with-data.min.js',
     'node_modules/jstz/dist/jstz.min.js',
     'node_modules/marked/marked.min.js',
-    'node_modules/dompurify/src/purify.js'
+    'node_modules/dompurify/src/purify.js',
+    'node_modules/selectize/dist/js/standalone/selectize.min.js'
 ];
 
 var watchList = [
@@ -34,10 +39,23 @@ gulp.task('default', function () {
 });
 
 gulp.task('build', function () {
+    var appJsFilter = filter(['**/*.js', '!**/*.min.js'], {restore: true});
+
+    function performChange(content, done) {
+        content = content.replace(/^(?:(?![\n\r])\s*)?[^\/]{0,2}((\$log|console)\.(warn|log|info))(.*)$/gm, '');
+        done(null, content);
+    }
+
     var chromeBase = gulp.src(requiredStuff, {base: '.'})
+        .pipe(appJsFilter)
+        .pipe(gulpif((argv.production == true), change(performChange)))
+        .pipe(appJsFilter.restore)
         .pipe(gulp.dest('build/chrome'));
 
     var firefoxBase = gulp.src(requiredStuff, {base: '.'})
+        .pipe(appJsFilter)
+        .pipe(gulpif((argv.production == true), change(performChange)))
+        .pipe(appJsFilter.restore)
         .pipe(gulp.dest('build/firefox'));
 
     var firefoxManifest = gulp.src('manifest.json')
