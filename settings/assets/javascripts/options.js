@@ -24,17 +24,25 @@ var themesSelect;
 
 $(document).ready(function() {
     var manifesto = chrome.runtime.getManifest();
-    document.getElementById("version").innerHTML = manifesto.version;
+    document.getElementById("version").innerText = manifesto.version;
 
     themesSelect = $('#themes').selectize(optionsSelectizeThemeDropdown);
     themesSelectSelectize = themesSelect[0].selectize;
 
     $.each(g_rgCurrencyData, function(i, v) {
-        $("#marketCurrency").append('<option value="' + i + '">' + v["strCode"] + '</option>');
+        $option = $('<option></option>');
+        $option.attr('value', i);
+        $option.text(v['strCode']);
+
+        $("#marketCurrency").append($option);
     });
 
     $.each(moment.tz.names(), function(i, v) {
-        $("#timezone").append('<option value="' + v + '">' + v + '</option>');
+        $option = $('<option></option>');
+        $option.attr('value', v);
+        $option.text(v);
+
+        $("#timezone").append($option);
     });
 
     chrome.storage.local.get(["userSettings", "themes"], function(result) {
@@ -46,7 +54,11 @@ $(document).ready(function() {
 
         $.each(Settings, function(index, value) {
             if (value !== undefined && value !== null) {
-                $("#" + index).val(value);
+                var vanillaOption = document.getElementById(index);
+
+                if (vanillaOption !== null) {
+                    $(vanillaOption).val(value);
+                }
             }
         });
 
@@ -80,11 +92,11 @@ $(document).ready(function() {
         });
 
         // set 'selected' on Disabled/Enabled for inventory statistics
-        if (Settings.inventoryStatisticsGroup["570"].indexOf("0")!==-1){
+        if (Settings.inventoryStatisticsGroup["570"].indexOf("0") !== -1){
             document.querySelector("#inventoryStatisticsGroup option[value='0']")
                 .setAttribute("selected", "true");
         }
-        if (Settings.inventoryStatisticsGroup["570"].indexOf("1")!==-1){
+        if (Settings.inventoryStatisticsGroup["570"].indexOf("1") !== -1){
             document.querySelector("#inventoryStatisticsGroup option[value='1']")
                 .setAttribute("selected", "true");
         }

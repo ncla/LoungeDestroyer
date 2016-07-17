@@ -183,7 +183,7 @@ Trade.prototype.getExtraSteamData = function(profileId, successCallback, errorCa
             var hoursPlayedTotal = 0;
 
             $(data).find('mostPlayedGames > mostPlayedGame').each(function(i, v) {
-                var hours2w = parseFloat($(v).find('hoursPlayed').text()) || 0;
+                var hours2w = parseFloat($(v).find('hoursPlayed').text().replace(',', '')) || 0;
                 var hoursAll = parseFloat($(v).find('hoursOnRecord').text().replace(',', '')) || 0;
                 hoursPlayed2w = hoursPlayed2w + hours2w;
                 hoursPlayedTotal = hoursPlayedTotal + hoursAll;
@@ -219,7 +219,10 @@ Trade.prototype.appendTradeData = function() {
     }
 
     if(_this.tradeurl) {
-        var tradeOfferBtn = $('<a class="button destroyer trade-offer" style="float: none;" href="' + _this.tradeurl + '" target="_blank">Trade offer</a>').hide();
+        var tradeOfferBtn = $('<a class="button destroyer trade-offer" style="float: none;" target="_blank">Trade offer</a>')
+            .attr('href', _this.tradeurl)
+            .hide();
+
         $tradeHeader.append(tradeOfferBtn);
         tradeOfferBtn.fadeIn();
     }
@@ -253,20 +256,32 @@ Trade.prototype.appendSteamData = function() {
         $steamExtra.addClass('ld-online-status-' + _this.steamUser.onlineState);
     }
 
-    $steamExtra.append(
-        '<div class="ld-steam-info">' +
-        '<a class="ld-steam-img" href="https://steamcommunity.com/profiles/' + _this.profileId + '"><img src="' + _this.avatarMediumUrl + '"/></a>' +
-        '<div class="ld-steam-status">' + _this.steamUser.onlineState + '</div>' +
-        '</div>'
-    );
+    $steamInfoWrap = $('<div class="ld-steam-info"></div>');
+
+    $profileLink = $('<a class="ld-steam-img"></a>');
+    $profileLink.attr('href', 'https://steamcommunity.com/profiles/' + _this.profileId);
+
+    $profileAvatar = $('<img/>');
+    $profileAvatar.attr('src', _this.avatarMediumUrl);
+
+    $profileLink.append($profileAvatar);
+
+    $steamInfoWrap.append($profileLink);
+
+    $steamStatus = $('<div class="ld-steam-status"></div>');
+    $steamStatus.text(_this.steamUser.onlineState);
+
+    $steamInfoWrap.append($steamStatus);
+
+    $steamExtra.append($steamInfoWrap);
 
     if (_this.steamUser.memberSince) {
         $steamExtra.append('<div class="ld-steam-info"><div class="ld-info-label">Date joined:</div> <div class="ld-info-val">' + moment.unix(_this.steamUser.memberSince).format('MMM Do, YYYY') + '</div></div>');
     }
 
-    $steamExtra.append('<div class="ld-steam-info"><div class="ld-info-label">VAC bans:</div> <div class="ld-info-val">' + _this.steamUser.vacBannedCount + '</div></div>');
+    $steamExtra.append('<div class="ld-steam-info"><div class="ld-info-label">VAC bans:</div> <div class="ld-info-val">' + parseInt(_this.steamUser.vacBannedCount) + '</div></div>');
 
-    var steamlevel = (_this.steamlevel !== null ? _this.steamlevel : 'Not found');
+    var steamlevel = (_this.steamlevel !== null ? parseInt(_this.steamlevel) : 'Not found');
     $steamExtra.append('<div class="ld-steam-info"><div class="ld-info-label">Steam level:</div> <div class="ld-info-val">' + steamlevel + '</div></div>');
 
     $steamExtra.append('<div class="ld-steam-info" title="Calculated from only three recently played games, this is done to save on extra, not so necessary API requests"><div class="ld-info-label">Game time all time:</div> <div class="ld-info-val">' + _this.steamUser.hoursPlayedTotal.toFixed(1) + 'h</div></div>');

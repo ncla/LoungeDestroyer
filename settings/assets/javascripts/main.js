@@ -75,7 +75,11 @@ navAnchor.click( function(e) {
 					$.each(data, function(i, release) {
 						var releaseVersion = release.tag_name;
 						var releaseDate = moment(release.published_at).format('MMMM Do, YYYY').toLowerCase();
-						$changelogContent.append('<h3>' + releaseVersion + ' <small>released on ' + releaseDate + '</small></h3>');
+						var $releaseName = $('<h3></h3>');
+						$releaseName.text(releaseVersion);
+						$releaseName.append(' <small>released on ' + releaseDate + '</small>');
+
+						$changelogContent.append($releaseName);
 						$changelogContent.append(DOMPurify.sanitize(marked(release.body)));
 						$changelogContent.append('<br class="margin"/>');
 					});
@@ -163,7 +167,7 @@ navAnchor.click( function(e) {
                                 var opskinsUrl = item.generateOPSkinsURL(730);
                                 var bitskinsUrl = item.generateBitskinsURL();
 
-                                htmlToAppend += '<tr><th scope="row">' + v.name + '</th><td>' + bettingValStr + '</td> <td>' + marketPriceStr + '</td>' +
+                                htmlToAppend += '<tr><th scope="row">' + removeTags(v.name) + '</th><td>' + bettingValStr + '</td> <td>' + marketPriceStr + '</td>' +
                                     '<td data-diff="' + (item.marketDifference || 0) + '">'+diffStr+'</td> <td data-op="'+(item.marketOverprice || 100)+'">'+overpriceStr+'</td> <td><a href="' + steamUrl + '" target="_blank">STEAM</a></td>' +
                                     '<td><a href="' + opskinsUrl + '" target="_blank">OPSKINS</a></td> <td><a href="' + bitskinsUrl + '" target="_blank">BITSKINS</a></td></tr>';
 

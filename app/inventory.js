@@ -41,6 +41,13 @@ Inventory.prototype.loadInventory = function() {
     // This will be default URL if none of the conditions below are met
     var theURL = _this.backpackAjaxData.url;
 
+    var parser = document.createElement('a');
+    parser.href = theURL;
+
+    if (['www.csgolounge.com', 'csgolounge.com', 'dota2lounge.com', 'www.dota2lounge.com'].indexOf(parser.hostname) === -1) {
+        return _this.stopLoadingInventory();
+    }
+
     // Don't bother with force refresh requests
     if (_this.backpackAjaxData.url.indexOf('?refresh=1') == -1) {
         // There are two APIs for inventory loading, we want to switch back and forth between two of them
@@ -90,7 +97,7 @@ Inventory.prototype.loadInventory = function() {
                 _this.inventoryIsLoading = false;
             } else {
                 // Show the received error to the user and continue loading the inventory
-                document.getElementById('LDerr').innerHTML = $(data).text();
+                document.getElementById('LDerr').innerText = $(data).text();
                 setTimeout(function() {
                     _this.loadInventory();
                 }, (1000 + Math.random() * 2000 - 500));
@@ -574,8 +581,13 @@ Inventory.prototype.createGroupElm = function(groupName) {
 
     $(elm).addClass('ld-item-group')
         .attr('data-group-name', groupName);
+
+    var grTitle = $('<div style="float: left;color: #999;"></div>');
+    grTitle[0].innerText = group.title;
+
     $(header).addClass('bpheader ld-item-group-header')
-        .html('<div style="float: left;color: #999;">' + group.title + '</div><a class="ld-item-group-delete" style="float: right">x</a>');
+        .append(grTitle)
+        .append('<a class="ld-item-group-delete" style="float: right">x</a>');
     $(wrapper).addClass('ld-item-group-wrapper')
         .attr('data-group-name', groupName)
         .append(header, elm);
@@ -747,7 +759,6 @@ function addInventoryStatistics(targetItems, targetBackpack, groupName) {
     });
 
     var itemValues = itemValuesTemp;
-    var groupString = groupName ? 'in <span class="stats-group-names">' + groupName + '</span> ' : '';
 
     var maxBet = 0;
     valueList.sort(function(a, b) {
@@ -765,8 +776,8 @@ function addInventoryStatistics(targetItems, targetBackpack, groupName) {
     }
 
     if (total > 0) {
-        $(targetBackpack).prepend('<div class="inventoryStatisticsBox">' +
-            '<div id="totalInvValue">Your items ' + groupString + 'are worth: <span>' + convertPrice(total, true) + '</span></div>' +
+        $stats = $('<div class="inventoryStatisticsBox">' +
+            '<div id="totalInvValue">Your items are worth: <span>' + convertPrice(total, true) + '</span></div>' +
             '<div id="rarityValuesWrapper"><div id="rarityValues"></div></div>' +
             '<div id="betSizeValues">' +
             '<span>Small bet: ' + convertPrice(((LoungeUser.userSettings.smallBetPercentage / 100) * total), true) + '</span>' +
@@ -776,13 +787,29 @@ function addInventoryStatistics(targetItems, targetBackpack, groupName) {
             '</div>' +
             '</div>');
 
+        if (groupName) {
+            $stats.find('#totalInvValue').html('Your items in <span class="stats-group-names"></span> are worth: <span>' + convertPrice(total, true));
+            $stats.find('#totalInvValue span.stats-group-names').text(groupName);
+        }
+
+        $(targetBackpack).prepend($stats);
+
         if (LoungeUser.userSettings.showInventoryStats === '1') {
             $.each(itemValues, function(i, v) {
-                $('#rarityValues').append('<div class="rarityContainer"><div><span class="' + i + '">' + capitaliseFirstLetter(i) + '</span>: ' + convertPrice(v, true) + '</div></div>');
+                $rarity = $('<div class="rarityContainer"><div><span class="ld-rarity-name"></span>: ' + convertPrice(v, true) + '</div></div>');
+                $rarity.find('.ld-rarity-name:eq(0)').attr('class', i).text(capitaliseFirstLetter(i));
+
+                $('#rarityValues').append($rarity);
             });
         }
     } else {
-        $(targetBackpack).prepend('<div class="inventoryStatisticsBox">' +
-            '<div id="totalInvValue">No items ' + groupString + 'to add statistics for.</div></div>');
+        $noStats = $('<div class="inventoryStatisticsBox"><div id="totalInvValue">No items to add statistics for.</div></div>');
+
+        if (groupName) {
+            $noStats.find('#totalInvValue').html('No items in <span class="stats-group-names"></span> to add statistics for.');
+            $noStats.find('#totalInvValue .stats-group-names:eq(0)').text(groupName);
+        }
+
+        $(targetBackpack).prepend($noStats);
     }
 }

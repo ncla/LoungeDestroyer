@@ -198,22 +198,37 @@ Match.prototype.appendExtraMatchInfo = function(targetElement) {
     }
 
     if (this.matchFormat) {
-        $(matchHeaderBlock).append(' <span class="seperator">|</span> <span class="bestoftype">' + this.matchFormat + '</span>');
+        $matchFormat = $('<span class="bestoftype"></span>');
+        $matchFormat.text(this.matchFormat);
+
+        $(matchHeaderBlock)
+            .append(' <span class="seperator">|</span> ')
+            .append($matchFormat);
     }
 
     if (LoungeUser.userSettings.displayAmountsPlaced !== '0') {
         if (LoungeUser.userSettings.displayAmountsPlaced === '1' && this.amountOfItemsPlaced) {
-            $(matchHeaderBlock).append(' <span class="seperator">|</span> <span class="ld-totalbets">' + this.amountOfItemsPlaced + ' items placed</span>');
+            $itemsPlaced = $('<span class="ld-totalitems"></span>');
+            $itemsPlaced.text(this.amountOfItemsPlaced + ' items placed');
+
+            $(matchHeaderBlock)
+                .append(' <span class="seperator">|</span> ')
+                .append($itemsPlaced);
         }
 
         if (LoungeUser.userSettings.displayAmountsPlaced === '2' && this.amountOfBetsPlaced) {
-            $(matchHeaderBlock).append(' <span class="seperator">|</span> <span class="ld-totalitems">' + this.amountOfBetsPlaced + ' bets placed</span>');
+            $betsPlaced = $('<span class="ld-totalbets"></span>');
+            $betsPlaced.text(this.amountOfBetsPlaced + ' bets placed');
+
+            $(matchHeaderBlock)
+                .append(' <span class="seperator">|</span> ')
+                .append($betsPlaced);
         }
     }
 
     if (LoungeUser.userSettings.showValueForOneIndicator === '1' && this.valueForOneTeamA && this.valueForOneTeamB) {
-        $('.teamtext:eq(0) i', this.matchElement).append(' <span class="ld-valueForOne">(' + this.valueForOneTeamA + ' for 1)</span>');
-        $('.teamtext:eq(1) i', this.matchElement).append(' <span class="ld-valueForOne">(' + this.valueForOneTeamB + ' for 1)</span>');
+        $('.teamtext:eq(0) i', this.matchElement).append(' <span class="ld-valueForOne">(' + parseFloat(this.valueForOneTeamA) + ' for 1)</span>');
+        $('.teamtext:eq(1) i', this.matchElement).append(' <span class="ld-valueForOne">(' + parseFloat(this.valueForOneTeamB) + ' for 1)</span>');
     }
 
     if (LoungeUser.userSettings.underlineTeamUserBetOn === '1' && this.teamBetOn !== undefined && this.teamBetOn > -1) {

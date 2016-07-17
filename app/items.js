@@ -70,7 +70,7 @@ Item.prototype.insertMarketValue = function(marketValue) {
             var $myLittleItem = $(_this.myFriends[index].item);
             _this.myFriends[index].marketPriced = true;
             _this.myFriends[index].marketValue = marketValue;
-            $myLittleItem.addClass('marketPriced').find('.rarity').html(marketValueHTML);
+            $myLittleItem.addClass('marketPriced').find('.rarity').text(marketValueHTML);
             _this.myFriends[index].displayWeaponQuality().displayMaxPriceWarning().calculateMarketDifference().calculateMarketOverprice();
         }
     }
@@ -85,7 +85,7 @@ Item.prototype.insertMarketValue = function(marketValue) {
         $('.oitm:not(.marketPriced)').each(function() {
             if ($(this).find('img.smallimg').attr('alt').trim() === _this.itemName) {
                 var itemObj = itemObject(this);
-                $(itemObj.item).addClass('marketPriced').find('.rarity').html(marketValueHTML);
+                $(itemObj.item).addClass('marketPriced').find('.rarity').text(marketValueHTML);
                 itemObj.marketPriced = true;
                 itemObj.marketValue = marketValue;
                 itemObj.displayWeaponQuality().displayMaxPriceWarning().calculateMarketDifference().calculateMarketOverprice();
@@ -242,7 +242,7 @@ Item.prototype.fetchSteamMarketPrice = function(steamOnly) {
         _this.fetchSteamMarketPriceFromSteam(function(priceInUsd) {
             successHandling(priceInUsd);
         }, function(errorMessage) {
-            $(_this.item).find('.rarity').html(errorMessage);
+            $(_this.item).find('.rarity').text(errorMessage);
             delete loadingItems[_this.itemName];
         }, notFoundHandling);
     };
@@ -503,7 +503,7 @@ Item.prototype.generateMarketURL = function(app) {
         appID = app;
     }
 
-    return 'https://steamcommunity.com/market/listings/' + appID + '/' + this.itemName;
+    return 'https://steamcommunity.com/market/listings/' + appID + '/' + encodeURIComponent(this.itemName);
 };
 
 Item.prototype.generateMarketSearchRender = function() {
@@ -511,7 +511,7 @@ Item.prototype.generateMarketSearchRender = function() {
         throw new TypeError('\'this\' must be instance of Item');
     }
 
-    return 'https://steamcommunity.com/market/search/render/?query=' + this.itemName + '&start=0&count=100&search_descriptions=0&sort_column=default&appid=' + appID;
+    return 'https://steamcommunity.com/market/search/render/?query=' + encodeURIComponent(this.itemName) + '&start=0&count=100&search_descriptions=0&sort_column=default&appid=' + appID;
 };
 
 Item.prototype.generateMarketSearchURL = function() {
@@ -519,7 +519,7 @@ Item.prototype.generateMarketSearchURL = function() {
         throw new TypeError('\'this\' must be instance of Item');
     }
 
-    return 'https://steamcommunity.com/market/search?q=' + this.itemName;
+    return 'https://steamcommunity.com/market/search?q=' + encodeURIComponent(this.itemName);
 };
 
 Item.prototype.generateMarketApiURL = function() {
@@ -528,7 +528,7 @@ Item.prototype.generateMarketApiURL = function() {
     }
 
     return 'https://steamcommunity.com/market/priceoverview/?country=US&currency=1&appid=' +
-        appID + '&market_hash_name=' + encodeURI(this.itemName);
+        appID + '&market_hash_name=' + encodeURIComponent(this.itemName);
 };
 
 Item.prototype.generateSteamStoreURL = function() {
@@ -536,7 +536,7 @@ Item.prototype.generateSteamStoreURL = function() {
         throw new TypeError('\'this\' must be instance of Item');
     }
 
-    return 'https://store.steampowered.com/search/?term=' + encodeURI(this.itemName);
+    return 'https://store.steampowered.com/search/?term=' + encodeURIComponent(this.itemName);
 };
 
 /**
@@ -559,7 +559,7 @@ Item.prototype.generateOPSkinsURL = function(appID, contextId) {
     var appIDUrl = (appID !== undefined && contextId !== undefined && appIDcontextIDs.hasOwnProperty(appID)
         ? ('&app=' + appID + '_' + appIDcontextIDs[appID]) : '');
 
-    return 'https://opskins.com/?loc=shop_search&ref=destroyer&aid=91' + appIDUrl + '&search_item=' + encodeURI(this.itemName) + '&sort=lh';
+    return 'https://opskins.com/?loc=shop_search&ref=destroyer&aid=91' + appIDUrl + '&search_item=' + encodeURIComponent(this.itemName) + '&sort=lh';
 };
 
 Item.prototype.generateBitskinsURL = function() {
@@ -569,7 +569,7 @@ Item.prototype.generateBitskinsURL = function() {
 
     var stattrak = (this.itemName.indexOf('StatTrak™ ') !== -1) ? 1 : 0;
 
-    return 'https://bitskins.com/?referred_by=76561198043770492&market_hash_name=' + encodeURI(this.itemName) + '&is_stattrak=' + stattrak + '&sort_by=price&order=asc';
+    return 'https://bitskins.com/?referred_by=76561198043770492&market_hash_name=' + encodeURIComponent(this.itemName) + '&is_stattrak=' + stattrak + '&sort_by=price&order=asc';
 };
 
 Item.prototype.convertLoungeValue = function() {
