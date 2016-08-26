@@ -103,19 +103,19 @@ chrome.runtime.onMessage.addListener(function(msg, sender, sendResponse) {
             tradesBtn.find('.notification').text(msg.tradesNotification);
         } else {
             tradesBtn.prepend($('<div>').attr('class', 'notification').text(msg.tradesNotification));
-        }          
+        }
     }
-    
+
     if (msg.offersNotification) {
         var offersBtn = $('#menu>a[href="myoffers"]');
         if (offersBtn.find('.notification').length) {
             offersBtn.find('.notification').text(msg.offersNotification);
         } else {
             offersBtn.prepend($('<div>').attr('class', 'notification').text(msg.offersNotification));
-        }      
+        }
     }
-    
-    
+
+
     if (!$.isEmptyObject(args)) {
         sendResponse(args);
     }
@@ -274,7 +274,7 @@ function init() {
         // dark/light theme
         if (themeChangeElm = document.querySelector('.ddbtn a:nth-of-type(2)')) {
             var theme = /skin=([0-9])/.exec(themeChangeElm.href);
-            
+
             if (theme.length === 2) {
                 document.body.classList.add(['ld-dark', 'ld-light'][theme[1]]);
             }
@@ -449,7 +449,7 @@ function init() {
 
             if (matchID !== null && appID === '730' && window.location.pathname.indexOf('/predict') === -1 && LoungeUser.userSettings.matchInformation === '1') {
                 var $wrapper = $('<div class="box-shiny-alt ld-match-info"></div>');
-                $('section.box:eq(1) .box-shiny-alt:eq(0)').after($wrapper);
+                $('section.box:eq(1) .tabholder').before($wrapper);
 
                 $wrapper.html('<div class="ld-loading-spinner spin-1"></div>');
 
@@ -493,7 +493,7 @@ function init() {
         if (document.URL.indexOf('/search') !== -1 || document.URL.indexOf('/addtrade') !== -1) {
             //disable post on /search and /addtrade input fields
             $('#itemfilter').keypress(function(e) {
-                if (e.which === 13) { 
+                if (e.which === 13) {
                     e.preventDefault();
                 }
             });
@@ -848,4 +848,3 @@ function buildTotalLine(date, total) {
 
     return totalLine;
 }
-
