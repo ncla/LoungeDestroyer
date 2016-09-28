@@ -903,7 +903,8 @@ var meaninglessUpdates = [
     '0.9.3.8',
     '0.9.3.9',
     '0.9.4.2',
-    '0.9.4.3'
+    '0.9.4.3',
+    '0.9.4.5'
 ];
 
 function onInstallOrUpdate() {
