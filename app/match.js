@@ -72,17 +72,21 @@ Match.prototype.parseMatchPage = function(response) {
     var doc = document.implementation.createHTMLDocument('');
     doc.body.innerHTML = response;
 
-    var matchHeader = $('section.box:eq(0) .box-shiny-alt div[style="display: flex"]', doc);
-    this.timeFromNow = $('.half:eq(0)', matchHeader).text().trim();
-    this.matchFormat = $('.half:eq(1)', matchHeader).text().trim();
-    this.exactTime = $('.half:eq(2)', matchHeader).text().trim();
-    this.userBetted = !!$('.box-shiny-alt .winsorloses', doc).length;
+    var matchHeader = $('section.box:eq(0) .match-box .row:eq(0)', doc);
+    this.timeFromNow = $('.s4:eq(0)', matchHeader).text().trim();
+    this.matchFormat = $('.s4:eq(1)', matchHeader).text().trim();
+    this.exactTime = $('.s4:eq(2)', matchHeader).text().trim();
+    this.userBetted = !!$('section.box:eq(0) .match-box #place-coins-msg', doc).length;
+
+    if (this.userBetted !== false) {
+        this.userBetted = !$('section.box:eq(0) .match-box #place-coins-msg', doc).next("br").length;
+    }
 
     this.amountOfBetsPlaced = 0;
     this.amountOfItemsPlaced = 0;
 
     if (LoungeUser.userSettings.displayAmountsPlaced !== '0') {
-        var matchStats = $('section.box:eq(1) .box-shiny-alt .full', doc);
+        var matchStats = $('section.box:eq(1) .match-box .full', doc);
         var matchStatsRegex = $(matchStats).text().match(/\d+/g);
 
         if (matchStatsRegex !== null) {
@@ -96,32 +100,26 @@ Match.prototype.parseMatchPage = function(response) {
 
     this.teamBetOn = -1;
 
-    $matchSection = $('section.box:eq(0) .box-shiny-alt', doc);
-    if ($('a:eq(0)', $matchSection).hasClass('active')) {
+    $matchSection = $('#bet-coins-info', doc);
+    if ($matchSection.data('on') === "a") {
         this.teamBetOn = 0;
     }
-    if ($('a:eq(1)', $matchSection).hasClass('active')) {
+    if ($matchSection.data('on') === "b") {
         this.teamBetOn = 1;
     }
 
     this.totalBet = 0;
 
     if (this.teamBetOn !== -1) {
-        $('.box-shiny-alt .winsorloses .oitm', doc).each(function(itemIndex, itemValue) {
-            var item = itemObject(itemValue);
-            _this.totalBet = _this.totalBet + item.loungeValue;
-        });
+        this.totalBet = $('section.box:eq(0) .match-box #match-coins-place #coins', doc).val();
     }
 
-    var textValueForOneA = $($('div[style="float: left; margin: 0.25em 2%;"]', doc).contents()[2]).text().replace(',', '.');
-    var textValueForOneB = $($('div[style="float: right; margin: 0.25em 2%;"]', doc).contents()[2]).text().replace(',', '.');
+    var textValueForOneA = $matchSection.data('oddsa');
+    var textValueForOneB = $matchSection.data('oddsb');
 
-    var regexValueTeamA = textValueForOneA.match(new RegExp('[-+]?\\d*\\.\\d+|\\d+', 'g'));
-    var regexValueTeamB = textValueForOneB.match(new RegExp('[-+]?\\d*\\.\\d+|\\d+', 'g'));
-
-    if(regexValueTeamA !== null && regexValueTeamB !== null) {
-        this.valueForOneTeamA = (regexValueTeamA.length === 3 ? regexValueTeamA[1] : regexValueTeamA[0]);
-        this.valueForOneTeamB = (regexValueTeamB.length === 3 ? regexValueTeamB[1] : regexValueTeamB[0]);
+    if(textValueForOneA !== null && textValueForOneB !== null) {
+        this.valueForOneTeamA = textValueForOneA;
+        this.valueForOneTeamB = textValueForOneB;
     } else {
         this.valueForOneTeamA = this.valueForOneTeamB = undefined;
     }
@@ -209,7 +207,7 @@ Match.prototype.appendExtraMatchInfo = function(targetElement) {
     if (LoungeUser.userSettings.displayAmountsPlaced !== '0') {
         if (LoungeUser.userSettings.displayAmountsPlaced === '1' && this.amountOfItemsPlaced) {
             $itemsPlaced = $('<span class="ld-totalitems"></span>');
-            $itemsPlaced.text(this.amountOfItemsPlaced + ' items placed');
+            $itemsPlaced.text(this.amountOfItemsPlaced + ' coins placed');
 
             $(matchHeaderBlock)
                 .append(' <span class="seperator">|</span> ')
