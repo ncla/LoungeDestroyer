@@ -325,7 +325,7 @@ chrome.webRequest.onBeforeRequest.addListener(function(details) {
         }
     },
     {
-        urls: ['*://csgolounge.com/css/*', '*://dota2lounge.com/css/*'],
+        urls: ['*://csgolounge.com/css/*', '*://dota2lounge.com/css/*', '*://csgolounge.com/assets/css/*'], 
         types: ['stylesheet']
     },
     ['blocking']
