@@ -938,16 +938,16 @@ if (chrome.runtime.onInstalled === undefined) {
 
                 // Don't bother notifying about meaningless updates
                 if (meaninglessUpdates.indexOf(thisVersion) === -1) {
-                    createNotification(
-                        'LoungeDestroyer ' + thisVersion + ' update',
-                        'LoungeDestroyer has updated to ' + thisVersion + ' version, bringing bug fixes and possibly new stuff. You can read about the changes by pressing button below',
-                        [{
-                            title: 'Open changelog',
-                            callback: function() {
-                                openTabIfNotExist(chrome.extension.getURL('settings/index.html#openchangelog'), true);
-                            }
-                        }]
-                    );
+                    //createNotification(
+                    //    'LoungeDestroyer ' + thisVersion + ' update',
+                    //    'LoungeDestroyer has updated to ' + thisVersion + ' version, bringing bug fixes and possibly new stuff. You can read about the changes by pressing button below',
+                    //    [{
+                    //        title: 'Open changelog',
+                    //        callback: function() {
+                    //            openTabIfNotExist(chrome.extension.getURL('settings/index.html#openchangelog'), true);
+                    //        }
+                    //    }]
+                    //);
                 }
 
                 // Migration forcing setting change for users that have cached item list and hover only market prices
