@@ -404,7 +404,7 @@ Item.prototype.fetchSteamMarketPriceFromSE = function(successCallback, notFoundC
     var _this = this;
 
     $.ajax({
-        url: 'https://steam.expert/api/items/name/' + encodeURI(this.itemName) + '/price?appid=' + appID,
+        url: 'https://api2.ncla.me/api/items/name/' + encodeURI(this.itemName) + '/price?appid=' + appID,
         type: 'GET',
         dataType: 'json',
         success: function(data) {

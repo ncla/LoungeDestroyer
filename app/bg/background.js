@@ -628,7 +628,7 @@ function updateMarketPriceList(callback) {
     var currentTimestamp = +new Date();
 
     $.ajax({
-        url: 'https://steam.expert/api/items/all/730,570/compact',
+        url: 'https://api2.ncla.me/api/items/all/730,570/compact',
         type: 'GET',
         dataType: 'json',
         success: function(response) {
