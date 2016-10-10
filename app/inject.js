@@ -147,7 +147,7 @@ function init() {
                 style.setAttribute('rel', 'stylesheet');
                 $(document).ready(function() {
                     document.head.appendChild(style);
-                })
+                });
             }
 
             $(document).ready(function() {
@@ -209,6 +209,48 @@ function init() {
                         //    }
                         //}
                     }
+                }
+
+                // Clone notifications if required
+                if (name === "cleanlounge") {
+                    console.log("THEMES :: Theme requires to clone notifications div");
+
+                    clonedNotifications = false;
+                    // Define a new MutationObserver
+                    var obsNotifications = new MutationObserver(function(mutations, observer) {
+                        // Loop all mutations we caught
+                        for (var i = 0; i < mutations.length; i++) {
+                            // Loop all elements added during mutation
+                            for (var j = 0; j < mutations[i].addedNodes.length; j++) {
+                                // Check if the element has a special class
+                                if ($(mutations[i].addedNodes[j]).hasClass('z-depth-2')) {
+                                    // Clone the notifications
+                                    $clone = $('#dropdown-notifications').clone();
+                                    $('#dropdown-notifications').remove();
+                                    $('header').after($clone);
+
+                                    // Regenerate jQuery selector, to rebind events
+                                    addJS_Node(null, null, function() {
+                                        userStatus.notificatElement = $('#dropdown-notifications');
+                                    }, null);
+
+                                    // Only one time clone
+                                    obsNotifications.disconnect();
+                                    clonedNotifications = true;
+                                    break;
+                                }
+                            }
+
+                            if (clonedNotifications === true) {
+                                break;
+                            }
+                        }
+                    });
+
+                    // Set the element we want to observe
+                    obsNotifications.observe($('#submenu').get(0), {
+                        childList: true
+                    });
                 }
             });
 
