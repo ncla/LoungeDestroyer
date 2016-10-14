@@ -215,6 +215,9 @@ function init() {
                 if (name === "cleanlounge") {
                     console.log("THEMES :: Theme requires to clone notifications div");
 
+                    // Add legacy support
+                    $('body').addClass('ld-ver-0.9.5');
+
                     clonedNotifications = false;
                     // Define a new MutationObserver
                     var obsNotifications = new MutationObserver(function(mutations, observer) {
@@ -225,7 +228,7 @@ function init() {
                                 // Check if the element has a special class
                                 if ($(mutations[i].addedNodes[j]).hasClass('z-depth-2')) {
                                     // Clone the notifications
-                                    $clone = $('#dropdown-notifications').clone();
+                                    $clone = $('#dropdown-notifications').clone(true); // Just in case for later
                                     $('#dropdown-notifications').remove();
                                     $('header').after($clone);
 
