@@ -319,6 +319,13 @@ function init() {
         $('body').addClass('appID' + appID);
         var themeChangeElm;
 
+        // Add a special class depending of browser
+        if (window.navigator.userAgent.match(/Chrom(?:e|ium)/)) {
+            $('body').addClass('chrome');
+        } else if (window.navigator.userAgent.match(/Firefox/)) {
+            $('body').addClass('firefox');
+        }
+
         // dark/light theme
         if (themeChangeElm = document.querySelector('.ddbtn a:nth-of-type(2)')) {
             var theme = /skin=([0-9])/.exec(themeChangeElm.href);

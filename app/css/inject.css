@@ -652,8 +652,15 @@ body.no-trade-title .ld-trade-filters {
     height: 16px;
     float: left;
     margin: -1px 7px 0 0;
-    background: url('chrome-extension://__MSG_@@extension_id__/icons/32x32.png') no-repeat,
-                url('moz-extension://__MSG_@@extension_id__/icons/32x32.png') no-repeat;
+}
+
+.chrome .ld-trade-filters:before, .chrome .ld-match-filters:before {
+    background: url('chrome-extension://__MSG_@@extension_id__/icons/32x32.png') no-repeat;
+    background-size: cover;
+}
+
+.firefox .ld-trade-filters:before, .firefox .ld-match-filters:before {
+    background: url('moz-extension://__MSG_@@extension_id__/icons/32x32.png') no-repeat;
     background-size: cover;
 }
 
@@ -696,13 +703,19 @@ span.ld-btn-icon {
     width: 16px;
     height: 16px;
     margin-right: 3px;
-    background: url('chrome-extension://__MSG_@@extension_id__/icons/32x32.png'),
-                url('moz-extension://__MSG_@@extension_id__/icons/32x32.png');
     display: inline-block;
     background-size: cover;
     position: relative;
     top: 2px;
     margin-top: -2px;
+}
+
+.chrome span.ld-btn-icon {
+    background: url('chrome-extension://__MSG_@@extension_id__/icons/32x32.png');
+}
+
+.firefox span.ld-btn-icon {
+    background: url('moz-extension://__MSG_@@extension_id__/icons/32x32.png');
 }
 
 .teamtext b.ld-teambeton {
