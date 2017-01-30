@@ -19,8 +19,8 @@ chrome.storage.local.get(['marketPriceListUpdatedEpoch', 'bettingItemListUpdated
 var lastTimeUserVisited = null;
 var lastTimeStorageFail = 0;
 var baseURLs = {
-    730: 'http://csgolounge.com/',
-    570: 'http://dota2lounge.com/'
+    730: 'https://csgolounge.com/',
+    570: 'https://dota2lounge.com/'
 };
 
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {

@@ -652,8 +652,7 @@ body.no-trade-title .ld-trade-filters {
     height: 16px;
     float: left;
     margin: -1px 7px 0 0;
-    background: url('chrome-extension://__MSG_@@extension_id__/icons/32x32.png') no-repeat,
-                url('moz-extension://__MSG_@@extension_id__/icons/32x32.png') no-repeat;
+    background: url('chrome-extension://__MSG_@@extension_id__/icons/32x32.png') no-repeat;
     background-size: cover;
 }
 
@@ -696,8 +695,7 @@ span.ld-btn-icon {
     width: 16px;
     height: 16px;
     margin-right: 3px;
-    background: url('chrome-extension://__MSG_@@extension_id__/icons/32x32.png'),
-                url('moz-extension://__MSG_@@extension_id__/icons/32x32.png');
+    background: url('chrome-extension://__MSG_@@extension_id__/icons/32x32.png');
     display: inline-block;
     background-size: cover;
     position: relative;
