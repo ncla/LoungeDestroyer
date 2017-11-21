@@ -495,40 +495,40 @@ function init() {
 
             var matchID = window.location.href.match(/\d+/);
 
-            if (matchID !== null && appID === '730' && window.location.pathname.indexOf('/predict') === -1 && LoungeUser.userSettings.matchInformation === '1') {
-                var $wrapper = $('<div class="box-shiny-alt ld-match-info"></div>');
-                $('section.box:eq(1) .tabholder').before($wrapper);
-
-                $wrapper.html('<div class="ld-loading-spinner spin-1"></div>');
-
-                // The reason why we are doing this through XMLHttpRequest is because FF has some weird bug where $.ajax gives CORS warning,
-                // while XMLHttpRequest does not. https://bugzilla.mozilla.org/show_bug.cgi?id=1205886
-                var xmlhttp = new XMLHttpRequest();
-
-                xmlhttp.onreadystatechange = function () {
-                    if (xmlhttp.readyState == XMLHttpRequest.DONE) {
-                        if (xmlhttp.status == 200) {
-                            $wrapper.html(DOMPurify.sanitize(xmlhttp.responseText));
-                        } else {
-                            $wrapper.html('<div class="ld-match-info-error"><span class="ld-btn-icon"></span> LoungeDestroyer failed to load information for this match. <b>Try again later.</b></div>');
-                        }
-                    }
-                };
-
-                xmlhttp.open('GET', 'https://api.ncla.me/match/' + matchID[0], true);
-                xmlhttp.send();
-
-                //$.ajax({
-                //    url: 'https://api.ncla.me/match/' + matchID[0],
-                //    dataType: 'html',
-                //    success: function(data) {
-                //        //$wrapper.html(safeResponse.cleanDomString(data));
-                //    },
-                //    error: function() {
-                //        //$wrapper.html('<div class="ld-match-info-error"><span class="ld-btn-icon"></span> LoungeDestroyer failed to load information for this match. <b>Try again later.</b></div>');
-                //    }
-                //});
-            }
+            // if (matchID !== null && appID === '730' && window.location.pathname.indexOf('/predict') === -1 && LoungeUser.userSettings.matchInformation === '1') {
+            //     var $wrapper = $('<div class="box-shiny-alt ld-match-info"></div>');
+            //     $('section.box:eq(1) .tabholder').before($wrapper);
+            //
+            //     $wrapper.html('<div class="ld-loading-spinner spin-1"></div>');
+            //
+            //     // The reason why we are doing this through XMLHttpRequest is because FF has some weird bug where $.ajax gives CORS warning,
+            //     // while XMLHttpRequest does not. https://bugzilla.mozilla.org/show_bug.cgi?id=1205886
+            //     var xmlhttp = new XMLHttpRequest();
+            //
+            //     xmlhttp.onreadystatechange = function () {
+            //         if (xmlhttp.readyState == XMLHttpRequest.DONE) {
+            //             if (xmlhttp.status == 200) {
+            //                 $wrapper.html(DOMPurify.sanitize(xmlhttp.responseText));
+            //             } else {
+            //                 $wrapper.html('<div class="ld-match-info-error"><span class="ld-btn-icon"></span> LoungeDestroyer failed to load information for this match. <b>Try again later.</b></div>');
+            //             }
+            //         }
+            //     };
+            //
+            //     xmlhttp.open('GET', 'https://api.ncla.me/match/' + matchID[0], true);
+            //     xmlhttp.send();
+            //
+            //     //$.ajax({
+            //     //    url: 'https://api.ncla.me/match/' + matchID[0],
+            //     //    dataType: 'html',
+            //     //    success: function(data) {
+            //     //        //$wrapper.html(safeResponse.cleanDomString(data));
+            //     //    },
+            //     //    error: function() {
+            //     //        //$wrapper.html('<div class="ld-match-info-error"><span class="ld-btn-icon"></span> LoungeDestroyer failed to load information for this match. <b>Try again later.</b></div>');
+            //     //    }
+            //     //});
+            // }
 
         }
 

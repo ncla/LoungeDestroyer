@@ -965,14 +965,6 @@ if (chrome.runtime.onInstalled === undefined) {
     });
 }
 
-chrome.runtime.setUninstallURL('http://goo.gl/forms/FFT1sTZpKJ', function() {
-    if (chrome.runtime.lastError) {
-        console.error(chrome.runtime.lastError);
-    }
-
-    console.log('Uninstall URL set');
-});
-
 chrome.browserAction.onClicked.addListener(function(tab) {
     openSettingsTab();
 });

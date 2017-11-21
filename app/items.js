@@ -15,7 +15,11 @@ var appIDcontextIDs = {
     295110: 1, // H1Z1:JS
     433850: 1, // H1Z1:KOTK
     218620: 2, // Payday 2
-    753: 6
+    753: 6,
+    578080: 2,
+    304930: 2,
+    252490: 2,
+    232090: 2
 };
 
 var Item = function(item) {
