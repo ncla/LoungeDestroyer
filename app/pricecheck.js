@@ -51,19 +51,12 @@ chrome.storage.local.get(['currencyConversionRates', 'ajaxCache', 'userSettings'
                 var itemObj = new Item();
                 itemObj.itemName = getItemName();
                 if (itemObj.itemName !== false) {
-                    if (appID === 730) {
-                        $('#largeiteminfo_item_actions').show().append('<span class="btn_small btn_grey_white_innerfade" id="csglpricecheck">' +
-                            '<span>Check CSGOLounge.com item betting value</span>' +
-                            '</span>');
-                    }
-
                     if(LoungeUser.userSettings.opskins === '1' && appID !== undefined && appIDcontextIDs.hasOwnProperty(appID)) {
                         var item = new Item();
                         item.itemName = itemObj.itemName;
 
                         $('#largeiteminfo_item_actions').show().append('<a href="' + itemObj.generateOPSkinsURL(appID, getContextId()) + '" class="btn_small btn_grey_white_innerfade" id="buyOnOpskins" target="_blank">' +
-                            '<span>Buy on OPSKINS.com <small title="This affiliate link is added by LoungeDestroyer and ' +
-                            'supports the developers, you can remove this affiliate link in the settings if you wish."> (?)</small></span></a>');
+                            '<span>Buy on OPSKINS.com</span></a>');
                     }
                 }
 

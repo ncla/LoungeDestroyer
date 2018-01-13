@@ -561,9 +561,9 @@ Item.prototype.generateOPSkinsURL = function(appID, contextId) {
     }
 
     var appIDUrl = (appID !== undefined && contextId !== undefined && appIDcontextIDs.hasOwnProperty(appID)
-        ? ('&app=' + appID + '_' + appIDcontextIDs[appID]) : '');
+        ? ('&aff_sub2=' + appID + '_' + appIDcontextIDs[appID]) : '');
 
-    return 'https://opskins.com/?loc=shop_search&ref=destroyer&aid=91' + appIDUrl + '&search_item=' + encodeURIComponent(this.itemName) + '&sort=lh';
+    return 'http://ref.opskins.com/aff_ad?campaign_id=261&aff_id=1413' + appIDUrl + '&aff_sub=' + encodeURIComponent(this.itemName);
 };
 
 Item.prototype.generateBitskinsURL = function() {
