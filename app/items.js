@@ -561,9 +561,9 @@ Item.prototype.generateOPSkinsURL = function(appID, contextId) {
     }
 
     var appIDUrl = (appID !== undefined && contextId !== undefined && appIDcontextIDs.hasOwnProperty(appID)
-        ? ('&aff_sub2=' + appID + '_' + appIDcontextIDs[appID]) : '');
+        ? ('?aff_sub2=' + appID + '_' + appIDcontextIDs[appID]) : '');
 
-    return 'http://ref.opskins.com/aff_ad?campaign_id=261&aff_id=1413' + appIDUrl + '&aff_sub=' + encodeURIComponent(this.itemName);
+    return 'https://ref.opskins.win/SHCJ' + appIDUrl + '&aff_sub=' + encodeURIComponent(this.itemName);
 };
 
 Item.prototype.generateBitskinsURL = function() {
